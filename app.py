@@ -30,7 +30,7 @@ with st.sidebar:
 
 if arquivo_upload:
     xls = pd.ExcelFile(arquivo_upload)
-    st.success("📤 Usando arquivo enviado pelo usuário")
+    st.success("📤 Arquivo enviado pelo usuário")
 elif os.path.exists(ARQUIVO_PADRAO):
     xls = pd.ExcelFile(ARQUIVO_PADRAO)
     st.info("📊 Arquivo padrão")
