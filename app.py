@@ -43,29 +43,42 @@ else:
 # CACHE — LEITURA
 # =========================================
 @st.cache_data
-def carregar_dados_bytes(file_bytes):
+def carregar_dados(file_bytes):
     xls = pd.ExcelFile(file_bytes)
     df_mgf = pd.read_excel(xls, "Poisson_Media_Gols")
     df_exg = pd.read_excel(xls, "Poisson_Ataque_Defesa")
     return df_mgf, df_exg
 
-df_mgf, df_exg = carregar_dados_bytes(file_bytes)
+df_mgf, df_exg = carregar_dados(file_bytes)
 
 for df in (df_mgf, df_exg):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
 
 # =========================================
-# CACHE — RADAR (SOMENTE EV CASA)
+# CACHE — RADAR (EV 1X2)
 # =========================================
 @st.cache_data
 def montar_radar(df_exg):
     df = df_exg.copy()
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
 
+    # EV CASA
     if {"Odds_Casa", "Odd_Justa_Home"}.issubset(df.columns):
         df["EV_CASA"] = (df["Odds_Casa"] / df["Odd_Justa_Home"]) - 1
     else:
         df["EV_CASA"] = np.nan
+
+    # EV EMPATE
+    if {"Odds_Empate", "Odd_Justa_Draw"}.issubset(df.columns):
+        df["EV_EMPATE"] = (df["Odds_Empate"] / df["Odd_Justa_Draw"]) - 1
+    else:
+        df["EV_EMPATE"] = np.nan
+
+    # EV VISITANTE
+    if {"Odds_Visitante", "Odd_Justa_Away"}.issubset(df.columns):
+        df["EV_VISITANTE"] = (df["Odds_Visitante"] / df["Odd_Justa_Away"]) - 1
+    else:
+        df["EV_VISITANTE"] = np.nan
 
     return df
 
@@ -79,6 +92,14 @@ def calc_ev(odd_real, odd_justa):
         return (odd_real / odd_justa) - 1
     except:
         return None
+
+def sinal(ev):
+    if ev > 0.05:
+        return "🟢 Value"
+    elif ev > 0:
+        return "🟡 Leve"
+    else:
+        return "🔴 Negativo"
 
 def calcular_matriz_poisson(lh, la, max_gols=4):
     matriz = np.zeros((max_gols + 1, max_gols + 1))
@@ -102,14 +123,6 @@ def top_placares(matriz, n=6):
     m.columns = ["Gols_Home", "Gols_Away", "Probabilidade%"]
     return m.sort_values("Probabilidade%", ascending=False).head(n)
 
-def sinal(ev):
-    if ev > 0.05:
-        return "🟢 Value"
-    elif ev > 0:
-        return "🟡 Leve"
-    else:
-        return "🔴 Negativo"
-
 # =========================================
 # ABAS
 # =========================================
@@ -122,25 +135,29 @@ tab0, tab1, tab2, tab3, tab4 = st.tabs([
 ])
 
 # =========================================
-# ABA 0 — VISÃO GERAL
+# ABA 0 — VISÃO GERAL (1X2)
 # =========================================
 with tab0:
-    st.subheader("📈 Radar de Oportunidades — EV Casa")
+    st.subheader("📈 Radar de Oportunidades — 1X2")
 
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Jogos", len(df_radar))
-    c2.metric("EV +", (df_radar["EV_CASA"] > 0).sum())
-    c3.metric("Melhor EV", f"{df_radar['EV_CASA'].max()*100:.2f}%")
+    mercado = st.selectbox("🎯 Mercado", ["Casa", "Empate", "Visitante"])
+
+    if mercado == "Casa":
+        ev_col, odd_col, justa_col = "EV_CASA", "Odds_Casa", "Odd_Justa_Home"
+    elif mercado == "Empate":
+        ev_col, odd_col, justa_col = "EV_EMPATE", "Odds_Empate", "Odd_Justa_Draw"
+    else:
+        ev_col, odd_col, justa_col = "EV_VISITANTE", "Odds_Visitante", "Odd_Justa_Away"
 
     min_ev = st.slider("EV mínimo (%)", -20.0, 50.0, 0.0) / 100
     top_n = st.selectbox("Ranking", [5, 10, 15, 20])
 
-    df_f = df_radar[df_radar["EV_CASA"] >= min_ev].copy()
-    df_f["SINAL"] = df_f["EV_CASA"].apply(sinal)
-    df_f["EV_%"] = df_f["EV_CASA"].map(lambda x: f"{x*100:.2f}%")
+    df_f = df_radar[df_radar[ev_col] >= min_ev].copy()
+    df_f["SINAL"] = df_f[ev_col].apply(sinal)
+    df_f["EV_%"] = df_f[ev_col].map(lambda x: f"{x*100:.2f}%")
 
-    ranking = df_f.sort_values("EV_CASA", ascending=False).head(top_n)[
-        ["JOGO", "Odds_Casa", "Odd_Justa_Home", "EV_%", "SINAL"]
+    ranking = df_f.sort_values(ev_col, ascending=False).head(top_n)[
+        ["JOGO", odd_col, justa_col, "EV_%", "SINAL"]
     ]
 
     st.dataframe(ranking, use_container_width=True)
@@ -150,8 +167,8 @@ with tab0:
         st.session_state["jogo_selecionado"] = jogo_detalhe
         st.experimental_rerun()
 
-    st.markdown("### 🔥 Heatmap — EV Casa")
-    heat = df_f.set_index("JOGO")[["EV_CASA"]]
+    st.markdown("### 🔥 Heatmap de EV")
+    heat = df_f.set_index("JOGO")[[ev_col]]
 
     fig, ax = plt.subplots(figsize=(6, max(4, len(heat) * 0.25)))
     sns.heatmap(heat, annot=True, fmt=".2f", cmap="RdYlGn", ax=ax)
@@ -174,10 +191,22 @@ with tab1:
 
     st.subheader(jogo)
 
-    ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
-    st.metric("Odds Casa", linha_exg["Odds_Casa"])
-    st.metric("Odd Justa Casa", linha_exg["Odd_Justa_Home"])
-    st.metric("EV Casa", f"{ev*100:.2f}%" if ev is not None else "—")
+    c1, c2, c3 = st.columns(3)
+
+    with c1:
+        ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
+        st.metric("Casa", linha_exg["Odds_Casa"])
+        st.metric("EV", f"{ev*100:.2f}%" if ev is not None else "—")
+
+    with c2:
+        ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
+        st.metric("Empate", linha_exg["Odds_Empate"])
+        st.metric("EV", f"{ev*100:.2f}%" if ev is not None else "—")
+
+    with c3:
+        ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
+        st.metric("Visitante", linha_exg["Odds_Visitante"])
+        st.metric("EV", f"{ev*100:.2f}%" if ev is not None else "—")
 
 # =========================================
 # ABA 2 — DADOS
