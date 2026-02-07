@@ -1,4 +1,13 @@
 import streamlit as st
+import pandas as pd
 
-st.title("🚀 PackBall V18 carregado")
-st.write("Se você está vendo isso, o Streamlit está OK")
+arquivo = st.file_uploader(
+    "📂 Envie o arquivo Excel",
+    type=["xlsx"]
+)
+
+if arquivo is None:
+    st.warning("Envie o arquivo para iniciar a análise")
+    st.stop()
+
+df = pd.read_excel(arquivo)
