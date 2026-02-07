@@ -203,31 +203,30 @@ with tab1:
 
     with e1:
         st.metric("Placar Provável", get_val(linha_exg, "Placar_Mais_Provavel"))
-        st.metric("Posse Home", get_val(linha_exg, "Posse_Bola_Home", "{:.2f}"))
-        st.metric("Posse Away", get_val(linha_exg, "Posse_Bola_Away", "{:.2f}"))
-
+        st.metric("Posse Home (%)", get_val(linha_exg, "Posse_Bola_Home", "{:.2f}"))
+        st.metric("Posse Away (%)", get_val(linha_exg, "Posse_Bola_Away", "{:.2f}"))
 
     with e2:
         st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
         st.metric("Clean Games Home (%)", get_val(linha_exg, "Clean_Games_H"))
-        st.metric("Precisão Chutes H", get_val(linha_exg, "Precisao_CG_H", "{:.2f}"))
+        st.metric("Precisão Chutes H (%)", get_val(linha_exg, "Precisao_CG_H", "{:.2f}"))
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
 
     with e3:
         st.metric("Clean Sheet Away (%)", get_val(linha_exg, "Clean_Sheet_Away_%", "{:.2f}"))
         st.metric("Clean Games Away (%)", get_val(linha_exg, "Clean_Games_A"))
-        st.metric("Precisão Chutes A", get_val(linha_exg, "Precisao_CG_A", "{:.2f}"))
+        st.metric("Precisão Chutes A (%)", get_val(linha_exg, "Precisao_CG_A", "{:.2f}"))
         st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
 
     with e4:
-        st.metric("Força Ataque Home", get_val(linha_exg, "FAH", "{:.2f}"))
-        st.metric("Força Defesa Home", get_val(linha_exg, "FDH", "{:.2f}"))
+        st.metric("Força Ataque Home (%)", get_val(linha_exg, "FAH", "{:.2f}"))
+        st.metric("Força Defesa Home (%)", get_val(linha_exg, "FDH", "{:.2f}"))
         st.metric("Chutes H (Marcar)", get_val(linha_mgf, "CHM", "{:.2f}"))
         st.metric("Chutes H (Sofrer)", get_val(linha_mgf, "CHS", "{:.2f}"))
 
     with e5:
-        st.metric("Força Ataque Away", get_val(linha_exg, "FAA", "{:.2f}"))
-        st.metric("Força Defesa Away", get_val(linha_exg, "FDA", "{:.2f}"))
+        st.metric("Força Ataque Away (%)", get_val(linha_exg, "FAA", "{:.2f}"))
+        st.metric("Força Defesa Away (%)", get_val(linha_exg, "FDA", "{:.2f}"))
         st.metric("Chutes A (Marcar)", get_val(linha_mgf, "CAM", "{:.2f}"))
         st.metric("Chutes A (Sofrer)", get_val(linha_mgf, "CAS", "{:.2f}"))
 
