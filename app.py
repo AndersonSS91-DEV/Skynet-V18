@@ -40,7 +40,7 @@ if arquivo_upload:
 
 elif os.path.exists(ARQUIVO_PADRAO):
     xls = pd.ExcelFile(ARQUIVO_PADRAO)
-    st.info("📊 Utilizado arquivo padrão")
+    st.info("📊 Utilizando arquivo padrão")
 
 else:
     st.error("❌ Nenhum arquivo disponível (nem upload nem padrão)")
