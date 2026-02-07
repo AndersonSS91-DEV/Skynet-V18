@@ -33,7 +33,7 @@ if arquivo_upload:
     st.success("📤 Usando arquivo enviado pelo usuário")
 elif os.path.exists(ARQUIVO_PADRAO):
     xls = pd.ExcelFile(ARQUIVO_PADRAO)
-    st.info("📊 Usando arquivo padrão do repositório")
+    st.info("📊 Arquivo padrão")
 else:
     st.error("❌ Nenhum arquivo disponível (nem upload nem padrão)")
     st.stop()
