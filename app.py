@@ -11,3 +11,7 @@ if arquivo is None:
     st.stop()
 
 df = pd.read_excel(arquivo)
+
+st.success("Arquivo carregado com sucesso")
+st.write(df.head())
+st.write(df.shape)
