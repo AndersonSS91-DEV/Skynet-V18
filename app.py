@@ -28,26 +28,31 @@ with st.sidebar:
         type=["xlsx"]
     )
 
+# =========================================
+# LEITURA DO ARQUIVO (BYTES)
+# =========================================
 if arquivo_upload:
-    xls = pd.ExcelFile(arquivo_upload)
+    file_bytes = arquivo_upload.getvalue()
     st.success("📤 Arquivo enviado pelo usuário")
 elif os.path.exists(ARQUIVO_PADRAO):
-    xls = pd.ExcelFile(ARQUIVO_PADRAO)
+    with open(ARQUIVO_PADRAO, "rb") as f:
+        file_bytes = f.read()
     st.info("📊 Arquivo padrão do dia")
 else:
     st.error("❌ Nenhum arquivo disponível")
     st.stop()
 
 # =========================================
-# CACHE — LEITURA
+# CACHE — LEITURA (CORRIGIDO)
 # =========================================
 @st.cache_data
-def carregar_dados(xls):
+def carregar_dados_bytes(file_bytes):
+    xls = pd.ExcelFile(file_bytes)
     df_mgf = pd.read_excel(xls, "Poisson_Media_Gols")
     df_exg = pd.read_excel(xls, "Poisson_Ataque_Defesa")
     return df_mgf, df_exg
 
-df_mgf, df_exg = carregar_dados(xls)
+df_mgf, df_exg = carregar_dados_bytes(file_bytes)
 
 for df in (df_mgf, df_exg):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
@@ -154,11 +159,11 @@ tab0, tab1, tab2, tab3, tab4 = st.tabs([
 with tab0:
     st.subheader("📈 Radar de Oportunidades do Dia")
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Jogos", len(df_radar))
-    col2.metric("EV Casa +", (df_radar["EV_HOME"] > 0).sum())
-    col3.metric("EV Over +", (df_radar["EV_OVER25"] > 0).sum())
-    col4.metric("EV BTTS +", (df_radar["EV_BTTS"] > 0).sum())
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Jogos", len(df_radar))
+    c2.metric("EV Casa +", (df_radar["EV_HOME"] > 0).sum())
+    c3.metric("EV Over +", (df_radar["EV_OVER25"] > 0).sum())
+    c4.metric("EV BTTS +", (df_radar["EV_BTTS"] > 0).sum())
 
     st.markdown("---")
 
@@ -248,9 +253,9 @@ with tab1:
 # ABA 2 — DADOS
 # =========================================
 with tab2:
-    for aba in xls.sheet_names:
+    for aba in ["Poisson_Media_Gols", "Poisson_Ataque_Defesa"]:
         with st.expander(aba):
-            st.dataframe(pd.read_excel(xls, aba), use_container_width=True)
+            st.dataframe(pd.read_excel(pd.ExcelFile(file_bytes), aba), use_container_width=True)
 
 # =========================================
 # ABA 3 — POISSON MGF
