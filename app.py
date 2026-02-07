@@ -15,8 +15,11 @@ import seaborn as sns
 # =========================================
 st.set_page_config(
     page_title="⚽🏆Poisson Skynet🏆⚽",
-    layout="wide"
-)
+    layout="wide")
+st.image(
+    "assets/banner.png",
+    use_container_width=True)
+
 st.title("⚽🏆Poisson Skynet🏆⚽")
 
 # =========================================
