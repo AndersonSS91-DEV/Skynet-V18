@@ -1,3 +1,4 @@
+import streamlit as st
 
-# COLE AQUI TODO O CÓDIGO STREAMLIT DA V18
-# (o mesmo que está acima, SEM essa linha do !streamlit run)
+st.title("🚀 PackBall V18 carregado")
+st.write("Se você está vendo isso, o Streamlit está OK")
