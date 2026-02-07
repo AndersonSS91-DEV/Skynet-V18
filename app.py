@@ -13,8 +13,8 @@ import seaborn as sns
 # =========================================
 # CONFIG
 # =========================================
-st.set_page_config(page_title="⚽Poisson Skynet⚽", layout="wide")
-st.title("⚽Poisson Skynet⚽")
+st.set_page_config(page_title="⚽🏆Poisson Skynet🏆⚽", layout="wide")
+st.title("⚽🏆Poisson Skynet🏆⚽")
 
 # =========================================
 # HÍBRIDO — ARQUIVO PADRÃO + UPLOAD OPCIONAL
@@ -122,10 +122,10 @@ def top_placares(matriz, n=6):
 # ABAS
 # =========================================
 tab1, tab2, tab3, tab4 = st.tabs([
-    "📊 Resumo",
-    "📁 Dados Completos",
-    "🔢 Poisson — Média de Gols",
-    "⚔️ Poisson — Ataque x Defesa"
+    "📊🎯 Resumo",
+    "📁🏆🎖️ Dados Completos",
+    "🔢⚽ Poisson — Média de Gols",
+    "⚔️⚽ Poisson — Ataque x Defesa"
 ])
 
 # =========================================
@@ -165,7 +165,7 @@ with tab1:
     st.markdown("---")
 
     # -------- LINHA 2 — MGF
-    st.markdown("### 📊 Média de Gols (MGF)")
+    st.markdown("### 📊⚽ Média de Gols (MGF)")
     c1, c2, c3, c4, c5 = st.columns(5)
 
     with c1:
@@ -198,7 +198,7 @@ with tab1:
     st.markdown("---")
 
     # -------- LINHA 3 — ATK x DEF (EXG)
-    st.markdown("### ⚔️ Ataque x Defesa")
+    st.markdown("### ⚔️⚽ Ataque x Defesa")
     e1, e2, e3, e4, e5 = st.columns(5)
 
     with e1:
