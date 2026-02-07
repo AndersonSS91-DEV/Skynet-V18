@@ -13,8 +13,8 @@ import seaborn as sns
 # =========================================
 # CONFIG
 # =========================================
-st.set_page_config(page_title="Poisson Skynet ⚽", layout="wide")
-st.title("⚽ Poisson Engine — Jogo a Jogo")
+st.set_page_config(page_title="⚽Poisson Skynet⚽", layout="wide")
+st.title("⚽Poisson Skynet⚽")
 
 # =========================================
 # UPLOAD
