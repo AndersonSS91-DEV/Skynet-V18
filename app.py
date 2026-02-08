@@ -226,9 +226,7 @@ card = f"""
 
 </div>
 """
-
-
-            st.markdown(card, unsafe_allow_html=True)
+st.markdown(card, unsafe_allow_html=True)
 
 
     st.subheader(jogo)
