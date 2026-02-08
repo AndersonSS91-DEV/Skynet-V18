@@ -222,7 +222,7 @@ with tab1:
 
             st.markdown(card, unsafe_allow_html=True)
 
-with tab1:
+
     st.subheader(jogo)
 
     # -------- ODDS + EV
