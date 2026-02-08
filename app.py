@@ -208,27 +208,49 @@ with tab1:
             cor = cor_card(row["Interpretacao"])
 
             card = f"""
-            <div style="
-                background:{cor};
-                padding:14px 18px;
-                border-radius:14px;
-                box-shadow:0 0 10px rgba(0,0,0,0.5);
-                color:white;
-                margin-bottom:18px;
-            ">
-                <div style="font-size:13px; opacity:0.85; margin-bottom:6px;">
-                    Interpretação
-                </div>
+<div style="
+    background:{cor};
+    padding:18px;
+    border-radius:14px;
+    box-shadow:0 0 12px rgba(0,0,0,0.55);
+    margin-bottom:18px;
+    color:white;
+">
 
-                <div style="font-size:15px; font-weight:600; margin-bottom:8px;">
-                    🧠 {row['Interpretacao']}
-                </div>
+    <div style="
+        font-size:12px;
+        opacity:0.7;
+        margin-bottom:4px;
+    ">
+        Interpretação
+    </div>
 
-                <div style="font-size:12px; opacity:0.75;">
-                    Score: {row['Score']:.2f}
-                </div>
-            </div>
-            """
+    <div style="
+        font-size:17px;
+        font-weight:700;
+        margin-bottom:14px;
+    ">
+        {row['Interpretacao']}
+    </div>
+
+    <div style="
+        font-size:12px;
+        opacity:0.7;
+        margin-bottom:4px;
+    ">
+        Score
+    </div>
+
+    <div style="
+        font-size:18px;
+        font-weight:700;
+    ">
+        {row['Score']:.2f}
+    </div>
+
+</div>
+"""
+
 
             st.markdown(card, unsafe_allow_html=True)
 
