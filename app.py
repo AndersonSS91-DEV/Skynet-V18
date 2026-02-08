@@ -180,10 +180,13 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
+with tab1:
+
     # =====================================================
     # 🧠 SCANNER IA — CARDS (NOVO)
     # =====================================================
     st.markdown("## 🧠 Scanner Inteligente — Visão Geral do Dia")
+
 
     df_cards = df_exg.copy()
 
@@ -240,7 +243,11 @@ tab1, tab2, tab3, tab4 = st.tabs([
 
     st.markdown("---")
 
-with tab1:
+# =========================================
+# ABA 2 — DADOS
+# =========================================
+
+with tab2:
     st.subheader(jogo)
 
     # -------- ODDS + EV
@@ -339,9 +346,9 @@ with tab1:
 
 
 # =========================================
-# ABA 2 — DADOS COMPLETOS
+# ABA 3 — DADOS COMPLETOS
 # =========================================
-with tab2:
+with tab3:
     for aba in xls.sheet_names:
         with st.expander(aba):
             st.dataframe(
@@ -350,9 +357,9 @@ with tab2:
             )
 
 # =========================================
-# ABA 3 — POISSON MGF
+# ABA 4 — POISSON MGF
 # =========================================
-with tab3:
+with tab4:
     matriz = calcular_matriz_poisson(
         linha_mgf["ExG_Home_MGF"],
         linha_mgf["ExG_Away_MGF"]
@@ -366,9 +373,9 @@ with tab3:
     st.dataframe(top_placares(matriz), use_container_width=True)
 
 # =========================================
-# ABA 4 — POISSON ATK x DEF
+# ABA 5 — POISSON ATK x DEF
 # =========================================
-with tab4:
+with tab5:
     matriz = calcular_matriz_poisson(
         linha_exg["ExG_Home_ATKxDEF"],
         linha_exg["ExG_Away_ATKxDEF"]
