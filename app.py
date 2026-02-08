@@ -187,63 +187,46 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # =========================================
 with tab1:
     # =====================================================
-    # 🧠 SCANNER IA — CARDS (NOVO)
-    # =====================================================
-    st.markdown("## 🧠 Scanner Inteligente — Visão Geral do Dia")
+# =====================================================
+# 🧠 SCANNER IA — CARD ÚNICO DO JOGO SELECIONADO
+# =====================================================
+st.markdown("## 🧠 Scanner Inteligente — Visão do Jogo")
 
-    df_cards = df_exg.copy()
+df_cards = df_exg.copy()
 
-    if "Interpretacao" not in df_cards.columns:
-        st.warning("Coluna 'Interpretacao' não encontrada no Excel.")
-    else:
-df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
-df_cards = df_cards.sort_values("Score", ascending=False)
+if "Interpretacao" not in df_cards.columns:
+    st.warning("Coluna 'Interpretacao' não encontrada no Excel.")
+else:
 
-# 🔥 MOSTRAR SÓ O JOGO SELECIONADO
-if "jogo" in st.session_state:
-    df_cards = df_cards[df_cards["JOGO"] == st.session_state["jogo"]]
+    # 🔥 TUDO AQUI DENTRO FICA INDENTADO
+    df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
 
-        # 🔹 filtro somente por tipo (mais limpo)
-        tipos = st.multiselect(
-            "🎯 Filtrar interpretação",
-            options=sorted(df_cards["Interpretacao"].unique())
-        )
+    # 🔥 MOSTRAR SOMENTE O JOGO ESCOLHIDO
+    df_cards = df_cards[df_cards["JOGO"] == jogo]
 
-        if tipos:
-            df_cards = df_cards[df_cards["Interpretacao"].isin(tipos)]
+    if not df_cards.empty:
 
-        cols = st.columns(3)
+        row = df_cards.iloc[0]
+        cor = cor_card(row["Interpretacao"])
 
-        for i, row in df_cards.iterrows():
+        card = f"""
+        <div style="
+            background:{cor};
+            padding:22px;
+            border-radius:18px;
+            box-shadow:0 0 14px rgba(0,0,0,0.6);
+            color:white;
+            text-align:center;
+            font-size:18px;
+        ">
+            <h3 style='margin-bottom:6px'>{row['Home_Team']} x {row['Visitor_Team']}</h3>
+            <b>🧠 {row['Interpretacao']}</b><br><br>
+            ⭐ Score: {row['Score']:.2f}
+        </div>
+        """
 
-            cor = cor_card(row["Interpretacao"])
+        st.markdown(card, unsafe_allow_html=True)
 
-            with cols[i % 3]:
-
-                if st.button(
-                    f"{row['Home_Team']} x {row['Visitor_Team']}",
-                    key=f"card_{i}",
-                    use_container_width=True
-                ):
-                    st.session_state["jogo"] = row["JOGO"]
-
-                st.markdown(f"""
-                <div style="
-                    background:{cor};
-                    padding:12px;
-                    border-radius:14px;
-                    margin-top:6px;
-                    margin-bottom:12px;
-                    box-shadow:0 0 10px rgba(0,0,0,0.35);
-                    color:white;
-                    font-size:13px;
-                ">
-                    🧠 {row['Interpretacao']}<br>
-                    ⭐ Score: {row['Score']:.2f}
-                </div>
-                """, unsafe_allow_html=True)
-
-    st.markdown("---")
 
 
 with tab1:
