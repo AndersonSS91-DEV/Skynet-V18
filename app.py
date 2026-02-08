@@ -188,46 +188,39 @@ tab1, tab2, tab3, tab4 = st.tabs([
 with tab1:
     # =====================================================
 # =====================================================
-# 🧠 SCANNER IA — CARD ÚNICO DO JOGO SELECIONADO
-# =====================================================
-st.markdown("## 🧠 Scanner Inteligente — Visão do Jogo")
+with tab1:
 
-df_cards = df_exg.copy()
+    st.markdown("## 🧠 Scanner Inteligente — Visão do Jogo")
 
-if "Interpretacao" not in df_cards.columns:
-    st.warning("Coluna 'Interpretacao' não encontrada no Excel.")
-else:
+    df_cards = df_exg.copy()
 
-    # 🔥 TUDO AQUI DENTRO FICA INDENTADO
-    df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
+    if "Interpretacao" not in df_cards.columns:
+        st.warning("Coluna 'Interpretacao' não encontrada no Excel.")
+    else:
+        df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
+        df_cards = df_cards[df_cards["JOGO"] == jogo]
 
-    # 🔥 MOSTRAR SOMENTE O JOGO ESCOLHIDO
-    df_cards = df_cards[df_cards["JOGO"] == jogo]
+        if not df_cards.empty:
+            row = df_cards.iloc[0]
+            cor = cor_card(row["Interpretacao"])
 
-    if not df_cards.empty:
+            card = f"""
+            <div style="
+                background:{cor};
+                padding:22px;
+                border-radius:18px;
+                box-shadow:0 0 14px rgba(0,0,0,0.6);
+                color:white;
+                text-align:center;
+                font-size:18px;
+            ">
+                <h3>{row['Home_Team']} x {row['Visitor_Team']}</h3>
+                🧠 {row['Interpretacao']}<br>
+                ⭐ Score: {row['Score']:.2f}
+            </div>
+            """
 
-        row = df_cards.iloc[0]
-        cor = cor_card(row["Interpretacao"])
-
-        card = f"""
-        <div style="
-            background:{cor};
-            padding:22px;
-            border-radius:18px;
-            box-shadow:0 0 14px rgba(0,0,0,0.6);
-            color:white;
-            text-align:center;
-            font-size:18px;
-        ">
-            <h3 style='margin-bottom:6px'>{row['Home_Team']} x {row['Visitor_Team']}</h3>
-            <b>🧠 {row['Interpretacao']}</b><br><br>
-            ⭐ Score: {row['Score']:.2f}
-        </div>
-        """
-
-        st.markdown(card, unsafe_allow_html=True)
-
-
+            st.markdown(card, unsafe_allow_html=True)
 
 with tab1:
     st.subheader(jogo)
