@@ -58,10 +58,15 @@ for df in (df_mgf, df_exg):
 # =========================================
 # SELEÇÃO DE JOGO
 # =========================================
+if "jogo" not in st.session_state:
+    st.session_state["jogo"] = df_mgf["JOGO"].iloc[0]
+
 jogo = st.selectbox(
     "⚽ Escolha o jogo",
-    df_mgf["JOGO"].unique()
+    df_mgf["JOGO"].unique(),
+    index=list(df_mgf["JOGO"]).index(st.session_state["jogo"])
 )
+
 
 linha_mgf = df_mgf[df_mgf["JOGO"] == jogo].iloc[0]
 linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
@@ -181,12 +186,10 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
-
     # =====================================================
     # 🧠 SCANNER IA — CARDS (NOVO)
     # =====================================================
     st.markdown("## 🧠 Scanner Inteligente — Visão Geral do Dia")
-
 
     df_cards = df_exg.copy()
 
@@ -197,51 +200,48 @@ with tab1:
         df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
         df_cards = df_cards.sort_values("Score", ascending=False)
 
-        # -------- FILTROS
-        colf1, colf2 = st.columns(2)
-
-        with colf1:
-            texto = st.text_input("🔎 Buscar time")
-
-        with colf2:
-            tipos = st.multiselect(
-                "🎯 Filtrar interpretação",
-                options=sorted(df_cards["Interpretacao"].unique())
-            )
-
-        if texto:
-            df_cards = df_cards[df_cards["JOGO"].str.contains(texto, case=False)]
+        # 🔹 filtro somente por tipo (mais limpo)
+        tipos = st.multiselect(
+            "🎯 Filtrar interpretação",
+            options=sorted(df_cards["Interpretacao"].unique())
+        )
 
         if tipos:
             df_cards = df_cards[df_cards["Interpretacao"].isin(tipos)]
 
-        # -------- CARDS GRID
         cols = st.columns(3)
 
         for i, row in df_cards.iterrows():
 
             cor = cor_card(row["Interpretacao"])
 
-            card = f"""
-            <div style="
-                background:{cor};
-                padding:14px;
-                border-radius:14px;
-                margin-bottom:12px;
-                box-shadow:0 0 10px rgba(0,0,0,0.4);
-                color:white;
-                min-height:120px;
-            ">
-                <b>{row['Home_Team']} x {row['Visitor_Team']}</b><br>
-                Odds: {row.get('Odds_Casa','-')} | {row.get('Odds_Empate','-')} | {row.get('Odds_Visitante','-')}<br><br>
-                🧠 {row['Interpretacao']}<br>
-                ⭐ Score: {row['Score']:.2f}
-            </div>
-            """
+            with cols[i % 3]:
 
-            cols[i % 3].markdown(card, unsafe_allow_html=True)
+                if st.button(
+                    f"{row['Home_Team']} x {row['Visitor_Team']}",
+                    key=f"card_{i}",
+                    use_container_width=True
+                ):
+                    st.session_state["jogo"] = row["JOGO"]
+
+                st.markdown(f"""
+                <div style="
+                    background:{cor};
+                    padding:12px;
+                    border-radius:14px;
+                    margin-top:6px;
+                    margin-bottom:12px;
+                    box-shadow:0 0 10px rgba(0,0,0,0.35);
+                    color:white;
+                    font-size:13px;
+                ">
+                    🧠 {row['Interpretacao']}<br>
+                    ⭐ Score: {row['Score']:.2f}
+                </div>
+                """, unsafe_allow_html=True)
 
     st.markdown("---")
+
 
 with tab1:
     st.subheader(jogo)
