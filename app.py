@@ -185,14 +185,8 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
-# =========================================
-# ABA 1 — RESUMO
-# =========================================
 with tab1:
 
-    # =====================================================
-    # 🧠 Scanner (mesmo tamanho dos outros títulos)
-    # =====================================================
     st.subheader("🧠 Scanner Inteligente — Visão do Jogo")
 
     df_cards = df_exg.copy()
@@ -220,10 +214,7 @@ with tab1:
     align-items:center;
     font-size:14px;
 ">
-
-    <div style="
-        font-weight:600;
-    ">
+    <div style="font-weight:600;">
         🧠 {row['Interpretacao']}
     </div>
 
@@ -238,15 +229,13 @@ with tab1:
     ">
         ⭐ {row['Score']:.2f}
     </div>
-
 </div>
 """
-st.markdown(card, unsafe_allow_html=True)
+            st.markdown(card, unsafe_allow_html=True)
 
-       # =====================================================
     # RESTO DO RESUMO
-    # =====================================================
     st.subheader(jogo)
+
 
     # -------- ODDS + EV
     st.markdown("### 🎯 Odds")
