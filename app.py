@@ -188,7 +188,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # =====================================================
 with tab1:
 
-    st.markdown("## 🧠 Scanner Inteligente — Visão do Jogo")
+    st.markdown("🧠 Scanner Inteligente — Visão do Jogo")
 
     df_cards = df_exg.copy()
 
@@ -202,21 +202,31 @@ with tab1:
             row = df_cards.iloc[0]
             cor = cor_card(row["Interpretacao"])
 
-            card = f"""
-            <div style="
-                background:{cor};
-                padding:22px;
-                border-radius:18px;
-                box-shadow:0 0 14px rgba(0,0,0,0.6);
-                color:white;
-                text-align:center;
-                font-size:18px;
-            ">
-                <h3>{row['Home_Team']} x {row['Visitor_Team']}</h3>
-                🧠 {row['Interpretacao']}<br>
-                ⭐ Score: {row['Score']:.2f}
-            </div>
-            """
+card = f"""
+<div style="
+    background:{cor};
+    padding:14px 18px;
+    border-radius:14px;
+    box-shadow:0 0 10px rgba(0,0,0,0.5);
+    color:white;
+    margin-bottom:18px;
+">
+
+    <div style="font-size:13px; opacity:0.85; margin-bottom:6px;">
+        Interpretação
+    </div>
+
+    <div style="font-size:15px; font-weight:600; margin-bottom:8px;">
+        🧠 {row['Interpretacao']}
+    </div>
+
+    <div style="font-size:12px; opacity:0.75;">
+        Score: {row['Score']:.2f}
+    </div>
+
+</div>
+"""
+
 
             st.markdown(card, unsafe_allow_html=True)
 
