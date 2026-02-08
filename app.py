@@ -210,46 +210,38 @@ with tab1:
             card = f"""
 <div style="
     background:{cor};
-    padding:18px;
-    border-radius:14px;
-    box-shadow:0 0 12px rgba(0,0,0,0.55);
-    margin-bottom:18px;
+    padding:10px 14px;
+    border-radius:10px;
+    box-shadow:0 0 8px rgba(0,0,0,0.45);
+    margin-bottom:14px;
     color:white;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:14px;
 ">
 
     <div style="
-        font-size:12px;
-        opacity:0.7;
-        margin-bottom:4px;
+        font-weight:600;
     ">
-        Interpretação
+        🧠 {row['Interpretacao']}
     </div>
 
     <div style="
-        font-size:17px;
+        background:rgba(0,0,0,0.35);
+        padding:4px 10px;
+        border-radius:8px;
+        font-size:13px;
         font-weight:700;
-        margin-bottom:14px;
+        min-width:55px;
+        text-align:center;
     ">
-        {row['Interpretacao']}
-    </div>
-
-    <div style="
-        font-size:12px;
-        opacity:0.7;
-        margin-bottom:4px;
-    ">
-        Score
-    </div>
-
-    <div style="
-        font-size:18px;
-        font-weight:700;
-    ">
-        {row['Score']:.2f}
+        ⭐ {row['Score']:.2f}
     </div>
 
 </div>
 """
+
 
 
             st.markdown(card, unsafe_allow_html=True)
