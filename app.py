@@ -1,7 +1,7 @@
 # =========================================
 # STREAMLIT — POISSON SKYNET (HÍBRIDO)
 # =========================================
-
+import re
 import os
 import streamlit as st
 import pandas as pd
@@ -140,6 +140,34 @@ def top_placares(matriz, n=6):
     return m
 
 # =========================================
+# 🎨 ESTILO CARDS (NOVO)
+# =========================================
+def cor_card(txt):
+    if not isinstance(txt, str):
+        return "#2b2b2b"
+
+    txt = txt.lower()
+
+    if "domínio" in txt:
+        return "#123524"   # verde
+    if "favorito" in txt:
+        return "#3a3a1a"   # amarelo
+    if "btts" in txt or "aberto" in txt or "caos" in txt:
+        return "#3a1414"   # vermelho
+
+    return "#2b2b2b"       # neutro
+
+
+def calcular_score(row):
+    try:
+        ph = 1/row["Odd_Justa_Home"]
+        pa = 1/row["Odd_Justa_Away"]
+        edge = ph - pa
+        return abs(edge)
+    except:
+        return 0
+
+# =========================================
 # ABAS
 # =========================================
 tab1, tab2, tab3, tab4 = st.tabs([
@@ -152,6 +180,66 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
+    # =====================================================
+    # 🧠 SCANNER IA — CARDS (NOVO)
+    # =====================================================
+    st.markdown("## 🧠 Scanner Inteligente — Visão Geral do Dia")
+
+    df_cards = df_exg.copy()
+
+    if "Interpretacao" not in df_cards.columns:
+        st.warning("Coluna 'Interpretacao' não encontrada no Excel.")
+    else:
+
+        df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
+        df_cards = df_cards.sort_values("Score", ascending=False)
+
+        # -------- FILTROS
+        colf1, colf2 = st.columns(2)
+
+        with colf1:
+            texto = st.text_input("🔎 Buscar time")
+
+        with colf2:
+            tipos = st.multiselect(
+                "🎯 Filtrar interpretação",
+                options=sorted(df_cards["Interpretacao"].unique())
+            )
+
+        if texto:
+            df_cards = df_cards[df_cards["JOGO"].str.contains(texto, case=False)]
+
+        if tipos:
+            df_cards = df_cards[df_cards["Interpretacao"].isin(tipos)]
+
+        # -------- CARDS GRID
+        cols = st.columns(3)
+
+        for i, row in df_cards.iterrows():
+
+            cor = cor_card(row["Interpretacao"])
+
+            card = f"""
+            <div style="
+                background:{cor};
+                padding:14px;
+                border-radius:14px;
+                margin-bottom:12px;
+                box-shadow:0 0 10px rgba(0,0,0,0.4);
+                color:white;
+                min-height:120px;
+            ">
+                <b>{row['Home_Team']} x {row['Visitor_Team']}</b><br>
+                Odds: {row.get('Odds_Casa','-')} | {row.get('Odds_Empate','-')} | {row.get('Odds_Visitante','-')}<br><br>
+                🧠 {row['Interpretacao']}<br>
+                ⭐ Score: {row['Score']:.2f}
+            </div>
+            """
+
+            cols[i % 3].markdown(card, unsafe_allow_html=True)
+
+    st.markdown("---")
+
 with tab1:
     st.subheader(jogo)
 
