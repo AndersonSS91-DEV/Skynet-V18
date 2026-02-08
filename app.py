@@ -185,50 +185,58 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
-# =====================================================
+# =========================================
+# ABA 1 — RESUMO
+# =========================================
 with tab1:
 
-    st.markdown("🧠 Scanner Inteligente — Visão do Jogo")
+    # =====================================================
+    # 🧠 Scanner (mesmo tamanho dos outros títulos)
+    # =====================================================
+    st.subheader("🧠 Scanner Inteligente — Visão do Jogo")
 
     df_cards = df_exg.copy()
 
-    if "Interpretacao" not in df_cards.columns:
-        st.warning("Coluna 'Interpretacao' não encontrada no Excel.")
-    else:
+    if "Interpretacao" in df_cards.columns:
+
         df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
         df_cards = df_cards[df_cards["JOGO"] == jogo]
 
         if not df_cards.empty:
+
             row = df_cards.iloc[0]
             cor = cor_card(row["Interpretacao"])
 
-card = f"""
-<div style="
-    background:{cor};
-    padding:14px 18px;
-    border-radius:14px;
-    box-shadow:0 0 10px rgba(0,0,0,0.5);
-    color:white;
-    margin-bottom:18px;
-">
+            card = f"""
+            <div style="
+                background:{cor};
+                padding:14px 18px;
+                border-radius:14px;
+                box-shadow:0 0 10px rgba(0,0,0,0.5);
+                color:white;
+                margin-bottom:18px;
+            ">
+                <div style="font-size:13px; opacity:0.85; margin-bottom:6px;">
+                    Interpretação
+                </div>
 
-    <div style="font-size:13px; opacity:0.85; margin-bottom:6px;">
-        Interpretação
-    </div>
+                <div style="font-size:15px; font-weight:600; margin-bottom:8px;">
+                    🧠 {row['Interpretacao']}
+                </div>
 
-    <div style="font-size:15px; font-weight:600; margin-bottom:8px;">
-        🧠 {row['Interpretacao']}
-    </div>
+                <div style="font-size:12px; opacity:0.75;">
+                    Score: {row['Score']:.2f}
+                </div>
+            </div>
+            """
 
-    <div style="font-size:12px; opacity:0.75;">
-        Score: {row['Score']:.2f}
-    </div>
+            st.markdown(card, unsafe_allow_html=True)
 
-</div>
-"""
-st.markdown(card, unsafe_allow_html=True)
+    st.markdown("---")
 
-
+    # =====================================================
+    # RESTO DO RESUMO
+    # =====================================================
     st.subheader(jogo)
 
     # -------- ODDS + EV
