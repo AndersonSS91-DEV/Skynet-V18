@@ -242,8 +242,6 @@ with tab1:
 </div>
 """
 
-
-
             st.markdown(card, unsafe_allow_html=True)
 
     st.markdown("---")
