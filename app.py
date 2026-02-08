@@ -243,11 +243,7 @@ with tab1:
 
     st.markdown("---")
 
-# =========================================
-# ABA 2 — DADOS
-# =========================================
-
-with tab2:
+with tab1:
     st.subheader(jogo)
 
     # -------- ODDS + EV
@@ -346,9 +342,9 @@ with tab2:
 
 
 # =========================================
-# ABA 3 — DADOS COMPLETOS
+# ABA 2 — DADOS COMPLETOS
 # =========================================
-with tab3:
+with tab2:
     for aba in xls.sheet_names:
         with st.expander(aba):
             st.dataframe(
@@ -357,9 +353,9 @@ with tab3:
             )
 
 # =========================================
-# ABA 4 — POISSON MGF
+# ABA 3 — POISSON MGF
 # =========================================
-with tab4:
+with tab3:
     matriz = calcular_matriz_poisson(
         linha_mgf["ExG_Home_MGF"],
         linha_mgf["ExG_Away_MGF"]
@@ -373,9 +369,9 @@ with tab4:
     st.dataframe(top_placares(matriz), use_container_width=True)
 
 # =========================================
-# ABA 5 — POISSON ATK x DEF
+# ABA 4 — POISSON ATK x DEF
 # =========================================
-with tab5:
+with tab4:
     matriz = calcular_matriz_poisson(
         linha_exg["ExG_Home_ATKxDEF"],
         linha_exg["ExG_Away_ATKxDEF"]
