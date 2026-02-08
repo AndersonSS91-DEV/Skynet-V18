@@ -204,33 +204,17 @@ with tab1:
             card = f"""
 <div style="
     background:{cor};
-    padding:10px 14px;
+    padding:12px 16px;
     border-radius:10px;
     box-shadow:0 0 8px rgba(0,0,0,0.45);
-    margin-bottom:14px;
     color:white;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
     font-size:14px;
+    font-weight:600;
 ">
-    <div style="font-weight:600;">
-        🧠 {row['Interpretacao']}
-    </div>
-
-    <div style="
-        background:rgba(0,0,0,0.35);
-        padding:4px 10px;
-        border-radius:8px;
-        font-size:13px;
-        font-weight:700;
-        min-width:55px;
-        text-align:center;
-    ">
-        ⭐ {row['Score']:.2f}
-    </div>
+    🧠 {row['Interpretacao']} &nbsp;&nbsp; ⭐ {row['Score']:.2f}
 </div>
 """
+
             st.markdown(card, unsafe_allow_html=True)
 
     # RESTO DO RESUMO
