@@ -196,14 +196,12 @@ with tab1:
     if "Interpretacao" not in df_cards.columns:
         st.warning("Coluna 'Interpretacao' não encontrada no Excel.")
     else:
-
 df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
 df_cards = df_cards.sort_values("Score", ascending=False)
 
 # 🔥 MOSTRAR SÓ O JOGO SELECIONADO
 if "jogo" in st.session_state:
     df_cards = df_cards[df_cards["JOGO"] == st.session_state["jogo"]]
-
 
         # 🔹 filtro somente por tipo (mais limpo)
         tipos = st.multiselect(
