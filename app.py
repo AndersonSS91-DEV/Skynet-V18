@@ -206,9 +206,9 @@ with tab1:
     background:{cor};
     padding:12px 16px;
     border-radius:10px;
-    box-shadow:0 0 8px rgba(0,0,0,0.45);
+    box-shadow:0 0 8px rgba(0,0,0,0.60);
     color:white;
-    font-size:14px;
+    font-size:20px;
     font-weight:600;
 ">
     🧠 {row['Interpretacao']} &nbsp;&nbsp; ⭐ {row['Score']:.2f}
