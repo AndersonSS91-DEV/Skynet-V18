@@ -255,19 +255,32 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # =========================================
 with tab1:
 
-    st.subheader("🧠 Scanner Inteligente — Visão do Jogo")
+# =====================================================
+# 🧠 Scanner Card — minimalista (SÓ ESTRELAS)
+# =====================================================
 
-    df_cards = df_exg.copy()
+st.markdown("🧠 Scanner Inteligente — Visão do Jogo")
 
-    if "Interpretacao" in df_cards.columns:
+df_cards = df_exg.copy()
 
-        df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
-        df_cards = df_cards[df_cards["JOGO"] == jogo]
+if "Interpretacao" in df_cards.columns:
 
-        if not df_cards.empty:
+    df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
+    df_cards = df_cards[df_cards["JOGO"] == jogo]
 
-            row = df_cards.iloc[0]
-            cor = cor_card(row["Interpretacao"])
+    if not df_cards.empty:
+
+        row = df_cards.iloc[0]
+        score = row["Score"]
+
+        # 0–10 → 0–5 estrelas
+        estrelas = "⭐"*round(score/2) + "☆"*(5-round(score/2))
+
+        with st.container(border=True):
+
+            st.markdown(f"**{row['Interpretacao']}**")
+            st.markdown(f"### {estrelas}")
+
 
             card = f"""
 <div style="
