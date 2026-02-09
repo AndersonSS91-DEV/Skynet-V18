@@ -74,21 +74,75 @@ div[data-baseweb="select"] > div {
 
 
 
-from streamlit_autorefresh import st_autorefresh
 import glob
+import time
+import streamlit as st
 
 # =========================
-# BANNER ROTATIVO
+# CSS FADE SUAVE
 # =========================
+st.markdown("""
+<style>
+.banner-img {
+    border-radius: 14px;
+    animation: fadein 0.8s ease-in-out;
+}
 
+@keyframes fadein {
+    from { opacity: 0; transform: scale(0.995); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* remove padding do topo */
+.block-container {
+    padding-top: 1rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+# =========================
+# LISTA DE BANNERS
+# =========================
 BANNERS = sorted(glob.glob("assets/banner*.png"))
 
-# troca a cada 10s
-count = st_autorefresh(interval=10000, key="banner")
+if "banner_idx" not in st.session_state:
+    st.session_state.banner_idx = 0
 
-idx = count % len(BANNERS)
+if "last_switch" not in st.session_state:
+    st.session_state.last_switch = time.time()
 
-st.image(BANNERS[idx], use_container_width=True)
+
+# =========================
+# AUTO TROCA (10s)
+# =========================
+AGORA = time.time()
+
+if AGORA - st.session_state.last_switch > 10:
+    st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
+    st.session_state.last_switch = AGORA
+
+
+# =========================
+# LAYOUT CONTROLES
+# =========================
+col1, col2, col3 = st.columns([1,10,1])
+
+with col1:
+    if st.button("◀", use_container_width=True):
+        st.session_state.banner_idx = (st.session_state.banner_idx - 1) % len(BANNERS)
+        st.session_state.last_switch = time.time()
+
+with col3:
+    if st.button("▶", use_container_width=True):
+        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
+        st.session_state.last_switch = time.time()
+
+with col2:
+    st.markdown(
+        f'<img src="{BANNERS[st.session_state.banner_idx]}" class="banner-img" width="100%">',
+        unsafe_allow_html=True
+    )
 
 
 st.title("⚽🏆Poisson Skynet🏆⚽")
