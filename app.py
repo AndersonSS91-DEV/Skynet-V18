@@ -23,38 +23,29 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-st.markdown("""
-<style>
+/* FONTE GLOBAL */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
-/* =========================
-FONTE GLOBAL (moderna)
-========================= */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
-html, body, [class*="css"]  {
+html, body, [class*="css"] {
     font-family: 'Poppins', sans-serif !important;
 }
 
 
-/* =========================
-TÍTULOS (Resumo, Scanner, etc)
-========================= */
-h1, h2, h3 {font-weight: 700 !important;
-    letter-spacing: 0.40px;}
+/* TÍTULOS */
+h1, h2, h3 {
+    font-weight: 700 !important;
+    letter-spacing: 0.2px;
+}
 
 
-/* =========================
-TABS (Resumo / Dados / Poisson)
-========================= */
+/* TABS */
 button[data-baseweb="tab"] {
     font-size: 20px !important;
     font-weight: 700 !important;
 }
 
 
-/* =========================
-SELECTBOX (Escolha o jogo)
-========================= */
+/* SELECTBOX */
 .stSelectbox label {
     font-size: 20px !important;
     font-weight: 700 !important;
@@ -65,38 +56,20 @@ div[data-baseweb="select"] > div {
 }
 
 
-/* =========================
-MÉTRICAS (st.metric)
-========================= */
+/* MÉTRICAS */
 [data-testid="stMetricLabel"] {
     font-size: 16px !important;
     font-weight: 700 !important;
-    opacity: 0.85;
 }
 
 [data-testid="stMetricValue"] {
-    font-size: 24px !important;
-    font-weight: 800 !important;
-}
-
-
-/* =========================
-CARDS (scanner container)
-========================= */
-div[data-testid="stVerticalBlock"] > div:has(div[style*="box-shadow"]) {
-    font-size: 16px !important;
-}
-
-
-/* =========================
-REMOVE FONTE FEIA PADRÃO
-========================= */
-code, pre {
-    font-family: 'Poppins', sans-serif !important;
+    font-size: 26px !important;
+    font-weight: 900 !important;
 }
 
 </style>
 """, unsafe_allow_html=True)
+
 
 
 
