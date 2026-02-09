@@ -23,60 +23,83 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* importa fonte moderna */
+st.markdown("""
+<style>
+
+/* =========================
+FONTE GLOBAL (moderna)
+========================= */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-/* aplica no app inteiro */
 html, body, [class*="css"]  {
     font-family: 'Poppins', sans-serif !important;
 }
 
 
 /* =========================
-TÍTULOS
+TÍTULOS (Resumo, Scanner, etc)
 ========================= */
 h1, h2, h3 {
     font-weight: 600 !important;
+    letter-spacing: 0.2px;
 }
 
 
 /* =========================
-TABS
+TABS (Resumo / Dados / Poisson)
 ========================= */
 button[data-baseweb="tab"] {
-    font-size: 22px !important;
-    font-weight: 600 !important;
-}
-
-
-/* =========================
-SELECTBOX
-========================= */
-.stSelectbox label {
-    font-size: 20px !important;
-    font-weight: 600 !important;
-}
-
-div[data-baseweb="select"] > div {
-    font-size: 20px !important;
-}
-
-
-/* =========================
-MÉTRICAS
-========================= */
-[data-testid="stMetricLabel"] {
-    font-size: 20px !important;
-    opacity: 1.0;
-}
-
-[data-testid="stMetricValue"] {
     font-size: 20px !important;
     font-weight: 700 !important;
 }
 
+
+/* =========================
+SELECTBOX (Escolha o jogo)
+========================= */
+.stSelectbox label {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+}
+
+div[data-baseweb="select"] > div {
+    font-size: 18px !important;
+}
+
+
+/* =========================
+MÉTRICAS (st.metric)
+========================= */
+[data-testid="stMetricLabel"] {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    opacity: 0.85;
+}
+
+[data-testid="stMetricValue"] {
+    font-size: 24px !important;
+    font-weight: 800 !important;
+}
+
+
+/* =========================
+CARDS (scanner container)
+========================= */
+div[data-testid="stVerticalBlock"] > div:has(div[style*="box-shadow"]) {
+    font-size: 16px !important;
+}
+
+
+/* =========================
+REMOVE FONTE FEIA PADRÃO
+========================= */
+code, pre {
+    font-family: 'Poppins', sans-serif !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
+
 
 
 st.image(
