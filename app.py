@@ -101,48 +101,58 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+import glob
+import time
+from PIL import Image
+
 # =========================
-# LISTA DE BANNERS
+# LISTA DE IMAGENS
 # =========================
 BANNERS = sorted(glob.glob("assets/banner*.png"))
 
+if not BANNERS:
+    st.error("❌ Nenhum banner encontrado em assets/")
+    st.stop()
+
+# =========================
+# SESSION STATE
+# =========================
 if "banner_idx" not in st.session_state:
     st.session_state.banner_idx = 0
 
 if "last_switch" not in st.session_state:
     st.session_state.last_switch = time.time()
 
-
 # =========================
 # AUTO TROCA (10s)
 # =========================
-AGORA = time.time()
-
-if AGORA - st.session_state.last_switch > 10:
+if time.time() - st.session_state.last_switch > 10:
     st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
-    st.session_state.last_switch = AGORA
-
+    st.session_state.last_switch = time.time()
 
 # =========================
-# LAYOUT CONTROLES
+# CONTROLES
 # =========================
-col1, col2, col3 = st.columns([1,10,1])
+c1, c2, c3 = st.columns([1,10,1])
 
-with col1:
-    if st.button("◀", use_container_width=True):
-        st.session_state.banner_idx = (st.session_state.banner_idx - 1) % len(BANNERS)
-        st.session_state.last_switch = time.time()
+with c1:
+    if st.button("◀"):
+        st.session_state.banner_idx -= 1
+        st.session_state.banner_idx %= len(BANNERS)
 
-with col3:
-    if st.button("▶", use_container_width=True):
-        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
-        st.session_state.last_switch = time.time()
+with c3:
+    if st.button("▶"):
+        st.session_state.banner_idx += 1
+        st.session_state.banner_idx %= len(BANNERS)
 
-with col2:
-    st.markdown(
-        f'<img src="{BANNERS[st.session_state.banner_idx]}" class="banner-img" width="100%">',
-        unsafe_allow_html=True
-    )
+# =========================
+# MOSTRA IMAGEM (FORMA CERTA)
+# =========================
+img = Image.open(BANNERS[st.session_state.banner_idx])
+
+with c2:
+    st.image(img, use_container_width=True)
+
 
 
 st.title("⚽🏆Poisson Skynet🏆⚽")
