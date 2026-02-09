@@ -238,12 +238,7 @@ def calcular_score(row):
 
     except:
         return 0
-        
-        def cor_score(s):
-    if s >= 7: return "#1f7a1f"   # verde forte
-    if s >= 4: return "#a67c00"   # amarelo
-    return "#7a1f1f"             # vermelho
-
+      
 
 # =========================================
 # ABAS
