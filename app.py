@@ -186,18 +186,19 @@ for df in (df_mgf, df_exg):
 # =========================================
 # SELEÇÃO DE JOGO
 # =========================================
-if "jogo" not in st.session_state:
-    st.session_state["jogo"] = df_mgf["JOGO"].iloc[0]
+jogos_lista = df_mgf["JOGO"].tolist()
+
+# garante que o valor salvo ainda existe
+if "jogo" not in st.session_state or st.session_state["jogo"] not in jogos_lista:
+    st.session_state["jogo"] = jogos_lista[0]
 
 jogo = st.selectbox(
     "⚽ Escolha o jogo",
-    df_mgf["JOGO"].unique(),
-    index=list(df_mgf["JOGO"]).index(st.session_state["jogo"])
+    jogos_lista,
+    index=jogos_lista.index(st.session_state["jogo"])
 )
 
-
-linha_mgf = df_mgf[df_mgf["JOGO"] == jogo].iloc[0]
-linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
+st.session_state["jogo"] = jogo
 
 # =========================================
 # FUNÇÕES AUX
