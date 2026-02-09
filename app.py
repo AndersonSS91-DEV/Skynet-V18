@@ -228,12 +228,22 @@ def cor_card(txt):
 
 def calcular_score(row):
     try:
-        ph = 1/row["Odd_Justa_Home"]
-        pa = 1/row["Odd_Justa_Away"]
-        edge = ph - pa
-        return abs(edge)
+        ph = 1 / row["Odd_Justa_Home"]
+        pa = 1 / row["Odd_Justa_Away"]
+
+        edge = abs(ph - pa)
+
+        score = edge * 20   # normaliza 0–10
+        return round(min(score, 10), 2)
+
     except:
         return 0
+        
+        def cor_score(s):
+    if s >= 7: return "#1f7a1f"   # verde forte
+    if s >= 4: return "#a67c00"   # amarelo
+    return "#7a1f1f"             # vermelho
+
 
 # =========================================
 # ABAS
