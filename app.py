@@ -44,7 +44,7 @@ h1, h2, h3 {
 TABS
 ========================= */
 button[data-baseweb="tab"] {
-    font-size: 16px !important;
+    font-size: 18px !important;
     font-weight: 600 !important;
 }
 
@@ -53,12 +53,12 @@ button[data-baseweb="tab"] {
 SELECTBOX
 ========================= */
 .stSelectbox label {
-    font-size: 18px !important;
+    font-size: 20px !important;
     font-weight: 600 !important;
 }
 
 div[data-baseweb="select"] > div {
-    font-size: 16px !important;
+    font-size: 18px !important;
 }
 
 
