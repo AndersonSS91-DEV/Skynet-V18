@@ -99,54 +99,57 @@ st.markdown("""
 
 
 # =========================================
-# BANNER AUTO (10s) + SETAS
+# 🎞️ BANNER SLIDER PROFISSIONAL (FIXO)
 # =========================================
+from pathlib import Path
+import time
 
-def natural_sort(l):
-    return sorted(l, key=lambda x: int(re.search(r'\d+', x).group()))
+PASTA_BANNERS = Path("assets")
 
-BANNERS = natural_sort(glob.glob("assets/banner*.png"))
+BANNERS = sorted(
+    [str(p) for p in PASTA_BANNERS.glob("banner*.png")],
+    key=lambda x: int(''.join(filter(str.isdigit, x)))  # ordena banner1,2,3...
+)
 
 if not BANNERS:
-    st.error("❌ Nenhum banner encontrado em assets/")
-    st.stop()
+    st.warning("⚠️ Nenhum banner encontrado na pasta assets/")
+else:
 
-# 🔥 AUTO REFRESH (AQUI É O LUGAR CERTO)
-count = st_autorefresh(interval=10000, key="banner")
+    # estado persistente
+    if "banner_idx" not in st.session_state:
+        st.session_state.banner_idx = 0
 
-if "banner_idx" not in st.session_state:
-    st.session_state.banner_idx = 0
-
-# autoplay controla índice
-st.session_state.banner_idx = count % len(BANNERS)
+    if "last_switch" not in st.session_state:
+        st.session_state.last_switch = time.time()
 
 
-# =========================
-# SETAS MANUAIS
-# =========================
-def prev_banner():
-    st.session_state.banner_idx = (st.session_state.banner_idx - 1) % len(BANNERS)
+    # =========================================
+    # AUTO TROCA (10s)
+    # =========================================
+    agora = time.time()
 
-def next_banner():
-    st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
-
-
-# =========================
-# LAYOUT
-# =========================
-c1, c2, c3 = st.columns([1,10,1])
-
-with c1:
-    st.button("◀", on_click=prev_banner, use_container_width=True)
-
-with c3:
-    st.button("▶", on_click=next_banner, use_container_width=True)
-
-with c2:
-    img = Image.open(BANNERS[st.session_state.banner_idx])
-    st.image(img, use_container_width=True)
+    if agora - st.session_state.last_switch > 10:
+        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
+        st.session_state.last_switch = agora
 
 
+    # =========================================
+    # CONTROLES MANUAIS
+    # =========================================
+    c1, c2, c3 = st.columns([1,8,1])
+
+    with c1:
+        if st.button("◀", use_container_width=True):
+            st.session_state.banner_idx = (st.session_state.banner_idx - 1) % len(BANNERS)
+            st.session_state.last_switch = time.time()
+
+    with c2:
+        st.image(BANNERS[st.session_state.banner_idx], use_container_width=True)
+
+    with c3:
+        if st.button("▶", use_container_width=True):
+            st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
+            st.session_state.last_switch = time.time()
 
 st.title("⚽🏆Poisson Skynet🏆⚽")
 
