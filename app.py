@@ -253,33 +253,32 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
+# =========================================
+# ABA 1 — RESUMO
+# =========================================
 with tab1:
 
-# =====================================================
-# 🧠 Scanner Card — minimalista (SÓ ESTRELAS)
-# =====================================================
+    st.markdown("🧠 Scanner Inteligente — Visão do Jogo")
 
-st.markdown("🧠 Scanner Inteligente — Visão do Jogo")
+    df_cards = df_exg.copy()
 
-df_cards = df_exg.copy()
+    if "Interpretacao" in df_cards.columns:
 
-if "Interpretacao" in df_cards.columns:
+        df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
+        df_cards = df_cards[df_cards["JOGO"] == jogo]
 
-    df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
-    df_cards = df_cards[df_cards["JOGO"] == jogo]
+        if not df_cards.empty:
 
-    if not df_cards.empty:
+            row = df_cards.iloc[0]
+            score = row["Score"]
 
-        row = df_cards.iloc[0]
-        score = row["Score"]
+            estrelas = "⭐"*round(score/2) + "☆"*(5-round(score/2))
 
-        # 0–10 → 0–5 estrelas
-        estrelas = "⭐"*round(score/2) + "☆"*(5-round(score/2))
+            with st.container(border=True):
 
-        with st.container(border=True):
+                st.markdown(f"**{row['Interpretacao']}**")
+                st.markdown(f"### {estrelas}")
 
-            st.markdown(f"**{row['Interpretacao']}**")
-            st.markdown(f"### {estrelas}")
 
 
             card = f"""
