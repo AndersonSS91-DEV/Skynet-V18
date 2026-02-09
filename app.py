@@ -99,57 +99,44 @@ st.markdown("""
 
 
 # =========================================
-# 🎞️ BANNER SLIDER PROFISSIONAL (FIXO)
+# 🎞️ BANNER SLIDER — DEFINITIVO (FUNCIONA)
 # =========================================
 from pathlib import Path
-import time
+from streamlit_autorefresh import st_autorefresh
 
-PASTA_BANNERS = Path("assets")
+PASTA = Path("assets")
 
 BANNERS = sorted(
-    [str(p) for p in PASTA_BANNERS.glob("banner*.png")],
-    key=lambda x: int(''.join(filter(str.isdigit, x)))  # ordena banner1,2,3...
+    PASTA.glob("banner*.png"),
+    key=lambda x: int(''.join(filter(str.isdigit, x.name)))
 )
 
 if not BANNERS:
-    st.warning("⚠️ Nenhum banner encontrado na pasta assets/")
+    st.warning("Sem banners na pasta assets/")
 else:
 
-    # estado persistente
-    if "banner_idx" not in st.session_state:
-        st.session_state.banner_idx = 0
+    # 🔥 ESSENCIAL → força rerun a cada 10s
+    count = st_autorefresh(interval=10000, key="banner_refresh")
 
-    if "last_switch" not in st.session_state:
-        st.session_state.last_switch = time.time()
+    idx = count % len(BANNERS)
 
+    col1, col2, col3 = st.columns([1,8,1])
 
-    # =========================================
-    # AUTO TROCA (10s)
-    # =========================================
-    agora = time.time()
+    # botão esquerda
+    with col1:
+        if st.button("◀"):
+            st.session_state.manual = (idx - 1) % len(BANNERS)
 
-    if agora - st.session_state.last_switch > 10:
-        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
-        st.session_state.last_switch = agora
+    # imagem
+    with col2:
+        manual = st.session_state.get("manual", idx)
+        st.image(str(BANNERS[manual]), use_container_width=True)
 
+    # botão direita
+    with col3:
+        if st.button("▶"):
+            st.session_state.manual = (idx + 1) % len(BANNERS)
 
-    # =========================================
-    # CONTROLES MANUAIS
-    # =========================================
-    c1, c2, c3 = st.columns([1,8,1])
-
-    with c1:
-        if st.button("◀", use_container_width=True):
-            st.session_state.banner_idx = (st.session_state.banner_idx - 1) % len(BANNERS)
-            st.session_state.last_switch = time.time()
-
-    with c2:
-        st.image(BANNERS[st.session_state.banner_idx], use_container_width=True)
-
-    with c3:
-        if st.button("▶", use_container_width=True):
-            st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
-            st.session_state.last_switch = time.time()
 
 st.title("⚽🏆Poisson Skynet🏆⚽")
 
