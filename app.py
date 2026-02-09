@@ -30,13 +30,13 @@ st.markdown("""
 
 /* caixa do select */
 div[data-baseweb="select"] > div {
-    font-size: 18px !important;
+    font-size: 20px !important;
     font-weight: 600 !important;
 }
 
 /* texto dentro do dropdown */
 div[role="listbox"] {
-    font-size: 18px !important;
+    font-size: 20px !important;
 }
 
 </style>
