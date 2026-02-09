@@ -133,8 +133,6 @@ with c3:
         st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
 
 
-st.write("DEBUG IDX:", idx)
-
 
 st.title("⚽🏆Poisson Skynet🏆⚽")
 
