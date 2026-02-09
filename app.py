@@ -40,30 +40,30 @@ h1, h2, h3 {
 
 /* TABS */
 button[data-baseweb="tab"] {
-    font-size: 20px !important;
+    font-size: 22px !important;
     font-weight: 700 !important;
 }
 
 
 /* SELECTBOX */
 .stSelectbox label {
-    font-size: 20px !important;
+    font-size: 22px !important;
     font-weight: 700 !important;
 }
 
 div[data-baseweb="select"] > div {
-    font-size: 18px !important;
+    font-size: 20px !important;
 }
 
 
 /* MÉTRICAS */
 [data-testid="stMetricLabel"] {
-    font-size: 16px !important;
+    font-size: 18px !important;
     font-weight: 700 !important;
 }
 
 [data-testid="stMetricValue"] {
-    font-size: 26px !important;
+    font-size: 28px !important;
     font-weight: 900 !important;
 }
 
