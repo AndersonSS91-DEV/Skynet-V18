@@ -9,6 +9,9 @@ import numpy as np
 from scipy.stats import poisson
 import matplotlib.pyplot as plt
 import seaborn as sns
+from streamlit_autorefresh import st_autorefresh
+import glob
+from PIL import Image
 
 # =========================================
 # CONFIG
@@ -72,23 +75,77 @@ div[data-baseweb="select"] > div {
 """, unsafe_allow_html=True)
 
 
-
-
-from streamlit_autorefresh import st_autorefresh
-import glob
-
 # =========================
-# BANNER ROTATIVO
+# CSS FADE SUAVE
 # =========================
+st.markdown("""
+<style>
+.banner-img {
+    border-radius: 14px;
+    animation: fadein 0.8s ease-in-out;
+}
 
-BANNERS = sorted(glob.glob("assets/banner*.png"))
+@keyframes fadein {
+    from { opacity: 0; transform: scale(0.995); }
+    to   { opacity: 1; transform: scale(1); }
+}
 
-# troca a cada 10s
+/* remove padding do topo */
+.block-container {
+    padding-top: 1rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+# =========================================
+# BANNER AUTO (10s) + SETAS
+# =========================================
+
+def natural_sort(l):
+    return sorted(l, key=lambda x: int(re.search(r'\d+', x).group()))
+
+BANNERS = natural_sort(glob.glob("assets/banner*.png"))
+
+if not BANNERS:
+    st.error("❌ Nenhum banner encontrado em assets/")
+    st.stop()
+
+# 🔥 AUTO REFRESH (AQUI É O LUGAR CERTO)
 count = st_autorefresh(interval=10000, key="banner")
 
-idx = count % len(BANNERS)
+if "banner_idx" not in st.session_state:
+    st.session_state.banner_idx = 0
 
-st.image(BANNERS[idx], use_container_width=True)
+# autoplay controla índice
+st.session_state.banner_idx = count % len(BANNERS)
+
+
+# =========================
+# SETAS MANUAIS
+# =========================
+def prev_banner():
+    st.session_state.banner_idx = (st.session_state.banner_idx - 1) % len(BANNERS)
+
+def next_banner():
+    st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
+
+
+# =========================
+# LAYOUT
+# =========================
+c1, c2, c3 = st.columns([1,10,1])
+
+with c1:
+    st.button("◀", on_click=prev_banner, use_container_width=True)
+
+with c3:
+    st.button("▶", on_click=next_banner, use_container_width=True)
+
+with c2:
+    img = Image.open(BANNERS[st.session_state.banner_idx])
+    st.image(img, use_container_width=True)
+
 
 
 st.title("⚽🏆Poisson Skynet🏆⚽")
