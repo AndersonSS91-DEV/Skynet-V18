@@ -98,30 +98,54 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# =========================
-# ORDEM NUMÉRICA CORRETA
-# =========================
+# =========================================
+# BANNER AUTO (10s) + SETAS
+# =========================================
+
 def natural_sort(l):
     return sorted(l, key=lambda x: int(re.search(r'\d+', x).group()))
 
 BANNERS = natural_sort(glob.glob("assets/banner*.png"))
 
 if not BANNERS:
+    st.error("❌ Nenhum banner encontrado em assets/")
     st.stop()
 
-# =========================
-# SLIDER NATIVO (PERFEITO)
-# =========================
-idx = st.slider(
-    "",
-    0,
-    len(BANNERS)-1,
-    0,
-    format="Banner %d"
-)
+# 🔥 AUTO REFRESH (AQUI É O LUGAR CERTO)
+count = st_autorefresh(interval=10000, key="banner")
 
-img = Image.open(BANNERS[idx])
-st.image(img, use_container_width=True)
+if "banner_idx" not in st.session_state:
+    st.session_state.banner_idx = 0
+
+# autoplay controla índice
+st.session_state.banner_idx = count % len(BANNERS)
+
+
+# =========================
+# SETAS MANUAIS
+# =========================
+def prev_banner():
+    st.session_state.banner_idx = (st.session_state.banner_idx - 1) % len(BANNERS)
+
+def next_banner():
+    st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
+
+
+# =========================
+# LAYOUT
+# =========================
+c1, c2, c3 = st.columns([1,10,1])
+
+with c1:
+    st.button("◀", on_click=prev_banner, use_container_width=True)
+
+with c3:
+    st.button("▶", on_click=next_banner, use_container_width=True)
+
+with c2:
+    img = Image.open(BANNERS[st.session_state.banner_idx])
+    st.image(img, use_container_width=True)
+
 
 
 st.title("⚽🏆Poisson Skynet🏆⚽")
