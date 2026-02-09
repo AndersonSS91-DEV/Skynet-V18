@@ -97,9 +97,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
 # =========================================
-# 🎞️ BANNER SLIDER — DEFINITIVO (FUNCIONA)
+# 🎞️ BANNER AUTO + SETAS (FUNCIONANDO 100%)
 # =========================================
 from pathlib import Path
 from streamlit_autorefresh import st_autorefresh
@@ -108,34 +107,35 @@ PASTA = Path("assets")
 
 BANNERS = sorted(
     PASTA.glob("banner*.png"),
-    key=lambda x: int(''.join(filter(str.isdigit, x.name)))
+    key=lambda x: int(''.join(filter(str.isdigit, x.stem)))
 )
 
-if not BANNERS:
-    st.warning("Sem banners na pasta assets/")
-else:
+if BANNERS:
 
-    # 🔥 ESSENCIAL → força rerun a cada 10s
     count = st_autorefresh(interval=10000, key="banner_refresh")
 
-    idx = count % len(BANNERS)
+    # 🔥 índice automático
+    idx_auto = count % len(BANNERS)
 
-    col1, col2, col3 = st.columns([1,8,1])
+    # 🔥 índice manual (só se clicar seta)
+    idx = st.session_state.get("banner_idx", idx_auto)
 
-    # botão esquerda
-    with col1:
-        if st.button("◀"):
-            st.session_state.manual = (idx - 1) % len(BANNERS)
+    c1, c2, c3 = st.columns([1,8,1])
 
-    # imagem
-    with col2:
-        manual = st.session_state.get("manual", idx)
-        st.image(str(BANNERS[manual]), use_container_width=True)
+    with c1:
+        if st.button("◀", key="prev"):
+            idx = (idx - 1) % len(BANNERS)
+            st.session_state.banner_idx = idx
 
-    # botão direita
-    with col3:
-        if st.button("▶"):
-            st.session_state.manual = (idx + 1) % len(BANNERS)
+    with c2:
+        st.image(str(BANNERS[idx]), use_container_width=True)
+
+    with c3:
+        if st.button("▶", key="next"):
+            idx = (idx + 1) % len(BANNERS)
+            st.session_state.banner_idx = idx
+
+st.write("DEBUG IDX:", idx)
 
 
 st.title("⚽🏆Poisson Skynet🏆⚽")
