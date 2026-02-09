@@ -74,9 +74,22 @@ div[data-baseweb="select"] > div {
 
 
 
-st.image(
-    "assets/banner.png",
-    use_container_width=True)
+from streamlit_autorefresh import st_autorefresh
+import glob
+
+# =========================
+# BANNER ROTATIVO
+# =========================
+
+BANNERS = sorted(glob.glob("assets/banner*.png"))
+
+# troca a cada 10s
+count = st_autorefresh(interval=10000, key="banner")
+
+idx = count % len(BANNERS)
+
+st.image(BANNERS[idx], use_container_width=True)
+
 
 st.title("⚽🏆Poisson Skynet🏆⚽")
 
