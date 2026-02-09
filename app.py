@@ -253,12 +253,9 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
-# =========================================
-# ABA 1 — RESUMO
-# =========================================
 with tab1:
 
-    st.markdown("🧠 Scanner Inteligente — Visão do Jogo")
+    st.subheader("🧠 Scanner Inteligente — Visão do Jogo")
 
     df_cards = df_exg.copy()
 
@@ -270,31 +267,35 @@ with tab1:
         if not df_cards.empty:
 
             row = df_cards.iloc[0]
+
             score = row["Score"]
 
-            estrelas = "⭐"*round(score/2) + "☆"*(5-round(score/2))
+            # ⭐ estrelas 0–5
+            estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
 
-            with st.container(border=True):
-
-                st.markdown(f"**{row['Interpretacao']}**")
-                st.markdown(f"### {estrelas}")
+            # 🎨 cor automática
+            cor = cor_card(row["Interpretacao"])
 
             card = f"""
-<div style="
-    background:{cor};
-    padding:12px 16px;
-    border-radius:10px;
-    box-shadow:0 0 8px rgba(0,0,0,0.60);
-    color:white;
-    font-size:20px;
-    font-weight:600;
-">
-    🧠 {row['Interpretacao']} &nbsp;&nbsp; ⭐ {row['Score']:.2f}
-</div>
-"""
+            <div style="
+                background:{cor};
+                padding:18px;
+                border-radius:14px;
+                box-shadow:0 0 10px rgba(0,0,0,0.45);
+                color:white;
+                margin-bottom:18px;
+            ">
+                <div style="font-size:18px; font-weight:600;">
+                    {row['Interpretacao']}
+                </div>
+
+                <div style="margin-top:8px; font-size:22px;">
+                    {estrelas}
+                </div>
+            </div>
+            """
 
             st.markdown(card, unsafe_allow_html=True)
-
 
 
     # -------- ODDS + EV
