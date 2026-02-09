@@ -66,8 +66,8 @@ div[data-baseweb="select"] > div {
 MÉTRICAS
 ========================= */
 [data-testid="stMetricLabel"] {
-    font-size: 16px !important;
-    opacity: 0.8;
+    font-size: 20px !important;
+    opacity: 1.0;
 }
 
 [data-testid="stMetricValue"] {
