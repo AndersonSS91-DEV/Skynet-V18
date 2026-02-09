@@ -16,27 +16,63 @@ import seaborn as sns
 st.set_page_config(
     page_title="⚽🏆Poisson Skynet🏆⚽",
     layout="wide")
+
 # =========================================
-# 🎨 CSS GLOBAL — PADRONIZAR FONTES
+# 🎨 TEMA VISUAL GLOBAL (FONTES MAIORES)
 # =========================================
 st.markdown("""
 <style>
 
-/* label do selectbox (⚽ Escolha o jogo) */
+/* =========================
+LABEL SELECTBOX (⚽ Escolha o jogo)
+========================= */
 .stSelectbox label {
     font-size: 20px !important;
     font-weight: 700 !important;
 }
 
-/* caixa do select */
-div[data-baseweb="select"] > div {
-    font-size: 20px !important;
+
+/* =========================
+TABS (Resumo / Dados / Poisson)
+========================= */
+button[data-baseweb="tab"] {
+    font-size: 18px !important;
     font-weight: 600 !important;
 }
 
-/* texto dentro do dropdown */
+
+/* =========================
+SUBHEADERS (Odds / Scanner / títulos seções)
+========================= */
+h3 {
+    font-size: 22px !important;
+    font-weight: 800 !important;
+}
+
+
+/* =========================
+st.metric — TÍTULO (Odds Casa, EV, etc)
+========================= */
+[data-testid="stMetricLabel"] {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+
+/* =========================
+st.metric — VALOR (número grande)
+========================= */
+[data-testid="stMetricValue"] {
+    font-size: 22px !important;
+    font-weight: 800 !important;
+}
+
+
+/* =========================
+Dropdown itens
+========================= */
 div[role="listbox"] {
-    font-size: 20px !important;
+    font-size: 18px !important;
 }
 
 </style>
