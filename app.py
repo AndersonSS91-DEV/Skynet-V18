@@ -267,13 +267,12 @@ with tab1:
         if not df_cards.empty:
 
             row = df_cards.iloc[0]
-
             score = row["Score"]
 
-           estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
-cor = cor_card(row["Interpretacao"])
+            estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
+            cor = cor_card(row["Interpretacao"])
 
-card = f"""
+            card = f"""
 <div style="
     background:{cor};
     padding:18px;
@@ -285,15 +284,16 @@ card = f"""
     margin-bottom:18px;
 ">
 
-🧠 {row['Interpretacao']}  
+🧠 {row['Interpretacao']}
 <br>
 <span style="font-size:26px;">{estrelas}</span>
 
 </div>
 """
 
-st.markdown(card, unsafe_allow_html=True)
+            st.markdown(card, unsafe_allow_html=True)
 
+    st.subheader(jogo)
 
 
     # -------- ODDS + EV
