@@ -279,8 +279,6 @@ with tab1:
                 st.markdown(f"**{row['Interpretacao']}**")
                 st.markdown(f"### {estrelas}")
 
-
-
             card = f"""
 <div style="
     background:{cor};
