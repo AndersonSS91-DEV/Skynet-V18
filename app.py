@@ -44,7 +44,7 @@ h1, h2, h3 {
 TABS
 ========================= */
 button[data-baseweb="tab"] {
-    font-size: 18px !important;
+    font-size: 22px !important;
     font-weight: 600 !important;
 }
 
@@ -58,7 +58,7 @@ SELECTBOX
 }
 
 div[data-baseweb="select"] > div {
-    font-size: 18px !important;
+    font-size: 20px !important;
 }
 
 
@@ -66,7 +66,7 @@ div[data-baseweb="select"] > div {
 MÉTRICAS
 ========================= */
 [data-testid="stMetricLabel"] {
-    font-size: 13px !important;
+    font-size: 16px !important;
     opacity: 0.8;
 }
 
