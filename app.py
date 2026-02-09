@@ -183,20 +183,17 @@ df_exg = pd.read_excel(xls, "Poisson_Ataque_Defesa")
 for df in (df_mgf, df_exg):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
 
-# =========================================
-# SELEÇÃO DE JOGO
-# =========================================
+
+# 🔥 DEFINA AQUI (ANTES DAS TABS)
 jogos_lista = df_mgf["JOGO"].tolist()
 
-# garante que o valor salvo ainda existe
 if "jogo" not in st.session_state or st.session_state["jogo"] not in jogos_lista:
     st.session_state["jogo"] = jogos_lista[0]
 
-jogo = st.selectbox(
-    "⚽ Escolha o jogo",
-    jogos_lista,
-    index=jogos_lista.index(st.session_state["jogo"])
-)
+jogo = st.selectbox("⚽ Escolha o jogo", jogos_lista)
+
+linha_mgf = df_mgf[df_mgf["JOGO"] == jogo].iloc[0]
+linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
 
 st.session_state["jogo"] = jogo
 
