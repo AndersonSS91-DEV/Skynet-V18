@@ -96,44 +96,42 @@ st.markdown("""
 }
 </style>
 """, unsafe_allow_html=True)
-
 # =========================================
-# 🎞️ BANNER AUTO + SETAS (FUNCIONANDO 100%)
+# 🎬 BANNER CARROSSEL — DEFINITIVO
 # =========================================
-from pathlib import Path
-from streamlit_autorefresh import st_autorefresh
+import glob
+import time
 
-PASTA = Path("assets")
+# pega todas imagens banner1..banner30
+BANNERS = sorted(glob.glob("assets/banner*.png"))
 
-BANNERS = sorted(
-    PASTA.glob("banner*.png"),
-    key=lambda x: int(''.join(filter(str.isdigit, x.stem)))
-)
+if "banner_idx" not in st.session_state:
+    st.session_state.banner_idx = 0
 
-if BANNERS:
+# ---------- AUTO PLAY (10s)
+agora = time.time()
 
-    count = st_autorefresh(interval=10000, key="banner_refresh")
+if "banner_last" not in st.session_state:
+    st.session_state.banner_last = agora
 
-    # 🔥 índice automático
-    idx_auto = count % len(BANNERS)
+if agora - st.session_state.banner_last >= 10:
+    st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
+    st.session_state.banner_last = agora
 
-    # 🔥 índice manual (só se clicar seta)
-    idx = st.session_state.get("banner_idx", idx_auto)
+# ---------- LAYOUT
+c1, c2, c3 = st.columns([1, 8, 1])
 
-    c1, c2, c3 = st.columns([1,8,1])
+with c1:
+    if st.button("◀", use_container_width=True):
+        st.session_state.banner_idx = (st.session_state.banner_idx - 1) % len(BANNERS)
 
-    with c1:
-        if st.button("◀", key="prev"):
-            idx = (idx - 1) % len(BANNERS)
-            st.session_state.banner_idx = idx
+with c2:
+    st.image(BANNERS[st.session_state.banner_idx], use_container_width=True)
 
-    with c2:
-        st.image(str(BANNERS[idx]), use_container_width=True)
+with c3:
+    if st.button("▶", use_container_width=True):
+        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
 
-    with c3:
-        if st.button("▶", key="next"):
-            idx = (idx + 1) % len(BANNERS)
-            st.session_state.banner_idx = idx
 
 st.write("DEBUG IDX:", idx)
 
