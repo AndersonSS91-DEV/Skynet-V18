@@ -96,41 +96,45 @@ st.markdown("""
 }
 </style>
 """, unsafe_allow_html=True)
-# =========================================
-# 🎬 BANNER CARROSSEL — DEFINITIVO
-# =========================================
-import glob
-import time
 
-# pega todas imagens banner1..banner30
+# =========================================
+# 🎬 BANNER CARROSSEL — DEFINITIVO (FUNCIONA MESMO)
+# =========================================
+from streamlit_autorefresh import st_autorefresh
+import glob
+
 BANNERS = sorted(glob.glob("assets/banner*.png"))
 
-if "banner_idx" not in st.session_state:
-    st.session_state.banner_idx = 0
+if not BANNERS:
+    st.error("Nenhuma imagem encontrada em assets/banner*.png")
+else:
 
-# ---------- AUTO PLAY (10s)
-agora = time.time()
+    # 🔥 força rerun a cada 10s
+    count = st_autorefresh(interval=10000, key="banner_refresh")
 
-if "banner_last" not in st.session_state:
-    st.session_state.banner_last = agora
+    # índice automático
+    banner_idx = count % len(BANNERS)
 
-if agora - st.session_state.banner_last >= 10:
-    st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
-    st.session_state.banner_last = agora
+    c1, c2, c3 = st.columns([1, 8, 1])
 
-# ---------- LAYOUT
-c1, c2, c3 = st.columns([1, 8, 1])
+    # setas funcionam
+    if "manual_idx" not in st.session_state:
+        st.session_state.manual_idx = banner_idx
 
-with c1:
-    if st.button("◀", use_container_width=True):
-        st.session_state.banner_idx = (st.session_state.banner_idx - 1) % len(BANNERS)
+    with c1:
+        if st.button("◀", use_container_width=True):
+            st.session_state.manual_idx = (st.session_state.manual_idx - 1) % len(BANNERS)
 
-with c2:
-    st.image(BANNERS[st.session_state.banner_idx], use_container_width=True)
+    with c3:
+        if st.button("▶", use_container_width=True):
+            st.session_state.manual_idx = (st.session_state.manual_idx + 1) % len(BANNERS)
 
-with c3:
-    if st.button("▶", use_container_width=True):
-        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
+    # usa manual OU auto
+    final_idx = st.session_state.manual_idx if st.session_state.manual_idx != banner_idx else banner_idx
+
+    with c2:
+        st.image(BANNERS[final_idx], use_container_width=True)
+
 
 
 
