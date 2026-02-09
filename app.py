@@ -270,32 +270,30 @@ with tab1:
 
             score = row["Score"]
 
-            # ⭐ estrelas 0–5
-            estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
+           estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
+cor = cor_card(row["Interpretacao"])
 
-            # 🎨 cor automática
-            cor = cor_card(row["Interpretacao"])
+card = f"""
+<div style="
+    background:{cor};
+    padding:18px;
+    border-radius:14px;
+    box-shadow:0 0 10px rgba(0,0,0,0.45);
+    color:white;
+    font-size:18px;
+    font-weight:600;
+    margin-bottom:18px;
+">
 
-            card = f"""
-            <div style="
-                background:{cor};
-                padding:18px;
-                border-radius:14px;
-                box-shadow:0 0 10px rgba(0,0,0,0.45);
-                color:white;
-                margin-bottom:18px;
-            ">
-                <div style="font-size:18px; font-weight:600;">
-                    {row['Interpretacao']}
-                </div>
+🧠 {row['Interpretacao']}  
+<br>
+<span style="font-size:26px;">{estrelas}</span>
 
-                <div style="margin-top:8px; font-size:22px;">
-                    {estrelas}
-                </div>
-            </div>
-            """
+</div>
+"""
 
-            st.markdown(card, unsafe_allow_html=True)
+st.markdown(card, unsafe_allow_html=True)
+
 
 
     # -------- ODDS + EV
