@@ -23,60 +23,61 @@ st.set_page_config(
 st.markdown("""
 <style>
 
+/* importa fonte moderna */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* aplica no app inteiro */
+html, body, [class*="css"]  {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+
 /* =========================
-LABEL SELECTBOX (⚽ Escolha o jogo)
+TÍTULOS
+========================= */
+h1, h2, h3 {
+    font-weight: 600 !important;
+}
+
+
+/* =========================
+TABS
+========================= */
+button[data-baseweb="tab"] {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+}
+
+
+/* =========================
+SELECTBOX
 ========================= */
 .stSelectbox label {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+}
+
+div[data-baseweb="select"] > div {
+    font-size: 16px !important;
+}
+
+
+/* =========================
+MÉTRICAS
+========================= */
+[data-testid="stMetricLabel"] {
+    font-size: 13px !important;
+    opacity: 0.8;
+}
+
+[data-testid="stMetricValue"] {
     font-size: 20px !important;
     font-weight: 700 !important;
 }
 
-
-/* =========================
-TABS (Resumo / Dados / Poisson)
-========================= */
-button[data-baseweb="tab"] {
-    font-size: 18px !important;
-    font-weight: 600 !important;
-}
-
-
-/* =========================
-SUBHEADERS (Odds / Scanner / títulos seções)
-========================= */
-h3 {
-    font-size: 22px !important;
-    font-weight: 800 !important;
-}
-
-
-/* =========================
-st.metric — TÍTULO (Odds Casa, EV, etc)
-========================= */
-[data-testid="stMetricLabel"] {
-    font-size: 15px !important;
-    font-weight: 600 !important;
-}
-
-
-/* =========================
-st.metric — VALOR (número grande)
-========================= */
-[data-testid="stMetricValue"] {
-    font-size: 22px !important;
-    font-weight: 800 !important;
-}
-
-
-/* =========================
-Dropdown itens
-========================= */
-div[role="listbox"] {
-    font-size: 18px !important;
-}
-
 </style>
 """, unsafe_allow_html=True)
+
 
 st.image(
     "assets/banner.png",
