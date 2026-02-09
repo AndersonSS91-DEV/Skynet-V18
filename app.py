@@ -39,10 +39,8 @@ html, body, [class*="css"]  {
 /* =========================
 TÍTULOS (Resumo, Scanner, etc)
 ========================= */
-h1, h2, h3 {
-    font-weight: 600 !important;
-    letter-spacing: 0.2px;
-}
+h1, h2, h3 {font-weight: 700 !important;
+    letter-spacing: 0.2px;}
 
 
 /* =========================
