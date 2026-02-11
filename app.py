@@ -551,7 +551,7 @@ with tab5:
         st.metric("Odd Justa", linha_vg["Odd_Justa_Away"])
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
-        st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}")
+        st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
                   
     st.markdown("---")
 
