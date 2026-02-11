@@ -18,36 +18,13 @@ from PIL import Image
 # =========================================
 st.set_page_config(
     page_title="⚽🏆Poisson Skynet🏆⚽",
-    layout="wide")
+    layout="wide"
+)
 
-# =========================================
-# 🎨 TEMA VISUAL GLOBAL (FONTES MAIORES)
-# =========================================
+st.title("⚽🏆 Poisson Skynet 🏆⚽")
+
 st.markdown("""
 <style>
-
-/* FONTE GLOBAL */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
-html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif !important;
-}
-
-
-
-/* TÍTULOS */
-h1, h2, h3 {
-    font-weight: 700 !important;
-    letter-spacing: 0.2px;
-}
-
-
-/* TABS */
-button[data-baseweb="tab"] {
-    font-size: 22px !important;
-    font-weight: 700 !important;
-}
-
 
 /* SELECTBOX */
 .stSelectbox label {
@@ -58,7 +35,6 @@ button[data-baseweb="tab"] {
 div[data-baseweb="select"] > div {
     font-size: 20px !important;
 }
-
 
 /* MÉTRICAS */
 [data-testid="stMetricLabel"] {
@@ -75,78 +51,43 @@ div[data-baseweb="select"] > div {
 """, unsafe_allow_html=True)
 
 
-# =========================
-# CSS FADE SUAVE
-# =========================
-st.markdown("""
-<style>
-.banner-img {
-    border-radius: 14px;
-    animation: fadein 0.8s ease-in-out;
-}
-
-@keyframes fadein {
-    from { opacity: 0; transform: scale(0.995); }
-    to   { opacity: 1; transform: scale(1); }
-}
-
-/* remove padding do topo */
-.block-container {
-    padding-top: 1rem;
-}
-</style>
-""", unsafe_allow_html=True)
-
-
 # =========================================
-# BANNER AUTO (10s) + SETAS
+# 🎬 BANNER CARROSSEL — DEFINITIVO (FUNCIONA MESMO)
 # =========================================
+from streamlit_autorefresh import st_autorefresh
+import glob
 
-def natural_sort(l):
-    return sorted(l, key=lambda x: int(re.search(r'\d+', x).group()))
-
-BANNERS = natural_sort(glob.glob("assets/banner*.png"))
+BANNERS = sorted(glob.glob("assets/banner*.png"))
 
 if not BANNERS:
-    st.error("❌ Nenhum banner encontrado em assets/")
-    st.stop()
+    st.error("Nenhuma imagem encontrada em assets/banner*.png")
+else:
 
-# 🔥 AUTO REFRESH (AQUI É O LUGAR CERTO)
-count = st_autorefresh(interval=10000, key="banner")
+    # 🔥 força rerun a cada 10s
+    count = st_autorefresh(interval=10000, key="banner_refresh")
 
-if "banner_idx" not in st.session_state:
-    st.session_state.banner_idx = 0
+    # índice automático
+    banner_idx = count % len(BANNERS)
 
-# autoplay controla índice
-st.session_state.banner_idx = count % len(BANNERS)
+    c1, c2, c3 = st.columns([1, 8, 1])
 
+    # setas funcionam
+    if "manual_idx" not in st.session_state:
+        st.session_state.manual_idx = banner_idx
 
-# =========================
-# SETAS MANUAIS
-# =========================
-def prev_banner():
-    st.session_state.banner_idx = (st.session_state.banner_idx - 1) % len(BANNERS)
+    with c1:
+        if st.button("◀", use_container_width=True):
+            st.session_state.manual_idx = (st.session_state.manual_idx - 1) % len(BANNERS)
 
-def next_banner():
-    st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
+    with c3:
+        if st.button("▶", use_container_width=True):
+            st.session_state.manual_idx = (st.session_state.manual_idx + 1) % len(BANNERS)
 
+    # usa manual OU auto
+    final_idx = st.session_state.manual_idx if st.session_state.manual_idx != banner_idx else banner_idx
 
-# =========================
-# LAYOUT
-# =========================
-c1, c2, c3 = st.columns([1,10,1])
-
-with c1:
-    st.button("◀", on_click=prev_banner, use_container_width=True)
-
-with c3:
-    st.button("▶", on_click=next_banner, use_container_width=True)
-
-with c2:
-    img = Image.open(BANNERS[st.session_state.banner_idx])
-    st.image(img, use_container_width=True)
-
-
+    with c2:
+        st.image(BANNERS[final_idx], use_container_width=True)
 
 st.title("⚽🏆Poisson Skynet🏆⚽")
 
@@ -179,26 +120,23 @@ else:
 # =========================================
 df_mgf = pd.read_excel(xls, "Poisson_Media_Gols")
 df_exg = pd.read_excel(xls, "Poisson_Ataque_Defesa")
+df_vg  = pd.read_excel(xls, "Poisson_VG")  # <<< FALTAVA ISSO
 
-for df in (df_mgf, df_exg):
+for df in (df_mgf, df_exg, df_vg):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
+    
+# 🔥 DEFINA AQUI (ANTES DAS TABS)
+jogos_lista = df_mgf["JOGO"].tolist()
 
-# =========================================
-# SELEÇÃO DE JOGO
-# =========================================
-if "jogo" not in st.session_state:
-    st.session_state["jogo"] = df_mgf["JOGO"].iloc[0]
+if "jogo" not in st.session_state or st.session_state["jogo"] not in jogos_lista:
+    st.session_state["jogo"] = jogos_lista[0]
 
-jogo = st.selectbox(
-    "⚽ Escolha o jogo",
-    df_mgf["JOGO"].unique(),
-    index=list(df_mgf["JOGO"]).index(st.session_state["jogo"])
-)
-
-
+jogo = st.selectbox("⚽ Escolha o jogo", jogos_lista)
 linha_mgf = df_mgf[df_mgf["JOGO"] == jogo].iloc[0]
 linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
+linha_vg  = df_vg[df_vg["JOGO"] == jogo].iloc[0]  # <<< FALTAVA ISSO
 
+st.session_state["jogo"] = jogo
 # =========================================
 # FUNÇÕES AUX
 # =========================================
@@ -304,157 +242,170 @@ def calcular_score(row):
     except:
         return 0
       
+# =========================================
+# 🎯 CARD REUTILIZÁVEL (BANNER INTERPRETAÇÃO)
+# =========================================
+def mostrar_card(df_base, jogo):
+
+    if "Interpretacao" not in df_base.columns:
+        return
+
+    linha = df_base[df_base["JOGO"] == jogo]
+    if linha.empty:
+        return
+
+    row = linha.iloc[0]
+
+    score = calcular_score(row)
+    estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
+    cor = cor_card(row["Interpretacao"])
+
+    card = f"""
+    <div style="
+        background:{cor};
+        padding:18px;
+        border-radius:14px;
+        box-shadow:0 0 10px rgba(0,0,0,0.45);
+        color:white;
+        font-size:18px;
+        font-weight:600;
+        margin-bottom:18px;
+    ">
+    🧠 {row['Interpretacao']}
+    <br>
+    <span style="font-size:26px;">{estrelas}</span>
+    </div>
+    """
+
+    st.markdown(card, unsafe_allow_html=True)
 
 # =========================================
 # ABAS
 # =========================================
-tab1, tab2, tab3, tab4 = st.tabs([
-    "📊 Resumo",
-    "📁 Dados Completos",
-    "🔢 Poisson — Média de Gols",
-    "⚔️ Poisson — Ataque x Defesa"
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
+"📊 Resumo",
+"📁 Dados",
+"🔢 MGF",
+"⚔️ ATK x DEF",
+"💰 VG"
 ])
 
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
-
-    st.subheader("🧠 Scanner Inteligente — Visão do Jogo")
-
-    df_cards = df_exg.copy()
-
-    if "Interpretacao" in df_cards.columns:
-
-        df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
-        df_cards = df_cards[df_cards["JOGO"] == jogo]
-
-        if not df_cards.empty:
-
-            row = df_cards.iloc[0]
-            score = row["Score"]
-
-            estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
-            cor = cor_card(row["Interpretacao"])
-
-            card = f"""
-<div style="
-    background:{cor};
-    padding:18px;
-    border-radius:14px;
-    box-shadow:0 0 10px rgba(0,0,0,0.45);
-    color:white;
-    font-size:18px;
-    font-weight:600;
-    margin-bottom:18px;
-">
-
-🧠 {row['Interpretacao']}
-<br>
-<span style="font-size:26px;">{estrelas}</span>
-
-</div>
-"""
-
-            st.markdown(card, unsafe_allow_html=True)
-
     st.subheader(jogo)
 
-
-    # -------- ODDS + EV
+    # -------- LINHA 1 — ODDS
     st.markdown("### 🎯 Odds")
     o1, o2, o3 = st.columns(3)
 
     with o1:
         ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
         st.metric("Odds Casa", linha_exg["Odds_Casa"])
-        st.metric("Odd Justa", linha_exg["Odd_Justa_Home"])
-        st.metric("EV", f"{ev*100:.2f}%" if ev is not None else "—")
-        st.metric("Odd Over 1.5FT", linha_exg["Odd_Over_1,5FT"])
+
+        st.metric("Odd_Over_1,5FT", linha_exg["Odd_Over_1,5FT"])
         st.metric("VR01", get_val(linha_exg, "VR01", "{:.2f}"))
 
     with o2:
         ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
         st.metric("Odds Empate", linha_exg["Odds_Empate"])
-        st.metric("Odd Justa", linha_exg["Odd_Justa_Draw"])
-        st.metric("EV", f"{ev*100:.2f}%" if ev is not None else "—")
-        st.metric("Odds Over 2.5FT", linha_exg["Odds_Over_2,5FT"])
+        st.metric("Odds_Over_2,5FT", linha_exg["Odds_Over_2,5FT"])
         st.metric("COEF_OVER1FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
 
     with o3:
         ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
         st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
-        st.metric("Odd Justa", linha_exg["Odd_Justa_Away"])
-        st.metric("EV", f"{ev*100:.2f}%" if ev is not None else "—")
-        st.metric("Odds Under 2.5FT", linha_exg["Odds_Under_2,5FT"])
-        st.metric("Odd BTTS YES", linha_exg["Odd_BTTS_YES"])
+        st.metric("Odds_Under_2,5FT", linha_exg["Odds_Under_2,5FT"])
+        st.metric("Odd_BTTS_YES", linha_exg["Odd_BTTS_YES"])
 
     st.markdown("---")
 
-    # -------- MGF
-    st.markdown("### 📊 Média de Gols (MGF)")
-    c1, c2, c3, c4, c5 = st.columns(5)
+    # -------- LINHA 2 — Métricas
+    st.markdown("### 📊Métricas")
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
 
     with c1:
         st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
+        st.metric("Posse Home (%)", get_val(linha_exg, "Posse_Bola_Home", "{:.2f}"))
         st.metric("PPJH", get_val(linha_exg, "PPJH", "{:.2f}"))
-        st.metric("PPJA", get_val(linha_exg, "PPJA", "{:.2f}"))
-
-    with c2:
         st.metric("Media_CG_H_01", get_val(linha_mgf, "Media_CG_H_01", "{:.2f}"))
         st.metric("CV_CG_H_01", get_val(linha_mgf, "CV_CG_H_01", "{:.2f}"))
+
+    with c2:
+        st.metric("Posse Away (%)", get_val(linha_exg, "Posse_Bola_Away", "{:.2f}"))
+        st.metric("PPJA", get_val(linha_exg, "PPJA", "{:.2f}"))
+        st.metric("Media_CG_A_01", get_val(linha_mgf, "Media_CG_A_01", "{:.2f}"))
+        st.metric("CV_CG_A_01", get_val(linha_mgf, "CV_CG_A_01", "{:.2f}"))
         st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
 
     with c3:
-        st.metric("Media_CG_A_01", get_val(linha_mgf, "Media_CG_A_01", "{:.2f}"))
-        st.metric("CV_CG_A_01", get_val(linha_mgf, "CV_CG_A_01", "{:.2f}"))
-        st.metric("ExG_Away_MGF", get_val(linha_mgf, "ExG_Away_MGF", "{:.2f}"))
-
-    with c4:
+        st.metric("Força Ataque Home (%)", get_val(linha_exg, "FAH", "{:.2f}"))
+        st.metric("Precisão Chutes H (%)", get_val(linha_exg, "Precisao_CG_H", "{:.2f}"))
+        st.metric("Chutes H (Marcar)", get_val(linha_mgf, "CHM", "{:.2f}"))
         st.metric("MGF_H", get_val(linha_mgf, "MGF_H", "{:.2f}"))
         st.metric("CV_GF_H", get_val(linha_mgf, "CV_GF_H", "{:.2f}"))
+
+    with c4:
+        st.metric("Força Ataque Away (%)", get_val(linha_exg, "FAA", "{:.2f}"))
+        st.metric("Precisão Chutes A (%)", get_val(linha_exg, "Precisao_CG_A", "{:.2f}"))
+        st.metric("Chutes A (Marcar)", get_val(linha_mgf, "CAM", "{:.2f}"))
+        st.metric("MGF_A", get_val(linha_mgf, "MGF_A", "{:.2f}"))
+        st.metric("CV_GF_A", get_val(linha_mgf, "CV_GF_A", "{:.2f}"))
+
+    with c5:
+        st.metric("Força Defesa Home (%)", get_val(linha_exg, "FDH", "{:.2f}"))
+        st.metric("Clean Games Home (%)", get_val(linha_exg, "Clean_Games_H"))
+        st.metric("Chutes H (Sofrer)", get_val(linha_mgf, "CHS", "{:.2f}"))
         st.metric("MGC_H", get_val(linha_mgf, "MGC_H", "{:.2f}"))
         st.metric("CV_GC_H", get_val(linha_mgf, "CV_GC_H", "{:.2f}"))
 
-    with c5:
-        st.metric("MGF_A", get_val(linha_mgf, "MGF_A", "{:.2f}"))
-        st.metric("CV_GF_A", get_val(linha_mgf, "CV_GF_A", "{:.2f}"))
+    with c6:
+        st.metric("Força Defesa Away (%)", get_val(linha_exg, "FDA", "{:.2f}"))
+        st.metric("Clean Games Away (%)", get_val(linha_exg, "Clean_Games_A"))
+        st.metric("Chutes A (Sofrer)", get_val(linha_mgf, "CAS", "{:.2f}"))
         st.metric("MGC_A", get_val(linha_mgf, "MGC_A", "{:.2f}"))
         st.metric("CV_GC_A", get_val(linha_mgf, "CV_GC_A", "{:.2f}"))
 
-    # -------- LINHA 3 — ATK x DEF (EXG)
+
+    # -------- LINHA 3 — MGF
+    st.markdown("### 📊 MGF")
+    a1, a2, a3 = st.columns(3)
+
+    with a1:
+        st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
+
+    with a2:
+        st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
+
+    with a3:
+        st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
+
+    # -------- LINHA 4 — ATK x DEF
     st.markdown("### ⚔️ Ataque x Defesa")
-    e1, e2, e3, e4, e5 = st.columns(5)
+    e1, e2, e3 = st.columns(3)
 
     with e1:
         st.metric("Placar Provável", get_val(linha_exg, "Placar_Mais_Provavel"))
-        st.metric("Posse Home (%)", get_val(linha_exg, "Posse_Bola_Home", "{:.2f}"))
-        st.metric("Posse Away (%)", get_val(linha_exg, "Posse_Bola_Away", "{:.2f}"))
 
     with e2:
-        st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
-        st.metric("Clean Games Home (%)", get_val(linha_exg, "Clean_Games_H"))
-        st.metric("Precisão Chutes H (%)", get_val(linha_exg, "Precisao_CG_H", "{:.2f}"))
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
 
     with e3:
-        st.metric("Clean Sheet Away (%)", get_val(linha_exg, "Clean_Sheet_Away_%", "{:.2f}"))
-        st.metric("Clean Games Away (%)", get_val(linha_exg, "Clean_Games_A"))
-        st.metric("Precisão Chutes A (%)", get_val(linha_exg, "Precisao_CG_A", "{:.2f}"))
         st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
 
-    with e4:
-        st.metric("Força Ataque Home (%)", get_val(linha_exg, "FAH", "{:.2f}"))
-        st.metric("Força Defesa Home (%)", get_val(linha_exg, "FDH", "{:.2f}"))
-        st.metric("Chutes H (Marcar)", get_val(linha_mgf, "CHM", "{:.2f}"))
-        st.metric("Chutes H (Sofrer)", get_val(linha_mgf, "CHS", "{:.2f}"))
+    # -------- LINHA 5 — VG
+    st.markdown("### 💰 Gols Value")
+    b1, b2, b3 = st.columns(3)
 
-    with e5:
-        st.metric("Força Ataque Away (%)", get_val(linha_exg, "FAA", "{:.2f}"))
-        st.metric("Força Defesa Away (%)", get_val(linha_exg, "FDA", "{:.2f}"))
-        st.metric("Chutes A (Marcar)", get_val(linha_mgf, "CAM", "{:.2f}"))
-        st.metric("Chutes A (Sofrer)", get_val(linha_mgf, "CAS", "{:.2f}"))
+    with b1:
+        st.metric("Placar Provável", get_val(linha_vg, "Placar_Mais_Provavel"))
 
+    with b2:
+        st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
+
+    with b3:
+        st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
@@ -467,34 +418,138 @@ with tab2:
                 use_container_width=True
             )
 
+
 # =========================================
 # ABA 3 — POISSON MGF
 # =========================================
 with tab3:
+
+    mostrar_card(df_mgf, jogo)
+
+    st.subheader(jogo)
+
+    st.markdown("### 🎯 Odds Justas MGF")
+
+    o1, o2, o3 = st.columns(3)
+
+    with o1:
+        ev = calc_ev(linha_mgf["Odds_Casa"], linha_mgf["Odd_Justa_Home"])
+        st.metric("Odds Casa", linha_mgf["Odds_Casa"])
+        st.metric("Odd Justa", linha_mgf["Odd_Justa_Home"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    with o2:
+        ev = calc_ev(linha_mgf["Odds_Empate"], linha_mgf["Odd_Justa_Draw"])
+        st.metric("Odds Empate", linha_mgf["Odds_Empate"])
+        st.metric("Odd Justa", linha_mgf["Odd_Justa_Draw"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    with o3:
+        ev = calc_ev(linha_mgf["Odds_Visitante"], linha_mgf["Odd_Justa_Away"])
+        st.metric("Odds Visitante", linha_mgf["Odds_Visitante"])
+        st.metric("Odd Justa", linha_mgf["Odd_Justa_Away"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    st.markdown("---")
+
     matriz = calcular_matriz_poisson(
         linha_mgf["ExG_Home_MGF"],
         linha_mgf["ExG_Away_MGF"]
     )
-    exibir_matriz(
-        matriz,
-        linha_mgf["Home_Team"],
-        linha_mgf["Visitor_Team"],
-        "Poisson — MGF"
-    )
+
+    exibir_matriz(matriz,
+                  linha_mgf["Home_Team"],
+                  linha_mgf["Visitor_Team"],
+                  "Poisson — MGF")
+
     st.dataframe(top_placares(matriz), use_container_width=True)
+    
 
 # =========================================
 # ABA 4 — POISSON ATK x DEF
 # =========================================
 with tab4:
+
+    mostrar_card(df_exg, jogo)
+
+    st.subheader(jogo)
+
+    st.markdown("### ⚔️ Odds & Modelo ATK x DEF")
+
+    o1, o2, o3 = st.columns(3)
+
+    with o1:
+        ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
+        st.metric("Odds Casa", linha_exg["Odds_Casa"])
+        st.metric("Odd Justa", linha_exg["Odd_Justa_Home"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    with o2:
+        ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
+        st.metric("Odds Empate", linha_exg["Odds_Empate"])
+        st.metric("Odd Justa", linha_exg["Odd_Justa_Draw"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    with o3:
+        ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
+        st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
+        st.metric("Odd Justa", linha_exg["Odd_Justa_Away"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    st.markdown("---")
+
     matriz = calcular_matriz_poisson(
         linha_exg["ExG_Home_ATKxDEF"],
         linha_exg["ExG_Away_ATKxDEF"]
     )
-    exibir_matriz(
-        matriz,
-        linha_exg["Home_Team"],
-        linha_exg["Visitor_Team"],
-        "Poisson — ATK x DEF"
+
+    exibir_matriz(matriz,
+                  linha_exg["Home_Team"],
+                  linha_exg["Visitor_Team"],
+                  "Poisson — ATK x DEF")
+
+    st.dataframe(top_placares(matriz), use_container_width=True)
+
+
+# =========================================
+# ABA 5 — VG
+# =========================================
+with tab5:
+
+    mostrar_card(df_vg, jogo)
+
+    st.subheader("💰 Valor do Gol (VG)")
+
+    o1, o2, o3 = st.columns(3)
+
+    with o1:
+        ev = calc_ev(linha_vg["Odds_Casa"], linha_vg["Odd_Justa_Home"])
+        st.metric("Odds Casa", linha_vg["Odds_Casa"])
+        st.metric("Odd Justa", linha_vg["Odd_Justa_Home"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    with o2:
+        ev = calc_ev(linha_vg["Odds_Empate"], linha_vg["Odd_Justa_Draw"])
+        st.metric("Odds Empate", linha_vg["Odds_Empate"])
+        st.metric("Odd Justa", linha_vg["Odd_Justa_Draw"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    with o3:
+        ev = calc_ev(linha_vg["Odds_Visitante"], linha_vg["Odd_Justa_Away"])
+        st.metric("Odds Visitante", linha_vg["Odds_Visitante"])
+        st.metric("Odd Justa", linha_vg["Odd_Justa_Away"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    st.markdown("---")
+
+    matriz = calcular_matriz_poisson(
+        linha_vg["ExG_Home_VG"],
+        linha_vg["ExG_Away_VG"]
     )
+
+    exibir_matriz(matriz,
+                  linha_vg["Home_Team"],
+                  linha_vg["Visitor_Team"],
+                  "Poisson — Valor do Gol (VG)")
+
     st.dataframe(top_placares(matriz), use_container_width=True)
