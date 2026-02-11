@@ -92,7 +92,8 @@ else:
 
     with c2:
         st.image(str(BANNERS[idx]), use_container_width=True)
-
+        
+st.write(BANNERS)
 # =========================================
 # HÍBRIDO — ARQUIVO PADRÃO + UPLOAD OPCIONAL
 # =========================================
