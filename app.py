@@ -19,34 +19,8 @@ from PIL import Image
 st.set_page_config(
     page_title="⚽🏆Poisson Skynet🏆⚽",
     layout="wide")
+st.title("⚽🏆 Poisson Skynet 🏆⚽")
 
-# =========================================
-# 🎨 TEMA VISUAL GLOBAL (FONTES MAIORES)
-# =========================================
-st.markdown("""
-<style>
-
-/* FONTE GLOBAL */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
-html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif !important;
-}
-
-
-
-/* TÍTULOS */
-h1, h2, h3 {
-    font-weight: 700 !important;
-    letter-spacing: 0.2px;
-}
-
-
-/* TABS */
-button[data-baseweb="tab"] {
-    font-size: 22px !important;
-    font-weight: 700 !important;
-}
 
 
 /* SELECTBOX */
@@ -71,29 +45,6 @@ div[data-baseweb="select"] > div {
     font-weight: 900 !important;
 }
 
-</style>
-""", unsafe_allow_html=True)
-
-
-# =========================
-# CSS FADE SUAVE
-# =========================
-st.markdown("""
-<style>
-.banner-img {
-    border-radius: 14px;
-    animation: fadein 0.8s ease-in-out;
-}
-
-@keyframes fadein {
-    from { opacity: 0; transform: scale(0.995); }
-    to   { opacity: 1; transform: scale(1); }
-}
-
-/* remove padding do topo */
-.block-container {
-    padding-top: 1rem;
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -134,9 +85,6 @@ else:
 
     with c2:
         st.image(BANNERS[final_idx], use_container_width=True)
-
-
-
 
 st.title("⚽🏆Poisson Skynet🏆⚽")
 
@@ -296,60 +244,21 @@ def calcular_score(row):
 # =========================================
 # ABAS
 # =========================================
-tab1, tab2, tab3, tab4 = st.tabs([
-    "📊 Resumo",
-    "📁 Dados Completos",
-    "🔢 Poisson — Média de Gols",
-    "⚔️ Poisson — Ataque x Defesa"
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
+"📊 Resumo",
+"📁 Dados",
+"🔢 MGF",
+"⚔️ ATK x DEF",
+"💰 VG"
 ])
 
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
-
-    st.subheader("🧠 Scanner Inteligente — Visão do Jogo")
-
-    df_cards = df_exg.copy()
-
-    if "Interpretacao" in df_cards.columns:
-
-        df_cards["Score"] = df_cards.apply(calcular_score, axis=1)
-        df_cards = df_cards[df_cards["JOGO"] == jogo]
-
-        if not df_cards.empty:
-
-            row = df_cards.iloc[0]
-            score = row["Score"]
-
-            estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
-            cor = cor_card(row["Interpretacao"])
-
-            card = f"""
-<div style="
-    background:{cor};
-    padding:18px;
-    border-radius:14px;
-    box-shadow:0 0 10px rgba(0,0,0,0.45);
-    color:white;
-    font-size:18px;
-    font-weight:600;
-    margin-bottom:18px;
-">
-
-🧠 {row['Interpretacao']}
-<br>
-<span style="font-size:26px;">{estrelas}</span>
-
-</div>
-"""
-
-            st.markdown(card, unsafe_allow_html=True)
-
     st.subheader(jogo)
 
-
-    # -------- ODDS + EV
+    # -------- LINHA 1 — ODDS + EV
     st.markdown("### 🎯 Odds")
     o1, o2, o3 = st.columns(3)
 
@@ -357,29 +266,29 @@ with tab1:
         ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
         st.metric("Odds Casa", linha_exg["Odds_Casa"])
         st.metric("Odd Justa", linha_exg["Odd_Justa_Home"])
-        st.metric("EV", f"{ev*100:.2f}%" if ev is not None else "—")
-        st.metric("Odd Over 1.5FT", linha_exg["Odd_Over_1,5FT"])
+        st.metric("EV", f"{ev*100:.2f}%" if ev else "—")
+        st.metric("Odd_Over_1,5FT", linha_exg["Odd_Over_1,5FT"])
         st.metric("VR01", get_val(linha_exg, "VR01", "{:.2f}"))
 
     with o2:
         ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
         st.metric("Odds Empate", linha_exg["Odds_Empate"])
         st.metric("Odd Justa", linha_exg["Odd_Justa_Draw"])
-        st.metric("EV", f"{ev*100:.2f}%" if ev is not None else "—")
-        st.metric("Odds Over 2.5FT", linha_exg["Odds_Over_2,5FT"])
+        st.metric("EV", f"{ev*100:.2f}%" if ev else "—")
+        st.metric("Odds_Over_2,5FT", linha_exg["Odds_Over_2,5FT"])
         st.metric("COEF_OVER1FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
 
     with o3:
         ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
         st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
         st.metric("Odd Justa", linha_exg["Odd_Justa_Away"])
-        st.metric("EV", f"{ev*100:.2f}%" if ev is not None else "—")
-        st.metric("Odds Under 2.5FT", linha_exg["Odds_Under_2,5FT"])
-        st.metric("Odd BTTS YES", linha_exg["Odd_BTTS_YES"])
+        st.metric("EV", f"{ev*100:.2f}%" if ev else "—")
+        st.metric("Odds_Under_2,5FT", linha_exg["Odds_Under_2,5FT"])
+        st.metric("Odd_BTTS_YES", linha_exg["Odd_BTTS_YES"])
 
     st.markdown("---")
 
-    # -------- MGF
+    # -------- LINHA 2 — MGF
     st.markdown("### 📊 Média de Gols (MGF)")
     c1, c2, c3, c4, c5 = st.columns(5)
 
@@ -409,6 +318,8 @@ with tab1:
         st.metric("CV_GF_A", get_val(linha_mgf, "CV_GF_A", "{:.2f}"))
         st.metric("MGC_A", get_val(linha_mgf, "MGC_A", "{:.2f}"))
         st.metric("CV_GC_A", get_val(linha_mgf, "CV_GC_A", "{:.2f}"))
+
+    st.markdown("---")
 
     # -------- LINHA 3 — ATK x DEF (EXG)
     st.markdown("### ⚔️ Ataque x Defesa")
@@ -458,31 +369,42 @@ with tab2:
 # =========================================
 # ABA 3 — POISSON MGF
 # =========================================
-with tab3:
-    matriz = calcular_matriz_poisson(
-        linha_mgf["ExG_Home_MGF"],
-        linha_mgf["ExG_Away_MGF"]
-    )
-    exibir_matriz(
-        matriz,
-        linha_mgf["Home_Team"],
-        linha_mgf["Visitor_Team"],
-        "Poisson — MGF"
-    )
-    st.dataframe(top_placares(matriz), use_container_width=True)
+ith tab3:
+mostrar_card(df_mgf)
+
+ev = calc_ev(linha_mgf["Odds_Casa"], linha_mgf["Odd_Justa_Home"])
+st.metric("EV Casa", f"{ev*100:.2f}%")
+
+m = matriz_poisson(linha_mgf["ExG_Home_MGF"], linha_mgf["ExG_Away_MGF"])
+heatmap(m, linha_mgf["Home_Team"], linha_mgf["Visitor_Team"], "Poisson MGF")
 
 # =========================================
 # ABA 4 — POISSON ATK x DEF
 # =========================================
 with tab4:
-    matriz = calcular_matriz_poisson(
-        linha_exg["ExG_Home_ATKxDEF"],
-        linha_exg["ExG_Away_ATKxDEF"]
-    )
-    exibir_matriz(
-        matriz,
-        linha_exg["Home_Team"],
+mostrar_card(df_exg)
+
+ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
+st.metric("EV Casa", f"{ev*100:.2f}%")
+
+m = matriz_poisson(linha_exg["ExG_Home_ATKxDEF"], linha_exg["ExG_Away_ATKxDEF"])
+heatmap(m, linha_exg["Home_Team"], linha_exg["Visitor_Team"], "Poisson ATK x DEF")
+
+
         linha_exg["Visitor_Team"],
         "Poisson — ATK x DEF"
     )
     st.dataframe(top_placares(matriz), use_container_width=True)
+
+=========================================
+ABA 5 — VG
+=========================================
+
+with tab5:
+mostrar_card(df_vg)
+
+ev = calc_ev(linha_vg["Odds_Casa"], linha_vg["Odd_Justa_Home"])
+st.metric("EV Casa", f"{ev*100:.2f}%")
+
+m = matriz_poisson(linha_vg["ExG_Home_VG"], linha_vg["ExG_Away_VG"])
+heatmap(m, linha_vg["Home_Team"], linha_vg["Visitor_Team"], "Poisson VG")
