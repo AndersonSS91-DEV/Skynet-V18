@@ -50,46 +50,46 @@ div[data-baseweb="select"] > div {
 </style>
 """, unsafe_allow_html=True)
 
-
 # =========================================
-# 🎬 BANNER CARROSSEL — DEFINITIVO (FUNCIONA MESMO)
+# 🎬 BANNER CARROSSEL — ESTÁVEL
 # =========================================
+from pathlib import Path
 from streamlit_autorefresh import st_autorefresh
-import glob
 
-BANNERS = sorted(glob.glob("assets/banner*.png"))
+ASSETS = Path("assets")
+BANNERS = sorted(ASSETS.glob("banner*.png"))
 
 if not BANNERS:
-    st.error("Nenhuma imagem encontrada em assets/banner*.png")
+    st.warning("⚠️ Nenhum banner encontrado em /assets")
 else:
 
-    # 🔥 força rerun a cada 10s
-    count = st_autorefresh(interval=10000, key="banner_refresh")
+    # 🔥 troca automática a cada 8s
+    count = st_autorefresh(interval=8000, key="banner_refresh")
 
-    # índice automático
-    banner_idx = count % len(BANNERS)
+    if "banner_idx" not in st.session_state:
+        st.session_state.banner_idx = 0
 
-    c1, c2, c3 = st.columns([1, 8, 1])
+    # auto rotate
+    auto_idx = count % len(BANNERS)
 
-    # setas funcionam
-    if "manual_idx" not in st.session_state:
-        st.session_state.manual_idx = banner_idx
+    col1, col2, col3 = st.columns([1, 8, 1])
 
-    with c1:
+    # ◀ botão
+    with col1:
         if st.button("◀", use_container_width=True):
-            st.session_state.manual_idx = (st.session_state.manual_idx - 1) % len(BANNERS)
+            st.session_state.banner_idx = (st.session_state.banner_idx - 1) % len(BANNERS)
 
-    with c3:
+    # ▶ botão
+    with col3:
         if st.button("▶", use_container_width=True):
-            st.session_state.manual_idx = (st.session_state.manual_idx + 1) % len(BANNERS)
+            st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
 
-    # usa manual OU auto
-    final_idx = st.session_state.manual_idx if st.session_state.manual_idx != banner_idx else banner_idx
+    # se não clicou, usa automático
+    if st.session_state.banner_idx == 0:
+        st.session_state.banner_idx = auto_idx
 
-    with c2:
-        st.image(BANNERS[final_idx], use_container_width=True)
-
-st.title("⚽🏆Poisson Skynet🏆⚽")
+    with col2:
+        st.image(str(BANNERS[st.session_state.banner_idx]), use_container_width=True)
 
 # =========================================
 # HÍBRIDO — ARQUIVO PADRÃO + UPLOAD OPCIONAL
