@@ -51,49 +51,56 @@ div[data-baseweb="select"] > div {
 """, unsafe_allow_html=True)
 
 # =========================================
-# 🎬 BANNER CARROSSEL — FUNCIONANDO 100%
+# 🎬 BANNER CARROSSEL — FUNCIONANDO 100% (FIX DEFINITIVO)
 # =========================================
 from pathlib import Path
 from streamlit_autorefresh import st_autorefresh
 
 ASSETS = Path("assets")
-BANNERS = sorted(list(ASSETS.glob("banner*.png")))
+
+# 🔥 pega QUALQUER extensão (PNG/JPG/JPEG/WebP etc)
+BANNERS = sorted([
+    str(p) for p in ASSETS.glob("banner*.*")
+])
 
 if not BANNERS:
     st.warning("⚠️ Coloque imagens em /assets/banner1.png, banner2.png ...")
 else:
 
-    # 🔥 rerun automático a cada 6s
-    refresh_count = st_autorefresh(interval=6000, key="banner")
-
     total = len(BANNERS)
 
-    # índice automático baseado no refresh
+    # 🔥 refresh automático (auto play)
+    refresh_count = st_autorefresh(interval=6000, key="banner_refresh")
+
+    # índice automático
     auto_idx = refresh_count % total
 
-    # índice manual salvo
-    if "banner_manual" not in st.session_state:
-        st.session_state.banner_manual = None
+    # índice manual persistente
+    if "banner_idx" not in st.session_state:
+        st.session_state.banner_idx = auto_idx
 
     c1, c2, c3 = st.columns([1, 8, 1])
 
-    # ◀
+    # ◀ anterior
     with c1:
         if st.button("◀", use_container_width=True):
-            st.session_state.banner_manual = (auto_idx - 1) % total
+            st.session_state.banner_idx = (st.session_state.banner_idx - 1) % total
 
-    # ▶
+    # ▶ próximo
     with c3:
         if st.button("▶", use_container_width=True):
-            st.session_state.banner_manual = (auto_idx + 1) % total
+            st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
 
-    # decide qual mostrar
-    idx = st.session_state.banner_manual if st.session_state.banner_manual is not None else auto_idx
+    # 🔥 sincroniza autoplay + manual
+    if refresh_count:
+        st.session_state.banner_idx = auto_idx
 
     with c2:
-        st.image(str(BANNERS[idx]), use_container_width=True)
-        
-st.write(BANNERS)
+        st.image(BANNERS[st.session_state.banner_idx], use_container_width=True)
+
+    # debug opcional (remove depois)
+    # st.write("Banners encontrados:", total)
+
 # =========================================
 # HÍBRIDO — ARQUIVO PADRÃO + UPLOAD OPCIONAL
 # =========================================
