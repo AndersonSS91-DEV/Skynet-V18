@@ -446,6 +446,7 @@ with tab3:
         st.metric("Odds Empate", linha_mgf["Odds_Empate"])
         st.metric("Odd Justa", linha_mgf["Odd_Justa_Draw"])
         st.metric("EV", f"{ev*100:.2f}%")
+        st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
         
     with o3:
@@ -453,6 +454,7 @@ with tab3:
         st.metric("Odds Visitante", linha_mgf["Odds_Visitante"])
         st.metric("Odd Justa", linha_mgf["Odd_Justa_Away"])
         st.metric("EV", f"{ev*100:.2f}%") 
+        st.metric("ExG_Away_MGF", get_val(linha_mgf, "ExG_Away_MGF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
 
     st.markdown("---")
@@ -493,6 +495,7 @@ with tab4:
         st.metric("Odd Justa", linha_exg["Odd_Justa_Draw"])
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
+        st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
         
     with o3:
         ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
@@ -500,7 +503,8 @@ with tab4:
         st.metric("Odd Justa", linha_exg["Odd_Justa_Away"])
         st.metric("EV", f"{ev*100:.2f}%") 
         st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
-
+        st.metric("Clean Sheet Away (%)", get_val(linha_exg, "Clean_Sheet_Away_%", "{:.2f}"))
+        
     st.markdown("---")
 
     matriz = calcular_matriz_poisson(
@@ -539,6 +543,7 @@ with tab5:
         st.metric("Odd Justa", linha_vg["Odd_Justa_Draw"])
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
+        st.metric("Clean Sheet Home (%)", get_val(linha_vg, "Clean_Sheet_Home_%", "{:.2f}"))
 
     with o3:
         ev = calc_ev(linha_vg["Odds_Visitante"], linha_vg["Odd_Justa_Away"])
@@ -546,7 +551,8 @@ with tab5:
         st.metric("Odd Justa", linha_vg["Odd_Justa_Away"])
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
-        
+        st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}")
+                  
     st.markdown("---")
 
     matriz = calcular_matriz_poisson(
