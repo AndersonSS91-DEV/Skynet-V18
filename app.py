@@ -485,18 +485,21 @@ with tab4:
         st.metric("Odds Casa", linha_exg["Odds_Casa"])
         st.metric("Odd Justa", linha_exg["Odd_Justa_Home"])
         st.metric("EV", f"{ev*100:.2f}%")
-
+        st.metric("Placar Provável", get_val(linha_exg, "Placar_Mais_Provavel"))
+        
     with o2:
         ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
         st.metric("Odds Empate", linha_exg["Odds_Empate"])
         st.metric("Odd Justa", linha_exg["Odd_Justa_Draw"])
         st.metric("EV", f"{ev*100:.2f}%")
-
+        st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
+        
     with o3:
         ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
         st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
         st.metric("Odd Justa", linha_exg["Odd_Justa_Away"])
-        st.metric("EV", f"{ev*100:.2f}%")
+        st.metric("EV", f"{ev*100:.2f}%") 
+        st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
 
     st.markdown("---")
 
@@ -511,8 +514,7 @@ with tab4:
                   "Poisson — ATK x DEF")
 
     st.dataframe(top_placares(matriz), use_container_width=True)
-
-
+       
 # =========================================
 # ABA 5 — VG
 # =========================================
@@ -529,19 +531,22 @@ with tab5:
         st.metric("Odds Casa", linha_vg["Odds_Casa"])
         st.metric("Odd Justa", linha_vg["Odd_Justa_Home"])
         st.metric("EV", f"{ev*100:.2f}%")
+        st.metric("Placar Provável", get_val(linha_vg, "Placar_Mais_Provavel"))
 
     with o2:
         ev = calc_ev(linha_vg["Odds_Empate"], linha_vg["Odd_Justa_Draw"])
         st.metric("Odds Empate", linha_vg["Odds_Empate"])
         st.metric("Odd Justa", linha_vg["Odd_Justa_Draw"])
         st.metric("EV", f"{ev*100:.2f}%")
+        st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
 
     with o3:
         ev = calc_ev(linha_vg["Odds_Visitante"], linha_vg["Odd_Justa_Away"])
         st.metric("Odds Visitante", linha_vg["Odds_Visitante"])
         st.metric("Odd Justa", linha_vg["Odd_Justa_Away"])
         st.metric("EV", f"{ev*100:.2f}%")
-
+        st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
+        
     st.markdown("---")
 
     matriz = calcular_matriz_poisson(
@@ -555,3 +560,8 @@ with tab5:
                   "Poisson — Valor do Gol (VG)")
 
     st.dataframe(top_placares(matriz), use_container_width=True)
+     
+
+
+
+       
