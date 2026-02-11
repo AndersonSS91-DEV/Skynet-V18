@@ -476,7 +476,7 @@ with tab4:
 
     st.subheader(jogo)
 
-    st.markdown("### ⚔️ Odds & Modelo ATK x DEF")
+    st.markdown("### ⚔️ Odds Justas ATK x DEF")
 
     o1, o2, o3 = st.columns(3)
 
@@ -522,7 +522,7 @@ with tab5:
 
     mostrar_card(df_vg, jogo)
 
-    st.subheader("💰 Valor do Gol (VG)")
+    st.subheader("💰 Odds Justas VG")
 
     o1, o2, o3 = st.columns(3)
 
