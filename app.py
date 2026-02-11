@@ -297,102 +297,116 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 with tab1:
     st.subheader(jogo)
 
-    # -------- LINHA 1 — ODDS + EV
+    # -------- LINHA 1 — ODDS
     st.markdown("### 🎯 Odds")
     o1, o2, o3 = st.columns(3)
 
     with o1:
         ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
         st.metric("Odds Casa", linha_exg["Odds_Casa"])
-        st.metric("Odd Justa", linha_exg["Odd_Justa_Home"])
-        st.metric("EV", f"{ev*100:.2f}%" if ev else "—")
+
         st.metric("Odd_Over_1,5FT", linha_exg["Odd_Over_1,5FT"])
         st.metric("VR01", get_val(linha_exg, "VR01", "{:.2f}"))
 
     with o2:
         ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
         st.metric("Odds Empate", linha_exg["Odds_Empate"])
-        st.metric("Odd Justa", linha_exg["Odd_Justa_Draw"])
-        st.metric("EV", f"{ev*100:.2f}%" if ev else "—")
         st.metric("Odds_Over_2,5FT", linha_exg["Odds_Over_2,5FT"])
         st.metric("COEF_OVER1FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
 
     with o3:
         ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
         st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
-        st.metric("Odd Justa", linha_exg["Odd_Justa_Away"])
-        st.metric("EV", f"{ev*100:.2f}%" if ev else "—")
         st.metric("Odds_Under_2,5FT", linha_exg["Odds_Under_2,5FT"])
         st.metric("Odd_BTTS_YES", linha_exg["Odd_BTTS_YES"])
 
     st.markdown("---")
 
-    # -------- LINHA 2 — MGF
-    st.markdown("### 📊 Média de Gols (MGF)")
-    c1, c2, c3, c4, c5 = st.columns(5)
+    # -------- LINHA 2 — Métricas
+    st.markdown("### 📊Métricas")
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
 
     with c1:
         st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
+        st.metric("Posse Home (%)", get_val(linha_exg, "Posse_Bola_Home", "{:.2f}"))
         st.metric("PPJH", get_val(linha_exg, "PPJH", "{:.2f}"))
-        st.metric("PPJA", get_val(linha_exg, "PPJA", "{:.2f}"))
-
-    with c2:
         st.metric("Media_CG_H_01", get_val(linha_mgf, "Media_CG_H_01", "{:.2f}"))
         st.metric("CV_CG_H_01", get_val(linha_mgf, "CV_CG_H_01", "{:.2f}"))
+
+    with c2:
+        st.metric("Posse Away (%)", get_val(linha_exg, "Posse_Bola_Away", "{:.2f}"))
+        st.metric("PPJA", get_val(linha_exg, "PPJA", "{:.2f}"))
+        st.metric("Media_CG_A_01", get_val(linha_mgf, "Media_CG_A_01", "{:.2f}"))
+        st.metric("CV_CG_A_01", get_val(linha_mgf, "CV_CG_A_01", "{:.2f}"))
         st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
 
     with c3:
-        st.metric("Media_CG_A_01", get_val(linha_mgf, "Media_CG_A_01", "{:.2f}"))
-        st.metric("CV_CG_A_01", get_val(linha_mgf, "CV_CG_A_01", "{:.2f}"))
-        st.metric("ExG_Away_MGF", get_val(linha_mgf, "ExG_Away_MGF", "{:.2f}"))
-
-    with c4:
+        st.metric("Força Ataque Home (%)", get_val(linha_exg, "FAH", "{:.2f}"))
+        st.metric("Precisão Chutes H (%)", get_val(linha_exg, "Precisao_CG_H", "{:.2f}"))
+        st.metric("Chutes H (Marcar)", get_val(linha_mgf, "CHM", "{:.2f}"))
         st.metric("MGF_H", get_val(linha_mgf, "MGF_H", "{:.2f}"))
         st.metric("CV_GF_H", get_val(linha_mgf, "CV_GF_H", "{:.2f}"))
+
+    with c4:
+        st.metric("Força Ataque Away (%)", get_val(linha_exg, "FAA", "{:.2f}"))
+        st.metric("Precisão Chutes A (%)", get_val(linha_exg, "Precisao_CG_A", "{:.2f}"))
+        st.metric("Chutes A (Marcar)", get_val(linha_mgf, "CAM", "{:.2f}"))
+        st.metric("MGF_A", get_val(linha_mgf, "MGF_A", "{:.2f}"))
+        st.metric("CV_GF_A", get_val(linha_mgf, "CV_GF_A", "{:.2f}"))
+
+    with c5:
+        st.metric("Força Defesa Home (%)", get_val(linha_exg, "FDH", "{:.2f}"))
+        st.metric("Clean Games Home (%)", get_val(linha_exg, "Clean_Games_H"))
+        st.metric("Chutes H (Sofrer)", get_val(linha_mgf, "CHS", "{:.2f}"))
         st.metric("MGC_H", get_val(linha_mgf, "MGC_H", "{:.2f}"))
         st.metric("CV_GC_H", get_val(linha_mgf, "CV_GC_H", "{:.2f}"))
 
-    with c5:
-        st.metric("MGF_A", get_val(linha_mgf, "MGF_A", "{:.2f}"))
-        st.metric("CV_GF_A", get_val(linha_mgf, "CV_GF_A", "{:.2f}"))
+    with c6:
+        st.metric("Força Defesa Away (%)", get_val(linha_exg, "FDA", "{:.2f}"))
+        st.metric("Clean Games Away (%)", get_val(linha_exg, "Clean_Games_A"))
+        st.metric("Chutes A (Sofrer)", get_val(linha_mgf, "CAS", "{:.2f}"))
         st.metric("MGC_A", get_val(linha_mgf, "MGC_A", "{:.2f}"))
         st.metric("CV_GC_A", get_val(linha_mgf, "CV_GC_A", "{:.2f}"))
 
-    st.markdown("---")
 
-    # -------- LINHA 3 — ATK x DEF (EXG)
+    # -------- LINHA 3 — MGF
+    st.markdown("### 📊 MGF")
+    a1, a2, a3 = st.columns(3)
+
+    with a1:
+        st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
+
+    with a2:
+        st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
+
+    with a3:
+        st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
+
+    # -------- LINHA 4 — ATK x DEF
     st.markdown("### ⚔️ Ataque x Defesa")
-    e1, e2, e3, e4, e5 = st.columns(5)
+    e1, e2, e3 = st.columns(3)
 
     with e1:
         st.metric("Placar Provável", get_val(linha_exg, "Placar_Mais_Provavel"))
-        st.metric("Posse Home (%)", get_val(linha_exg, "Posse_Bola_Home", "{:.2f}"))
-        st.metric("Posse Away (%)", get_val(linha_exg, "Posse_Bola_Away", "{:.2f}"))
 
     with e2:
-        st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
-        st.metric("Clean Games Home (%)", get_val(linha_exg, "Clean_Games_H"))
-        st.metric("Precisão Chutes H (%)", get_val(linha_exg, "Precisao_CG_H", "{:.2f}"))
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
 
     with e3:
-        st.metric("Clean Sheet Away (%)", get_val(linha_exg, "Clean_Sheet_Away_%", "{:.2f}"))
-        st.metric("Clean Games Away (%)", get_val(linha_exg, "Clean_Games_A"))
-        st.metric("Precisão Chutes A (%)", get_val(linha_exg, "Precisao_CG_A", "{:.2f}"))
         st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
 
-    with e4:
-        st.metric("Força Ataque Home (%)", get_val(linha_exg, "FAH", "{:.2f}"))
-        st.metric("Força Defesa Home (%)", get_val(linha_exg, "FDH", "{:.2f}"))
-        st.metric("Chutes H (Marcar)", get_val(linha_mgf, "CHM", "{:.2f}"))
-        st.metric("Chutes H (Sofrer)", get_val(linha_mgf, "CHS", "{:.2f}"))
+    # -------- LINHA 5 — VG
+    st.markdown("### 💰 Gols Value")
+    b1, b2, b3 = st.columns(3)
 
-    with e5:
-        st.metric("Força Ataque Away (%)", get_val(linha_exg, "FAA", "{:.2f}"))
-        st.metric("Força Defesa Away (%)", get_val(linha_exg, "FDA", "{:.2f}"))
-        st.metric("Chutes A (Marcar)", get_val(linha_mgf, "CAM", "{:.2f}"))
-        st.metric("Chutes A (Sofrer)", get_val(linha_mgf, "CAS", "{:.2f}"))
+    with b1:
+        st.metric("Placar Provável", get_val(linha_vg, "Placar_Mais_Provavel"))
 
+    with b2:
+        st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
+
+    with b3:
+        st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
