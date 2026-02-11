@@ -372,42 +372,67 @@ with tab2:
 # =========================================
 # ABA 3 — POISSON MGF
 # =========================================
-ith tab3:
-mostrar_card(df_mgf)
+with tab3:
 
-ev = calc_ev(linha_mgf["Odds_Casa"], linha_mgf["Odd_Justa_Home"])
-st.metric("EV Casa", f"{ev*100:.2f}%")
+    mostrar_card(df_mgf)
 
-m = matriz_poisson(linha_mgf["ExG_Home_MGF"], linha_mgf["ExG_Away_MGF"])
-heatmap(m, linha_mgf["Home_Team"], linha_mgf["Visitor_Team"], "Poisson MGF")
+    ev = calc_ev(linha_mgf["Odds_Casa"], linha_mgf["Odd_Justa_Home"])
+    st.metric("EV Casa", f"{ev*100:.2f}%")
 
+    m = matriz_poisson(
+        linha_mgf["ExG_Home_MGF"],
+        linha_mgf["ExG_Away_MGF"]
+    )
+
+    heatmap(
+        m,
+        linha_mgf["Home_Team"],
+        linha_mgf["Visitor_Team"],
+        "Poisson MGF"
+    )
+
+
+# =========================================
 # =========================================
 # ABA 4 — POISSON ATK x DEF
 # =========================================
 with tab4:
-mostrar_card(df_exg)
 
-ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
-st.metric("EV Casa", f"{ev*100:.2f}%")
+    mostrar_card(df_exg)
 
-m = matriz_poisson(linha_exg["ExG_Home_ATKxDEF"], linha_exg["ExG_Away_ATKxDEF"])
-heatmap(m, linha_exg["Home_Team"], linha_exg["Visitor_Team"], "Poisson ATK x DEF")
+    ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
+    st.metric("EV Casa", f"{ev*100:.2f}%")
 
-
-        linha_exg["Visitor_Team"],
-        "Poisson — ATK x DEF"
+    m = matriz_poisson(
+        linha_exg["ExG_Home_ATKxDEF"],
+        linha_exg["ExG_Away_ATKxDEF"]
     )
-    st.dataframe(top_placares(matriz), use_container_width=True)
 
-=========================================
-ABA 5 — VG
-=========================================
+    heatmap(
+        m,
+        linha_exg["Home_Team"],
+        linha_exg["Visitor_Team"],
+        "Poisson ATK x DEF"
+    )
 
+# =========================================
+# ABA 5 — VG
+# =========================================
 with tab5:
-mostrar_card(df_vg)
 
-ev = calc_ev(linha_vg["Odds_Casa"], linha_vg["Odd_Justa_Home"])
-st.metric("EV Casa", f"{ev*100:.2f}%")
+    mostrar_card(df_vg)
 
-m = matriz_poisson(linha_vg["ExG_Home_VG"], linha_vg["ExG_Away_VG"])
-heatmap(m, linha_vg["Home_Team"], linha_vg["Visitor_Team"], "Poisson VG")
+    ev = calc_ev(linha_vg["Odds_Casa"], linha_vg["Odd_Justa_Home"])
+    st.metric("EV Casa", f"{ev*100:.2f}%")
+
+    m = matriz_poisson(
+        linha_vg["ExG_Home_VG"],
+        linha_vg["ExG_Away_VG"]
+    )
+
+    heatmap(
+        m,
+        linha_vg["Home_Team"],
+        linha_vg["Visitor_Team"],
+        "Poisson VG"
+    )
