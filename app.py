@@ -51,45 +51,47 @@ div[data-baseweb="select"] > div {
 """, unsafe_allow_html=True)
 
 # =========================================
-# 🎬 BANNER CARROSSEL — ESTÁVEL
+# 🎬 BANNER CARROSSEL — FUNCIONANDO 100%
 # =========================================
 from pathlib import Path
 from streamlit_autorefresh import st_autorefresh
 
 ASSETS = Path("assets")
-BANNERS = sorted(ASSETS.glob("banner*.png"))
+BANNERS = sorted(list(ASSETS.glob("banner*.png")))
 
 if not BANNERS:
-    st.warning("⚠️ Nenhum banner encontrado em /assets")
+    st.warning("⚠️ Coloque imagens em /assets/banner1.png, banner2.png ...")
 else:
 
-    # 🔥 troca automática a cada 8s
-    count = st_autorefresh(interval=8000, key="banner_refresh")
+    # 🔥 rerun automático a cada 6s
+    refresh_count = st_autorefresh(interval=6000, key="banner")
 
-    if "banner_idx" not in st.session_state:
-        st.session_state.banner_idx = 0
+    total = len(BANNERS)
 
-    # auto rotate
-    auto_idx = count % len(BANNERS)
+    # índice automático baseado no refresh
+    auto_idx = refresh_count % total
 
-    col1, col2, col3 = st.columns([1, 8, 1])
+    # índice manual salvo
+    if "banner_manual" not in st.session_state:
+        st.session_state.banner_manual = None
 
-    # ◀ botão
-    with col1:
+    c1, c2, c3 = st.columns([1, 8, 1])
+
+    # ◀
+    with c1:
         if st.button("◀", use_container_width=True):
-            st.session_state.banner_idx = (st.session_state.banner_idx - 1) % len(BANNERS)
+            st.session_state.banner_manual = (auto_idx - 1) % total
 
-    # ▶ botão
-    with col3:
+    # ▶
+    with c3:
         if st.button("▶", use_container_width=True):
-            st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
+            st.session_state.banner_manual = (auto_idx + 1) % total
 
-    # se não clicou, usa automático
-    if st.session_state.banner_idx == 0:
-        st.session_state.banner_idx = auto_idx
+    # decide qual mostrar
+    idx = st.session_state.banner_manual if st.session_state.banner_manual is not None else auto_idx
 
-    with col2:
-        st.image(str(BANNERS[st.session_state.banner_idx]), use_container_width=True)
+    with c2:
+        st.image(str(BANNERS[idx]), use_container_width=True)
 
 # =========================================
 # HÍBRIDO — ARQUIVO PADRÃO + UPLOAD OPCIONAL
