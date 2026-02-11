@@ -243,6 +243,42 @@ def calcular_score(row):
     except:
         return 0
       
+# =========================================
+# 🎯 CARD REUTILIZÁVEL (BANNER INTERPRETAÇÃO)
+# =========================================
+def mostrar_card(df_base, jogo):
+
+    if "Interpretacao" not in df_base.columns:
+        return
+
+    linha = df_base[df_base["JOGO"] == jogo]
+    if linha.empty:
+        return
+
+    row = linha.iloc[0]
+
+    score = calcular_score(row)
+    estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
+    cor = cor_card(row["Interpretacao"])
+
+    card = f"""
+    <div style="
+        background:{cor};
+        padding:18px;
+        border-radius:14px;
+        box-shadow:0 0 10px rgba(0,0,0,0.45);
+        color:white;
+        font-size:18px;
+        font-weight:600;
+        margin-bottom:18px;
+    ">
+    🧠 {row['Interpretacao']}
+    <br>
+    <span style="font-size:26px;">{estrelas}</span>
+    </div>
+    """
+
+    st.markdown(card, unsafe_allow_html=True)
 
 # =========================================
 # ABAS
