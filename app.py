@@ -120,12 +120,11 @@ else:
 # =========================================
 df_mgf = pd.read_excel(xls, "Poisson_Media_Gols")
 df_exg = pd.read_excel(xls, "Poisson_Ataque_Defesa")
-df_vg = pd.read_excel(xls, "Poisson_VG")
+df_vg  = pd.read_excel(xls, "Poisson_VG")  # <<< FALTAVA ISSO
 
-for df in (df_mgf, df_exg):
+for df in (df_mgf, df_exg, df_vg):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
-
-
+    
 # 🔥 DEFINA AQUI (ANTES DAS TABS)
 jogos_lista = df_mgf["JOGO"].tolist()
 
@@ -133,12 +132,11 @@ if "jogo" not in st.session_state or st.session_state["jogo"] not in jogos_lista
     st.session_state["jogo"] = jogos_lista[0]
 
 jogo = st.selectbox("⚽ Escolha o jogo", jogos_lista)
-
 linha_mgf = df_mgf[df_mgf["JOGO"] == jogo].iloc[0]
 linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
+linha_vg  = df_vg[df_vg["JOGO"] == jogo].iloc[0]  # <<< FALTAVA ISSO
 
 st.session_state["jogo"] = jogo
-
 # =========================================
 # FUNÇÕES AUX
 # =========================================
