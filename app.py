@@ -426,8 +426,6 @@ with tab3:
 
     mostrar_card(df_mgf, jogo)
 
-    st.subheader(jogo)
-
     st.markdown("### 🎯 Odds Justas MGF")
 
     o1, o2, o3 = st.columns(3)
@@ -473,8 +471,6 @@ with tab3:
 with tab4:
 
     mostrar_card(df_exg, jogo)
-
-    st.subheader(jogo)
 
     st.markdown("### ⚔️ Odds Justas ATK x DEF")
 
