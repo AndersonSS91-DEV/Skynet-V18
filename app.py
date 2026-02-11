@@ -369,51 +369,98 @@ with tab2:
                 use_container_width=True
             )
 
+
 # =========================================
 # ABA 3 — POISSON MGF
 # =========================================
 with tab3:
 
-    mostrar_card(df_mgf)
+    mostrar_card(df_mgf, jogo)
 
-    ev = calc_ev(linha_mgf["Odds_Casa"], linha_mgf["Odd_Justa_Home"])
-    st.metric("EV Casa", f"{ev*100:.2f}%")
+    st.subheader(jogo)
 
-    m = matriz_poisson(
+    st.markdown("### 🎯 Odds Justas MGF")
+
+    o1, o2, o3 = st.columns(3)
+
+    with o1:
+        ev = calc_ev(linha_mgf["Odds_Casa"], linha_mgf["Odd_Justa_Home"])
+        st.metric("Odds Casa", linha_mgf["Odds_Casa"])
+        st.metric("Odd Justa", linha_mgf["Odd_Justa_Home"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    with o2:
+        ev = calc_ev(linha_mgf["Odds_Empate"], linha_mgf["Odd_Justa_Draw"])
+        st.metric("Odds Empate", linha_mgf["Odds_Empate"])
+        st.metric("Odd Justa", linha_mgf["Odd_Justa_Draw"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    with o3:
+        ev = calc_ev(linha_mgf["Odds_Visitante"], linha_mgf["Odd_Justa_Away"])
+        st.metric("Odds Visitante", linha_mgf["Odds_Visitante"])
+        st.metric("Odd Justa", linha_mgf["Odd_Justa_Away"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    st.markdown("---")
+
+    matriz = calcular_matriz_poisson(
         linha_mgf["ExG_Home_MGF"],
         linha_mgf["ExG_Away_MGF"]
     )
 
-    heatmap(
-        m,
-        linha_mgf["Home_Team"],
-        linha_mgf["Visitor_Team"],
-        "Poisson MGF"
-    )
+    exibir_matriz(matriz,
+                  linha_mgf["Home_Team"],
+                  linha_mgf["Visitor_Team"],
+                  "Poisson — MGF")
 
+    st.dataframe(top_placares(matriz), use_container_width=True)
+    
 
-# =========================================
 # =========================================
 # ABA 4 — POISSON ATK x DEF
 # =========================================
 with tab4:
 
-    mostrar_card(df_exg)
+    mostrar_card(df_exg, jogo)
 
-    ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
-    st.metric("EV Casa", f"{ev*100:.2f}%")
+    st.subheader(jogo)
 
-    m = matriz_poisson(
+    st.markdown("### ⚔️ Odds & Modelo ATK x DEF")
+
+    o1, o2, o3 = st.columns(3)
+
+    with o1:
+        ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
+        st.metric("Odds Casa", linha_exg["Odds_Casa"])
+        st.metric("Odd Justa", linha_exg["Odd_Justa_Home"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    with o2:
+        ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
+        st.metric("Odds Empate", linha_exg["Odds_Empate"])
+        st.metric("Odd Justa", linha_exg["Odd_Justa_Draw"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    with o3:
+        ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
+        st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
+        st.metric("Odd Justa", linha_exg["Odd_Justa_Away"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    st.markdown("---")
+
+    matriz = calcular_matriz_poisson(
         linha_exg["ExG_Home_ATKxDEF"],
         linha_exg["ExG_Away_ATKxDEF"]
     )
 
-    heatmap(
-        m,
-        linha_exg["Home_Team"],
-        linha_exg["Visitor_Team"],
-        "Poisson ATK x DEF"
-    )
+    exibir_matriz(matriz,
+                  linha_exg["Home_Team"],
+                  linha_exg["Visitor_Team"],
+                  "Poisson — ATK x DEF")
+
+    st.dataframe(top_placares(matriz), use_container_width=True)
+
 
 # =========================================
 # ABA 5 — VG
