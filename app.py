@@ -326,7 +326,6 @@ with tab1:
     c1, c2, c3, c4, c5, c6 = st.columns(6)
 
     with c1:
-        st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
         st.metric("Posse Home (%)", get_val(linha_exg, "Posse_Bola_Home", "{:.2f}"))
         st.metric("PPJH", get_val(linha_exg, "PPJH", "{:.2f}"))
         st.metric("Media_CG_H_01", get_val(linha_mgf, "Media_CG_H_01", "{:.2f}"))
