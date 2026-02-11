@@ -420,19 +420,40 @@ with tab4:
 # =========================================
 with tab5:
 
-    mostrar_card(df_vg)
+    mostrar_card(df_vg, jogo)
 
-    ev = calc_ev(linha_vg["Odds_Casa"], linha_vg["Odd_Justa_Home"])
-    st.metric("EV Casa", f"{ev*100:.2f}%")
+    st.subheader("💰 Valor do Gol (VG)")
 
-    m = matriz_poisson(
+    o1, o2, o3 = st.columns(3)
+
+    with o1:
+        ev = calc_ev(linha_vg["Odds_Casa"], linha_vg["Odd_Justa_Home"])
+        st.metric("Odds Casa", linha_vg["Odds_Casa"])
+        st.metric("Odd Justa", linha_vg["Odd_Justa_Home"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    with o2:
+        ev = calc_ev(linha_vg["Odds_Empate"], linha_vg["Odd_Justa_Draw"])
+        st.metric("Odds Empate", linha_vg["Odds_Empate"])
+        st.metric("Odd Justa", linha_vg["Odd_Justa_Draw"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    with o3:
+        ev = calc_ev(linha_vg["Odds_Visitante"], linha_vg["Odd_Justa_Away"])
+        st.metric("Odds Visitante", linha_vg["Odds_Visitante"])
+        st.metric("Odd Justa", linha_vg["Odd_Justa_Away"])
+        st.metric("EV", f"{ev*100:.2f}%")
+
+    st.markdown("---")
+
+    matriz = calcular_matriz_poisson(
         linha_vg["ExG_Home_VG"],
         linha_vg["ExG_Away_VG"]
     )
 
-    heatmap(
-        m,
-        linha_vg["Home_Team"],
-        linha_vg["Visitor_Team"],
-        "Poisson VG"
-    )
+    exibir_matriz(matriz,
+                  linha_vg["Home_Team"],
+                  linha_vg["Visitor_Team"],
+                  "Poisson — Valor do Gol (VG)")
+
+    st.dataframe(top_placares(matriz), use_container_width=True)
