@@ -120,6 +120,7 @@ else:
 # =========================================
 df_mgf = pd.read_excel(xls, "Poisson_Media_Gols")
 df_exg = pd.read_excel(xls, "Poisson_Ataque_Defesa")
+df_vg = pd.read_excel(xls, "Poisson_VG")
 
 for df in (df_mgf, df_exg):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
