@@ -437,18 +437,21 @@ with tab3:
         st.metric("Odds Casa", linha_mgf["Odds_Casa"])
         st.metric("Odd Justa", linha_mgf["Odd_Justa_Home"])
         st.metric("EV", f"{ev*100:.2f}%")
+        st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
 
     with o2:
         ev = calc_ev(linha_mgf["Odds_Empate"], linha_mgf["Odd_Justa_Draw"])
         st.metric("Odds Empate", linha_mgf["Odds_Empate"])
         st.metric("Odd Justa", linha_mgf["Odd_Justa_Draw"])
         st.metric("EV", f"{ev*100:.2f}%")
-
+        st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
+        
     with o3:
         ev = calc_ev(linha_mgf["Odds_Visitante"], linha_mgf["Odd_Justa_Away"])
         st.metric("Odds Visitante", linha_mgf["Odds_Visitante"])
         st.metric("Odd Justa", linha_mgf["Odd_Justa_Away"])
-        st.metric("EV", f"{ev*100:.2f}%")
+        st.metric("EV", f"{ev*100:.2f}%") 
+        st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
 
     st.markdown("---")
 
@@ -464,7 +467,6 @@ with tab3:
 
     st.dataframe(top_placares(matriz), use_container_width=True)
     
-
 # =========================================
 # ABA 4 — POISSON ATK x DEF
 # =========================================
