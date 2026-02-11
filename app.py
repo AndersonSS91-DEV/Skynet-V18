@@ -336,7 +336,6 @@ with tab1:
         st.metric("PPJA", get_val(linha_exg, "PPJA", "{:.2f}"))
         st.metric("Media_CG_A_01", get_val(linha_mgf, "Media_CG_A_01", "{:.2f}"))
         st.metric("CV_CG_A_01", get_val(linha_mgf, "CV_CG_A_01", "{:.2f}"))
-        st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
 
     with c3:
         st.metric("Força Ataque Home (%)", get_val(linha_exg, "FAH", "{:.2f}"))
@@ -375,9 +374,11 @@ with tab1:
         st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
 
     with a2:
+        st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
 
     with a3:
+        st.metric("ExG_Away_MGF", get_val(linha_mgf, "ExG_Away_MGF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
 
     # -------- LINHA 4 — ATK x DEF
@@ -389,9 +390,11 @@ with tab1:
 
     with e2:
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
-
+        st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
+        
     with e3:
         st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
+        st.metric("Clean Sheet Away (%)", get_val(linha_exg, "Clean_Sheet_Away_%", "{:.2f}"))
 
     # -------- LINHA 5 — VG
     st.markdown("### 💰 Gols Value")
@@ -402,9 +405,11 @@ with tab1:
 
     with b2:
         st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
+        st.metric("Clean Sheet Home (%)", get_val(linha_vg, "Clean_Sheet_Home_%", "{:.2f}"))
 
     with b3:
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
+        st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
