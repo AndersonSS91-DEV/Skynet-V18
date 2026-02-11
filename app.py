@@ -18,10 +18,13 @@ from PIL import Image
 # =========================================
 st.set_page_config(
     page_title="⚽🏆Poisson Skynet🏆⚽",
-    layout="wide")
+    layout="wide"
+)
+
 st.title("⚽🏆 Poisson Skynet 🏆⚽")
 
-
+st.markdown("""
+<style>
 
 /* SELECTBOX */
 .stSelectbox label {
@@ -32,7 +35,6 @@ st.title("⚽🏆 Poisson Skynet 🏆⚽")
 div[data-baseweb="select"] > div {
     font-size: 20px !important;
 }
-
 
 /* MÉTRICAS */
 [data-testid="stMetricLabel"] {
@@ -47,6 +49,7 @@ div[data-baseweb="select"] > div {
 
 </style>
 """, unsafe_allow_html=True)
+
 
 # =========================================
 # 🎬 BANNER CARROSSEL — DEFINITIVO (FUNCIONA MESMO)
