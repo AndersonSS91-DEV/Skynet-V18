@@ -50,46 +50,56 @@ div[data-baseweb="select"] > div {
 </style>
 """, unsafe_allow_html=True)
 
-
 # =========================================
-# 🎬 BANNER CARROSSEL — DEFINITIVO (FUNCIONA MESMO)
+# 🎬 BANNER CARROSSEL — FUNCIONANDO 100% (FIX DEFINITIVO)
 # =========================================
+from pathlib import Path
 from streamlit_autorefresh import st_autorefresh
-import glob
 
-BANNERS = sorted(glob.glob("assets/banner*.png"))
+ASSETS = Path("assets")
+
+# 🔥 pega QUALQUER extensão (PNG/JPG/JPEG/WebP etc)
+BANNERS = sorted([
+    str(p) for p in ASSETS.glob("banner*.*")
+])
 
 if not BANNERS:
-    st.error("Nenhuma imagem encontrada em assets/banner*.png")
+    st.warning("⚠️ Coloque imagens em /assets/banner1.png, banner2.png ...")
 else:
 
-    # 🔥 força rerun a cada 10s
-    count = st_autorefresh(interval=10000, key="banner_refresh")
+    total = len(BANNERS)
+
+    # 🔥 refresh automático (auto play)
+    refresh_count = st_autorefresh(interval=6000, key="banner_refresh")
 
     # índice automático
-    banner_idx = count % len(BANNERS)
+    auto_idx = refresh_count % total
+
+    # índice manual persistente
+    if "banner_idx" not in st.session_state:
+        st.session_state.banner_idx = auto_idx
 
     c1, c2, c3 = st.columns([1, 8, 1])
 
-    # setas funcionam
-    if "manual_idx" not in st.session_state:
-        st.session_state.manual_idx = banner_idx
-
+    # ◀ anterior
     with c1:
         if st.button("◀", use_container_width=True):
-            st.session_state.manual_idx = (st.session_state.manual_idx - 1) % len(BANNERS)
+            st.session_state.banner_idx = (st.session_state.banner_idx - 1) % total
 
+    # ▶ próximo
     with c3:
         if st.button("▶", use_container_width=True):
-            st.session_state.manual_idx = (st.session_state.manual_idx + 1) % len(BANNERS)
+            st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
 
-    # usa manual OU auto
-    final_idx = st.session_state.manual_idx if st.session_state.manual_idx != banner_idx else banner_idx
+    # 🔥 sincroniza autoplay + manual
+    if refresh_count:
+        st.session_state.banner_idx = auto_idx
 
     with c2:
-        st.image(BANNERS[final_idx], use_container_width=True)
+        st.image(BANNERS[st.session_state.banner_idx], use_container_width=True)
 
-st.title("⚽🏆Poisson Skynet🏆⚽")
+    # debug opcional (remove depois)
+    # st.write("Banners encontrados:", total)
 
 # =========================================
 # HÍBRIDO — ARQUIVO PADRÃO + UPLOAD OPCIONAL
@@ -326,7 +336,6 @@ with tab1:
     c1, c2, c3, c4, c5, c6 = st.columns(6)
 
     with c1:
-        st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
         st.metric("Posse Home (%)", get_val(linha_exg, "Posse_Bola_Home", "{:.2f}"))
         st.metric("PPJH", get_val(linha_exg, "PPJH", "{:.2f}"))
         st.metric("Media_CG_H_01", get_val(linha_mgf, "Media_CG_H_01", "{:.2f}"))
@@ -337,7 +346,6 @@ with tab1:
         st.metric("PPJA", get_val(linha_exg, "PPJA", "{:.2f}"))
         st.metric("Media_CG_A_01", get_val(linha_mgf, "Media_CG_A_01", "{:.2f}"))
         st.metric("CV_CG_A_01", get_val(linha_mgf, "CV_CG_A_01", "{:.2f}"))
-        st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
 
     with c3:
         st.metric("Força Ataque Home (%)", get_val(linha_exg, "FAH", "{:.2f}"))
@@ -376,9 +384,11 @@ with tab1:
         st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
 
     with a2:
+        st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
 
     with a3:
+        st.metric("ExG_Away_MGF", get_val(linha_mgf, "ExG_Away_MGF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
 
     # -------- LINHA 4 — ATK x DEF
@@ -390,9 +400,11 @@ with tab1:
 
     with e2:
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
-
+        st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
+        
     with e3:
         st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
+        st.metric("Clean Sheet Away (%)", get_val(linha_exg, "Clean_Sheet_Away_%", "{:.2f}"))
 
     # -------- LINHA 5 — VG
     st.markdown("### 💰 Gols Value")
@@ -403,9 +415,11 @@ with tab1:
 
     with b2:
         st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
+        st.metric("Clean Sheet Home (%)", get_val(linha_vg, "Clean_Sheet_Home_%", "{:.2f}"))
 
     with b3:
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
+        st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
@@ -426,8 +440,6 @@ with tab3:
 
     mostrar_card(df_mgf, jogo)
 
-    st.subheader(jogo)
-
     st.markdown("### 🎯 Odds Justas MGF")
 
     o1, o2, o3 = st.columns(3)
@@ -437,18 +449,23 @@ with tab3:
         st.metric("Odds Casa", linha_mgf["Odds_Casa"])
         st.metric("Odd Justa", linha_mgf["Odd_Justa_Home"])
         st.metric("EV", f"{ev*100:.2f}%")
+        st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
 
     with o2:
         ev = calc_ev(linha_mgf["Odds_Empate"], linha_mgf["Odd_Justa_Draw"])
         st.metric("Odds Empate", linha_mgf["Odds_Empate"])
         st.metric("Odd Justa", linha_mgf["Odd_Justa_Draw"])
         st.metric("EV", f"{ev*100:.2f}%")
-
+        st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
+        st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
+        
     with o3:
         ev = calc_ev(linha_mgf["Odds_Visitante"], linha_mgf["Odd_Justa_Away"])
         st.metric("Odds Visitante", linha_mgf["Odds_Visitante"])
         st.metric("Odd Justa", linha_mgf["Odd_Justa_Away"])
-        st.metric("EV", f"{ev*100:.2f}%")
+        st.metric("EV", f"{ev*100:.2f}%") 
+        st.metric("ExG_Away_MGF", get_val(linha_mgf, "ExG_Away_MGF", "{:.2f}"))
+        st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
 
     st.markdown("---")
 
@@ -464,7 +481,6 @@ with tab3:
 
     st.dataframe(top_placares(matriz), use_container_width=True)
     
-
 # =========================================
 # ABA 4 — POISSON ATK x DEF
 # =========================================
@@ -472,9 +488,7 @@ with tab4:
 
     mostrar_card(df_exg, jogo)
 
-    st.subheader(jogo)
-
-    st.markdown("### ⚔️ Odds & Modelo ATK x DEF")
+    st.markdown("### ⚔️ Odds Justas ATK x DEF")
 
     o1, o2, o3 = st.columns(3)
 
@@ -483,19 +497,24 @@ with tab4:
         st.metric("Odds Casa", linha_exg["Odds_Casa"])
         st.metric("Odd Justa", linha_exg["Odd_Justa_Home"])
         st.metric("EV", f"{ev*100:.2f}%")
-
+        st.metric("Placar Provável", get_val(linha_exg, "Placar_Mais_Provavel"))
+        
     with o2:
         ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
         st.metric("Odds Empate", linha_exg["Odds_Empate"])
         st.metric("Odd Justa", linha_exg["Odd_Justa_Draw"])
         st.metric("EV", f"{ev*100:.2f}%")
-
+        st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
+        st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
+        
     with o3:
         ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
         st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
         st.metric("Odd Justa", linha_exg["Odd_Justa_Away"])
-        st.metric("EV", f"{ev*100:.2f}%")
-
+        st.metric("EV", f"{ev*100:.2f}%") 
+        st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
+        st.metric("Clean Sheet Away (%)", get_val(linha_exg, "Clean_Sheet_Away_%", "{:.2f}"))
+        
     st.markdown("---")
 
     matriz = calcular_matriz_poisson(
@@ -509,8 +528,7 @@ with tab4:
                   "Poisson — ATK x DEF")
 
     st.dataframe(top_placares(matriz), use_container_width=True)
-
-
+       
 # =========================================
 # ABA 5 — VG
 # =========================================
@@ -518,7 +536,7 @@ with tab5:
 
     mostrar_card(df_vg, jogo)
 
-    st.subheader("💰 Valor do Gol (VG)")
+    st.subheader("💰 Odds Justas VG")
 
     o1, o2, o3 = st.columns(3)
 
@@ -527,19 +545,24 @@ with tab5:
         st.metric("Odds Casa", linha_vg["Odds_Casa"])
         st.metric("Odd Justa", linha_vg["Odd_Justa_Home"])
         st.metric("EV", f"{ev*100:.2f}%")
+        st.metric("Placar Provável", get_val(linha_vg, "Placar_Mais_Provavel"))
 
     with o2:
         ev = calc_ev(linha_vg["Odds_Empate"], linha_vg["Odd_Justa_Draw"])
         st.metric("Odds Empate", linha_vg["Odds_Empate"])
         st.metric("Odd Justa", linha_vg["Odd_Justa_Draw"])
         st.metric("EV", f"{ev*100:.2f}%")
+        st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
+        st.metric("Clean Sheet Home (%)", get_val(linha_vg, "Clean_Sheet_Home_%", "{:.2f}"))
 
     with o3:
         ev = calc_ev(linha_vg["Odds_Visitante"], linha_vg["Odd_Justa_Away"])
         st.metric("Odds Visitante", linha_vg["Odds_Visitante"])
         st.metric("Odd Justa", linha_vg["Odd_Justa_Away"])
         st.metric("EV", f"{ev*100:.2f}%")
-
+        st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
+        st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
+                  
     st.markdown("---")
 
     matriz = calcular_matriz_poisson(
@@ -553,3 +576,8 @@ with tab5:
                   "Poisson — Valor do Gol (VG)")
 
     st.dataframe(top_placares(matriz), use_container_width=True)
+     
+
+
+
+       
