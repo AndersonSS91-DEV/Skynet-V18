@@ -559,6 +559,7 @@ with tab5:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("Placar Provável", get_val(linha_vg, "Placar_Mais_Provavel"))
 
+        
     with o2:
         ev = calc_ev(linha_vg["Odds_Empate"], linha_vg["Odd_Justa_Draw"])
         st.metric("Odds Empate", linha_vg["Odds_Empate"])
@@ -566,6 +567,7 @@ with tab5:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_vg, "Clean_Sheet_Home_%", "{:.2f}"))
+        st.metric("BTTS_VG", linha_vg["BTTS_%"])
 
     with o3:
         ev = calc_ev(linha_vg["Odds_Visitante"], linha_vg["Odd_Justa_Away"])
@@ -574,6 +576,8 @@ with tab5:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
+        st.metric("Odd_BTTS_YES", linha_vg["Odd_BTTS_YES"])
+        st.metric("Odd Justa BTTS", linha_vg["Odd_Justa_BTTS"])
                   
     st.markdown("---")
 
