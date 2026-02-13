@@ -482,29 +482,7 @@ with tab3:
         linha_mgf["ExG_Away_MGF"]
     )
 
-    # 🔥 BTTS
-def calcular_btts_e_odd(matriz):
-    btts_prob = sum(
-        matriz[i][j]
-        for i in range(1, matriz.shape[0])
-        for j in range(1, matriz.shape[1])
-    )
-
-    btts_pct = btts_prob * 100
-    odd_justa = round(1 / btts_prob, 2) if btts_prob > 0 else np.nan
-
-    return btts_pct, odd_justa
-
-    # 🔥 HEATMAP
-    exibir_matriz(
-        matriz,
-        linha_mgf["Home_Team"],
-        linha_mgf["Visitor_Team"],
-        "Poisson — MGF"
-    )
-
     st.dataframe(top_placares(matriz), use_container_width=True)
-    st.write("Soma total matriz:", matriz.sum())
 
 # =========================================
 # ABA 4 — POISSON ATK x DEF
