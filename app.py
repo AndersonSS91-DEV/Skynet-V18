@@ -213,6 +213,20 @@ def top_placares(matriz, n=6):
     m["Probabilidade%"] = m["Probabilidade%"].map(lambda x: f"{x:.2f}%")
     return m
 
+
+# 🎨 BTTS (NOVO)
+def calcular_btts_e_odd(matriz):
+    prob = sum(
+        matriz[i][j]
+        for i in range(1, matriz.shape[0])
+        for j in range(1, matriz.shape[1])
+    )
+    prob_pct = prob * 100
+
+    odd_justa = round(1 / prob, 2) if prob > 0 else np.nan
+
+    return prob_pct, odd_justa
+
 # =========================================
 # 🎨 ESTILO CARDS (NOVO)
 # =========================================
@@ -467,6 +481,11 @@ with tab3:
         linha_mgf["ExG_Away_MGF"]
     )
 
+    btts_pct, btts_odd = calcular_btts_e_odd(matriz_mgf)
+c1, c2 = st.columns(2)
+c1.metric("BTTS (%)", f"{btts_pct:.2f}")
+c2.metric("Odd Justa BTTS", btts_odd)
+
     exibir_matriz(matriz,
                   linha_mgf["Home_Team"],
                   linha_mgf["Visitor_Team"],
@@ -515,6 +534,11 @@ with tab4:
         linha_exg["ExG_Away_ATKxDEF"]
     )
 
+    btts_pct, btts_odd = calcular_btts_e_odd(matriz_exg)
+c1, c2 = st.columns(2)
+c1.metric("BTTS (%)", f"{btts_pct:.2f}")
+c2.metric("Odd Justa BTTS", btts_odd)
+
     exibir_matriz(matriz,
                   linha_exg["Home_Team"],
                   linha_exg["Visitor_Team"],
@@ -562,6 +586,12 @@ with tab5:
         linha_vg["ExG_Home_VG"],
         linha_vg["ExG_Away_VG"]
     )
+
+    btts_pct, btts_odd = calcular_btts_e_odd(matriz_vg)
+
+c1, c2 = st.columns(2)
+c1.metric("BTTS (%)", f"{btts_pct:.2f}")
+c2.metric("Odd Justa BTTS", btts_odd)
 
     exibir_matriz(matriz,
                   linha_vg["Home_Team"],
