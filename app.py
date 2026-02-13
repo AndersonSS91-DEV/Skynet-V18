@@ -390,7 +390,8 @@ with tab1:
 
     with a1:
         st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
-
+        st.metric("BTTS_YES_VG (%)", linha_mgf["BTTS_%"])
+        
     with a2:
         st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
@@ -405,7 +406,8 @@ with tab1:
 
     with e1:
         st.metric("Placar Provável", get_val(linha_exg, "Placar_Mais_Provavel"))
-
+        st.metric("BTTS_YES_VG (%)", linha_exg["BTTS_%"])
+        
     with e2:
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
@@ -420,7 +422,8 @@ with tab1:
 
     with b1:
         st.metric("Placar Provável", get_val(linha_vg, "Placar_Mais_Provavel"))
-
+        st.metric("BTTS_YES_VG (%)", linha_vg["BTTS_%"])
+        
     with b2:
         st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_vg, "Clean_Sheet_Home_%", "{:.2f}"))
