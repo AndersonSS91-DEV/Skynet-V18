@@ -213,6 +213,21 @@ def top_placares(matriz, n=6):
     m["Probabilidade%"] = m["Probabilidade%"].map(lambda x: f"{x:.2f}%")
     return m
 
+
+# 🎨 BTTS (NOVO)
+def calcular_btts_e_odd(matriz):
+    # matriz deve estar em PROBABILIDADE (0–1), NÃO %
+    btts_prob = sum(
+        matriz[i][j]
+        for i in range(1, matriz.shape[0])
+        for j in range(1, matriz.shape[1])
+    )
+
+    btts_pct = btts_prob * 100
+    odd_justa = round(1 / btts_prob, 2) if btts_prob > 0 else np.nan
+
+    return btts_pct, odd_justa
+
 # =========================================
 # 🎨 ESTILO CARDS (NOVO)
 # =========================================
@@ -466,14 +481,16 @@ with tab3:
         linha_mgf["ExG_Home_MGF"],
         linha_mgf["ExG_Away_MGF"]
     )
-
-    exibir_matriz(matriz,
-                  linha_mgf["Home_Team"],
-                  linha_mgf["Visitor_Team"],
-                  "Poisson — MGF")
-
-    st.dataframe(top_placares(matriz), use_container_width=True)
     
+    # 🔥 HEATMAP
+    exibir_matriz(matriz,
+        linha_mgf["Home_Team"],
+        linha_mgf["Visitor_Team"],
+        "Poisson — MGF"
+    )
+    
+    st.dataframe(top_placares(matriz), use_container_width=True)
+
 # =========================================
 # ABA 4 — POISSON ATK x DEF
 # =========================================
@@ -515,11 +532,13 @@ with tab4:
         linha_exg["ExG_Away_ATKxDEF"]
     )
 
+        # 🔥 HEATMAP
     exibir_matriz(matriz,
-                  linha_exg["Home_Team"],
-                  linha_exg["Visitor_Team"],
-                  "Poisson — ATK x DEF")
-
+        linha_mgf["Home_Team"],
+        linha_mgf["Visitor_Team"],
+        "Poisson — ATKxDEF"
+    )
+    
     st.dataframe(top_placares(matriz), use_container_width=True)
        
 # =========================================
@@ -562,13 +581,16 @@ with tab5:
         linha_vg["ExG_Home_VG"],
         linha_vg["ExG_Away_VG"]
     )
-
+    
+    # 🔥 HEATMAP
     exibir_matriz(matriz,
-                  linha_vg["Home_Team"],
-                  linha_vg["Visitor_Team"],
-                  "Poisson — Valor do Gol (VG)")
+        linha_mgf["Home_Team"],
+        linha_mgf["Visitor_Team"],
+        "Poisson — Valor do Gol (VG)"
+    )
 
     st.dataframe(top_placares(matriz), use_container_width=True)
+   
      
 
 
