@@ -550,18 +550,22 @@ with tab5:
 
     st.subheader("💰 Odds Justas VG")
 
-    o1, o2, o3 = st.columns(3)
+o1, o2, o3 = st.columns(3)
 
-    with o1:
+with o1:
     ev_home = calc_ev(linha_vg["Odds_Casa"], linha_vg["Odd_Justa_Home"])
     ev_btts = calc_ev_btts(linha_vg["Odd_BTTS_YES"], linha_vg["Odd_Justa_BTTS"])
+
     st.metric("Odds Casa", linha_vg["Odds_Casa"])
     st.metric("Odd Justa Casa", linha_vg["Odd_Justa_Home"])
     st.metric("EV Casa", f"{ev_home*100:.2f}%")
+
     st.metric("Placar Provável", get_val(linha_vg, "Placar_Mais_Provavel"))
+
     st.metric("Odd BTTS Yes", linha_vg["Odd_BTTS_YES"])
     st.metric("Odd Justa BTTS", linha_vg["Odd_Justa_BTTS"])
     st.metric("EV BTTS", f"{ev_btts*100:.2f}%")
+
 
     with o2:
         ev = calc_ev(linha_vg["Odds_Empate"], linha_vg["Odd_Justa_Draw"])
