@@ -51,55 +51,48 @@ div[data-baseweb="select"] > div {
 """, unsafe_allow_html=True)
 
 # =========================================
-# 🎬 BANNER CARROSSEL — FUNCIONANDO 100% (FIX DEFINITIVO)
+# 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
 # =========================================
+import streamlit as st
 from pathlib import Path
 from streamlit_autorefresh import st_autorefresh
 
 ASSETS = Path("assets")
 
-# 🔥 pega QUALQUER extensão (PNG/JPG/JPEG/WebP etc)
-BANNERS = sorted([
-    str(p) for p in ASSETS.glob("banner*.*")
-])
+BANNERS = sorted(str(p) for p in ASSETS.glob("banner*.*"))
 
 if not BANNERS:
     st.warning("⚠️ Coloque imagens em /assets/banner1.png, banner2.png ...")
-else:
 
+else:
     total = len(BANNERS)
 
-    # 🔥 refresh automático (auto play)
+    # autoplay (a cada 2 min)
     refresh_count = st_autorefresh(interval=120000, key="banner_refresh")
 
-    # índice automático
-    auto_idx = refresh_count % total
-
-    # índice manual persistente
+    # inicia estado
     if "banner_idx" not in st.session_state:
-        st.session_state.banner_idx = auto_idx
+        st.session_state.banner_idx = 0
+
+    # autoplay só incrementa (não sobrescreve)
+    if refresh_count:
+        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
 
     c1, c2, c3 = st.columns([1, 8, 1])
 
-    # ◀ anterior
+    # ◀
     with c1:
         if st.button("◀", use_container_width=True):
             st.session_state.banner_idx = (st.session_state.banner_idx - 1) % total
 
-    # ▶ próximo
+    # ▶
     with c3:
         if st.button("▶", use_container_width=True):
             st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
 
-    # 🔥 sincroniza autoplay + manual
-    if refresh_count:
-        st.session_state.banner_idx = auto_idx
-
     with c2:
         st.image(BANNERS[st.session_state.banner_idx], use_container_width=True)
 
-    # debug opcional (remove depois)
-    # st.write("Banners encontrados:", total)
 
 # =========================================
 # HÍBRIDO — ARQUIVO PADRÃO + UPLOAD OPCIONAL
