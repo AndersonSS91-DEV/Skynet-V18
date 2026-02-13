@@ -606,7 +606,6 @@ with tab5:
 
     # 🔥 HEATMAP
     exibir_matriz(matriz,
-        matriz,
         linha_mgf["Home_Team"],
         linha_mgf["Visitor_Team"],
         "Poisson — Valor do Gol (VG)")
