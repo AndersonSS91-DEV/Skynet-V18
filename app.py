@@ -487,6 +487,7 @@ c1.metric("BTTS (%)", f"{btts_pct:.2f}")
 c2.metric("Odd Justa BTTS", btts_odd)
 
     exibir_matriz(matriz,
+                  
                   linha_mgf["Home_Team"],
                   linha_mgf["Visitor_Team"],
                   "Poisson — MGF")
@@ -540,6 +541,7 @@ c1.metric("BTTS (%)", f"{btts_pct:.2f}")
 c2.metric("Odd Justa BTTS", btts_odd)
 
     exibir_matriz(matriz,
+                  
                   linha_exg["Home_Team"],
                   linha_exg["Visitor_Team"],
                   "Poisson — ATK x DEF")
