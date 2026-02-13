@@ -216,16 +216,17 @@ def top_placares(matriz, n=6):
 
 # 🎨 BTTS (NOVO)
 def calcular_btts_e_odd(matriz):
-    prob = sum(
+    # matriz deve estar em PROBABILIDADE (0–1), NÃO %
+    btts_prob = sum(
         matriz[i][j]
         for i in range(1, matriz.shape[0])
         for j in range(1, matriz.shape[1])
     )
-    prob_pct = prob * 100
 
-    odd_justa = round(1 / prob, 2) if prob > 0 else np.nan
+    btts_pct = btts_prob * 100
+    odd_justa = round(1 / btts_prob, 2) if btts_prob > 0 else np.nan
 
-    return prob_pct, odd_justa
+    return btts_pct, odd_justa
 
 # =========================================
 # 🎨 ESTILO CARDS (NOVO)
@@ -482,11 +483,17 @@ with tab3:
     )
 
     # 🔥 BTTS
-    btts_pct, btts_odd = calcular_btts_e_odd(matriz)
+def calcular_btts_e_odd(matriz):
+    btts_prob = sum(
+        matriz[i][j]
+        for i in range(1, matriz.shape[0])
+        for j in range(1, matriz.shape[1])
+    )
 
-    c1, c2 = st.columns(2)
-    c1.metric("BTTS (%)", f"{btts_pct:.2f}")
-    c2.metric("Odd Justa BTTS", btts_odd)
+    btts_pct = btts_prob * 100
+    odd_justa = round(1 / btts_prob, 2) if btts_prob > 0 else np.nan
+
+    return btts_pct, odd_justa
 
     # 🔥 HEATMAP
     exibir_matriz(
@@ -497,7 +504,8 @@ with tab3:
     )
 
     st.dataframe(top_placares(matriz), use_container_width=True)
-    
+    st.write("Soma total matriz:", matriz.sum())
+
 # =========================================
 # ABA 4 — POISSON ATK x DEF
 # =========================================
