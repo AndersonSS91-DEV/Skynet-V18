@@ -547,21 +547,6 @@ with tab4:
         linha_exg["ExG_Away_ATKxDEF"]
     )
 
-        # 🔥 BTTS
-    btts_pct, btts_odd = calcular_btts_e_odd(matriz)
-
-    c1, c2 = st.columns(2)
-    c1.metric("BTTS (%)", f"{btts_pct:.2f}")
-    c2.metric("Odd Justa BTTS", btts_odd)
-
-    # 🔥 HEATMAP
-    exibir_matriz(
-        matriz,
-        linha_exg["Home_Team"],
-        linha_exg["Visitor_Team"],
-        "Poisson — ATKxDEF"
-    )
-
     st.dataframe(top_placares(matriz), use_container_width=True)
        
 # =========================================
