@@ -596,19 +596,24 @@ with tab5:
         linha_vg["ExG_Home_VG"],
         linha_vg["ExG_Away_VG"]
     )
+    
+    # 🔥 BTTS
+    btts_pct, btts_odd = calcular_btts_e_odd(matriz)
 
-    btts_pct, btts_odd = calcular_btts_e_odd(matriz_vg)
+    c1, c2 = st.columns(2)
+    c1.metric("BTTS (%)", f"{btts_pct:.2f}")
+    c2.metric("Odd Justa BTTS", btts_odd)
 
-c1, c2 = st.columns(2)
-c1.metric("BTTS (%)", f"{btts_pct:.2f}")
-c2.metric("Odd Justa BTTS", btts_odd)
-
+    # 🔥 HEATMAP
     exibir_matriz(matriz,
-                  linha_vg["Home_Team"],
-                  linha_vg["Visitor_Team"],
-                  "Poisson — Valor do Gol (VG)")
+        matriz,
+        linha_mgf["Home_Team"],
+        linha_mgf["Visitor_Team"],
+        "Poisson — Valor do Gol (VG)")
+    )
 
     st.dataframe(top_placares(matriz), use_container_width=True)
+   
      
 
 
