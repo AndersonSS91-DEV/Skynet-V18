@@ -608,7 +608,7 @@ with tab5:
     exibir_matriz(matriz,
         linha_mgf["Home_Team"],
         linha_mgf["Visitor_Team"],
-        "Poisson — Valor do Gol (VG)")
+        "Poisson — Valor do Gol (VG)"
     )
 
     st.dataframe(top_placares(matriz), use_container_width=True)
