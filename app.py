@@ -568,13 +568,6 @@ with tab5:
         linha_vg["ExG_Away_VG"]
     )
     
-    # 🔥 BTTS
-    btts_pct, btts_odd = calcular_btts_e_odd(matriz)
-
-    c1, c2 = st.columns(2)
-    c1.metric("BTTS (%)", f"{btts_pct:.2f}")
-    c2.metric("Odd Justa BTTS", btts_odd)
-
     # 🔥 HEATMAP
     exibir_matriz(matriz,
         linha_mgf["Home_Team"],
