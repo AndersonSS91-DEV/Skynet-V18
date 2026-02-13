@@ -472,6 +472,7 @@ with tab3:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
+        st.metric("BTTS_YES_VG (%)", linha_mgf["BTTS_%"])
         
     with o3:
         ev = calc_ev(linha_mgf["Odds_Visitante"], linha_mgf["Odd_Justa_Away"])
@@ -528,6 +529,7 @@ with tab4:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
+        st.metric("BTTS_YES_VG (%)", linha_exg["BTTS_%"])
         
     with o3:
         ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
