@@ -454,11 +454,17 @@ with tab3:
 
     with o1:
         ev = calc_ev(linha_mgf["Odds_Casa"], linha_mgf["Odd_Justa_Home"])
+        ev_btts = calc_ev(linha_mgf["Odd_BTTS_YES"], linha_mgf["Odd_Justa_BTTS"])
+        
         st.metric("Odds Casa", linha_mgf["Odds_Casa"])
         st.metric("Odd Justa", linha_mgf["Odd_Justa_Home"])
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
-
+        
+        st.metric("Odd BTTS Yes", linha_mgf["Odd_BTTS_YES"])
+        st.metric("Odd Justa BTTS", linha_mgf["Odd_Justa_BTTS"])
+        st.metric("EV BTTS", f"{ev_btts*100:.2f}%")
+        
     with o2:
         ev = calc_ev(linha_mgf["Odds_Empate"], linha_mgf["Odd_Justa_Draw"])
         st.metric("Odds Empate", linha_mgf["Odds_Empate"])
@@ -504,10 +510,16 @@ with tab4:
 
     with o1:
         ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
+        ev_btts = calc_ev(linha_exg["Odd_BTTS_YES"], linha_exg["Odd_Justa_BTTS"])
+        
         st.metric("Odds Casa", linha_exg["Odds_Casa"])
         st.metric("Odd Justa", linha_exg["Odd_Justa_Home"])
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("Placar Provável", get_val(linha_exg, "Placar_Mais_Provavel"))
+
+        st.metric("Odd BTTS Yes", linha_exg["Odd_BTTS_YES"])
+        st.metric("Odd Justa BTTS", linha_exg["Odd_Justa_BTTS"])
+        st.metric("EV BTTS", f"{ev_btts*100:.2f}%")
         
     with o2:
         ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
