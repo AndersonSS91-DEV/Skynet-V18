@@ -70,7 +70,7 @@ else:
     total = len(BANNERS)
 
     # 🔥 refresh automático (auto play)
-    refresh_count = st_autorefresh(interval=6000, key="banner_refresh")
+    refresh_count = st_autorefresh(interval=120000, key="banner_refresh")
 
     # índice automático
     auto_idx = refresh_count % total
