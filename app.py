@@ -498,7 +498,16 @@ with tab3:
         linha_mgf["Visitor_Team"],
         "Poisson — MGF"
     )
-    
+
+    # TESTE - AUMENTAR LETRAS
+    st.markdown("""
+<style>
+[data-testid="stDataFrame"] {
+    font-size: 18px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
     st.dataframe(top_placares(matriz), use_container_width=True)
 
 # =========================================
