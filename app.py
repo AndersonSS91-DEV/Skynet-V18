@@ -503,7 +503,7 @@ with tab3:
     st.markdown("""
 <style>
 [data-testid="stDataFrame"] {
-    font-size: 18px !important;
+    font-size: 22px !important;
 }
 </style>
 """, unsafe_allow_html=True)
