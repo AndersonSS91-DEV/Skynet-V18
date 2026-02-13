@@ -481,7 +481,14 @@ with tab3:
         linha_mgf["ExG_Home_MGF"],
         linha_mgf["ExG_Away_MGF"]
     )
-
+    
+    # 🔥 HEATMAP
+    exibir_matriz(matriz,
+        linha_mgf["Home_Team"],
+        linha_mgf["Visitor_Team"],
+        "Poisson — MGF"
+    )
+    
     st.dataframe(top_placares(matriz), use_container_width=True)
 
 # =========================================
@@ -525,6 +532,13 @@ with tab4:
         linha_exg["ExG_Away_ATKxDEF"]
     )
 
+        # 🔥 HEATMAP
+    exibir_matriz(matriz,
+        linha_mgf["Home_Team"],
+        linha_mgf["Visitor_Team"],
+        "Poisson — ATKxDEF"
+    )
+    
     st.dataframe(top_placares(matriz), use_container_width=True)
        
 # =========================================
