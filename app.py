@@ -390,7 +390,8 @@ with tab1:
 
     with a1:
         st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
-
+        st.metric("BTTS_YES_VG (%)", linha_mgf["BTTS_%"])
+        
     with a2:
         st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
@@ -405,7 +406,8 @@ with tab1:
 
     with e1:
         st.metric("Placar Provável", get_val(linha_exg, "Placar_Mais_Provavel"))
-
+        st.metric("BTTS_YES_VG (%)", linha_exg["BTTS_%"])
+        
     with e2:
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
@@ -420,7 +422,8 @@ with tab1:
 
     with b1:
         st.metric("Placar Provável", get_val(linha_vg, "Placar_Mais_Provavel"))
-
+        st.metric("BTTS_YES_VG (%)", linha_vg["BTTS_%"])
+        
     with b2:
         st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_vg, "Clean_Sheet_Home_%", "{:.2f}"))
@@ -454,11 +457,17 @@ with tab3:
 
     with o1:
         ev = calc_ev(linha_mgf["Odds_Casa"], linha_mgf["Odd_Justa_Home"])
+        ev_btts = calc_ev(linha_mgf["Odd_BTTS_YES"], linha_mgf["Odd_Justa_BTTS"])
+        
         st.metric("Odds Casa", linha_mgf["Odds_Casa"])
         st.metric("Odd Justa", linha_mgf["Odd_Justa_Home"])
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("Placar Provável", get_val(linha_mgf, "Placar_Mais_Provavel"))
-
+        
+        st.metric("Odd BTTS Yes", linha_mgf["Odd_BTTS_YES"])
+        st.metric("Odd Justa BTTS", linha_mgf["Odd_Justa_BTTS"])
+        st.metric("EV BTTS", f"{ev_btts*100:.2f}%")
+        
     with o2:
         ev = calc_ev(linha_mgf["Odds_Empate"], linha_mgf["Odd_Justa_Draw"])
         st.metric("Odds Empate", linha_mgf["Odds_Empate"])
@@ -466,6 +475,7 @@ with tab3:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
+        st.metric("BTTS_YES_VG (%)", linha_mgf["BTTS_%"])
         
     with o3:
         ev = calc_ev(linha_mgf["Odds_Visitante"], linha_mgf["Odd_Justa_Away"])
@@ -488,7 +498,16 @@ with tab3:
         linha_mgf["Visitor_Team"],
         "Poisson — MGF"
     )
-    
+
+    # TESTE - AUMENTAR LETRAS
+    st.markdown("""
+<style>
+[data-testid="stDataFrame"] {
+    font-size: 22px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
     st.dataframe(top_placares(matriz), use_container_width=True)
 
 # =========================================
@@ -504,10 +523,16 @@ with tab4:
 
     with o1:
         ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
+        ev_btts = calc_ev(linha_exg["Odd_BTTS_YES"], linha_exg["Odd_Justa_BTTS"])
+        
         st.metric("Odds Casa", linha_exg["Odds_Casa"])
         st.metric("Odd Justa", linha_exg["Odd_Justa_Home"])
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("Placar Provável", get_val(linha_exg, "Placar_Mais_Provavel"))
+
+        st.metric("Odd BTTS Yes", linha_exg["Odd_BTTS_YES"])
+        st.metric("Odd Justa BTTS", linha_exg["Odd_Justa_BTTS"])
+        st.metric("EV BTTS", f"{ev_btts*100:.2f}%")
         
     with o2:
         ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
@@ -516,6 +541,7 @@ with tab4:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
+        st.metric("BTTS_YES_VG (%)", linha_exg["BTTS_%"])
         
     with o3:
         ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
@@ -553,11 +579,18 @@ with tab5:
     o1, o2, o3 = st.columns(3)
 
     with o1:
-        ev = calc_ev(linha_vg["Odds_Casa"], linha_vg["Odd_Justa_Home"])
+        ev_home = calc_ev(linha_vg["Odds_Casa"], linha_vg["Odd_Justa_Home"])
+        ev_btts = calc_ev(linha_vg["Odd_BTTS_YES"], linha_vg["Odd_Justa_BTTS"])
+
         st.metric("Odds Casa", linha_vg["Odds_Casa"])
-        st.metric("Odd Justa", linha_vg["Odd_Justa_Home"])
-        st.metric("EV", f"{ev*100:.2f}%")
+        st.metric("Odd Justa Casa", linha_vg["Odd_Justa_Home"])
+        st.metric("EV Casa", f"{ev_home*100:.2f}%")
+
         st.metric("Placar Provável", get_val(linha_vg, "Placar_Mais_Provavel"))
+
+        st.metric("Odd BTTS Yes", linha_vg["Odd_BTTS_YES"])
+        st.metric("Odd Justa BTTS", linha_vg["Odd_Justa_BTTS"])
+        st.metric("EV BTTS", f"{ev_btts*100:.2f}%")
 
     with o2:
         ev = calc_ev(linha_vg["Odds_Empate"], linha_vg["Odd_Justa_Draw"])
@@ -566,6 +599,7 @@ with tab5:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_vg, "Clean_Sheet_Home_%", "{:.2f}"))
+        st.metric("BTTS_YES_VG (%)", linha_vg["BTTS_%"])
 
     with o3:
         ev = calc_ev(linha_vg["Odds_Visitante"], linha_vg["Odd_Justa_Away"])
@@ -574,25 +608,19 @@ with tab5:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
-                  
+
     st.markdown("---")
 
     matriz = calcular_matriz_poisson(
         linha_vg["ExG_Home_VG"],
         linha_vg["ExG_Away_VG"]
     )
-    
-    # 🔥 HEATMAP
-    exibir_matriz(matriz,
-        linha_mgf["Home_Team"],
-        linha_mgf["Visitor_Team"],
+
+    exibir_matriz(
+        matriz,
+        linha_vg["Home_Team"],
+        linha_vg["Visitor_Team"],
         "Poisson — Valor do Gol (VG)"
     )
 
     st.dataframe(top_placares(matriz), use_container_width=True)
-   
-     
-
-
-
-       
