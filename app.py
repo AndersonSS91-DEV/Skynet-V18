@@ -372,7 +372,66 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
-    st.subheader(jogo)
+    # =========================================
+# 🏁 RESULTADOS OFICIAIS (NOME DESTACADO)
+# =========================================
+
+if all(col in linha_exg.index for col in [
+    "Result_Home", "Result_Visitor",
+    "Result_Home_HT", "Result_Visitor_HT"
+]):
+
+    home = linha_exg["Home_Team"]
+    away = linha_exg["Visitor_Team"]
+
+    gh = linha_exg["Result_Home"]
+    ga = linha_exg["Result_Visitor"]
+
+    gh_ht = linha_exg["Result_Home_HT"]
+    ga_ht = linha_exg["Result_Visitor_HT"]
+
+    def estilo_time(gols_pro, gols_contra):
+        if gols_pro > gols_contra:
+            return "color:#22c55e; font-weight:900;"  # vitória verde
+        elif gols_pro < gols_contra:
+            return "color:#ef4444; font-weight:700;"  # derrota vermelho
+        else:
+            return "color:#9ca3af; font-weight:700;"  # empate neutro
+
+    r1, r2 = st.columns(2)
+
+    # ================= FT =================
+    with r1:
+        st.markdown("### 🏁 Resultado Final")
+
+        st.markdown(
+            f"""
+            <div style="font-size:22px;">
+                <span style="{estilo_time(gh, ga)}">{home}</span>
+                <span style="color:white;"> {gh} x {ga} </span>
+                <span style="{estilo_time(ga, gh)}">{away}</span>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    # ================= HT =================
+    with r2:
+        st.markdown("### ⏱️ Resultado HT")
+
+        st.markdown(
+            f"""
+            <div style="font-size:22px;">
+                <span style="{estilo_time(gh_ht, ga_ht)}">{home}</span>
+                <span style="color:white;"> {gh_ht} x {ga_ht} </span>
+                <span style="{estilo_time(ga_ht, gh_ht)}">{away}</span>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    st.markdown("---")
+
 
     # -------- LINHA 1 — ODDS
     st.markdown("### 🎯 Odds")
