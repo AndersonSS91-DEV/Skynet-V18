@@ -348,10 +348,10 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 with tab1:
 
     # ==============================
-# RESULTADO COM BOLINHA AZUL
-# ==============================
+    # RESULTADO COM BOLINHA AZUL
+    # ==============================
 
-st.markdown("## 🏁 Resultado")
+    st.markdown("## 🏁 Resultado")
 
 gh = linha_exg.get("Result Home")
 ga = linha_exg.get("Result Visitor")
