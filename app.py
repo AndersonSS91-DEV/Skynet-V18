@@ -351,7 +351,7 @@ with tab1:
     # RESULTADO
     # =========================================
 
-    st.markdown("## 🏁 Resultado")
+    st.markdown("### 🏁 Resultado")
 
     gh = linha_exg.get("Result Home")
     ga = linha_exg.get("Result Visitor")
