@@ -341,71 +341,56 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💰 VG"
 ])
 
-# =========================================
-# 🏁 RESULTADOS OFICIAIS (AUTO DETECÇÃO)
-# =========================================
+    # =========================================
+    # 🏁 RESULTADOS
+    # =========================================
 
-def buscar_resultado():
-    for df_base in [df_exg, df_mgf, df_vg]:
-        if all(col in df_base.columns for col in [
-            "Result_Home", "Result_Visitor",
-            "Result_Home_HT", "Result_Visitor_HT"
-        ]):
-            linha = df_base[df_base["JOGO"] == jogo]
-            if not linha.empty:
-                return linha.iloc[0]
-    return None
+    if (
+        "Result_Home" in linha_exg
+        and "Result_Visitor" in linha_exg
+        and pd.notna(linha_exg["Result_Home"])
+        and pd.notna(linha_exg["Result_Visitor"])
+    ):
 
-linha_resultado = buscar_resultado()
+        home = linha_exg["Home_Team"]
+        away = linha_exg["Visitor_Team"]
 
-if linha_resultado is not None:
+        gh = int(linha_exg["Result_Home"])
+        ga = int(linha_exg["Result_Visitor"])
 
-    gh = linha_resultado["Result_Home"]
-    ga = linha_resultado["Result_Visitor"]
-
-    if pd.notna(gh) and pd.notna(ga):
-
-        gh_ht = linha_resultado["Result_Home_HT"]
-        ga_ht = linha_resultado["Result_Visitor_HT"]
-
-        home = linha_resultado["Home_Team"]
-        away = linha_resultado["Visitor_Team"]
-
-        gh = int(gh)
-        ga = int(ga)
-        gh_ht = int(gh_ht) if pd.notna(gh_ht) else 0
-        ga_ht = int(ga_ht) if pd.notna(ga_ht) else 0
+        gh_ht = int(linha_exg["Result_Home_HT"]) if "Result_Home_HT" in linha_exg and pd.notna(linha_exg["Result_Home_HT"]) else 0
+        ga_ht = int(linha_exg["Result_Visitor_HT"]) if "Result_Visitor_HT" in linha_exg and pd.notna(linha_exg["Result_Visitor_HT"]) else 0
 
         def estilo(gp, gc):
             if gp > gc:
-                return "color:#22c55e; font-weight:900; font-size:26px;"
+                return "color:#22c55e; font-weight:900;"
             elif gp < gc:
-                return "color:#ef4444; font-weight:700; font-size:26px;"
+                return "color:#ef4444; font-weight:700;"
             else:
-                return "color:#9ca3af; font-weight:700; font-size:26px;"
+                return "color:#9ca3af; font-weight:700;"
 
-        r1, r2 = st.columns(2)
+        c1, c2 = st.columns(2)
 
-        with r1:
+        with c1:
             st.markdown("### 🏁 Resultado Final")
             st.markdown(
                 f"""
-                <div>
+                <div style="font-size:30px;">
                     <span style="{estilo(gh, ga)}">{home}</span>
-                    <span style="font-size:32px; font-weight:900;"> {gh} x {ga} </span>
+                    <span style="font-weight:900;"> {gh} x {ga} </span>
                     <span style="{estilo(ga, gh)}">{away}</span>
                 </div>
                 """,
                 unsafe_allow_html=True
             )
 
-        with r2:
+        with c2:
             st.markdown("### ⏱️ Resultado HT")
             st.markdown(
                 f"""
-                <div>
+                <div style="font-size:30px;">
                     <span style="{estilo(gh_ht, ga_ht)}">{home}</span>
-                    <span style="font-size:32px; font-weight:900;"> {gh_ht} x {ga_ht} </span>
+                    <span style="font-weight:900;"> {gh_ht} x {ga_ht} </span>
                     <span style="{estilo(ga_ht, gh_ht)}">{away}</span>
                 </div>
                 """,
