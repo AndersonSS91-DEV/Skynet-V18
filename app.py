@@ -26,89 +26,62 @@ st.title("⚽🏆 Poisson Skynet 🏆⚽")
 st.markdown("""
 <style>
 
-/* ============================= */
-/* GOOGLE FONT */
-/* ============================= */
+/* ===== Fonte Global ===== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
 
 html, body, [class*="css"]  {
     font-family: 'Inter', sans-serif;
 }
 
-/* ============================= */
-/* TÍTULO PRINCIPAL */
-/* ============================= */
+/* ===== Título Principal ===== */
 h1 {
+    font-size: 46px !important;
+    font-weight: 900 !important;
+}
+
+/* ===== Subheader ===== */
+h3 {
+    font-size: 28px !important;
+    font-weight: 800 !important;
+}
+
+/* ===== MÉTRICAS (SELETOR CERTO) ===== */
+
+/* Label */
+div[data-testid="metric-container"] label {
+    font-size: 14px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    opacity: 0.6 !important;
+    font-weight: 700 !important;
+}
+
+/* Valor */
+div[data-testid="metric-container"] > div {
     font-size: 42px !important;
     font-weight: 900 !important;
-    letter-spacing: 1px;
 }
 
-/* ============================= */
-/* SUBTÍTULOS */
-/* ============================= */
-h3 {
-    font-size: 26px !important;
-    font-weight: 800 !important;
-    margin-top: 25px !important;
-}
-
-/* ============================= */
-/* SELECTBOX */
-/* ============================= */
-.stSelectbox label {
-    font-size: 22px !important;
-    font-weight: 800 !important;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-div[data-baseweb="select"] > div {
-    font-size: 20px !important;
-    font-weight: 600 !important;
-}
-
-/* ============================= */
-/* MÉTRICAS */
-/* ============================= */
-[data-testid="stMetricLabel"] {
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: 0.65;
-}
-
-[data-testid="stMetricValue"] {
-    font-size: 36px !important;
-    font-weight: 900 !important;
-}
-
-/* ============================= */
-/* DATAFRAME */
-/* ============================= */
-[data-testid="stDataFrame"] {
-    font-size: 20px !important;
-}
-
-/* ============================= */
-/* TABS */
-/* ============================= */
+/* ===== TABS ===== */
 button[data-baseweb="tab"] {
     font-size: 18px !important;
     font-weight: 700 !important;
 }
 
-/* ============================= */
-/* EXPANDER */
-/* ============================= */
-.streamlit-expanderHeader {
-    font-size: 18px !important;
+/* ===== SELECTBOX ===== */
+div[data-baseweb="select"] {
+    font-size: 20px !important;
     font-weight: 700 !important;
+}
+
+/* ===== DATAFRAME ===== */
+div[data-testid="stDataFrame"] * {
+    font-size: 18px !important;
 }
 
 </style>
 """, unsafe_allow_html=True)
+
 
 # =========================================
 # 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
