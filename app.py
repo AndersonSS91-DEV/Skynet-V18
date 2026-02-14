@@ -347,7 +347,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 with tab1:
 
-    st.markdown("## 🏁 Resultado")
+    st.markdown("### 🏁 Resultado")
 
     gh = linha_exg.get("Result Home")
     ga = linha_exg.get("Result Visitor")
@@ -386,7 +386,7 @@ with tab1:
         st.markdown(
             """
             <div style="font-size:20px; margin-bottom:6px; opacity:0.8;">
-                Resultado HT:
+                st.metric('Resultado HT'):
             </div>
             """,
             unsafe_allow_html=True
