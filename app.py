@@ -344,56 +344,68 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
-with tab1:
-    st.subheader(jogo)
+# =========================================
+# 🏁 RESULTADOS OFICIAIS (VERSÃO ROBUSTA)
+# =========================================
 
-    # =========================================
-    # 🏁 RESULTADOS OFICIAIS (NOME DESTACADO)
-    # =========================================
-    if all(col in linha_exg.index for col in [
-        "Result_Home", "Result_Visitor",
-        "Result_Home_HT", "Result_Visitor_HT"
-    ]):
+colunas_resultado = [
+    "Result_Home", "Result_Visitor",
+    "Result_Home_HT", "Result_Visitor_HT"
+]
+
+if all(col in df_exg.columns for col in colunas_resultado):
+
+    gh = linha_exg.get("Result_Home")
+    ga = linha_exg.get("Result_Visitor")
+    gh_ht = linha_exg.get("Result_Home_HT")
+    ga_ht = linha_exg.get("Result_Visitor_HT")
+
+    # Só exibe se não for NaN
+    if pd.notna(gh) and pd.notna(ga):
 
         home = linha_exg["Home_Team"]
         away = linha_exg["Visitor_Team"]
 
-        gh = linha_exg["Result_Home"]
-        ga = linha_exg["Result_Visitor"]
-
-        gh_ht = linha_exg["Result_Home_HT"]
-        ga_ht = linha_exg["Result_Visitor_HT"]
+        # Converte pra int (remove .0)
+        gh = int(gh)
+        ga = int(ga)
+        gh_ht = int(gh_ht) if pd.notna(gh_ht) else 0
+        ga_ht = int(ga_ht) if pd.notna(ga_ht) else 0
 
         def estilo_time(gols_pro, gols_contra):
             if gols_pro > gols_contra:
-                return "color:#22c55e; font-weight:900;"
+                return "color:#22c55e; font-weight:900; font-size:26px;"
             elif gols_pro < gols_contra:
-                return "color:#ef4444; font-weight:700;"
+                return "color:#ef4444; font-weight:700; font-size:26px;"
             else:
-                return "color:#9ca3af; font-weight:700;"
+                return "color:#9ca3af; font-weight:700; font-size:26px;"
 
         r1, r2 = st.columns(2)
 
+        # ================= FT =================
         with r1:
             st.markdown("### 🏁 Resultado Final")
+
             st.markdown(
                 f"""
-                <div style="font-size:22px;">
+                <div>
                     <span style="{estilo_time(gh, ga)}">{home}</span>
-                    <span style="color:white;"> {gh} x {ga} </span>
+                    <span style="font-size:32px; font-weight:900;"> {gh} x {ga} </span>
                     <span style="{estilo_time(ga, gh)}">{away}</span>
                 </div>
                 """,
                 unsafe_allow_html=True
             )
 
+        # ================= HT =================
         with r2:
             st.markdown("### ⏱️ Resultado HT")
+
             st.markdown(
                 f"""
-                <div style="font-size:22px;">
+                <div>
                     <span style="{estilo_time(gh_ht, ga_ht)}">{home}</span>
-                    <span style="color:white;"> {gh_ht} x {ga_ht} </span>
+                    <span style="font-size:32px; font-weight:900;"> {gh_ht} x {ga_ht} </span>
                     <span style="{estilo_time(ga_ht, gh_ht)}">{away}</span>
                 </div>
                 """,
@@ -401,6 +413,8 @@ with tab1:
             )
 
         st.markdown("---")
+
+st.write(linha_exg[["Result_Home","Result_Visitor","Result_Home_HT","Result_Visitor_HT"]])
 
     # -------- LINHA 1 — ODDS
     st.markdown("### 🎯 Odds")
