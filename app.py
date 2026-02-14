@@ -347,69 +347,59 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 with tab1:
 
-    # ==============================
-    # RESULTADO COM BOLINHA AZUL
-    # ==============================
-
     st.markdown("## 🏁 Resultado")
 
-gh = linha_exg.get("Result Home")
-ga = linha_exg.get("Result Visitor")
-gh_ht = linha_exg.get("Result_Home_HT")
-ga_ht = linha_exg.get("Result_Visitor_HT")
+    gh = linha_exg.get("Result Home")
+    ga = linha_exg.get("Result Visitor")
+    gh_ht = linha_exg.get("Result_Home_HT")
+    ga_ht = linha_exg.get("Result_Visitor_HT")
 
-if pd.notna(gh) and pd.notna(ga):
+    if pd.notna(gh) and pd.notna(ga):
 
-    gh = int(gh)
-    ga = int(ga)
-    gh_ht = int(gh_ht) if pd.notna(gh_ht) else 0
-    ga_ht = int(ga_ht) if pd.notna(ga_ht) else 0
+        gh = int(gh)
+        ga = int(ga)
+        gh_ht = int(gh_ht) if pd.notna(gh_ht) else 0
+        ga_ht = int(ga_ht) if pd.notna(ga_ht) else 0
 
-    home = linha_exg["Home_Team"]
-    away = linha_exg["Visitor_Team"]
+        home = linha_exg["Home_Team"]
+        away = linha_exg["Visitor_Team"]
 
-    # Define vencedor
-    if gh > ga:
-        home_display = f"🔵 {home}"
-        away_display = away
-    elif ga > gh:
-        home_display = home
-        away_display = f"🔵 {away}"
+        if gh > ga:
+            home_display = f"🔵 {home}"
+            away_display = away
+        elif ga > gh:
+            home_display = home
+            away_display = f"🔵 {away}"
+        else:
+            home_display = home
+            away_display = away
+
+        st.markdown(
+            f"""
+            <div style="font-size:28px; font-weight:800; margin-bottom:8px;">
+                <span style="color:white;">{home_display}</span>
+                <span style="color:white;"> {gh} x {ga} </span>
+                <span style="color:white;">{away_display}</span>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            f"""
+            <div style="font-size:28px; opacity:0.70; margin-bottom:15px;">
+                Resultado HT: {home} {gh_ht} x {ga_ht} {away}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown("---")
+
     else:
-        home_display = home
-        away_display = away
+        st.info("⏳ Jogo ainda não finalizado")
 
-    # ===== RESULTADO FINAL =====
-    st.markdown(
-        f"""
-        <div style="font-size:34px; font-weight:900; margin-bottom:8px;">
-            <span style="color:white;">{home_display}</span>
-            <span style="color:white;"> {gh} x {ga} </span>
-            <span style="color:white;">{away_display}</span>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # ===== RESULTADO HT =====
-    st.markdown(
-        f"""
-        <div style="font-size:26px; opacity:0.85; margin-bottom:15px;">
-            Resultado HT: {home} {gh_ht} x {ga_ht} {away}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.markdown("---")
-
-else:
-    st.info("⏳ Jogo ainda não finalizado")
-
-    # =========================================
-    # AGORA CONTINUA NORMAL
-    # =========================================
-
+    # 👇 AQUI CONTINUA SUA ABA NORMAL
     st.markdown("### 🎯 Odds")
 
     o1, o2, o3 = st.columns(3)
