@@ -344,11 +344,12 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
+with tab1:
     st.subheader(jogo)
 
-    # BLOCO RESULTADO AQUI (INDENTADO 4 ESPAÇOS)
     # -------- LINHA 1 — ODDS
     st.markdown("### 🎯 Odds")
+
     o1, o2, o3 = st.columns(3)
 
     with o1:
