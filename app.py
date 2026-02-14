@@ -476,6 +476,7 @@ with tab1:
         st.metric("MGC_A", get_val(linha_mgf, "MGC_A", "{:.2f}"))
         st.metric("CV_GC_A", get_val(linha_mgf, "CV_GC_A", "{:.2f}"))
 
+    st.markdown("---")
 
     # -------- LINHA 3 — MGF
     st.markdown("### 📊 MGF")
@@ -493,6 +494,8 @@ with tab1:
         st.metric("ExG_Away_MGF", get_val(linha_mgf, "ExG_Away_MGF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
 
+    st.markdown("---")
+    
     # -------- LINHA 4 — ATK x DEF
     st.markdown("### ⚔️ Ataque x Defesa")
     e1, e2, e3 = st.columns(3)
@@ -509,6 +512,8 @@ with tab1:
         st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_exg, "Clean_Sheet_Away_%", "{:.2f}"))
 
+    st.markdown("---")
+    
     # -------- LINHA 5 — VG
     st.markdown("### 💰 Gols Value")
     b1, b2, b3 = st.columns(3)
