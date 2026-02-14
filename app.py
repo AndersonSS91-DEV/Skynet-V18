@@ -341,60 +341,72 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💰 VG"
 ])
 
-st.markdown("## 🏁 Resultado")
 
-gh = linha_exg.get("Result Home")
-ga = linha_exg.get("Result Visitor")
-gh_ht = linha_exg.get("Result_Home_HT")
-ga_ht = linha_exg.get("Result_Visitor_HT")
+# ABA 1
+with tab1:
 
-if pd.notna(gh) and pd.notna(ga):
+    st.subheader(jogo)
 
-    gh = int(gh)
-    ga = int(ga)
-    gh_ht = int(gh_ht) if pd.notna(gh_ht) else 0
-    ga_ht = int(ga_ht) if pd.notna(ga_ht) else 0
+    # =========================================
+    # RESULTADO
+    # =========================================
 
-    home = linha_exg["Home_Team"]
-    away = linha_exg["Visitor_Team"]
+    st.markdown("## 🏁 Resultado")
 
-    def estilo(gp, gc):
-        if gp > gc:
-            return "color:#22c55e; font-weight:900;"
-        elif gp < gc:
-            return "color:#ef4444; font-weight:700;"
-        else:
-            return "color:#9ca3af; font-weight:700;"
+    gh = linha_exg.get("Result Home")
+    ga = linha_exg.get("Result Visitor")
+    gh_ht = linha_exg.get("Result_Home_HT")
+    ga_ht = linha_exg.get("Result_Visitor_HT")
 
-    c1, c2 = st.columns(2)
+    if pd.notna(gh) and pd.notna(ga):
 
-    with c1:
-        st.markdown(
-            f"""
-            <div style="font-size:28px;">
-                <span style="{estilo(gh, ga)}">{home}</span>
-                <span style="font-weight:900;"> {gh} x {ga} </span>
-                <span style="{estilo(ga, gh)}">{away}</span>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        gh = int(gh)
+        ga = int(ga)
+        gh_ht = int(gh_ht) if pd.notna(gh_ht) else 0
+        ga_ht = int(ga_ht) if pd.notna(ga_ht) else 0
 
-    with c2:
-        st.markdown(
-            f"""
-            <div style="font-size:22px; opacity:0.7;">
-                HT: {gh_ht} x {ga_ht}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        home = linha_exg["Home_Team"]
+        away = linha_exg["Visitor_Team"]
 
-else:
-    st.info("⏳ Jogo ainda não finalizado")
+        def estilo(gp, gc):
+            if gp > gc:
+                return "color:#22c55e; font-weight:900;"
+            elif gp < gc:
+                return "color:#ef4444; font-weight:700;"
+            else:
+                return "color:#9ca3af; font-weight:700;"
 
+        c1, c2 = st.columns(2)
 
-    # -------- LINHA 1 — ODDS
+        with c1:
+            st.markdown(
+                f"""
+                <div style="font-size:28px;">
+                    <span style="{estilo(gh, ga)}">{home}</span>
+                    <span style="font-weight:900;"> {gh} x {ga} </span>
+                    <span style="{estilo(ga, gh)}">{away}</span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        with c2:
+            st.markdown(
+                f"""
+                <div style="font-size:22px; opacity:0.7;">
+                    HT: {gh_ht} x {ga_ht}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+    else:
+        st.info("⏳ Jogo ainda não finalizado")
+
+    # =========================================
+    # AGORA CONTINUA NORMAL
+    # =========================================
+
     st.markdown("### 🎯 Odds")
 
     o1, o2, o3 = st.columns(3)
