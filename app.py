@@ -434,7 +434,7 @@ with tab1:
     st.markdown("---")
 
     # -------- LINHA 2 — Métricas
-    st.markdown("### 📊Métricas")
+    st.markdown("### 📊📈Métricas")
     c1, c2, c3, c4, c5, c6 = st.columns(6)
 
     with c1:
@@ -480,7 +480,7 @@ with tab1:
     st.markdown("---")
 
     # -------- LINHA 3 — MGF
-    st.markdown("### 📊 MGF")
+    st.markdown("### ⚽🥅 MGF")
     a1, a2, a3 = st.columns(3)
 
     with a1:
@@ -550,7 +550,7 @@ with tab3:
 
     mostrar_card(df_mgf, jogo)
 
-    st.markdown("### 🎯 Odds Justas MGF")
+    st.markdown("### 🎯⚽🥅 Odds Justas MGF")
 
     o1, o2, o3 = st.columns(3)
 
@@ -595,7 +595,7 @@ with tab3:
     exibir_matriz(matriz,
         linha_mgf["Home_Team"],
         linha_mgf["Visitor_Team"],
-        "Poisson — MGF"
+        "🔢⚽🥅Poisson — MGF"
     )
 
     # TESTE - AUMENTAR LETRAS
@@ -616,7 +616,7 @@ with tab4:
 
     mostrar_card(df_exg, jogo)
 
-    st.markdown("### ⚔️ Odds Justas ATK x DEF")
+    st.markdown("### 🎯⚔️ Odds Justas ATK x DEF")
 
     o1, o2, o3 = st.columns(3)
 
@@ -661,7 +661,7 @@ with tab4:
     exibir_matriz(matriz,
         linha_mgf["Home_Team"],
         linha_mgf["Visitor_Team"],
-        "Poisson — ATKxDEF"
+        "🔢⚔️Poisson — ATKxDEF"
     )
     
     st.dataframe(top_placares(matriz), use_container_width=True)
@@ -673,7 +673,7 @@ with tab5:
 
     mostrar_card(df_vg, jogo)
 
-    st.subheader("💰 Odds Justas VG")
+    st.subheader("🎯💎⚽ Odds Justas VG")
 
     o1, o2, o3 = st.columns(3)
 
@@ -719,7 +719,7 @@ with tab5:
         matriz,
         linha_vg["Home_Team"],
         linha_vg["Visitor_Team"],
-        "Poisson — Valor do Gol (VG)"
+        "🔢💰⚽Poisson — Valor do Gol (VG)"
     )
 
     st.dataframe(top_placares(matriz), use_container_width=True)
