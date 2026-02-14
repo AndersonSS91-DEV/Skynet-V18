@@ -341,6 +341,13 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💰 VG"
 ])
 
+# =========================================
+# ABA 1 — RESUMO
+# =========================================
+with tab1:
+
+    st.subheader(jogo)
+
     # =========================================
     # 🏁 RESULTADOS
     # =========================================
@@ -357,9 +364,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 
         gh = int(linha_exg["Result_Home"])
         ga = int(linha_exg["Result_Visitor"])
-
-        gh_ht = int(linha_exg["Result_Home_HT"]) if "Result_Home_HT" in linha_exg and pd.notna(linha_exg["Result_Home_HT"]) else 0
-        ga_ht = int(linha_exg["Result_Visitor_HT"]) if "Result_Visitor_HT" in linha_exg and pd.notna(linha_exg["Result_Visitor_HT"]) else 0
 
         def estilo(gp, gc):
             if gp > gc:
@@ -389,9 +393,9 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
             st.markdown(
                 f"""
                 <div style="font-size:30px;">
-                    <span style="{estilo(gh_ht, ga_ht)}">{home}</span>
-                    <span style="font-weight:900;"> {gh_ht} x {ga_ht} </span>
-                    <span style="{estilo(ga_ht, gh_ht)}">{away}</span>
+                    <span style="{estilo(gh, ga)}">{home}</span>
+                    <span style="font-weight:900;"> {gh} x {ga} </span>
+                    <span style="{estilo(ga, gh)}">{away}</span>
                 </div>
                 """,
                 unsafe_allow_html=True
