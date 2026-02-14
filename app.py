@@ -343,8 +343,8 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 
 st.markdown("## 🏁 Resultado")
 
-gh = linha_exg.get("Result_Home")
-ga = linha_exg.get("Result_Visitor")
+gh = linha_exg.get("Result Home")
+ga = linha_exg.get("Result Visitor")
 gh_ht = linha_exg.get("Result_Home_HT")
 ga_ht = linha_exg.get("Result_Visitor_HT")
 
