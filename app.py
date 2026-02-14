@@ -498,7 +498,7 @@ with tab1:
     st.markdown("---")
     
     # -------- LINHA 4 — ATK x DEF
-    st.markdown("### ⚔️ Ataque x Defesa")
+    st.markdown("### ⚽⚔️ Ataque x Defesa")
     e1, e2, e3 = st.columns(3)
 
     with e1:
@@ -516,7 +516,7 @@ with tab1:
     st.markdown("---")
     
     # -------- LINHA 5 — VG
-    st.markdown("### 💰 Gols Value")
+    st.markdown("### ⚽💎 Gols Value")
     b1, b2, b3 = st.columns(3)
 
     with b1:
