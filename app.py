@@ -385,8 +385,8 @@ with tab1:
 
         st.markdown(
             """
-            <div style="font-size:20px; margin-bottom:6px; opacity:0.8;">
-                st.metric('Resultado HT'):
+            <div style="font-size:14px; margin-bottom:6px; opacity:0.6;">
+                (Resultado HT):
             </div>
             """,
             unsafe_allow_html=True
