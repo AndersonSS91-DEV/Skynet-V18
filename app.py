@@ -376,7 +376,7 @@ with tab1:
 
         st.markdown(
             f"""
-            <div style="font-size:28px; font-weight:800; margin-bottom:8px;">
+            <div style="font-size:28px; font-weight:700; margin-bottom:12px;">
                 <span style="color:white;">{home_display}</span>
                 <span style="color:white;"> {gh} x {ga} </span>
                 <span style="color:white;">{away_display}</span>
@@ -388,7 +388,8 @@ with tab1:
         st.markdown(
             f"""
             <div style="font-size:28px; opacity:0.70; margin-bottom:15px;">
-                Resultado HT: {home} {gh_ht} x {ga_ht} {away}
+                Resultado HT:
+                {home} {gh_ht} x {ga_ht} {away}
             </div>
             """,
             unsafe_allow_html=True
