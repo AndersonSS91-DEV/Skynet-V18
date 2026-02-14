@@ -356,49 +356,58 @@ with tab1:
 
     if pd.notna(gh) and pd.notna(ga):
 
-        gh = int(gh)
-        ga = int(ga)
-        gh_ht = int(gh_ht) if pd.notna(gh_ht) else 0
-        ga_ht = int(ga_ht) if pd.notna(ga_ht) else 0
+    gh = int(gh)
+    ga = int(ga)
+    gh_ht = int(gh_ht) if pd.notna(gh_ht) else 0
+    ga_ht = int(ga_ht) if pd.notna(ga_ht) else 0
 
-        home = linha_exg["Home_Team"]
-        away = linha_exg["Visitor_Team"]
+    home = linha_exg["Home_Team"]
+    away = linha_exg["Visitor_Team"]
 
-        if gh > ga:
-            home_display = f"🔵 {home}"
-            away_display = away
-        elif ga > gh:
-            home_display = home
-            away_display = f"🔵 {away}"
-        else:
-            home_display = home
-            away_display = away
-
-        st.markdown(
-            f"""
-            <div style="font-size:28px; font-weight:700; margin-bottom:12px;">
-                <span style="color:white;">{home_display}</span>
-                <span style="color:white;"> {gh} x {ga} </span>
-                <span style="color:white;">{away_display}</span>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        st.markdown(
-            f"""
-            <div style="font-size:28px; opacity:0.70; margin-bottom:15px;">
-                Resultado HT:
-                {home} {gh_ht} x {ga_ht} {away}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        st.markdown("---")
-
+    # 🔵 Bolinha azul no vencedor final
+    if gh > ga:
+        home_display = f"🔵 {home}"
+        away_display = away
+    elif ga > gh:
+        home_display = home
+        away_display = f"🔵 {away}"
     else:
-        st.info("⏳ Jogo ainda não finalizado")
+        home_display = home
+        away_display = away
+
+    # ===== RESULTADO FINAL =====
+    st.markdown(
+        f"""
+        <div style="font-size:26px; font-weight:700; margin-bottom:16px;">
+            {home_display} {gh} x {ga} {away_display}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # ===== RESULTADO HT (EXATAMENTE COMO PRINT) =====
+    st.markdown(
+        """
+        <div style="font-size:20px; margin-bottom:6px; opacity:0.8;">
+            Resultado HT:
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        f"""
+        <div style="font-size:28px; font-weight:700;">
+            {home} {gh_ht} x {ga_ht} {away}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown("---")
+
+else:
+    st.info("⏳ Jogo ainda não finalizado")
 
     # 👇 AQUI CONTINUA SUA ABA NORMAL
     st.markdown("### 🎯 Odds")
