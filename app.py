@@ -415,7 +415,11 @@ if all(col in df_exg.columns for col in colunas_resultado):
         st.markdown("---")
 
 st.write(linha_exg[["Result_Home","Result_Visitor","Result_Home_HT","Result_Visitor_HT"]])
+with tab1:
 
+    st.subheader(jogo)
+
+    # BLOCO RESULTADO AQUI (INDENTADO 4 ESPAÇOS)
     # -------- LINHA 1 — ODDS
     st.markdown("### 🎯 Odds")
     o1, o2, o3 = st.columns(3)
