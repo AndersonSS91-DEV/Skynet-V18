@@ -342,75 +342,77 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 ])
 
 # =========================================
-# ABA 1 — RESUMO
+# 🏁 RESULTADOS OFICIAIS (AUTO DETECÇÃO)
 # =========================================
-with tab1:
 
-    st.subheader(jogo)
+def buscar_resultado():
+    for df_base in [df_exg, df_mgf, df_vg]:
+        if all(col in df_base.columns for col in [
+            "Result_Home", "Result_Visitor",
+            "Result_Home_HT", "Result_Visitor_HT"
+        ]):
+            linha = df_base[df_base["JOGO"] == jogo]
+            if not linha.empty:
+                return linha.iloc[0]
+    return None
 
-    # =========================================
-    # 🏁 RESULTADOS OFICIAIS (VERSÃO ROBUSTA)
-    # =========================================
+linha_resultado = buscar_resultado()
 
-    colunas_resultado = [
-        "Result_Home", "Result_Visitor",
-        "Result_Home_HT", "Result_Visitor_HT"
-    ]
+if linha_resultado is not None:
 
-    if all(col in df_exg.columns for col in colunas_resultado):
+    gh = linha_resultado["Result_Home"]
+    ga = linha_resultado["Result_Visitor"]
 
-        gh = linha_exg.get("Result_Home")
-        ga = linha_exg.get("Result_Visitor")
-        gh_ht = linha_exg.get("Result_Home_HT")
-        ga_ht = linha_exg.get("Result_Visitor_HT")
+    if pd.notna(gh) and pd.notna(ga):
 
-        if pd.notna(gh) and pd.notna(ga):
+        gh_ht = linha_resultado["Result_Home_HT"]
+        ga_ht = linha_resultado["Result_Visitor_HT"]
 
-            home = linha_exg["Home_Team"]
-            away = linha_exg["Visitor_Team"]
+        home = linha_resultado["Home_Team"]
+        away = linha_resultado["Visitor_Team"]
 
-            gh = int(gh)
-            ga = int(ga)
-            gh_ht = int(gh_ht) if pd.notna(gh_ht) else 0
-            ga_ht = int(ga_ht) if pd.notna(ga_ht) else 0
+        gh = int(gh)
+        ga = int(ga)
+        gh_ht = int(gh_ht) if pd.notna(gh_ht) else 0
+        ga_ht = int(ga_ht) if pd.notna(ga_ht) else 0
 
-            def estilo_time(gols_pro, gols_contra):
-                if gols_pro > gols_contra:
-                    return "color:#22c55e; font-weight:900; font-size:26px;"
-                elif gols_pro < gols_contra:
-                    return "color:#ef4444; font-weight:700; font-size:26px;"
-                else:
-                    return "color:#9ca3af; font-weight:700; font-size:26px;"
+        def estilo(gp, gc):
+            if gp > gc:
+                return "color:#22c55e; font-weight:900; font-size:26px;"
+            elif gp < gc:
+                return "color:#ef4444; font-weight:700; font-size:26px;"
+            else:
+                return "color:#9ca3af; font-weight:700; font-size:26px;"
 
-            r1, r2 = st.columns(2)
+        r1, r2 = st.columns(2)
 
-            with r1:
-                st.markdown("### 🏁 Resultado Final")
-                st.markdown(
-                    f"""
-                    <div>
-                        <span style="{estilo_time(gh, ga)}">{home}</span>
-                        <span style="font-size:32px; font-weight:900;"> {gh} x {ga} </span>
-                        <span style="{estilo_time(ga, gh)}">{away}</span>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+        with r1:
+            st.markdown("### 🏁 Resultado Final")
+            st.markdown(
+                f"""
+                <div>
+                    <span style="{estilo(gh, ga)}">{home}</span>
+                    <span style="font-size:32px; font-weight:900;"> {gh} x {ga} </span>
+                    <span style="{estilo(ga, gh)}">{away}</span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
-            with r2:
-                st.markdown("### ⏱️ Resultado HT")
-                st.markdown(
-                    f"""
-                    <div>
-                        <span style="{estilo_time(gh_ht, ga_ht)}">{home}</span>
-                        <span style="font-size:32px; font-weight:900;"> {gh_ht} x {ga_ht} </span>
-                        <span style="{estilo_time(ga_ht, gh_ht)}">{away}</span>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+        with r2:
+            st.markdown("### ⏱️ Resultado HT")
+            st.markdown(
+                f"""
+                <div>
+                    <span style="{estilo(gh_ht, ga_ht)}">{home}</span>
+                    <span style="font-size:32px; font-weight:900;"> {gh_ht} x {ga_ht} </span>
+                    <span style="{estilo(ga_ht, gh_ht)}">{away}</span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
-            st.markdown("---")
+        st.markdown("---")
 
     # -------- LINHA 1 — ODDS
     st.markdown("### 🎯 Odds")
