@@ -334,11 +334,11 @@ def mostrar_card(df_base, jogo):
 # ABAS
 # =========================================
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
-"📊 Resumo",
-"📁 Dados",
-"🔢 MGF",
-"⚔️ ATK x DEF",
-"💰 VG"
+"📊🧠 Resumo",
+"📁🧠 Dados",
+"📊⚽ MGF",
+"⚔️⚽ ATK x DEF",
+"💎⚽ VG"
 ])
 
 
