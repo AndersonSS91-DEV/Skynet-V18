@@ -386,7 +386,7 @@ with tab1:
         st.markdown(
             """
             <div style="font-size:14px; margin-bottom:6px; opacity:0.6;">
-                (Resultado HT):
+                Resultado HT
             </div>
             """,
             unsafe_allow_html=True
