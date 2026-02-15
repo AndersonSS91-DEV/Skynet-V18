@@ -204,9 +204,12 @@ def calcular_over_under(matriz, max_gols=4):
     linhas = [0.5, 1.5, 2.5, 3.5, 4.5]
     resultados = {}
 
+    # converter para probabilidade
+    matriz_prob = matriz / 100
+
     for linha in linhas:
         over = sum(
-            matriz[i][j]
+            matriz_prob[i][j]
             for i in range(max_gols+1)
             for j in range(max_gols+1)
             if i + j > linha
