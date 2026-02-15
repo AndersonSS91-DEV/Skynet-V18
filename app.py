@@ -747,7 +747,9 @@ with tab5:
     ou = calcular_over_under(matriz)
 
     st.markdown("### ⚽ Over/Under — Valor do Gol (VG)")
+    
     df_ou = df_ou.round(2)
+    
     df_ou = pd.DataFrame({
         "Linha": ["0.5","1.5","2.5","3.5","4.5"],
         "Over %": [ou['Over 0.5'], ou['Over 1.5'], ou['Over 2.5'], ou['Over 3.5'], ou['Over 4.5']],
