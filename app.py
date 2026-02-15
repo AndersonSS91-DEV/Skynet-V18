@@ -199,7 +199,23 @@ def calcular_matriz_poisson(lh, la, max_gols=4):
             matriz[i, j] = poisson.pmf(i, lh) * poisson.pmf(j, la)
     return matriz * 100
 
+    
+def calcular_over_under(matriz, max_gols=4):
+    linhas = [0.5, 1.5, 2.5, 3.5, 4.5]
+    resultados = {}
 
+    for linha in linhas:
+        over = sum(
+            matriz[i][j]
+            for i in range(max_gols+1)
+            for j in range(max_gols+1)
+            if i + j > linha
+        )
+        resultados[f'Over {linha}'] = over * 100
+        resultados[f'Under {linha}'] = (1 - over) * 100
+
+    return resultados
+    
 def exibir_matriz(matriz, home, away, titulo):
     df = pd.DataFrame(
         matriz,
@@ -329,39 +345,6 @@ def mostrar_card(df_base, jogo):
     """
 
     st.markdown(card, unsafe_allow_html=True)
-
-
-def calcular_over_under(matriz, max_gols=4):
-    linhas = [0.5, 1.5, 2.5, 3.5, 4.5]
-    resultados = {}
-
-    for linha in linhas:
-        over = sum(
-            matriz[i][j]
-            for i in range(max_gols+1)
-            for j in range(max_gols+1)
-            if i + j > linha
-        )
-        resultados[f'Over {linha}'] = over * 100
-        resultados[f'Under {linha}'] = (1 - over) * 100
-
-    return resultados
-    
-def calcular_over_under(matriz, max_gols=4):
-    linhas = [0.5, 1.5, 2.5, 3.5, 4.5]
-    resultados = {}
-
-    for linha in linhas:
-        over = sum(
-            matriz[i][j]
-            for i in range(max_gols+1)
-            for j in range(max_gols+1)
-            if i + j > linha
-        )
-        resultados[f'Over {linha}'] = over * 100
-        resultados[f'Under {linha}'] = (1 - over) * 100
-
-    return resultados
 
 # =========================================
 # ABAS
@@ -755,24 +738,6 @@ with tab5:
         "🔢💰⚽Poisson — Valor do Gol (VG)"
     )
     
-def calcular_over_under(matriz, max_gols=4):
-    linhas = [0.5, 1.5, 2.5, 3.5, 4.5]
-    resultados = {}
-
-    for linha in linhas:
-        over = sum(
-            matriz[i][j]
-            for i in range(max_gols+1)
-            for j in range(max_gols+1)
-            if i + j > linha
-        )
-        resultados[f'Over {linha}'] = over * 100
-        resultados[f'Under {linha}'] = (1 - over) * 100
-
-    return resultados
-
-    ou = calcular_over_under(matriz)
-
     # =========================
     # OVER / UNDER
     # =========================
@@ -788,6 +753,5 @@ def calcular_over_under(matriz, max_gols=4):
 
     st.dataframe(df_ou, use_container_width=True)
 
-
-
+    # 🔥 TABELA TOP PLACARES (VOLTA AO NORMAL)
     st.dataframe(top_placares(matriz), use_container_width=True)
