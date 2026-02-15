@@ -605,30 +605,25 @@ with tab3:
 
     st.markdown("---")
 
-    matriz = calcular_matriz_poisson(
-        linha_mgf["ExG_Home_MGF"],
-        linha_mgf["ExG_Away_MGF"]
-    )
-    
-    # 🔥 HEATMAP
-    exibir_matriz(matriz,
-        linha_mgf["Home_Team"],
-        linha_mgf["Visitor_Team"],
-        "🔢⚽🥅Poisson — MGF"
-    )
+matriz = calcular_matriz_poisson(
+    linha_mgf["ExG_Home_MGF"],
+    linha_mgf["ExG_Away_MGF"]
+)
 
-def mostrar_over_under(matriz, titulo):
-    ou = calcular_over_under(matriz)
+exibir_matriz(
+    matriz,
+    linha_mgf["Home_Team"],
+    linha_mgf["Visitor_Team"],
+    "🔢⚽🥅 Poisson — MGF"
+)
 
-    st.markdown(f"### ⚽ {titulo}")
+mostrar_over_under(
+    matriz,
+    "Over/Under — Média de Gols (MGF)"
+)
 
-    df_ou = pd.DataFrame({
-        "Linha": ["0.5","1.5","2.5","3.5","4.5"],
-        "Over %": [ou['Over 0.5'], ou['Over 1.5'], ou['Over 2.5'], ou['Over 3.5'], ou['Over 4.5']],
-        "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
-    }).round(2)
+st.dataframe(top_placares(matriz), use_container_width=True)
 
-    st.dataframe(df_ou, use_container_width=True)
 
 # =========================================
 # ABA 4 — POISSON ATK x DEF
@@ -673,30 +668,25 @@ with tab4:
         
     st.markdown("---")
 
-    matriz = calcular_matriz_poisson(
-        linha_exg["ExG_Home_ATKxDEF"],
-        linha_exg["ExG_Away_ATKxDEF"]
-    )
+matriz = calcular_matriz_poisson(
+    linha_exg["ExG_Home_ATKxDEF"],
+    linha_exg["ExG_Away_ATKxDEF"]
+)
 
-        # 🔥 HEATMAP
-    exibir_matriz(matriz,
-        linha_mgf["Home_Team"],
-        linha_mgf["Visitor_Team"],
-        "🔢⚔️Poisson — ATKxDEF"
-    )
-    
-def mostrar_over_under(matriz, titulo):
-    ou = calcular_over_under(matriz)
+exibir_matriz(
+    matriz,
+    linha_exg["Home_Team"],
+    linha_exg["Visitor_Team"],
+    "🔢⚔️ Poisson — ATK x DEF"
+)
 
-    st.markdown(f"### ⚽ {titulo}")
+mostrar_over_under(
+    matriz,
+    "Over/Under — Ataque x Defesa"
+)
 
-    df_ou = pd.DataFrame({
-        "Linha": ["0.5","1.5","2.5","3.5","4.5"],
-        "Over %": [ou['Over 0.5'], ou['Over 1.5'], ou['Over 2.5'], ou['Over 3.5'], ou['Over 4.5']],
-        "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
-    }).round(2)
+st.dataframe(top_placares(matriz), use_container_width=True)
 
-    st.dataframe(df_ou, use_container_width=True)
        
 # =========================================
 # ABA 5 — VG
