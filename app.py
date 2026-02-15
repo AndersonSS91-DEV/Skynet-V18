@@ -346,6 +346,22 @@ def calcular_over_under(matriz, max_gols=4):
         resultados[f'Under {linha}'] = (1 - over) * 100
 
     return resultados
+    
+def calcular_over_under(matriz, max_gols=4):
+    linhas = [0.5, 1.5, 2.5, 3.5, 4.5]
+    resultados = {}
+
+    for linha in linhas:
+        over = sum(
+            matriz[i][j]
+            for i in range(max_gols+1)
+            for j in range(max_gols+1)
+            if i + j > linha
+        )
+        resultados[f'Over {linha}'] = over * 100
+        resultados[f'Under {linha}'] = (1 - over) * 100
+
+    return resultados
 
 # =========================================
 # ABAS
