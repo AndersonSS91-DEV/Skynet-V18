@@ -330,6 +330,23 @@ def mostrar_card(df_base, jogo):
 
     st.markdown(card, unsafe_allow_html=True)
 
+
+def calcular_over_under(matriz, max_gols=4):
+    linhas = [0.5, 1.5, 2.5, 3.5, 4.5]
+    resultados = {}
+
+    for linha in linhas:
+        over = sum(
+            matriz[i][j]
+            for i in range(max_gols+1)
+            for j in range(max_gols+1)
+            if i + j > linha
+        )
+        resultados[f'Over {linha}'] = over * 100
+        resultados[f'Under {linha}'] = (1 - over) * 100
+
+    return resultados
+
 # =========================================
 # ABAS
 # =========================================
@@ -721,5 +738,40 @@ with tab5:
         linha_vg["Visitor_Team"],
         "🔢💰⚽Poisson — Valor do Gol (VG)"
     )
+    
+def calcular_over_under(matriz, max_gols=4):
+    linhas = [0.5, 1.5, 2.5, 3.5, 4.5]
+    resultados = {}
+
+    for linha in linhas:
+        over = sum(
+            matriz[i][j]
+            for i in range(max_gols+1)
+            for j in range(max_gols+1)
+            if i + j > linha
+        )
+        resultados[f'Over {linha}'] = over * 100
+        resultados[f'Under {linha}'] = (1 - over) * 100
+
+    return resultados
+
+    ou = calcular_over_under(matriz)
+
+    # =========================
+    # OVER / UNDER
+    # =========================
+    ou = calcular_over_under(matriz)
+
+    st.markdown("### ⚽ Over / Under")
+
+    df_ou = pd.DataFrame({
+        "Linha": ["0.5","1.5","2.5","3.5","4.5"],
+        "Over %": [ou['Over 0.5'], ou['Over 1.5'], ou['Over 2.5'], ou['Over 3.5'], ou['Over 4.5']],
+        "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
+    })
+
+    st.dataframe(df_ou, use_container_width=True)
+
+
 
     st.dataframe(top_placares(matriz), use_container_width=True)
