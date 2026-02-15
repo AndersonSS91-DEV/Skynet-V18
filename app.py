@@ -617,7 +617,7 @@ with tab3:
         "🔢⚽🥅Poisson — MGF"
     )
 
-    def mostrar_over_under(matriz, titulo):
+def mostrar_over_under(matriz, titulo):
     ou = calcular_over_under(matriz)
 
     st.markdown(f"### ⚽ {titulo}")
