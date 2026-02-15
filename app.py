@@ -199,7 +199,39 @@ def calcular_matriz_poisson(lh, la, max_gols=4):
             matriz[i, j] = poisson.pmf(i, lh) * poisson.pmf(j, la)
     return matriz * 100
 
+    
+def calcular_over_under(matriz, max_gols=4):
+    linhas = [0.5, 1.5, 2.5, 3.5, 4.5]
+    resultados = {}
 
+    # converter para probabilidade
+    matriz_prob = matriz / 100
+
+    for linha in linhas:
+        over = sum(
+            matriz_prob[i][j]
+            for i in range(max_gols+1)
+            for j in range(max_gols+1)
+            if i + j > linha
+        )
+        resultados[f'Over {linha}'] = over * 100
+        resultados[f'Under {linha}'] = (1 - over) * 100
+
+    return resultados
+
+def mostrar_over_under(matriz, titulo):
+    ou = calcular_over_under(matriz)
+
+    st.markdown(f"### ⚽ {titulo}")
+
+    df_ou = pd.DataFrame({
+        "Linha": ["0.5","1.5","2.5","3.5","4.5"],
+        "Over %": [ou['Over 0.5'], ou['Over 1.5'], ou['Over 2.5'], ou['Over 3.5'], ou['Over 4.5']],
+        "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
+    }).round(2)
+
+    st.dataframe(df_ou, use_container_width=True)
+    
 def exibir_matriz(matriz, home, away, titulo):
     df = pd.DataFrame(
         matriz,
@@ -334,20 +366,80 @@ def mostrar_card(df_base, jogo):
 # ABAS
 # =========================================
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
-"📊 Resumo",
-"📁 Dados",
-"🔢 MGF",
-"⚔️ ATK x DEF",
-"💰 VG"
+"📊🧠 Resumo",
+"📁🧠 Dados",
+"📊⚽ MGF",
+"⚔️⚽ ATK x DEF",
+"💎⚽ VG"
 ])
+
 
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
-    st.subheader(jogo)
 
-    # -------- LINHA 1 — ODDS
+    st.markdown("### 🏁 Resultado")
+
+    gh = linha_exg.get("Result Home")
+    ga = linha_exg.get("Result Visitor")
+    gh_ht = linha_exg.get("Result_Home_HT")
+    ga_ht = linha_exg.get("Result_Visitor_HT")
+
+    if pd.notna(gh) and pd.notna(ga):
+
+        gh = int(gh)
+        ga = int(ga)
+        gh_ht = int(gh_ht) if pd.notna(gh_ht) else 0
+        ga_ht = int(ga_ht) if pd.notna(ga_ht) else 0
+
+        home = linha_exg["Home_Team"]
+        away = linha_exg["Visitor_Team"]
+
+        if gh > ga:
+            home_display = f"🔵 {home}"
+            away_display = away
+        elif ga > gh:
+            home_display = home
+            away_display = f"🔵 {away}"
+        else:
+            home_display = home
+            away_display = away
+
+        st.markdown(
+            f"""
+            <div style="font-size:26px; font-weight:700; margin-bottom:16px;">
+                {home_display} {gh} x {ga} {away_display}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            """
+            <div style="font-size:14px; margin-bottom:6px; opacity:0.6;">
+                Resultado HT
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            f"""
+            <div style="font-size:24px; font-weight:700;">
+                {home} {gh_ht} x {ga_ht} {away}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    else:
+        st.info("⏳ Jogo ainda não finalizado")
+
+    st.markdown("---")
+
+
+    # 👇 AQUI CONTINUA SUA ABA NORMAL
     st.markdown("### 🎯 Odds")
 
     o1, o2, o3 = st.columns(3)
@@ -374,7 +466,7 @@ with tab1:
     st.markdown("---")
 
     # -------- LINHA 2 — Métricas
-    st.markdown("### 📊Métricas")
+    st.markdown("### 📊📈Métricas")
     c1, c2, c3, c4, c5, c6 = st.columns(6)
 
     with c1:
@@ -417,9 +509,10 @@ with tab1:
         st.metric("MGC_A", get_val(linha_mgf, "MGC_A", "{:.2f}"))
         st.metric("CV_GC_A", get_val(linha_mgf, "CV_GC_A", "{:.2f}"))
 
+    st.markdown("---")
 
     # -------- LINHA 3 — MGF
-    st.markdown("### 📊 MGF")
+    st.markdown("### ⚽🥅 MGF")
     a1, a2, a3 = st.columns(3)
 
     with a1:
@@ -434,8 +527,10 @@ with tab1:
         st.metric("ExG_Away_MGF", get_val(linha_mgf, "ExG_Away_MGF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
 
+    st.markdown("---")
+    
     # -------- LINHA 4 — ATK x DEF
-    st.markdown("### ⚔️ Ataque x Defesa")
+    st.markdown("### ⚽⚔️ Ataque x Defesa")
     e1, e2, e3 = st.columns(3)
 
     with e1:
@@ -450,8 +545,10 @@ with tab1:
         st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_exg, "Clean_Sheet_Away_%", "{:.2f}"))
 
+    st.markdown("---")
+    
     # -------- LINHA 5 — VG
-    st.markdown("### 💰 Gols Value")
+    st.markdown("### ⚽💎 Gols Value")
     b1, b2, b3 = st.columns(3)
 
     with b1:
@@ -485,7 +582,7 @@ with tab3:
 
     mostrar_card(df_mgf, jogo)
 
-    st.markdown("### 🎯 Odds Justas MGF")
+    st.markdown("### 🎯⚽🥅 Odds Justas MGF")
 
     o1, o2, o3 = st.columns(3)
 
@@ -525,22 +622,18 @@ with tab3:
         linha_mgf["ExG_Home_MGF"],
         linha_mgf["ExG_Away_MGF"]
     )
-    
-    # 🔥 HEATMAP
-    exibir_matriz(matriz,
+
+    exibir_matriz(
+        matriz,
         linha_mgf["Home_Team"],
         linha_mgf["Visitor_Team"],
-        "Poisson — MGF"
+        "🔢⚽🥅 Poisson — MGF"
     )
 
-    # TESTE - AUMENTAR LETRAS
-    st.markdown("""
-<style>
-[data-testid="stDataFrame"] {
-    font-size: 22px !important;
-}
-</style>
-""", unsafe_allow_html=True)
+    mostrar_over_under(
+        matriz,
+        "Over/Under — Média de Gols (MGF)"
+    )
 
     st.dataframe(top_placares(matriz), use_container_width=True)
 
@@ -551,7 +644,7 @@ with tab4:
 
     mostrar_card(df_exg, jogo)
 
-    st.markdown("### ⚔️ Odds Justas ATK x DEF")
+    st.markdown("### 🎯⚔️ Odds Justas ATK x DEF")
 
     o1, o2, o3 = st.columns(3)
 
@@ -592,14 +685,20 @@ with tab4:
         linha_exg["ExG_Away_ATKxDEF"]
     )
 
-        # 🔥 HEATMAP
-    exibir_matriz(matriz,
-        linha_mgf["Home_Team"],
-        linha_mgf["Visitor_Team"],
-        "Poisson — ATKxDEF"
+    exibir_matriz(
+        matriz,
+        linha_exg["Home_Team"],
+        linha_exg["Visitor_Team"],
+        "🔢⚔️ Poisson — ATK x DEF"
     )
-    
+
+    mostrar_over_under(
+        matriz,
+        "Over/Under — Ataque x Defesa"
+    )
+
     st.dataframe(top_placares(matriz), use_container_width=True)
+
        
 # =========================================
 # ABA 5 — VG
@@ -608,7 +707,7 @@ with tab5:
 
     mostrar_card(df_vg, jogo)
 
-    st.subheader("💰 Odds Justas VG")
+    st.subheader("🎯💎⚽ Odds Justas VG")
 
     o1, o2, o3 = st.columns(3)
 
@@ -654,7 +753,12 @@ with tab5:
         matriz,
         linha_vg["Home_Team"],
         linha_vg["Visitor_Team"],
-        "Poisson — Valor do Gol (VG)"
+        "🔢💰⚽Poisson — Valor do Gol (VG)"
+    )
+
+    mostrar_over_under(
+        matriz,
+        "Over/Under — Valor do Gol (VG)"
     )
 
     st.dataframe(top_placares(matriz), use_container_width=True)
