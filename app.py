@@ -218,6 +218,19 @@ def calcular_over_under(matriz, max_gols=4):
         resultados[f'Under {linha}'] = (1 - over) * 100
 
     return resultados
+
+def mostrar_over_under(matriz, titulo):
+    ou = calcular_over_under(matriz)
+
+    st.markdown(f"### ⚽ {titulo}")
+
+    df_ou = pd.DataFrame({
+        "Linha": ["0.5","1.5","2.5","3.5","4.5"],
+        "Over %": [ou['Over 0.5'], ou['Over 1.5'], ou['Over 2.5'], ou['Over 3.5'], ou['Over 4.5']],
+        "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
+    }).round(2)
+
+    st.dataframe(df_ou, use_container_width=True)
     
 def exibir_matriz(matriz, home, away, titulo):
     df = pd.DataFrame(
