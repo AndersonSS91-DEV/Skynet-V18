@@ -618,20 +618,19 @@ with tab3:
 
     st.markdown("---")
 
-matriz = calcular_matriz_poisson(
-    linha_mgf["ExG_Home_MGF"],
-    linha_mgf["ExG_Away_MGF"]
-)
+    matriz = calcular_matriz_poisson(
+        linha_mgf["ExG_Home_MGF"],
+        linha_mgf["ExG_Away_MGF"]
+    )
 
-exibir_matriz(
-    matriz,
-    linha_mgf["Home_Team"],
-    linha_mgf["Visitor_Team"],
-    "🔢⚽🥅 Poisson — MGF"
-)
+    exibir_matriz(
+        matriz,
+        linha_mgf["Home_Team"],
+        linha_mgf["Visitor_Team"],
+        "🔢⚽🥅 Poisson — MGF"
+    )
 
- # 👇 AQUI DENTRO DA ABA
-mostrar_over_under(
+    mostrar_over_under(
         matriz,
         "Over/Under — Média de Gols (MGF)"
     )
