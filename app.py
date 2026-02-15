@@ -748,12 +748,18 @@ with tab5:
 
     st.markdown("### ⚽ Over/Under — Valor do Gol (VG)")
     
-    df_ou = df_ou.round(2)
-    
     df_ou = pd.DataFrame({
-        "Linha": ["0.5","1.5","2.5","3.5","4.5"],
-        "Over %": [ou['Over 0.5'], ou['Over 1.5'], ou['Over 2.5'], ou['Over 3.5'], ou['Over 4.5']],
-        "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
-    })
+    "Linha": ["0.5","1.5","2.5","3.5","4.5"],
+    "Over %": [round(ou['Over 0.5'], 2),
+               round(ou['Over 1.5'], 2),
+               round(ou['Over 2.5'], 2),
+               round(ou['Over 3.5'], 2),
+               round(ou['Over 4.5'], 2)],
+    "Under %": [round(ou['Under 0.5'], 2),
+                round(ou['Under 1.5'], 2),
+                round(ou['Under 2.5'], 2),
+                round(ou['Under 3.5'], 2),
+                round(ou['Under 4.5'], 2)]
+})
 
     st.dataframe(df_ou, use_container_width=True)
