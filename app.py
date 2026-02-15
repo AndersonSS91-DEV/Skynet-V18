@@ -630,13 +630,13 @@ exibir_matriz(
     "🔢⚽🥅 Poisson — MGF"
 )
 
+ # 👇 AQUI DENTRO DA ABA
 mostrar_over_under(
-    matriz,
-    "Over/Under — Média de Gols (MGF)"
-)
+        matriz,
+        "Over/Under — Média de Gols (MGF)"
+    )
 
-st.dataframe(top_placares(matriz), use_container_width=True)
-
+    st.dataframe(top_placares(matriz), use_container_width=True)
 
 # =========================================
 # ABA 4 — POISSON ATK x DEF
@@ -694,11 +694,11 @@ exibir_matriz(
 )
 
 mostrar_over_under(
-    matriz,
-    "Over/Under — Ataque x Defesa"
-)
+        matriz,
+        "Over/Under — Ataque x Defesa"
+    )
 
-st.dataframe(top_placares(matriz), use_container_width=True)
+    st.dataframe(top_placares(matriz), use_container_width=True)
 
        
 # =========================================
@@ -757,17 +757,9 @@ with tab5:
         "🔢💰⚽Poisson — Valor do Gol (VG)"
     )
     
-    # =========================
-    # OVER / UNDER
-    # =========================
-    ou = calcular_over_under(matriz)
+    mostrar_over_under(
+        matriz,
+        "Over/Under — Valor do Gol (VG)"
+    )
 
-    st.markdown("### ⚽ Over/Under — Valor do Gol (VG)")
-    
-    df_ou = pd.DataFrame({
-        "Linha": ["0.5","1.5","2.5","3.5","4.5"],
-        "Over %": [ou['Over 0.5'], ou['Over 1.5'], ou['Over 2.5'], ou['Over 3.5'], ou['Over 4.5']],
-        "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
-    }).round(2)
-
-    st.dataframe(df_ou, use_container_width=True)
+    st.dataframe(top_placares(matriz), use_container_width=True)
