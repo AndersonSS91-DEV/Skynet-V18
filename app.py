@@ -680,19 +680,19 @@ with tab4:
         
     st.markdown("---")
 
-matriz = calcular_matriz_poisson(
-    linha_exg["ExG_Home_ATKxDEF"],
-    linha_exg["ExG_Away_ATKxDEF"]
-)
+    matriz = calcular_matriz_poisson(
+        linha_exg["ExG_Home_ATKxDEF"],
+        linha_exg["ExG_Away_ATKxDEF"]
+    )
 
-exibir_matriz(
-    matriz,
-    linha_exg["Home_Team"],
-    linha_exg["Visitor_Team"],
-    "🔢⚔️ Poisson — ATK x DEF"
-)
+    exibir_matriz(
+        matriz,
+        linha_exg["Home_Team"],
+        linha_exg["Visitor_Team"],
+        "🔢⚔️ Poisson — ATK x DEF"
+    )
 
-mostrar_over_under(
+    mostrar_over_under(
         matriz,
         "Over/Under — Ataque x Defesa"
     )
