@@ -617,16 +617,18 @@ with tab3:
         "🔢⚽🥅Poisson — MGF"
     )
 
-    # TESTE - AUMENTAR LETRAS
-    st.markdown("""
-<style>
-[data-testid="stDataFrame"] {
-    font-size: 22px !important;
-}
-</style>
-""", unsafe_allow_html=True)
+    def mostrar_over_under(matriz, titulo):
+    ou = calcular_over_under(matriz)
 
-    st.dataframe(top_placares(matriz), use_container_width=True)
+    st.markdown(f"### ⚽ {titulo}")
+
+    df_ou = pd.DataFrame({
+        "Linha": ["0.5","1.5","2.5","3.5","4.5"],
+        "Over %": [ou['Over 0.5'], ou['Over 1.5'], ou['Over 2.5'], ou['Over 3.5'], ou['Over 4.5']],
+        "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
+    }).round(2)
+
+    st.dataframe(df_ou, use_container_width=True)
 
 # =========================================
 # ABA 4 — POISSON ATK x DEF
@@ -683,7 +685,18 @@ with tab4:
         "🔢⚔️Poisson — ATKxDEF"
     )
     
-    st.dataframe(top_placares(matriz), use_container_width=True)
+def mostrar_over_under(matriz, titulo):
+    ou = calcular_over_under(matriz)
+
+    st.markdown(f"### ⚽ {titulo}")
+
+    df_ou = pd.DataFrame({
+        "Linha": ["0.5","1.5","2.5","3.5","4.5"],
+        "Over %": [ou['Over 0.5'], ou['Over 1.5'], ou['Over 2.5'], ou['Over 3.5'], ou['Over 4.5']],
+        "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
+    }).round(2)
+
+    st.dataframe(df_ou, use_container_width=True)
        
 # =========================================
 # ABA 5 — VG
