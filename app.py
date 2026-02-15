@@ -755,7 +755,7 @@ with tab5:
         linha_vg["Visitor_Team"],
         "🔢💰⚽Poisson — Valor do Gol (VG)"
     )
-    
+
     mostrar_over_under(
         matriz,
         "Over/Under — Valor do Gol (VG)"
