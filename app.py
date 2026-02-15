@@ -746,7 +746,7 @@ with tab5:
     # =========================
     ou = calcular_over_under(matriz)
 
-    st.markdown("### ⚽ Over / Under")
+    st.markdown("### ⚽ Over/Under — Valor do Gol (VG)")
 
     df_ou = pd.DataFrame({
         "Linha": ["0.5","1.5","2.5","3.5","4.5"],
@@ -755,6 +755,3 @@ with tab5:
     })
 
     st.dataframe(df_ou, use_container_width=True)
-
-    # 🔥 TABELA TOP PLACARES (VOLTA AO NORMAL)
-    st.dataframe(top_placares(matriz), use_container_width=True)
