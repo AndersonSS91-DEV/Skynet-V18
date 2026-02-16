@@ -1000,30 +1000,28 @@ with tab3:
         "Over/Under — Média de Gols (MGF)"
     )
 
-    # ===== RADAR MGF =====
-ief_home = eficiencia_finalizacao(linha_mgf["CHM"])
-ief_away = eficiencia_finalizacao(linha_mgf["CAM"])
-
-radar_home_mgf = [
-    ief_home,
-    min(linha_mgf["ExG_Home_MGF"] * 40, 100),
-    min((linha_mgf["CHM"]/15)*100, 100),
-    linha_exg["Precisao_CG_H"],
-    linha_mgf["BTTS_%"]
-]
-
-radar_away_mgf = [
-    ief_away,
-    min(linha_mgf["ExG_Away_MGF"] * 40, 100),
-    min((linha_mgf["CAM"]/15)*100, 100),
-    linha_exg["Precisao_CG_A"],
-    linha_mgf["BTTS_%"]
-]
-
-
-    st.dataframe(top_placares(matriz), use_container_width=True)
+       st.dataframe(top_placares(matriz), use_container_width=True)
 
     # ===== RADAR MGF =====
+    ief_home = eficiencia_finalizacao(linha_mgf["CHM"])
+    ief_away = eficiencia_finalizacao(linha_mgf["CAM"])
+
+    radar_home_mgf = [
+        ief_home,
+        min(linha_mgf["ExG_Home_MGF"] * 40, 100),
+        min((linha_mgf["CHM"]/15)*100, 100),
+        linha_exg["Precisao_CG_H"],
+        linha_mgf["BTTS_%"]
+    ]
+
+    radar_away_mgf = [
+        ief_away,
+        min(linha_mgf["ExG_Away_MGF"] * 40, 100),
+        min((linha_mgf["CAM"]/15)*100, 100),
+        linha_exg["Precisao_CG_A"],
+        linha_mgf["BTTS_%"]
+    ]
+
     st.markdown("### 🎯 Radar Ofensivo — MGF")
 
     st.pyplot(
@@ -1035,31 +1033,21 @@ radar_away_mgf = [
         )
     )
 
-st.markdown("### 🧠 Leitura Ofensiva (Histórico)")
+    st.markdown("### 🧠 Leitura Ofensiva (Histórico)")
 
-col1, col2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-with col1:
-    st.info(leitura_ofensiva(
-        linha_mgf["Home_Team"],
-        radar_home_mgf[0],
-        radar_home_mgf[1],
-        radar_home_mgf[2],
-        radar_home_mgf[3],
-        radar_home_mgf[4]
-    ))
+    with col1:
+        st.info(leitura_ofensiva(
+            linha_mgf["Home_Team"],
+            *radar_home_mgf
+        ))
 
-with col2:
-    st.info(leitura_ofensiva(
-        linha_mgf["Visitor_Team"],
-        radar_away_mgf[0],
-        radar_away_mgf[1],
-        radar_away_mgf[2],
-        radar_away_mgf[3],
-        radar_away_mgf[4]
-    ))
-
-
+    with col2:
+        st.info(leitura_ofensiva(
+            linha_mgf["Visitor_Team"],
+            *radar_away_mgf
+        ))
 
 # =========================================
 # ABA 4 — POISSON ATK x DEF
@@ -1121,24 +1109,24 @@ with tab4:
         "Over/Under — Ataque x Defesa"
     )
 
-    # ===== RADAR ATK x DEF =====
-radar_home_exg = [
-    linha_exg["FAH"],
-    min(linha_exg["ExG_Home_ATKxDEF"] * 40, 100),
-    min((linha_mgf["CHM"]/15)*100, 100),
-    linha_exg["Precisao_CG_H"],
-    linha_exg["BTTS_%"]
-]
+       # ===== RADAR ATK x DEF =====
+    radar_home_exg = [
+        linha_exg["FAH"],
+        min(linha_exg["ExG_Home_ATKxDEF"] * 40, 100),
+        min((linha_mgf["CHM"]/15)*100, 100),
+        linha_exg["Precisao_CG_H"],
+        linha_exg["BTTS_%"]
+    ]
 
-radar_away_exg = [
-    linha_exg["FAA"],
-    min(linha_exg["ExG_Away_ATKxDEF"] * 40, 100),
-    min((linha_mgf["CAM"]/15)*100, 100),
-    linha_exg["Precisao_CG_A"],
-    linha_exg["BTTS_%"]
-]
+    radar_away_exg = [
+        linha_exg["FAA"],
+        min(linha_exg["ExG_Away_ATKxDEF"] * 40, 100),
+        min((linha_mgf["CAM"]/15)*100, 100),
+        linha_exg["Precisao_CG_A"],
+        linha_exg["BTTS_%"]
+    ]
 
-st.markdown("### ⚔️ Radar Tático")
+    st.markdown("### ⚔️ Radar Tático")
 
     st.pyplot(
         radar_comparativo(
@@ -1149,29 +1137,21 @@ st.markdown("### ⚔️ Radar Tático")
         )
     )
 
-st.markdown("### 🧠 Leitura Tática")
+    st.markdown("### 🧠 Leitura Tática")
 
-col1, col2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-with col1:
-    st.info(leitura_ofensiva(
-        linha_exg["Home_Team"],
-        radar_home_exg[0],
-        radar_home_exg[1],
-        radar_home_exg[2],
-        radar_home_exg[3],
-        radar_home_exg[4]
-    ))
+    with col1:
+        st.info(leitura_ofensiva(
+            linha_exg["Home_Team"],
+            *radar_home_exg
+        ))
 
-with col2:
-    st.info(leitura_ofensiva(
-        linha_exg["Visitor_Team"],
-        radar_away_exg[0],
-        radar_away_exg[1],
-        radar_away_exg[2],
-        radar_away_exg[3],
-        radar_away_exg[4]
-    ))
+    with col2:
+        st.info(leitura_ofensiva(
+            linha_exg["Visitor_Team"],
+            *radar_away_exg
+        ))
        
 # =========================================
 # ABA 5 — VG
@@ -1235,23 +1215,23 @@ with tab5:
     )
 
     # ===== RADAR VG =====
-radar_home_vg = [
-    linha_exg["FAH"],
-    min(linha_vg["ExG_Home_VG"] * 40, 100),
-    min((linha_mgf["CHM"]/15)*100, 100),
-    linha_exg["Precisao_CG_H"],
-    linha_vg["BTTS_%"]
-]
+    radar_home_vg = [
+        linha_exg["FAH"],
+        min(linha_vg["ExG_Home_VG"] * 40, 100),
+        min((linha_mgf["CHM"]/15)*100, 100),
+        linha_exg["Precisao_CG_H"],
+        linha_vg["BTTS_%"]
+    ]
 
-radar_away_vg = [
-    linha_exg["FAA"],
-    min(linha_vg["ExG_Away_VG"] * 40, 100),
-    min((linha_mgf["CAM"]/15)*100, 100),
-    linha_exg["Precisao_CG_A"],
-    linha_vg["BTTS_%"]
-]
+    radar_away_vg = [
+        linha_exg["FAA"],
+        min(linha_vg["ExG_Away_VG"] * 40, 100),
+        min((linha_mgf["CAM"]/15)*100, 100),
+        linha_exg["Precisao_CG_A"],
+        linha_vg["BTTS_%"]
+    ]
 
-st.markdown("### 💎 Radar Ofensivo — Valor")
+    st.markdown("### 💎 Radar Ofensivo — Valor")
 
     st.pyplot(
         radar_comparativo(
@@ -1262,26 +1242,19 @@ st.markdown("### 💎 Radar Ofensivo — Valor")
         )
     )
 
-st.markdown("### 🧠 Leitura de Valor Ofensivo")
+    st.markdown("### 🧠 Leitura de Valor Ofensivo")
 
-col1, col2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-with col1:
-    st.info(leitura_ofensiva(
-        linha_vg["Home_Team"],
-        radar_home_vg[0],
-        radar_home_vg[1],
-        radar_home_vg[2],
-        radar_home_vg[3],
-        radar_home_vg[4]
-    ))
+    with col1:
+        st.info(leitura_ofensiva(
+            linha_vg["Home_Team"],
+            *radar_home_vg
+        ))
 
-with col2:
-    st.info(leitura_ofensiva(
-        linha_vg["Visitor_Team"],
-        radar_away_vg[0],
-        radar_away_vg[1],
-        radar_away_vg[2],
-        radar_away_vg[3],
-        radar_away_vg[4]
-    ))
+    with col2:
+        st.info(leitura_ofensiva(
+            linha_vg["Visitor_Team"],
+            *radar_away_vg
+        ))
+
