@@ -319,12 +319,12 @@ def rank_time(score):
     return "D"
 
 # =========================================
-# RADAR OFENSIVO
+# RADAR PROFISSIONAL
 # =========================================
 import numpy as np
 import matplotlib.pyplot as plt
 
-def radar_ataque(valores, titulo="Radar Ofensivo"):
+def radar_profissional(valores, titulo="Radar Ofensivo", cor="#00E5FF"):
     labels = ["Eficiência","ExG","Finalizações","Precisão","BTTS"]
 
     valores = np.array(valores)
@@ -333,17 +333,67 @@ def radar_ataque(valores, titulo="Radar Ofensivo"):
     valores = np.concatenate((valores, [valores[0]]))
     angulos = np.concatenate((angulos, [angulos[0]]))
 
-    fig = plt.figure(figsize=(2,2))
+    fig = plt.figure(figsize=(4,4), facecolor="#0e1117")
     ax = fig.add_subplot(111, polar=True)
+    ax.set_facecolor("#0e1117")
 
-    ax.plot(angulos, valores)
-    ax.fill(angulos, valores, alpha=0.25)
+    ax.plot(angulos, valores, linewidth=2, color=cor)
+    ax.fill(angulos, valores, alpha=0.25, color=cor)
 
     ax.set_xticks(angulos[:-1])
-    ax.set_xticklabels(labels, fontsize=6)
+    ax.set_xticklabels(labels, fontsize=8, color="white")
 
-    ax.set_title(titulo, fontsize=8)
+    ax.tick_params(colors="white")
+    ax.spines["polar"].set_color("#444")
+
+    ax.set_title(titulo, fontsize=11, color="white")
+
     return fig
+# =========================================
+# DOMÍNIO OFENSIVO
+# =========================================
+def dominio_ofensivo(home_vals, away_vals):
+    score_home = sum(home_vals)
+    score_away = sum(away_vals)
+
+    if score_home > score_away * 1.15:
+        return "HOME"
+    elif score_away > score_home * 1.15:
+        return "AWAY"
+    else:
+        return "EQUILIBRADO"
+
+
+# =========================================
+# RADAR ESTILO FIFA
+# =========================================
+def radar_fifa(valores, titulo="Atributos Ofensivos"):
+    return radar_profissional(valores, titulo, "#FFD166")
+
+
+# =========================================
+# SCORE GERAL DO JOGO
+# =========================================
+def score_jogo(home_vals, away_vals):
+    s_home = sum(home_vals)/len(home_vals)
+    s_away = sum(away_vals)/len(away_vals)
+    total = (s_home + s_away) / 2
+    return round(total,1)
+
+
+# =========================================
+# TENDÊNCIA DE GOLS
+# =========================================
+def tendencia_gols(ief_home, ief_away, exg_total):
+    if exg_total > 2.6 and (ief_home + ief_away) > 70:
+        return "ALTÍSSIMA"
+    elif exg_total > 2.2:
+        return "ALTA"
+    elif exg_total > 1.8:
+        return "MODERADA"
+    else:
+        return "BAIXA"
+
 
 # 🎨 BTTS (NOVO)
 def calcular_btts_e_odd(matriz):
@@ -654,8 +704,10 @@ radar_home = [
     btts_home
 ]
 
-st.markdown("## 🎯 Radar Ofensivo Home")
-st.pyplot(radar_ataque(radar_home))
+st.markdown("### 🎯 Radar Ofensivo")
+
+st.pyplot(radar_profissional(radar_home, "Radar Home", "#00E5FF"))
+st.pyplot(radar_profissional(radar_away, "Radar Away", "#FF4D6D"))
 
 st.markdown("## 🎯 Radar Ofensivo Away")
 st.pyplot(radar_ataque([
@@ -687,6 +739,35 @@ anti_home = anti_xg(
 
 if anti_home > 0:
     st.metric("Anti-xG Home", f"{anti_home:.2f}")
+    
+dominio = dominio_ofensivo(radar_home, radar_away)
+
+if dominio == "HOME":
+    st.success("⚔️ Domínio Ofensivo: HOME")
+
+elif dominio == "AWAY":
+    st.success("⚔️ Domínio Ofensivo: AWAY")
+
+else:
+    st.info("⚖️ Ataques equilibrados")
+    
+st.markdown("### 🎮 Power Ofensivo")
+st.pyplot(radar_fifa(radar_home, "HOME Power"))
+
+tendencia = tendencia_gols(
+    ief_home,
+    ief_away,
+    exg_home + exg_away
+)
+
+if tendencia == "ALTÍSSIMA":
+    st.error("🚨 Tendência ALTÍSSIMA de gols")
+
+elif tendencia == "ALTA":
+    st.warning("🔥 Tendência ALTA de gols")
+
+else:
+    st.info(f"Tendência de gols: {tendencia}")
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
