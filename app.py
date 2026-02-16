@@ -1000,7 +1000,7 @@ with tab3:
         "Over/Under — Média de Gols (MGF)"
     )
 
-       st.dataframe(top_placares(matriz), use_container_width=True)
+    st.dataframe(top_placares(matriz), use_container_width=True)
 
     # ===== RADAR MGF =====
     ief_home = eficiencia_finalizacao(linha_mgf["CHM"])
@@ -1050,7 +1050,7 @@ with tab3:
         ))
 
 # =========================================
-# ABA 4 — POISSON ATK x DEF
+    # ===== RADAR ATK x DEF =====
 # =========================================
 with tab4:
 
