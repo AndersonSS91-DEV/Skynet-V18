@@ -900,34 +900,6 @@ with tab1:
     else:
         st.info(f"Tendência de gols: {tendencia}")
 
-st.markdown("### 🧠 Leitura Ofensiva")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.info(
-        leitura_ofensiva(
-            linha_exg["Home_Team"],
-            radar_home[0],
-            radar_home[1],
-            radar_home[2],
-            radar_home[3],
-            radar_home[4]
-        )
-    )
-
-with col2:
-    st.info(
-        leitura_ofensiva(
-            linha_exg["Visitor_Team"],
-            radar_away[0],
-            radar_away[1],
-            radar_away[2],
-            radar_away[3],
-            radar_away[4]
-        )
-    )
-
 # =========================================
 # ABA 2 — DADOS COMPLETOS
 # =========================================
