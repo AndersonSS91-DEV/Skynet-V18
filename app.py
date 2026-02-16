@@ -473,6 +473,64 @@ def leitura_ofensiva(nome, eficiencia, exg, finalizacoes, precisao, btts):
     return texto
 
 # =========================================
+# LEITURA OFENSIVA
+# =========================================
+def leitura_consenso(nome, radar_vals):
+
+    eficiencia, exg, finalizacoes, precisao, btts = radar_vals
+
+    texto = f"{nome}\n\n"
+
+    if eficiencia > 50:
+        texto += "✔ Eficiência ofensiva alta\n"
+    elif eficiencia > 35:
+        texto += "✔ Eficiência ofensiva média\n"
+    else:
+        texto += "✔ Eficiência ofensiva baixa\n"
+
+    if exg > 70:
+        texto += "✔ Criação de chances muito alta\n"
+    elif exg > 45:
+        texto += "✔ Criação de chances moderada\n"
+    else:
+        texto += "✔ Baixa criação ofensiva\n"
+
+    if finalizacoes > 70:
+        texto += "✔ Volume ofensivo intenso\n"
+    elif finalizacoes < 30:
+        texto += "✔ Poucas finalizações\n"
+    else:
+        texto += "✔ Volume equilibrado\n"
+
+    if precisao > 55:
+        texto += "✔ Alta precisão nas finalizações\n"
+    else:
+        texto += "✔ Precisão mediana\n"
+
+    if btts > 60:
+        texto += "✔ Jogos abertos com frequência\n"
+    else:
+        texto += "✔ Tendência a jogos controlados\n"
+
+    texto += "\n🧠 leitura:\n"
+
+    if eficiencia > 50 and exg > 60:
+        texto += "👉 time cria chances claras\n"
+        texto += "👉 perfil ofensivo letal\n"
+
+    elif finalizacoes > 70 and eficiencia < 40:
+        texto += "👉 volume alto com baixa qualidade\n"
+        texto += "👉 pode desperdiçar chances\n"
+
+    elif exg < 40:
+        texto += "👉 dificuldade para criar oportunidades\n"
+
+    else:
+        texto += "👉 perfil ofensivo equilibrado\n"
+
+    return texto
+
+# =========================================
 # RADAR COMPARATIVO
 # =========================================
 def radar_comparativo(home_vals, away_vals, home, away):
@@ -931,6 +989,26 @@ with tab1:
         radar_home_consenso[0],
         radar_away_consenso[0],
         linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
+    )
+    
+    st.markdown("### 🧠 Leitura Ofensiva Consenso")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.info(
+        leitura_consenso(
+            linha_exg["Home_Team"],
+            radar_home_consenso
+        )
+    )
+
+with col2:
+    st.info(
+        leitura_consenso(
+            linha_exg["Visitor_Team"],
+            radar_away_consenso
+        )
     )
 
 # =========================================
