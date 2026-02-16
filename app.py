@@ -775,7 +775,7 @@ with tab1:
     home_team = linha_exg["Home_Team"]
     away_team = linha_exg["Visitor_Team"]
     
-    st.markdown("### 🎯 Radar Ofensivo)
+    st.markdown("### 🎯 Radar Ofensivo")
                 
     st.markdown(
     f"### <span style='color:#00BFFF'>{home_team}</span> x "
