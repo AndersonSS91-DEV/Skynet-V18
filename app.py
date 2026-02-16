@@ -1270,15 +1270,6 @@ with tab4:
         linha_exg["ExG_Home_ATKxDEF"] + linha_exg["ExG_Away_ATKxDEF"]
     )
 
-    cards_ofensivos(
-    radar_home_exg,
-    radar_away_exg,
-    radar_home_exg[0],
-    radar_away_exg[0],
-    linha_exg["ExG_Home_ATKxDEF"] + linha_exg["ExG_Away_ATKxDEF"]
-)
-
-
     st.markdown("### 🧠 Leitura Tática")
 
     col1, col2 = st.columns(2)
@@ -1391,13 +1382,6 @@ with tab5:
         radar_away_vg[0],
         linha_vg["ExG_Home_VG"] + linha_vg["ExG_Away_VG"]
     )
-    cards_ofensivos(
-    radar_home_vg,
-    radar_away_vg,
-    radar_home_vg[0],
-    radar_away_vg[0],
-    linha_vg["ExG_Home_VG"] + linha_vg["ExG_Away_VG"])
-
 
     st.markdown("### 🧠 Leitura de Valor Ofensivo")
 
