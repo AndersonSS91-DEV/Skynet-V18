@@ -481,10 +481,25 @@ def calcular_btts_e_odd(matriz):
     return btts_pct, odd_justa
     
 def radar_comparativo(home_vals, away_vals, home, away):
+
     labels = [
-        "Eficiência","ExG","Finalizações",
-        "Precisão","Posse","Ataque","Defesa"
+        "Eficiência",
+        "ExG",
+        "Finalizações",
+        "Precisão",
+        "BTTS"
     ]
+
+    home_vals = np.array(home_vals, dtype=float)
+    away_vals = np.array(away_vals, dtype=float)
+
+    if len(home_vals) != len(labels):
+        st.error(f"Radar HOME inválido: {len(home_vals)} valores")
+        return
+
+    if len(away_vals) != len(labels):
+        st.error(f"Radar AWAY inválido: {len(away_vals)} valores")
+        return
 
     angulos = np.linspace(0, 2*np.pi, len(labels), endpoint=False)
     angulos = np.concatenate((angulos, [angulos[0]]))
@@ -795,9 +810,6 @@ with tab1:
     shots_home = linha_mgf["CHM"]
     precision_home = linha_exg["Precisao_CG_H"]
     btts_home = linha_mgf["BTTS_%"]
-    posse_home = linha_exg["Posse_Bola_Home"]
-    atk_home = linha_exg["FAH"]
-    def_home = linha_exg["FDH"]
 
     # ===== MÉTRICAS AWAY =====
     ief_away = eficiencia_finalizacao(linha_mgf["CAM"])
@@ -805,9 +817,6 @@ with tab1:
     shots_away = linha_mgf["CAM"]
     precision_away = linha_exg["Precisao_CG_A"]
     btts_away = linha_mgf["BTTS_%"]
-    posse_away = linha_exg["Posse_Bola_Away"]
-    atk_away = linha_exg["FAA"]
-    def_away = linha_exg["FDA"]
 
     def norm_exg(x): return min(x * 40, 100)
     def norm_shots(x): return min((x / 15) * 100, 100)
@@ -817,21 +826,17 @@ with tab1:
     norm_exg(exg_home),
     norm_shots(shots_home),
     precision_home,
-    posse_home,
-    atk_home,
-    def_home
+    btts_home
 ]
 
-
-    radar_away = [
+radar_away = [
     ief_away,
     norm_exg(exg_away),
     norm_shots(shots_away),
     precision_away,
-    posse_away,
-    atk_away,
-    def_away
+    btts_away
 ]
+
     home_team = linha_exg["Home_Team"]
     away_team = linha_exg["Visitor_Team"]
     
