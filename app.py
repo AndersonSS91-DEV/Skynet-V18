@@ -1006,14 +1006,13 @@ with tab1:
     )
 
     fig = radar_comparativo(
-    radar_home_consenso,
-    radar_away_consenso,
-    linha_exg["Home_Team"],
-    linha_exg["Visitor_Team"]
-)
+        radar_home_consenso,
+        radar_away_consenso,
+        linha_exg["Home_Team"],
+        linha_exg["Visitor_Team"]
+    )
 
-st.pyplot(fig, use_container_width=False)
-    
+    st.pyplot(fig, use_container_width=False)
 
     cards_ofensivos(
         radar_home_consenso,
@@ -1022,6 +1021,7 @@ st.pyplot(fig, use_container_width=False)
         radar_away_consenso[0],
         linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
     )
+
 
     # =========================================
     # 🧠 LEITURA CONSENSO
