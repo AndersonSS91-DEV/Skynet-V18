@@ -843,143 +843,92 @@ with tab1:
 
     st.markdown("---")
     
+    st.markdown("---")
+
     # =========================================
-    # 🎯 RADAR CONSENSO
+    # 🎯 RADAR CONSENSO (SÓ NA ABA RESUMO)
     # =========================================
-# =========================================
-# RADAR MGF
-# =========================================
 
-radar_home_mgf = [
-    eficiencia_finalizacao(linha_mgf["CHM"]),
-    norm_exg(linha_mgf["ExG_Home_MGF"]),
-    norm_shots(linha_mgf["CHM"]),
-    linha_exg["Precisao_CG_H"],
-    linha_mgf["BTTS_%"]
-]
+    radar_home_mgf = [
+        eficiencia_finalizacao(linha_mgf["CHM"]),
+        norm_exg(linha_mgf["ExG_Home_MGF"]),
+        norm_shots(linha_mgf["CHM"]),
+        linha_exg["Precisao_CG_H"],
+        linha_mgf["BTTS_%"]
+    ]
 
-radar_away_mgf = [
-    eficiencia_finalizacao(linha_mgf["CAM"]),
-    norm_exg(linha_mgf["ExG_Away_MGF"]),
-    norm_shots(linha_mgf["CAM"]),
-    linha_exg["Precisao_CG_A"],
-    linha_mgf["BTTS_%"]
-]
+    radar_away_mgf = [
+        eficiencia_finalizacao(linha_mgf["CAM"]),
+        norm_exg(linha_mgf["ExG_Away_MGF"]),
+        norm_shots(linha_mgf["CAM"]),
+        linha_exg["Precisao_CG_A"],
+        linha_mgf["BTTS_%"]
+    ]
 
-# ===== RADAR ATK x DEF =====
-radar_home_exg = [
-    linha_exg["FAH"],
-    norm_exg(linha_exg["ExG_Home_ATKxDEF"]),
-    norm_shots(linha_mgf["CHM"]),
-    linha_exg["Precisao_CG_H"],
-    linha_exg["BTTS_%"]
-]
+    radar_home_exg = [
+        linha_exg["FAH"],
+        norm_exg(linha_exg["ExG_Home_ATKxDEF"]),
+        norm_shots(linha_mgf["CHM"]),
+        linha_exg["Precisao_CG_H"],
+        linha_exg["BTTS_%"]
+    ]
 
-radar_away_exg = [
-    linha_exg["FAA"],
-    norm_exg(linha_exg["ExG_Away_ATKxDEF"]),
-    norm_shots(linha_mgf["CAM"]),
-    linha_exg["Precisao_CG_A"],
-    linha_exg["BTTS_%"]
-]
+    radar_away_exg = [
+        linha_exg["FAA"],
+        norm_exg(linha_exg["ExG_Away_ATKxDEF"]),
+        norm_shots(linha_mgf["CAM"]),
+        linha_exg["Precisao_CG_A"],
+        linha_exg["BTTS_%"]
+    ]
 
-# ===== RADAR VG =====
-radar_home_vg = [
-    linha_exg["FAH"],
-    norm_exg(linha_vg["ExG_Home_VG"]),
-    norm_shots(linha_mgf["CHM"]),
-    linha_exg["Precisao_CG_H"],
-    linha_vg["BTTS_%"]
-]
+    radar_home_vg = [
+        linha_exg["FAH"],
+        norm_exg(linha_vg["ExG_Home_VG"]),
+        norm_shots(linha_mgf["CHM"]),
+        linha_exg["Precisao_CG_H"],
+        linha_vg["BTTS_%"]
+    ]
 
-radar_away_vg = [
-    linha_exg["FAA"],
-    norm_exg(linha_vg["ExG_Away_VG"]),
-    norm_shots(linha_mgf["CAM"]),
-    linha_exg["Precisao_CG_A"],
-    linha_vg["BTTS_%"]
-]
+    radar_away_vg = [
+        linha_exg["FAA"],
+        norm_exg(linha_vg["ExG_Away_VG"]),
+        norm_shots(linha_mgf["CAM"]),
+        linha_exg["Precisao_CG_A"],
+        linha_vg["BTTS_%"]
+    ]
 
-# ===== CONSENSO =====
-radar_home_consenso = np.mean(
-    [radar_home_mgf, radar_home_exg, radar_home_vg],
-    axis=0
-)
+    radar_home_consenso = np.mean(
+        [radar_home_mgf, radar_home_exg, radar_home_vg], axis=0
+    )
 
-radar_away_consenso = np.mean(
-    [radar_away_mgf, radar_away_exg, radar_away_vg],
-    axis=0
-)
+    radar_away_consenso = np.mean(
+        [radar_away_mgf, radar_away_exg, radar_away_vg], axis=0
+    )
 
-home_team = linha_exg["Home_Team"]
-away_team = linha_exg["Visitor_Team"]
+    st.markdown("### 🎯 Radar Ofensivo Consenso")
 
-st.markdown("### 🎯 Radar Ofensivo Consenso")
+    st.markdown(
+        f"### <span style='color:#00BFFF'>{linha_exg['Home_Team']}</span> x "
+        f"<span style='color:#FF7A00'>{linha_exg['Visitor_Team']}</span>",
+        unsafe_allow_html=True
+    )
 
-st.markdown(
-    f"### <span style='color:#00BFFF'>{home_team}</span> x "
-    f"<span style='color:#FF7A00'>{away_team}</span>",
-    unsafe_allow_html=True
-)
+    st.pyplot(
+        radar_comparativo(
+            radar_home_consenso,
+            radar_away_consenso,
+            linha_exg["Home_Team"],
+            linha_exg["Visitor_Team"]
+        )
+    )
 
-st.pyplot(
-    radar_comparativo(
+    cards_ofensivos(
         radar_home_consenso,
         radar_away_consenso,
-        home_team,
-        away_team
+        radar_home_consenso[0],
+        radar_away_consenso[0],
+        linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
     )
-)
-
-# =========================================
-# 🚨 ALERTAS INTELIGENTES
-# =========================================
-
-ief_home = eficiencia_finalizacao(linha_mgf["CHM"])
-ief_away = eficiencia_finalizacao(linha_mgf["CAM"])
-
-exg_home = linha_mgf["ExG_Home_MGF"]
-exg_away = linha_mgf["ExG_Away_MGF"]
-
-# 🔥 LETAL
-if time_letal(ief_home, exg_home):
-    st.success("🔥 Home LETAL hoje")
-
-if time_letal(ief_away, exg_away):
-    st.success("🔥 Away LETAL hoje")
-
-# 💰 OVER OCULTO
-if over_valor_oculto(ief_home, ief_away, exg_home + exg_away):
-    st.warning("💰 Over com valor oculto detectado")
-
-# ⚔️ DOMÍNIO
-dominio = dominio_ofensivo(radar_home_consenso, radar_away_consenso)
-
-if dominio == "HOME":
-    st.success("⚔️ Domínio Ofensivo: HOME")
-elif dominio == "AWAY":
-    st.success("⚔️ Domínio Ofensivo: AWAY")
-else:
-    st.info("⚖️ Ataques equilibrados")
-
-# 🔥 SCORE DO JOGO
-score = score_jogo(radar_home_consenso, radar_away_consenso)
-st.metric("🔥 Score Ofensivo do Jogo", score)
-
-# ⚽ TENDÊNCIA DE GOLS
-tendencia = tendencia_gols(
-    ief_home,
-    ief_away,
-    exg_home + exg_away
-)
-
-if tendencia == "ALTÍSSIMA":
-    st.error("🚨 Tendência ALTÍSSIMA de gols")
-elif tendencia == "ALTA":
-    st.warning("🔥 Tendência ALTA de gols")
-else:
-    st.info(f"Tendência de gols: {tendencia}")
-
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
