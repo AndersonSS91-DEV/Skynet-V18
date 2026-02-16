@@ -679,95 +679,90 @@ with tab1:
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
 
-# ===== MÉTRICAS HOME =====
-ief_home = eficiencia_finalizacao(linha_mgf["CHM"])
-exg_home = linha_mgf["ExG_Home_MGF"]
-shots_home = linha_mgf["CHM"]
-precision_home = linha_exg["Precisao_CG_H"]
-btts_home = linha_mgf["BTTS_%"]
+    st.markdown("---")
+    # =========================================
+    # 🎯 RADAR + INTELIGÊNCIA OFENSIVA
+    # =========================================
 
-# ===== MÉTRICAS AWAY =====
-ief_away = eficiencia_finalizacao(linha_mgf["CAM"])
-exg_away = linha_mgf["ExG_Away_MGF"]
-shots_away = linha_mgf["CAM"]
-precision_away = linha_exg["Precisao_CG_A"]
-btts_away = linha_mgf["BTTS_%"]
+    # ===== MÉTRICAS HOME =====
+    ief_home = eficiencia_finalizacao(linha_mgf["CHM"])
+    exg_home = linha_mgf["ExG_Home_MGF"]
+    shots_home = linha_mgf["CHM"]
+    precision_home = linha_exg["Precisao_CG_H"]
+    btts_home = linha_mgf["BTTS_%"]
 
-def norm_exg(x): return min(x * 40, 100)
-def norm_shots(x): return min((x / 15) * 100, 100)
+    # ===== MÉTRICAS AWAY =====
+    ief_away = eficiencia_finalizacao(linha_mgf["CAM"])
+    exg_away = linha_mgf["ExG_Away_MGF"]
+    shots_away = linha_mgf["CAM"]
+    precision_away = linha_exg["Precisao_CG_A"]
+    btts_away = linha_mgf["BTTS_%"]
 
-radar_home = [
-    ief_home,
-    norm_exg(exg_home),
-    norm_shots(shots_home),
-    precision_home,
-    btts_home
-]
+    def norm_exg(x): return min(x * 40, 100)
+    def norm_shots(x): return min((x / 15) * 100, 100)
 
-st.markdown("### 🎯 Radar Ofensivo")
+    radar_home = [
+        ief_home,
+        norm_exg(exg_home),
+        norm_shots(shots_home),
+        precision_home,
+        btts_home
+    ]
 
-st.pyplot(radar_profissional(radar_home, "Radar Home", "#00E5FF"))
-st.pyplot(radar_profissional(radar_away, "Radar Away", "#FF4D6D"))
+    radar_away = [
+        ief_away,
+        norm_exg(exg_away),
+        norm_shots(shots_away),
+        precision_away,
+        btts_away
+    ]
 
-st.markdown("## 🎯 Radar Ofensivo Away")
-st.pyplot(radar_ataque([
-    ief_away,
-    norm_exg(exg_away),
-    norm_shots(shots_away),
-    precision_away,
-    btts_away
-]))
+    st.markdown("### 🎯 Radar Ofensivo")
 
-lh_adj = ajustar_exg_por_eficiencia(exg_home, ief_home)
-la_adj = ajustar_exg_por_eficiencia(exg_away, ief_away)
+    st.pyplot(radar_profissional(radar_home, "Radar Home", "#00E5FF"))
+    st.pyplot(radar_profissional(radar_away, "Radar Away", "#FF4D6D"))
 
-matriz = calcular_matriz_poisson(lh_adj, la_adj)
+    # ===== ALERTAS =====
 
-if time_letal(ief_home, exg_home):
-    st.success("🔥 Home LETAL hoje")
+    if time_letal(ief_home, exg_home):
+        st.success("🔥 Home LETAL hoje")
 
-if time_letal(ief_away, exg_away):
-    st.success("🔥 Away LETAL hoje")
+    if time_letal(ief_away, exg_away):
+        st.success("🔥 Away LETAL hoje")
 
-if over_valor_oculto(ief_home, ief_away, exg_home+exg_away):
-    st.warning("💰 Over com valor oculto detectado")
+    if over_valor_oculto(ief_home, ief_away, exg_home+exg_away):
+        st.warning("💰 Over com valor oculto detectado")
 
-anti_home = anti_xg(
-    linha_exg.get("Result Home", 0),
-    exg_home
-)
+    # ===== DOMÍNIO OFENSIVO =====
 
-if anti_home > 0:
-    st.metric("Anti-xG Home", f"{anti_home:.2f}")
-    
-dominio = dominio_ofensivo(radar_home, radar_away)
+    dominio = dominio_ofensivo(radar_home, radar_away)
 
-if dominio == "HOME":
-    st.success("⚔️ Domínio Ofensivo: HOME")
+    if dominio == "HOME":
+        st.success("⚔️ Domínio Ofensivo: HOME")
+    elif dominio == "AWAY":
+        st.success("⚔️ Domínio Ofensivo: AWAY")
+    else:
+        st.info("⚖️ Ataques equilibrados")
 
-elif dominio == "AWAY":
-    st.success("⚔️ Domínio Ofensivo: AWAY")
+    # ===== SCORE DO JOGO =====
 
-else:
-    st.info("⚖️ Ataques equilibrados")
-    
-st.markdown("### 🎮 Power Ofensivo")
-st.pyplot(radar_fifa(radar_home, "HOME Power"))
+    score = score_jogo(radar_home, radar_away)
+    st.metric("🔥 Score Ofensivo do Jogo", score)
 
-tendencia = tendencia_gols(
-    ief_home,
-    ief_away,
-    exg_home + exg_away
-)
+    # ===== TENDÊNCIA DE GOLS =====
 
-if tendencia == "ALTÍSSIMA":
-    st.error("🚨 Tendência ALTÍSSIMA de gols")
+    tendencia = tendencia_gols(
+        ief_home,
+        ief_away,
+        exg_home + exg_away
+    )
 
-elif tendencia == "ALTA":
-    st.warning("🔥 Tendência ALTA de gols")
-
-else:
-    st.info(f"Tendência de gols: {tendencia}")
+    if tendencia == "ALTÍSSIMA":
+        st.error("🚨 Tendência ALTÍSSIMA de gols")
+    elif tendencia == "ALTA":
+        st.warning("🔥 Tendência ALTA de gols")
+    else:
+        st.info(f"Tendência de gols: {tendencia}")
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
