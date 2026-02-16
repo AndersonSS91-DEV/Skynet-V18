@@ -465,6 +465,67 @@ def leitura_ofensiva(nome, eficiencia, exg, finalizacoes, precisao, btts):
 
     return texto
 
+# =========================================
+# RADAR COMPARATIVO
+# =========================================
+def radar_comparativo(home_vals, away_vals, home, away):
+
+    labels = [
+        "Eficiência",
+        "ExG",
+        "Finalizações",
+        "Precisão",
+        "BTTS"
+    ]
+
+    home_vals = np.array(home_vals, dtype=float)
+    away_vals = np.array(away_vals, dtype=float)
+
+    if len(home_vals) != len(labels):
+        st.error(f"Radar HOME inválido: {len(home_vals)} valores")
+        return
+
+    if len(away_vals) != len(labels):
+        st.error(f"Radar AWAY inválido: {len(away_vals)} valores")
+        return
+
+    angulos = np.linspace(0, 2*np.pi, len(labels), endpoint=False)
+    angulos = np.concatenate((angulos, [angulos[0]]))
+
+    home_vals = np.concatenate((home_vals, [home_vals[0]]))
+    away_vals = np.concatenate((away_vals, [away_vals[0]]))
+
+    fig = plt.figure(figsize=(3.2, 2.8), dpi=120, facecolor="#0e1117")
+    ax = fig.add_subplot(111, polar=True)
+    ax.set_facecolor("#0e1117")
+
+    # HOME azul
+    ax.plot(angulos, home_vals, linewidth=2, color="#00BFFF")
+    ax.fill(angulos, home_vals, alpha=0.25, color="#00BFFF")
+
+    # AWAY laranja
+    ax.plot(angulos, away_vals, linewidth=2, color="#FF7A00")
+    ax.fill(angulos, away_vals, alpha=0.18, color="#FF7A00")
+
+    ax.set_xticks(angulos[:-1])
+    ax.set_xticklabels(labels, fontsize=7, color="white")
+
+    ax.set_ylim(0, 100)
+
+    ax.tick_params(axis='y', labelsize=6, colors="white")
+    ax.spines["polar"].set_color("#444")
+
+    return fig
+
+def radar_consenso(radars):
+    return np.mean(radars, axis=0)
+
+def norm_exg(x): 
+    return min(x * 40, 100)
+
+def norm_shots(x): 
+    return min((x / 15) * 100, 100)
+
 
 #CARDS
 def cards_ofensivos(radar_home, radar_away, ief_home, ief_away, exg_total):
@@ -511,66 +572,6 @@ def calcular_btts_e_odd(matriz):
 
     return btts_pct, odd_justa
     
-def radar_comparativo(home_vals, away_vals, home, away):
-
-    labels = [
-        "Eficiência",
-        "ExG",
-        "Finalizações",
-        "Precisão",
-        "BTTS"
-    ]
-
-    home_vals = np.array(home_vals, dtype=float)
-    away_vals = np.array(away_vals, dtype=float)
-
-    if len(home_vals) != len(labels):
-        st.error(f"Radar HOME inválido: {len(home_vals)} valores")
-        return
-
-    if len(away_vals) != len(labels):
-        st.error(f"Radar AWAY inválido: {len(away_vals)} valores")
-        return
-
-    angulos = np.linspace(0, 2*np.pi, len(labels), endpoint=False)
-    angulos = np.concatenate((angulos, [angulos[0]]))
-
-    home_vals = np.concatenate((home_vals, [home_vals[0]]))
-    away_vals = np.concatenate((away_vals, [away_vals[0]]))
-
-    fig = plt.figure(figsize=(3.2, 2.8), dpi=120, facecolor="#0e1117")
-    ax = fig.add_subplot(111, polar=True)
-    ax.set_facecolor("#0e1117")
-
-    # HOME azul
-    ax.plot(angulos, home_vals, linewidth=2, color="#00BFFF")
-    ax.fill(angulos, home_vals, alpha=0.25, color="#00BFFF")
-
-    # AWAY laranja
-    ax.plot(angulos, away_vals, linewidth=2, color="#FF7A00")
-    ax.fill(angulos, away_vals, alpha=0.18, color="#FF7A00")
-
-    ax.set_xticks(angulos[:-1])
-    ax.set_xticklabels(labels, fontsize=9, color="white")
-
-    ax.set_ylim(0, 100)
-
-    ax.tick_params(colors="white")
-    ax.spines["polar"].set_color("#444")
-
-    return fig
-
-def radar_consenso(radars):
-    return np.mean(radars, axis=0)
-
-def norm_exg(x): 
-    return min(x * 40, 100)
-
-def norm_shots(x): 
-    return min((x / 15) * 100, 100)
-
-
-
 # =========================================
 # 🎨 ESTILO CARDS (NOVO)
 # =========================================
