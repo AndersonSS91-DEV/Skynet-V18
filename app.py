@@ -466,6 +466,37 @@ def leitura_ofensiva(nome, eficiencia, exg, finalizacoes, precisao, btts):
     return texto
 
 
+#CARDS
+def cards_ofensivos(radar_home, radar_away, ief_home, ief_away, exg_total):
+    
+    dominio = dominio_ofensivo(radar_home, radar_away)
+
+    if dominio == "HOME":
+        st.success("⚔️ Domínio Ofensivo: HOME")
+    elif dominio == "AWAY":
+        st.error("⚔️ Domínio Ofensivo: AWAY")
+    else:
+        st.warning("⚖️ Jogo equilibrado")
+
+    if time_letal(ief_home, exg_total/2):
+        st.success("🔥 Home LETAL hoje")
+
+    if time_letal(ief_away, exg_total/2):
+        st.success("🔥 Away LETAL hoje")
+
+    score = score_jogo(radar_home, radar_away)
+    st.metric("🔥 Score Ofensivo", score)
+
+    tendencia = tendencia_gols(ief_home, ief_away, exg_total)
+
+    if tendencia == "ALTÍSSIMA":
+        st.error("🚨 Altíssima tendência de gols")
+    elif tendencia == "ALTA":
+        st.warning("🔥 Tendência ALTA de gols")
+    else:
+        st.info(f"Tendência: {tendencia}")
+
+
 # 🎨 BTTS (NOVO)
 def calcular_btts_e_odd(matriz):
     # matriz deve estar em PROBABILIDADE (0–1), NÃO %
@@ -1005,6 +1036,14 @@ with tab3:
         )
     )
 
+    cards_ofensivos(
+    radar_home_mgf,
+    radar_away_mgf,
+    ief_home,
+    ief_away,
+    linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
+)
+
     st.markdown("### 🧠 Leitura Ofensiva (Histórico)")
 
     col1, col2 = st.columns(2)
@@ -1108,6 +1147,15 @@ with tab4:
             linha_exg["Visitor_Team"]
         )
     )
+
+    cards_ofensivos(
+    radar_home_exg,
+    radar_away_exg,
+    radar_home_exg[0],
+    radar_away_exg[0],
+    linha_exg["ExG_Home_ATKxDEF"] + linha_exg["ExG_Away_ATKxDEF"]
+)
+
 
     st.markdown("### 🧠 Leitura Tática")
 
@@ -1213,6 +1261,13 @@ with tab5:
             linha_vg["Visitor_Team"]
         )
     )
+    cards_ofensivos(
+    radar_home_vg,
+    radar_away_vg,
+    radar_home_vg[0],
+    radar_away_vg[0],
+    linha_vg["ExG_Home_VG"] + linha_vg["ExG_Away_VG"])
+
 
     st.markdown("### 🧠 Leitura de Valor Ofensivo")
 
