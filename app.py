@@ -846,7 +846,10 @@ with tab1:
     # =========================================
     # 🎯 RADAR CONSENSO
     # =========================================
-==== RADAR MGF =====
+# =========================================
+# RADAR MGF
+# =========================================
+
 radar_home_mgf = [
     eficiencia_finalizacao(linha_mgf["CHM"]),
     norm_exg(linha_mgf["ExG_Home_MGF"]),
