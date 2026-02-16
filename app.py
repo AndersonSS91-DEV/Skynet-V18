@@ -93,13 +93,13 @@ div[data-testid="stDataFrame"] * {
 }
 
 /* texto dentro dos alertas */
-div[data-testid="stAlert"] p {
-    color: #FFFFFF !important;   /* cor do texto */
+div[data-testid="stAlert"] {
+    color: white !important;
 }
 
-/* ===== TABELAS (GRID INTERNO) ===== */
-div[data-testid="stDataFrame"] table {
-    font-size: 20px !important;
+/* ===== DATAFRAME ===== */
+div[data-testid="stDataFrame"] {
+    font-size: 18px !important;
 }
 
 div[data-testid="stDataFrame"] th {
