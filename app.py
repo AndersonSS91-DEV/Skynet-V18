@@ -1,16 +1,19 @@
 # =========================================
 # STREAMLIT — POISSON SKYNET (HÍBRIDO)
 # =========================================
-import re
-import os
-import glob
-
+import streamlit as st
 import pandas as pd
 import numpy as np
+import os
+import re
+import glob
+from pathlib import Path
 from scipy.stats import poisson
 import matplotlib.pyplot as plt
 import seaborn as sns
+from streamlit_autorefresh import st_autorefresh
 from PIL import Image
+
 
 # =========================================
 # CONFIG
