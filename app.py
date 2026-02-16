@@ -342,12 +342,8 @@ def radar_profissional(valores, titulo="Radar Ofensivo", cor="#00E5FF"):
     "ExG",
     "Finalizações",
     "Precisão",
-    "Posse",
-    "Ataque",
-    "Defesa"
+    "BTTS"
 ]
-
-
     valores = np.array(valores)
     angulos = np.linspace(0, 2*np.pi, len(labels), endpoint=False)
 
@@ -1019,6 +1015,7 @@ radar_away_mgf = [
     linha_mgf["BTTS_%"]
 ]
 
+
 st.markdown("### 🎯 Radar Ofensivo — MGF")
 
 st.pyplot(
@@ -1119,18 +1116,18 @@ with tab4:
     # ===== RADAR ATK x DEF =====
 radar_home_exg = [
     linha_exg["FAH"],
-    min(linha_exg["ExG_Home_ATKxDEF"]*40,100),
-    min((linha_mgf["CHM"]/15)*100,100),
+    min(linha_exg["ExG_Home_ATKxDEF"] * 40, 100),
+    min((linha_mgf["CHM"]/15)*100, 100),
     linha_exg["Precisao_CG_H"],
-    linha_exg["FDH"]
+    linha_exg["BTTS_%"]
 ]
 
 radar_away_exg = [
     linha_exg["FAA"],
-    min(linha_exg["ExG_Away_ATKxDEF"]*40,100),
-    min((linha_mgf["CAM"]/15)*100,100),
+    min(linha_exg["ExG_Away_ATKxDEF"] * 40, 100),
+    min((linha_mgf["CAM"]/15)*100, 100),
     linha_exg["Precisao_CG_A"],
-    linha_exg["FDA"]
+    linha_exg["BTTS_%"]
 ]
 
 st.markdown("### ⚔️ Radar Tático")
@@ -1232,16 +1229,16 @@ with tab5:
     # ===== RADAR VG =====
 radar_home_vg = [
     linha_exg["FAH"],
-    min(linha_vg["ExG_Home_VG"]*40,100),
-    min((linha_mgf["CHM"]/15)*100,100),
+    min(linha_vg["ExG_Home_VG"] * 40, 100),
+    min((linha_mgf["CHM"]/15)*100, 100),
     linha_exg["Precisao_CG_H"],
     linha_vg["BTTS_%"]
 ]
 
 radar_away_vg = [
     linha_exg["FAA"],
-    min(linha_vg["ExG_Away_VG"]*40,100),
-    min((linha_mgf["CAM"]/15)*100,100),
+    min(linha_vg["ExG_Away_VG"] * 40, 100),
+    min((linha_mgf["CAM"]/15)*100, 100),
     linha_exg["Precisao_CG_A"],
     linha_vg["BTTS_%"]
 ]
