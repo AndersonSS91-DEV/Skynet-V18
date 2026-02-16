@@ -58,7 +58,7 @@ div[data-testid="metric-container"] label {
 
 /* Valor */
 div[data-testid="metric-container"] > div {
-    font-size: 42px !important;
+    font-size: 48px !important;
     font-weight: 900 !important;
 }
 
@@ -436,17 +436,21 @@ def radar_comparativo(home_vals, away_vals, home, away):
     ax = fig.add_subplot(111, polar=True)
     ax.set_facecolor("#0e1117")
 
-    ax.plot(angulos, home_vals, linewidth=2, color="#00BFFF", label=home)
+    # HOME azul
+    ax.plot(angulos, home_vals, linewidth=2, color="#00BFFF")
     ax.fill(angulos, home_vals, alpha=0.25, color="#00BFFF")
 
-    ax.plot(angulos, away_vals, linewidth=2, color="#FFD700", label=away)
-    ax.fill(angulos, away_vals, alpha=0.15, color="#FFD700")
+    # AWAY laranja
+    ax.plot(angulos, away_vals, linewidth=2, color="#FF7A00")
+    ax.fill(angulos, away_vals, alpha=0.18, color="#FF7A00")
 
     ax.set_xticks(angulos[:-1])
-    ax.set_xticklabels(labels, fontsize=8, color="white")
+    ax.set_xticklabels(labels, fontsize=9, color="white")
 
     ax.set_ylim(0, 100)
-    ax.legend(loc="upper right", bbox_to_anchor=(1.3, 1.1))
+
+    ax.tick_params(colors="white")
+    ax.spines["polar"].set_color("#444")
 
     return fig
 
@@ -768,10 +772,14 @@ with tab1:
     atk_away,
     def_away
 ]
-    st.markdown("### 🎯 Radar Ofensivo")
-
     home_team = linha_exg["Home_Team"]
     away_team = linha_exg["Visitor_Team"]
+    
+    st.markdown(
+    f"### 🎯 Radar Ofensivo 🔵 <span style='color:#00BFFF'>{home_team}</span> x "
+    f"<span style='color:#FF7A00'>{away_team}</span>",
+    unsafe_allow_html=True
+    )
 
     st.pyplot(
         radar_comparativo(
