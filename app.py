@@ -628,10 +628,10 @@ def mostrar_card(df_base, jogo):
     cor = cor_card(row["Interpretacao"])
 
     card = f"""
-    <div style="
-        background:{cor};
-        padding:18px;
-        border-radius:14px;
+<div style="
+    background:{cor};
+    padding:18px;
+    border-radius:14px;
         box-shadow:0 0 10px rgba(0,0,0,0.45);
         color:white;
         font-size:18px;
