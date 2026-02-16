@@ -417,6 +417,58 @@ def tendencia_gols(ief_home, ief_away, exg_total):
     else:
         return "BAIXA"
 
+# =========================================
+# LEITURA OFENSIVA
+# =========================================
+def leitura_ofensiva(nome, eficiencia, exg, finalizacoes, precisao, btts):
+    
+    texto = f"🔵 {nome}\n\n"
+
+    if eficiencia > 50:
+        texto += "✔ Eficiência alta\n"
+    elif eficiencia > 35:
+        texto += "✔ Eficiência média\n"
+    else:
+        texto += "✔ Eficiência baixa\n"
+
+    if exg > 70:
+        texto += "✔ ExG muito alto\n"
+    elif exg > 45:
+        texto += "✔ ExG moderado\n"
+    else:
+        texto += "✔ ExG baixo\n"
+
+    if finalizacoes < 30:
+        texto += "✔ Poucas finalizações\n"
+    elif finalizacoes > 70:
+        texto += "✔ Muitas finalizações\n"
+    else:
+        texto += "✔ Volume equilibrado\n"
+
+    if precisao > 55:
+        texto += "✔ Alta precisão\n"
+    else:
+        texto += "✔ Precisão média\n"
+
+    if btts < 45:
+        texto += "✔ BTTS baixo\n"
+    else:
+        texto += "✔ BTTS moderado/alto\n"
+
+    texto += "\n🧠 leitura:\n"
+
+    if eficiencia > 50 and exg > 60:
+        texto += "👉 cria chances de alta qualidade\n"
+        texto += "👉 precisa de poucas oportunidades\n"
+        texto += "🔥 perfil letal\n"
+    elif finalizacoes > 70 and eficiencia < 40:
+        texto += "👉 volume alto, qualidade baixa\n"
+        texto += "👉 chuta muito e marca pouco\n"
+    else:
+        texto += "👉 perfil ofensivo equilibrado\n"
+
+    return texto
+
 
 # 🎨 BTTS (NOVO)
 def calcular_btts_e_odd(matriz):
@@ -847,6 +899,33 @@ with tab1:
     else:
         st.info(f"Tendência de gols: {tendencia}")
 
+st.markdown("### 🧠 Leitura Ofensiva")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.info(
+        leitura_ofensiva(
+            linha_exg["Home_Team"],
+            radar_home[0],
+            radar_home[1],
+            radar_home[2],
+            radar_home[3],
+            radar_home[4]
+        )
+    )
+
+with col2:
+    st.info(
+        leitura_ofensiva(
+            linha_exg["Visitor_Team"],
+            radar_away[0],
+            radar_away[1],
+            radar_away[2],
+            radar_away[3],
+            radar_away[4]
+        )
+    )
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
@@ -920,7 +999,62 @@ with tab3:
         "Over/Under — Média de Gols (MGF)"
     )
 
-    st.dataframe(top_placares(matriz), use_container_width=True)
+    # ===== RADAR MGF =====
+ief_home = eficiencia_finalizacao(linha_mgf["CHM"])
+ief_away = eficiencia_finalizacao(linha_mgf["CAM"])
+
+radar_home_mgf = [
+    ief_home,
+    min(linha_mgf["ExG_Home_MGF"] * 40, 100),
+    min((linha_mgf["CHM"]/15)*100, 100),
+    linha_exg["Precisao_CG_H"],
+    linha_mgf["BTTS_%"]
+]
+
+radar_away_mgf = [
+    ief_away,
+    min(linha_mgf["ExG_Away_MGF"] * 40, 100),
+    min((linha_mgf["CAM"]/15)*100, 100),
+    linha_exg["Precisao_CG_A"],
+    linha_mgf["BTTS_%"]
+]
+
+st.markdown("### 🎯 Radar Ofensivo — MGF")
+
+st.pyplot(
+    radar_comparativo(
+        radar_home_mgf,
+        radar_away_mgf,
+        linha_mgf["Home_Team"],
+        linha_mgf["Visitor_Team"]
+    )
+)
+
+st.markdown("### 🧠 Leitura Ofensiva (Histórico)")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.info(leitura_ofensiva(
+        linha_mgf["Home_Team"],
+        radar_home_mgf[0],
+        radar_home_mgf[1],
+        radar_home_mgf[2],
+        radar_home_mgf[3],
+        radar_home_mgf[4]
+    ))
+
+with col2:
+    st.info(leitura_ofensiva(
+        linha_mgf["Visitor_Team"],
+        radar_away_mgf[0],
+        radar_away_mgf[1],
+        radar_away_mgf[2],
+        radar_away_mgf[3],
+        radar_away_mgf[4]
+    ))
+
+
 
 # =========================================
 # ABA 4 — POISSON ATK x DEF
@@ -982,8 +1116,57 @@ with tab4:
         "Over/Under — Ataque x Defesa"
     )
 
-    st.dataframe(top_placares(matriz), use_container_width=True)
+    # ===== RADAR ATK x DEF =====
+radar_home_exg = [
+    linha_exg["FAH"],
+    min(linha_exg["ExG_Home_ATKxDEF"]*40,100),
+    min((linha_mgf["CHM"]/15)*100,100),
+    linha_exg["Precisao_CG_H"],
+    linha_exg["FDH"]
+]
 
+radar_away_exg = [
+    linha_exg["FAA"],
+    min(linha_exg["ExG_Away_ATKxDEF"]*40,100),
+    min((linha_mgf["CAM"]/15)*100,100),
+    linha_exg["Precisao_CG_A"],
+    linha_exg["FDA"]
+]
+
+st.markdown("### ⚔️ Radar Tático")
+
+st.pyplot(
+    radar_comparativo(
+        radar_home_exg,
+        radar_away_exg,
+        linha_exg["Home_Team"],
+        linha_exg["Visitor_Team"]
+    )
+)
+
+st.markdown("### 🧠 Leitura Tática")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.info(leitura_ofensiva(
+        linha_exg["Home_Team"],
+        radar_home_exg[0],
+        radar_home_exg[1],
+        radar_home_exg[2],
+        radar_home_exg[3],
+        radar_home_exg[4]
+    ))
+
+with col2:
+    st.info(leitura_ofensiva(
+        linha_exg["Visitor_Team"],
+        radar_away_exg[0],
+        radar_away_exg[1],
+        radar_away_exg[2],
+        radar_away_exg[3],
+        radar_away_exg[4]
+    ))
        
 # =========================================
 # ABA 5 — VG
@@ -1046,4 +1229,53 @@ with tab5:
         "Over/Under — Valor do Gol (VG)"
     )
 
-    st.dataframe(top_placares(matriz), use_container_width=True)
+    # ===== RADAR VG =====
+radar_home_vg = [
+    linha_exg["FAH"],
+    min(linha_vg["ExG_Home_VG"]*40,100),
+    min((linha_mgf["CHM"]/15)*100,100),
+    linha_exg["Precisao_CG_H"],
+    linha_vg["BTTS_%"]
+]
+
+radar_away_vg = [
+    linha_exg["FAA"],
+    min(linha_vg["ExG_Away_VG"]*40,100),
+    min((linha_mgf["CAM"]/15)*100,100),
+    linha_exg["Precisao_CG_A"],
+    linha_vg["BTTS_%"]
+]
+
+st.markdown("### 💎 Radar Ofensivo — Valor")
+
+st.pyplot(
+    radar_comparativo(
+        radar_home_vg,
+        radar_away_vg,
+        linha_vg["Home_Team"],
+        linha_vg["Visitor_Team"]
+    )
+)
+st.markdown("### 🧠 Leitura de Valor Ofensivo")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.info(leitura_ofensiva(
+        linha_vg["Home_Team"],
+        radar_home_vg[0],
+        radar_home_vg[1],
+        radar_home_vg[2],
+        radar_home_vg[3],
+        radar_home_vg[4]
+    ))
+
+with col2:
+    st.info(leitura_ofensiva(
+        linha_vg["Visitor_Team"],
+        radar_away_vg[0],
+        radar_away_vg[1],
+        radar_away_vg[2],
+        radar_away_vg[3],
+        radar_away_vg[4]
+    ))
