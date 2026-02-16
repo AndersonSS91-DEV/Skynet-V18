@@ -423,7 +423,7 @@ def tendencia_gols(ief_home, ief_away, exg_total):
 # =========================================
 def leitura_ofensiva(nome, eficiencia, exg, finalizacoes, precisao, btts):
     
-    texto = f" {nome}\n\n"
+    texto = f"<div style='text-align:center; font-weight:700; font-size:18px'>{nome}</div>\n\n"
 
     if eficiencia > 50:
         texto += "✔ Eficiência alta\n"
