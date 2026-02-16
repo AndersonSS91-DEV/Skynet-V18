@@ -829,25 +829,24 @@ with tab1:
     btts_home
 ]
 
-radar_away = [
-    ief_away,
-    norm_exg(exg_away),
-    norm_shots(shots_away),
-    precision_away,
-    btts_away
-]
+    radar_away = [
+        ief_away,
+        norm_exg(exg_away),
+        norm_shots(shots_away),
+        precision_away,
+        btts_away
+    ]
 
     home_team = linha_exg["Home_Team"]
     away_team = linha_exg["Visitor_Team"]
-    
-    st.markdown("### 🎯 Radar Ofensivo")
-                
-    st.markdown(
-    f"### <span style='color:#00BFFF'>{home_team}</span> x "
-    f"<span style='color:#FF7A00'>{away_team}</span>",
-    unsafe_allow_html=True
-)
 
+    st.markdown("### 🎯 Radar Ofensivo")
+
+    st.markdown(
+        f"### <span style='color:#00BFFF'>{home_team}</span> x "
+        f"<span style='color:#FF7A00'>{away_team}</span>",
+        unsafe_allow_html=True
+    )
 
     st.pyplot(
         radar_comparativo(
@@ -857,6 +856,7 @@ radar_away = [
             away_team
         )
     )
+
 
     # ===== ALERTAS =====
 
