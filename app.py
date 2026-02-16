@@ -82,6 +82,16 @@ div[data-testid="stDataFrame"] * {
 </style>
 """, unsafe_allow_html=True)
 
+/* ===== ALERT CARDS ===== */
+
+div[data-testid="stAlert"] {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+}
+
+div[data-testid="stAlert"] p {
+    font-size: 20px !important;
+}
 
 # =========================================
 # 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
