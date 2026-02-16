@@ -4,15 +4,12 @@
 import re
 import os
 import glob
-from pathlib import Path
 
-import streamlit as st
 import pandas as pd
 import numpy as np
 from scipy.stats import poisson
 import matplotlib.pyplot as plt
 import seaborn as sns
-from streamlit_autorefresh import st_autorefresh
 from PIL import Image
 
 # =========================================
@@ -99,6 +96,9 @@ div[data-testid="stDataFrame"] th {
 div[data-testid="stDataFrame"] td {
     font-size: 17px !important;
 }
+
+</style>
+""", unsafe_allow_html=True)
 
 # =========================================
 # 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
