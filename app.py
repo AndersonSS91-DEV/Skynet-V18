@@ -14,7 +14,6 @@ import seaborn as sns
 from streamlit_autorefresh import st_autorefresh
 from PIL import Image
 
-
 # =========================================
 # CONFIG
 # =========================================
