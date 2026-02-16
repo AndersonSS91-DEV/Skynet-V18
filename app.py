@@ -560,7 +560,7 @@ def radar_comparativo(home_vals, away_vals, home, away):
     home_vals = np.concatenate((home_vals, [home_vals[0]]))
     away_vals = np.concatenate((away_vals, [away_vals[0]]))
 
-    fig = plt.figure(figsize=(3.2, 2.8), dpi=120, facecolor="#0e1117")
+    fig = plt.figure(figsize=(2.8, 2.5), dpi=120, facecolor="#0e1117")
     ax = fig.add_subplot(111, polar=True)
     ax.set_facecolor("#0e1117")
 
