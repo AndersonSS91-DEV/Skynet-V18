@@ -560,8 +560,7 @@ def radar_comparativo(home_vals, away_vals, home, away):
 
     return fig
 
-    #RADAR RESUMO
-    def media_radars(*radars):
+def radar_consenso(radars):
     return np.mean(radars, axis=0)
 
 
