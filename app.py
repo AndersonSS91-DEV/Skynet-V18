@@ -333,16 +333,16 @@ def radar_ataque(valores, titulo="Radar Ofensivo"):
     valores = np.concatenate((valores, [valores[0]]))
     angulos = np.concatenate((angulos, [angulos[0]]))
 
-    fig = plt.figure(figsize=(4,4))
+    fig = plt.figure(figsize=(2,2))
     ax = fig.add_subplot(111, polar=True)
 
     ax.plot(angulos, valores)
     ax.fill(angulos, valores, alpha=0.25)
 
     ax.set_xticks(angulos[:-1])
-    ax.set_xticklabels(labels, fontsize=8)
+    ax.set_xticklabels(labels, fontsize=6)
 
-    ax.set_title(titulo, fontsize=10)
+    ax.set_title(titulo, fontsize=8)
     return fig
 
 # 🎨 BTTS (NOVO)
@@ -644,7 +644,7 @@ precision_away = linha_exg["Precisao_CG_A"]
 btts_away = linha_mgf["BTTS_%"]
 
 def norm_exg(x): return min(x * 40, 100)
-def norm_shots(x): return min(x * 10, 100)
+def norm_shots(x): return min((x / 15) * 100, 100)
 
 radar_home = [
     ief_home,
@@ -654,10 +654,10 @@ radar_home = [
     btts_home
 ]
 
-st.markdown("### 🎯 Radar Ofensivo Home")
+st.markdown("## 🎯 Radar Ofensivo Home")
 st.pyplot(radar_ataque(radar_home))
 
-st.markdown("### 🎯 Radar Ofensivo Away")
+st.markdown("## 🎯 Radar Ofensivo Away")
 st.pyplot(radar_ataque([
     ief_away,
     norm_exg(exg_away),
@@ -680,8 +680,13 @@ if time_letal(ief_away, exg_away):
 if over_valor_oculto(ief_home, ief_away, exg_home+exg_away):
     st.warning("💰 Over com valor oculto detectado")
 
-anti_home = anti_xg(linha_exg["Result Home"], exg_home)
-st.metric("Anti-xG Home", f"{anti_home:.2f}")
+anti_home = anti_xg(
+    linha_exg.get("Result Home", 0),
+    exg_home
+)
+
+if anti_home > 0:
+    st.metric("Anti-xG Home", f"{anti_home:.2f}")
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
