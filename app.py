@@ -94,13 +94,19 @@ div[data-testid="stDataFrame"] * {
     font-size: 18px !important;
 }
 
-/* texto dentro dos alertas */
+/* =========================
+   ALERTAS (sem quebrar cores)
+========================= */
+
 div[data-testid="stAlert"] p {
-    color: #FFFFFF !important;
     font-size: 18px !important;
+    font-weight: 600 !important;
 }
 
-/* ===== TABELAS ===== */
+
+/* =========================
+   DATAFRAME (grid interno)
+========================= */
 
 div[data-testid="stDataFrame"] table {
     font-size: 18px !important;
@@ -114,6 +120,7 @@ div[data-testid="stDataFrame"] th {
 div[data-testid="stDataFrame"] td {
     font-size: 18px !important;
 }
+
 
 </style>
 """, unsafe_allow_html=True)
