@@ -99,6 +99,15 @@ div[data-testid="stDataFrame"] td {
     font-size: 17px !important;
 }
 
+/* texto dos cards st.info */
+div[data-testid="stAlert"] {
+    color: white !important;
+}
+
+div[data-testid="stAlert"] p {
+    color: white !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
