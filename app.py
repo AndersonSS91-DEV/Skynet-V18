@@ -277,7 +277,73 @@ def top_placares(matriz, n=6):
 
     m["Probabilidade%"] = m["Probabilidade%"].map(lambda x: f"{x:.2f}%")
     return m
+# =========================================
+# ⚽ MÉTRICAS OFENSIVAS SKYNET
+# =========================================
 
+def eficiencia_finalizacao(chutes_por_gol):
+    if chutes_por_gol == 0:
+        return 0
+    return (1 / chutes_por_gol) * 100
+
+
+def ajustar_exg_por_eficiencia(exg, ief, media_liga=30):
+    fator = ief / media_liga
+    return exg * fator
+
+
+def time_letal(ief, exg):
+    return ief > 45 and exg > 1.2
+
+
+def over_valor_oculto(ief_home, ief_away, exg_total):
+    return (ief_home + ief_away) > 80 and exg_total > 2.2
+
+
+def anti_xg(gols, exg):
+    if exg == 0:
+        return 0
+    return gols / exg
+
+
+def score_ofensivo(ief, exg, finalizacoes):
+    score = (ief*0.4) + (exg*20*0.4) + (finalizacoes*0.2)
+    return min(round(score,1), 99)
+
+
+def rank_time(score):
+    if score > 85: return "S"
+    if score > 75: return "A"
+    if score > 65: return "B"
+    if score > 55: return "C"
+    return "D"
+
+# =========================================
+# RADAR OFENSIVO
+# =========================================
+import numpy as np
+import matplotlib.pyplot as plt
+
+def radar_ataque(valores, titulo="Radar Ofensivo"):
+    labels = ["Eficiência","ExG","Finalizações","Precisão","BTTS"]
+
+    valores = np.array(valores)
+    angulos = np.linspace(0, 2*np.pi, len(labels), endpoint=False)
+
+    valores = np.concatenate((valores, [valores[0]]))
+    angulos = np.concatenate((angulos, [angulos[0]]))
+
+    fig = plt.figure(figsize=(4,4))
+    ax = fig.add_subplot(111, polar=True)
+
+    ax.plot(angulos, valores)
+    ax.fill(angulos, valores, alpha=0.25)
+
+    ax.set_xticks(angulos[:-1])
+    ax.set_xticklabels(labels, fontsize=8)
+
+    ax.set_title(titulo, fontsize=10)
+    return fig
 
 # 🎨 BTTS (NOVO)
 def calcular_btts_e_odd(matriz):
@@ -562,6 +628,60 @@ with tab1:
     with b3:
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
+
+# ===== MÉTRICAS HOME =====
+ief_home = eficiencia_finalizacao(linha_mgf["CHM"])
+exg_home = linha_mgf["ExG_Home_MGF"]
+shots_home = linha_mgf["CHM"]
+precision_home = linha_exg["Precisao_CG_H"]
+btts_home = linha_mgf["BTTS_%"]
+
+# ===== MÉTRICAS AWAY =====
+ief_away = eficiencia_finalizacao(linha_mgf["CAM"])
+exg_away = linha_mgf["ExG_Away_MGF"]
+shots_away = linha_mgf["CAM"]
+precision_away = linha_exg["Precisao_CG_A"]
+btts_away = linha_mgf["BTTS_%"]
+
+def norm_exg(x): return min(x * 40, 100)
+def norm_shots(x): return min(x * 10, 100)
+
+radar_home = [
+    ief_home,
+    norm_exg(exg_home),
+    norm_shots(shots_home),
+    precision_home,
+    btts_home
+]
+
+st.markdown("### 🎯 Radar Ofensivo Home")
+st.pyplot(radar_ataque(radar_home))
+
+st.markdown("### 🎯 Radar Ofensivo Away")
+st.pyplot(radar_ataque([
+    ief_away,
+    norm_exg(exg_away),
+    norm_shots(shots_away),
+    precision_away,
+    btts_away
+]))
+
+lh_adj = ajustar_exg_por_eficiencia(exg_home, ief_home)
+la_adj = ajustar_exg_por_eficiencia(exg_away, ief_away)
+
+matriz = calcular_matriz_poisson(lh_adj, la_adj)
+
+if time_letal(ief_home, exg_home):
+    st.success("🔥 Home LETAL hoje")
+
+if time_letal(ief_away, exg_away):
+    st.success("🔥 Away LETAL hoje")
+
+if over_valor_oculto(ief_home, ief_away, exg_home+exg_away):
+    st.warning("💰 Over com valor oculto detectado")
+
+anti_home = anti_xg(linha_exg["Result Home"], exg_home)
+st.metric("Anti-xG Home", f"{anti_home:.2f}")
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
