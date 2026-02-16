@@ -1141,14 +1141,14 @@ with tab3:
 
     st.markdown("### 🎯 Radar Ofensivo — MGF")
 
-    st.pyplot(
-        radar_comparativo(
-            radar_home_mgf,
-            radar_away_mgf,
-            linha_mgf["Home_Team"],
-            linha_mgf["Visitor_Team"]
-        )
+    fig = radar_comparativo(
+        radar_home_mgf,
+        radar_away_mgf,
+        linha_mgf["Home_Team"],
+        linha_mgf["Visitor_Team"]
     )
+
+    st.pyplot(fig, use_container_width=False)
 
     cards_ofensivos(
     radar_home_mgf,
@@ -1253,13 +1253,21 @@ with tab4:
 
     st.markdown("### ⚔️ Radar Tático")
 
-    st.pyplot(
-        radar_comparativo(
-            radar_home_exg,
-            radar_away_exg,
-            linha_exg["Home_Team"],
-            linha_exg["Visitor_Team"]
-        )
+    fig = radar_comparativo(
+        radar_home_exg,
+        radar_away_exg,
+        linha_exg["Home_Team"],
+        linha_exg["Visitor_Team"]
+    )
+
+    st.pyplot(fig, use_container_width=False)
+
+    cards_ofensivos(
+        radar_home_exg,
+        radar_away_exg,
+        radar_home_exg[0],
+        radar_away_exg[0],
+        linha_exg["ExG_Home_ATKxDEF"] + linha_exg["ExG_Away_ATKxDEF"]
     )
 
     cards_ofensivos(
@@ -1367,13 +1375,21 @@ with tab5:
 
     st.markdown("### 💎 Radar Ofensivo — Valor")
 
-    st.pyplot(
-        radar_comparativo(
-            radar_home_vg,
-            radar_away_vg,
-            linha_vg["Home_Team"],
-            linha_vg["Visitor_Team"]
-        )
+    fig = radar_comparativo(
+        radar_home_vg,
+        radar_away_vg,
+        linha_vg["Home_Team"],
+        linha_vg["Visitor_Team"]
+    )
+
+    st.pyplot(fig, use_container_width=False)
+
+    cards_ofensivos(
+        radar_home_vg,
+        radar_away_vg,
+        radar_home_vg[0],
+        radar_away_vg[0],
+        linha_vg["ExG_Home_VG"] + linha_vg["ExG_Away_VG"]
     )
     cards_ofensivos(
     radar_home_vg,
