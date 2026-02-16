@@ -560,7 +560,7 @@ def radar_comparativo(home_vals, away_vals, home, away):
     home_vals = np.concatenate((home_vals, [home_vals[0]]))
     away_vals = np.concatenate((away_vals, [away_vals[0]]))
 
-    fig = plt.figure(figsize=(3.2, 2.8), dpi=120)
+    fig = plt.figure(figsize=(3.2, 2.8), dpi=120, facecolor="#0e1117")
     ax = fig.add_subplot(111, polar=True)
     ax.set_facecolor("#0e1117")
 
@@ -1005,13 +1005,15 @@ with tab1:
         unsafe_allow_html=True
     )
 
-    st.pyplot(
-        radar_comparativo(
-            radar_home_consenso,
-            radar_away_consenso,
-            linha_exg["Home_Team"],
-            linha_exg["Visitor_Team"]
-        )
+    fig = radar_comparativo(
+    radar_home_consenso,
+    radar_away_consenso,
+    linha_exg["Home_Team"],
+    linha_exg["Visitor_Team"]
+)
+
+st.pyplot(fig, use_container_width=False)
+
     )
 
     cards_ofensivos(
