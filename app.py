@@ -777,10 +777,10 @@ with tab1:
     
     st.markdown("### 🎯 Radar Ofensivo")
     st.markdown(
-    f"<span style='color:#00BFFF; font-weight:700;'> {home_team}</span>"
-    f" &nbsp; x &nbsp; "
-    f"<span style='color:#FF7A00; font-weight:700;'> {away_team}</span>",
-    unsafe_allow_html=True)
+    f"🔵 <span style='color:#00BFFF'>{home_team}</span>  x  "
+    f"<span style='color:#FF7A00'>{away_team}</span>",
+    unsafe_allow_html=True
+)
 
 
     st.pyplot(
