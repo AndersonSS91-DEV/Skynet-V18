@@ -714,7 +714,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💎⚽ VG"
 ])
 
-
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
@@ -904,48 +903,47 @@ with tab1:
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
 
-    st.markdown("---")
-    
-# =========================================
-# 🔢 POISSON CONSENSO (MGF + ATKxDEF + VG)
-# =========================================
+      st.markdown("---")
 
-# média dos modelos
-lambda_home = np.mean([
-    linha_mgf["ExG_Home_MGF"],
-    linha_exg["ExG_Home_ATKxDEF"],
-    linha_vg["ExG_Home_VG"]
-])
-
-lambda_away = np.mean([
-    linha_mgf["ExG_Away_MGF"],
-    linha_exg["ExG_Away_ATKxDEF"],
-    linha_vg["ExG_Away_VG"]
-])
-
-st.markdown("### 🔢⚽ Poisson Consenso")
-
-matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
-
-exibir_matriz(
-    matriz_consenso,
-    linha_exg["Home_Team"],
-    linha_exg["Visitor_Team"],
-    "Probabilidades de Placar (Consenso)"
-)
-
-mostrar_over_under(
-    matriz_consenso,
-    "Over/Under — Consenso"
-)
-
-st.dataframe(
-    top_placares(matriz_consenso),
-    use_container_width=True
-)
-    
     # =========================================
-    # 🎯 RADAR CONSENSO (SÓ NA ABA RESUMO)
+    # 🔢 POISSON CONSENSO
+    # =========================================
+
+    lambda_home = np.mean([
+        linha_mgf["ExG_Home_MGF"],
+        linha_exg["ExG_Home_ATKxDEF"],
+        linha_vg["ExG_Home_VG"]
+    ])
+
+    lambda_away = np.mean([
+        linha_mgf["ExG_Away_MGF"],
+        linha_exg["ExG_Away_ATKxDEF"],
+        linha_vg["ExG_Away_VG"]
+    ])
+
+    st.markdown("### 🔢⚽ Poisson Consenso")
+
+    matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
+
+    exibir_matriz(
+        matriz_consenso,
+        linha_exg["Home_Team"],
+        linha_exg["Visitor_Team"],
+        "Probabilidades de Placar (Consenso)"
+    )
+
+    mostrar_over_under(
+        matriz_consenso,
+        "Over/Under — Consenso"
+    )
+
+    st.dataframe(
+        top_placares(matriz_consenso),
+        use_container_width=True
+    )
+
+    # =========================================
+    # 🎯 RADAR CONSENSO
     # =========================================
 
     radar_home_mgf = [
@@ -1028,26 +1026,30 @@ st.dataframe(
         radar_away_consenso[0],
         linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
     )
-    
+
+    # =========================================
+    # 🧠 LEITURA CONSENSO
+    # =========================================
+
     st.markdown("### 🧠 Leitura Ofensiva Consenso")
 
-col1, col2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-with col1:
-    st.info(
-        leitura_consenso(
-            linha_exg["Home_Team"],
-            radar_home_consenso
+    with col1:
+        st.info(
+            leitura_consenso(
+                linha_exg["Home_Team"],
+                radar_home_consenso
+            )
         )
-    )
 
-with col2:
-    st.info(
-        leitura_consenso(
-            linha_exg["Visitor_Team"],
-            radar_away_consenso
+    with col2:
+        st.info(
+            leitura_consenso(
+                linha_exg["Visitor_Team"],
+                radar_away_consenso
+            )
         )
-    )
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
