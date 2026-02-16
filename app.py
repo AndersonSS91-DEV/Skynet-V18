@@ -563,6 +563,13 @@ def radar_comparativo(home_vals, away_vals, home, away):
 def radar_consenso(radars):
     return np.mean(radars, axis=0)
 
+def norm_exg(x): 
+    return min(x * 40, 100)
+
+def norm_shots(x): 
+    return min((x / 15) * 100, 100)
+
+
 
 # =========================================
 # 🎨 ESTILO CARDS (NOVO)
@@ -836,17 +843,10 @@ with tab1:
 
     st.markdown("---")
     
-   # =========================================
-# 🎯 RADAR CONSENSO (MGF + ATKxDEF + VG)
-# =========================================
-
-def norm_exg(x): 
-    return min(x * 40, 100)
-
-def norm_shots(x): 
-    return min((x / 15) * 100, 100)
-
-# ===== RADAR MGF =====
+    # =========================================
+    # 🎯 RADAR CONSENSO
+    # =========================================
+==== RADAR MGF =====
 radar_home_mgf = [
     eficiencia_finalizacao(linha_mgf["CHM"]),
     norm_exg(linha_mgf["ExG_Home_MGF"]),
