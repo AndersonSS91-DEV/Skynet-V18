@@ -325,7 +325,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def radar_profissional(valores, titulo="Radar Ofensivo", cor="#00E5FF"):
-    labels = ["Eficiência","ExG","Finalizações","Precisão","BTTS"]
+    labels = [
+    "Eficiência",
+    "ExG",
+    "Finalizações",
+    "Precisão",
+    "Posse",
+    "Ataque",
+    "Defesa"
+]
+
 
     valores = np.array(valores)
     angulos = np.linspace(0, 2*np.pi, len(labels), endpoint=False)
@@ -337,7 +346,9 @@ def radar_profissional(valores, titulo="Radar Ofensivo", cor="#00E5FF"):
     ax = fig.add_subplot(111, polar=True)
     ax.set_facecolor("#0e1117")
 
+    ax.set_ylim(0, 100)
     ax.plot(angulos, valores, linewidth=2, color=cor)
+
     ax.fill(angulos, valores, alpha=0.25, color=cor)
 
     ax.set_xticks(angulos[:-1])
@@ -408,6 +419,36 @@ def calcular_btts_e_odd(matriz):
     odd_justa = round(1 / btts_prob, 2) if btts_prob > 0 else np.nan
 
     return btts_pct, odd_justa
+    
+def radar_comparativo(home_vals, away_vals, home, away):
+    labels = [
+        "Eficiência","ExG","Finalizações",
+        "Precisão","Posse","Ataque","Defesa"
+    ]
+
+    angulos = np.linspace(0, 2*np.pi, len(labels), endpoint=False)
+    angulos = np.concatenate((angulos, [angulos[0]]))
+
+    home_vals = np.concatenate((home_vals, [home_vals[0]]))
+    away_vals = np.concatenate((away_vals, [away_vals[0]]))
+
+    fig = plt.figure(figsize=(5,5), facecolor="#0e1117")
+    ax = fig.add_subplot(111, polar=True)
+    ax.set_facecolor("#0e1117")
+
+    ax.plot(angulos, home_vals, linewidth=2, color="#00BFFF", label=home)
+    ax.fill(angulos, home_vals, alpha=0.25, color="#00BFFF")
+
+    ax.plot(angulos, away_vals, linewidth=2, color="#FFD700", label=away)
+    ax.fill(angulos, away_vals, alpha=0.15, color="#FFD700")
+
+    ax.set_xticks(angulos[:-1])
+    ax.set_xticklabels(labels, fontsize=8, color="white")
+
+    ax.set_ylim(0, 100)
+    ax.legend(loc="upper right", bbox_to_anchor=(1.3, 1.1))
+
+    return fig
 
 # =========================================
 # 🎨 ESTILO CARDS (NOVO)
@@ -690,6 +731,9 @@ with tab1:
     shots_home = linha_mgf["CHM"]
     precision_home = linha_exg["Precisao_CG_H"]
     btts_home = linha_mgf["BTTS_%"]
+    posse_home = linha_exg["Posse_Bola_Home"]
+    atk_home = linha_exg["FAH"]
+    def_home = linha_exg["FDH"]
 
     # ===== MÉTRICAS AWAY =====
     ief_away = eficiencia_finalizacao(linha_mgf["CAM"])
@@ -697,32 +741,52 @@ with tab1:
     shots_away = linha_mgf["CAM"]
     precision_away = linha_exg["Precisao_CG_A"]
     btts_away = linha_mgf["BTTS_%"]
+    posse_away = linha_exg["Posse_Bola_Away"]
+    atk_away = linha_exg["FAA"]
+    def_away = linha_exg["FDA"]
 
     def norm_exg(x): return min(x * 40, 100)
     def norm_shots(x): return min((x / 15) * 100, 100)
 
     radar_home = [
-        ief_home,
-        norm_exg(exg_home),
-        norm_shots(shots_home),
-        precision_home,
-        btts_home
-    ]
+    ief_home,
+    norm_exg(exg_home),
+    norm_shots(shots_home),
+    precision_home,
+    posse_home,
+    atk_home,
+    def_home
+]
+
 
     radar_away = [
-        ief_away,
-        norm_exg(exg_away),
-        norm_shots(shots_away),
-        precision_away,
-        btts_away
-    ]
+    ief_away,
+    norm_exg(exg_away),
+    norm_shots(shots_away),
+    precision_away,
+    posse_away,
+    atk_away,
+    def_away
+]
+
 
     st.markdown("### 🎯 Radar Ofensivo")
 
-    st.pyplot(radar_profissional(radar_home, "Radar Home", "#00E5FF"))
-    st.pyplot(radar_profissional(radar_away, "Radar Away", "#FF4D6D"))
+home_team = linha_exg["Home_Team"]
+away_team = linha_exg["Visitor_Team"]
 
-    # ===== ALERTAS =====
+st.markdown("### ⚔️ Comparativo Ofensivo")
+
+st.pyplot(
+    radar_comparativo(
+        radar_home,
+        radar_away,
+        home_team,
+        away_team
+    )
+)
+
+# ===== ALERTAS =====
 
     if time_letal(ief_home, exg_home):
         st.success("🔥 Home LETAL hoje")
