@@ -937,11 +937,6 @@ with tab1:
         "Over/Under — Consenso"
     )
 
-    st.dataframe(
-        top_placares(matriz_consenso),
-        use_container_width=True
-    )
-
     # =========================================
     # 🎯 RADAR CONSENSO
     # =========================================
