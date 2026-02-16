@@ -97,6 +97,20 @@ div[data-testid="stAlert"] p {
     color: #FFFFFF !important;   /* cor do texto */
 }
 
+/* ===== TABELAS (GRID INTERNO) ===== */
+div[data-testid="stDataFrame"] table {
+    font-size: 20px !important;
+}
+
+div[data-testid="stDataFrame"] th {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+}
+
+div[data-testid="stDataFrame"] td {
+    font-size: 18px !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
