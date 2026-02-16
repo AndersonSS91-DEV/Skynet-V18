@@ -45,11 +45,11 @@ h3 {
     font-weight: 800 !important;
 }
 
-/* ===== MÉTRICAS (SELETOR CERTO) ===== */
+/* ===== MÉTRICAS ===== */
 
 /* Label */
 div[data-testid="metric-container"] label {
-    font-size: 14px !important;
+    font-size: 13px !important;
     text-transform: uppercase !important;
     letter-spacing: 1px !important;
     opacity: 0.6 !important;
@@ -60,6 +60,19 @@ div[data-testid="metric-container"] label {
 div[data-testid="metric-container"] > div {
     font-size: 48px !important;
     font-weight: 900 !important;
+}
+
+/* ===== ALERT CARDS (🔥 LETAL / DOMÍNIO / TENDÊNCIA) ===== */
+
+div[data-testid="stAlert"] {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+}
+
+div[data-testid="stAlert"] p {
+    font-size: 22px !important;
 }
 
 /* ===== TABS ===== */
@@ -81,17 +94,6 @@ div[data-testid="stDataFrame"] * {
 
 </style>
 """, unsafe_allow_html=True)
-
-/* ===== ALERT CARDS ===== */
-
-div[data-testid="stAlert"] {
-    font-size: 20px !important;
-    font-weight: 700 !important;
-}
-
-div[data-testid="stAlert"] p {
-    font-size: 20px !important;
-}
 
 # =========================================
 # 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
