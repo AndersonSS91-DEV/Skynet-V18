@@ -775,9 +775,13 @@ with tab1:
     home_team = linha_exg["Home_Team"]
     away_team = linha_exg["Visitor_Team"]
     
-    st.markdown("### 🎯 Radar Ofensivo")
-    
-    st.subheader(f"{home_team} x {away_team}")
+    st.markdown("### 🎯 Radar Ofensivo)
+                
+    st.markdown(
+    f"### <span style='color:#00BFFF'>{home_team}</span> x "
+    f"<span style='color:#FF7A00'>{away_team}</span>",
+    unsafe_allow_html=True
+)
 
 
     st.pyplot(
