@@ -92,6 +92,11 @@ div[data-testid="stDataFrame"] * {
     font-size: 18px !important;
 }
 
+/* texto dentro dos alertas */
+div[data-testid="stAlert"] p {
+    color: #FFFFFF !important;   /* cor do texto */
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -455,8 +460,8 @@ def leitura_ofensiva(nome, eficiencia, exg, finalizacoes, precisao, btts):
 
     if eficiencia > 50 and exg > 60:
         texto += "👉 cria chances de alta qualidade\n"
-        texto += "👉 precisa de poucas oportunidades\n"
-        texto += "🔥 perfil letal\n"
+        texto += "🎯🔫 precisa de poucas oportunidades\n"
+        texto += "🎯🔥 perfil letal\n"
     elif finalizacoes > 70 and eficiencia < 40:
         texto += "👉 volume alto, qualidade baixa\n"
         texto += "👉 chuta muito e marca pouco\n"
