@@ -1021,16 +1021,19 @@ radar_away_mgf = [
 ]
 
 
-st.markdown("### 🎯 Radar Ofensivo — MGF")
+    st.dataframe(top_placares(matriz), use_container_width=True)
 
-st.pyplot(
-    radar_comparativo(
-        radar_home_mgf,
-        radar_away_mgf,
-        linha_mgf["Home_Team"],
-        linha_mgf["Visitor_Team"]
+    # ===== RADAR MGF =====
+    st.markdown("### 🎯 Radar Ofensivo — MGF")
+
+    st.pyplot(
+        radar_comparativo(
+            radar_home_mgf,
+            radar_away_mgf,
+            linha_mgf["Home_Team"],
+            linha_mgf["Visitor_Team"]
+        )
     )
-)
 
 st.markdown("### 🧠 Leitura Ofensiva (Histórico)")
 
@@ -1137,14 +1140,14 @@ radar_away_exg = [
 
 st.markdown("### ⚔️ Radar Tático")
 
-st.pyplot(
-    radar_comparativo(
-        radar_home_exg,
-        radar_away_exg,
-        linha_exg["Home_Team"],
-        linha_exg["Visitor_Team"]
+    st.pyplot(
+        radar_comparativo(
+            radar_home_exg,
+            radar_away_exg,
+            linha_exg["Home_Team"],
+            linha_exg["Visitor_Team"]
+        )
     )
-)
 
 st.markdown("### 🧠 Leitura Tática")
 
@@ -1250,14 +1253,15 @@ radar_away_vg = [
 
 st.markdown("### 💎 Radar Ofensivo — Valor")
 
-st.pyplot(
-    radar_comparativo(
-        radar_home_vg,
-        radar_away_vg,
-        linha_vg["Home_Team"],
-        linha_vg["Visitor_Team"]
+    st.pyplot(
+        radar_comparativo(
+            radar_home_vg,
+            radar_away_vg,
+            linha_vg["Home_Team"],
+            linha_vg["Visitor_Team"]
+        )
     )
-)
+
 st.markdown("### 🧠 Leitura de Valor Ofensivo")
 
 col1, col2 = st.columns(2)
