@@ -768,29 +768,24 @@ with tab1:
     atk_away,
     def_away
 ]
-
-
     st.markdown("### 🎯 Radar Ofensivo")
 
-home_team = linha_exg["Home_Team"]
-away_team = linha_exg["Visitor_Team"]
+    home_team = linha_exg["Home_Team"]
+    away_team = linha_exg["Visitor_Team"]
 
-st.markdown("### ⚔️ Comparativo Ofensivo")
-
-st.pyplot(
-    radar_comparativo(
-        radar_home,
-        radar_away,
-        home_team,
-        away_team
+    st.pyplot(
+        radar_comparativo(
+            radar_home,
+            radar_away,
+            home_team,
+            away_team
+        )
     )
-)
 
-# ===== ALERTAS =====
-    st.pyplot(radar_comparativo(...))
+    # ===== ALERTAS =====
 
     if time_letal(ief_home, exg_home):
-        st.success("🔥 Home LETAL hoje"))
+        st.success("🔥 Home LETAL hoje")
 
     if time_letal(ief_away, exg_away):
         st.success("🔥 Away LETAL hoje")
@@ -828,6 +823,7 @@ st.pyplot(
         st.warning("🔥 Tendência ALTA de gols")
     else:
         st.info(f"Tendência de gols: {tendencia}")
+
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
