@@ -1013,8 +1013,7 @@ with tab1:
 )
 
 st.pyplot(fig, use_container_width=False)
-
-    )
+    
 
     cards_ofensivos(
         radar_home_consenso,
