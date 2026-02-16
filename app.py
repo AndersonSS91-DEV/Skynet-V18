@@ -903,7 +903,7 @@ with tab1:
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
 
-      st.markdown("---")
+    st.markdown("---")
 
     # =========================================
     # 🔢 POISSON CONSENSO
