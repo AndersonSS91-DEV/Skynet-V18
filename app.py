@@ -835,12 +835,16 @@ with tab1:
         st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
 
     st.markdown("---")
-    # =========================================
+    
+   # =========================================
 # 🎯 RADAR CONSENSO (MGF + ATKxDEF + VG)
 # =========================================
 
-def norm_exg(x): return min(x * 40, 100)
-def norm_shots(x): return min((x / 15) * 100, 100)
+def norm_exg(x): 
+    return min(x * 40, 100)
+
+def norm_shots(x): 
+    return min((x / 15) * 100, 100)
 
 # ===== RADAR MGF =====
 radar_home_mgf = [
@@ -893,7 +897,7 @@ radar_away_vg = [
     linha_vg["BTTS_%"]
 ]
 
-# ===== MÉDIA (CONSENSO) =====
+# ===== CONSENSO =====
 radar_home_consenso = np.mean(
     [radar_home_mgf, radar_home_exg, radar_home_vg],
     axis=0
@@ -917,52 +921,62 @@ st.markdown(
 
 st.pyplot(
     radar_comparativo(
-        radar_home,
-        radar_away,
+        radar_home_consenso,
+        radar_away_consenso,
         home_team,
         away_team
     )
 )
 
+# =========================================
+# 🚨 ALERTAS INTELIGENTES
+# =========================================
+
+ief_home = eficiencia_finalizacao(linha_mgf["CHM"])
+ief_away = eficiencia_finalizacao(linha_mgf["CAM"])
+
+exg_home = linha_mgf["ExG_Home_MGF"]
+exg_away = linha_mgf["ExG_Away_MGF"]
+
+# 🔥 LETAL
 if time_letal(ief_home, exg_home):
     st.success("🔥 Home LETAL hoje")
 
 if time_letal(ief_away, exg_away):
     st.success("🔥 Away LETAL hoje")
-    
-if over_valor_oculto(ief_home, ief_away, exg_home+exg_away):
+
+# 💰 OVER OCULTO
+if over_valor_oculto(ief_home, ief_away, exg_home + exg_away):
     st.warning("💰 Over com valor oculto detectado")
 
-    # ===== DOMÍNIO OFENSIVO =====
+# ⚔️ DOMÍNIO
+dominio = dominio_ofensivo(radar_home_consenso, radar_away_consenso)
 
-    dominio = dominio_ofensivo(radar_home, radar_away)
+if dominio == "HOME":
+    st.success("⚔️ Domínio Ofensivo: HOME")
+elif dominio == "AWAY":
+    st.success("⚔️ Domínio Ofensivo: AWAY")
+else:
+    st.info("⚖️ Ataques equilibrados")
 
-    if dominio == "HOME":
-        st.success("⚔️ Domínio Ofensivo: HOME")
-    elif dominio == "AWAY":
-        st.success("⚔️ Domínio Ofensivo: AWAY")
-    else:
-        st.info("⚖️ Ataques equilibrados")
+# 🔥 SCORE DO JOGO
+score = score_jogo(radar_home_consenso, radar_away_consenso)
+st.metric("🔥 Score Ofensivo do Jogo", score)
 
-    # ===== SCORE DO JOGO =====
+# ⚽ TENDÊNCIA DE GOLS
+tendencia = tendencia_gols(
+    ief_home,
+    ief_away,
+    exg_home + exg_away
+)
 
-    score = score_jogo(radar_home, radar_away)
-    st.metric("🔥 Score Ofensivo do Jogo", score)
+if tendencia == "ALTÍSSIMA":
+    st.error("🚨 Tendência ALTÍSSIMA de gols")
+elif tendencia == "ALTA":
+    st.warning("🔥 Tendência ALTA de gols")
+else:
+    st.info(f"Tendência de gols: {tendencia}")
 
-    # ===== TENDÊNCIA DE GOLS =====
-
-    tendencia = tendencia_gols(
-        ief_home,
-        ief_away,
-        exg_home + exg_away
-    )
-
-    if tendencia == "ALTÍSSIMA":
-        st.error("🚨 Tendência ALTÍSSIMA de gols")
-    elif tendencia == "ALTA":
-        st.warning("🔥 Tendência ALTA de gols")
-    else:
-        st.info(f"Tendência de gols: {tendencia}")
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
