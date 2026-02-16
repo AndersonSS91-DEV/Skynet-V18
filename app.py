@@ -560,6 +560,11 @@ def radar_comparativo(home_vals, away_vals, home, away):
 
     return fig
 
+    #RADAR RESUMO
+    def media_radars(*radars):
+    return np.mean(radars, axis=0)
+
+
 # =========================================
 # 🎨 ESTILO CARDS (NOVO)
 # =========================================
@@ -832,62 +837,93 @@ with tab1:
 
     st.markdown("---")
     # =========================================
-    # 🎯 RADAR + INTELIGÊNCIA OFENSIVA
-    # =========================================
+# 🎯 RADAR CONSENSO (MGF + ATKxDEF + VG)
+# =========================================
 
-    # ===== MÉTRICAS HOME =====
-    ief_home = eficiencia_finalizacao(linha_mgf["CHM"])
-    exg_home = linha_mgf["ExG_Home_MGF"]
-    shots_home = linha_mgf["CHM"]
-    precision_home = linha_exg["Precisao_CG_H"]
-    btts_home = linha_mgf["BTTS_%"]
+def norm_exg(x): return min(x * 40, 100)
+def norm_shots(x): return min((x / 15) * 100, 100)
 
-    # ===== MÉTRICAS AWAY =====
-    ief_away = eficiencia_finalizacao(linha_mgf["CAM"])
-    exg_away = linha_mgf["ExG_Away_MGF"]
-    shots_away = linha_mgf["CAM"]
-    precision_away = linha_exg["Precisao_CG_A"]
-    btts_away = linha_mgf["BTTS_%"]
-
-    def norm_exg(x): return min(x * 40, 100)
-    def norm_shots(x): return min((x / 15) * 100, 100)
-
-    radar_home = [
-    ief_home,
-    norm_exg(exg_home),
-    norm_shots(shots_home),
-    precision_home,
-    btts_home
+# ===== RADAR MGF =====
+radar_home_mgf = [
+    eficiencia_finalizacao(linha_mgf["CHM"]),
+    norm_exg(linha_mgf["ExG_Home_MGF"]),
+    norm_shots(linha_mgf["CHM"]),
+    linha_exg["Precisao_CG_H"],
+    linha_mgf["BTTS_%"]
 ]
 
-    radar_away = [
-        ief_away,
-        norm_exg(exg_away),
-        norm_shots(shots_away),
-        precision_away,
-        btts_away
-    ]
+radar_away_mgf = [
+    eficiencia_finalizacao(linha_mgf["CAM"]),
+    norm_exg(linha_mgf["ExG_Away_MGF"]),
+    norm_shots(linha_mgf["CAM"]),
+    linha_exg["Precisao_CG_A"],
+    linha_mgf["BTTS_%"]
+]
 
-    home_team = linha_exg["Home_Team"]
-    away_team = linha_exg["Visitor_Team"]
+# ===== RADAR ATK x DEF =====
+radar_home_exg = [
+    linha_exg["FAH"],
+    norm_exg(linha_exg["ExG_Home_ATKxDEF"]),
+    norm_shots(linha_mgf["CHM"]),
+    linha_exg["Precisao_CG_H"],
+    linha_exg["BTTS_%"]
+]
 
-    st.markdown("### 🎯 Radar Ofensivo")
+radar_away_exg = [
+    linha_exg["FAA"],
+    norm_exg(linha_exg["ExG_Away_ATKxDEF"]),
+    norm_shots(linha_mgf["CAM"]),
+    linha_exg["Precisao_CG_A"],
+    linha_exg["BTTS_%"]
+]
 
-    st.markdown(
-        f"### <span style='color:#00BFFF'>{home_team}</span> x "
-        f"<span style='color:#FF7A00'>{away_team}</span>",
-        unsafe_allow_html=True
+# ===== RADAR VG =====
+radar_home_vg = [
+    linha_exg["FAH"],
+    norm_exg(linha_vg["ExG_Home_VG"]),
+    norm_shots(linha_mgf["CHM"]),
+    linha_exg["Precisao_CG_H"],
+    linha_vg["BTTS_%"]
+]
+
+radar_away_vg = [
+    linha_exg["FAA"],
+    norm_exg(linha_vg["ExG_Away_VG"]),
+    norm_shots(linha_mgf["CAM"]),
+    linha_exg["Precisao_CG_A"],
+    linha_vg["BTTS_%"]
+]
+
+# ===== MÉDIA (CONSENSO) =====
+radar_home_consenso = np.mean(
+    [radar_home_mgf, radar_home_exg, radar_home_vg],
+    axis=0
+)
+
+radar_away_consenso = np.mean(
+    [radar_away_mgf, radar_away_exg, radar_away_vg],
+    axis=0
+)
+
+home_team = linha_exg["Home_Team"]
+away_team = linha_exg["Visitor_Team"]
+
+st.markdown("### 🎯 Radar Ofensivo Consenso")
+
+st.markdown(
+    f"### <span style='color:#00BFFF'>{home_team}</span> x "
+    f"<span style='color:#FF7A00'>{away_team}</span>",
+    unsafe_allow_html=True
+)
+
+st.pyplot(
+    radar_comparativo(
+        radar_home_consenso,
+        radar_away_consenso,
+        home_team,
+        away_team
     )
-
-    st.pyplot(
-        radar_comparativo(
-            radar_home,
-            radar_away,
-            home_team,
-            away_team
-        )
-    )
-
+)
 
     # ===== ALERTAS =====
 
