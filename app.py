@@ -95,12 +95,14 @@ div[data-testid="stDataFrame"] * {
 }
 
 /* texto dentro dos alertas */
-div[data-testid="stAlert"] {
-    color: white !important;
+div[data-testid="stAlert"] p {
+    color: #FFFFFF !important;
+    font-size: 18px !important;
 }
 
-/* ===== DATAFRAME ===== */
-div[data-testid="stDataFrame"] {
+/* ===== TABELAS ===== */
+
+div[data-testid="stDataFrame"] table {
     font-size: 18px !important;
 }
 
