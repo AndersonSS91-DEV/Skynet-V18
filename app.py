@@ -48,8 +48,6 @@ h3 {
 }
 
 /* ===== MÉTRICAS ===== */
-
-/* Label */
 div[data-testid="metric-container"] label {
     font-size: 13px !important;
     text-transform: uppercase !important;
@@ -58,23 +56,22 @@ div[data-testid="metric-container"] label {
     font-weight: 700 !important;
 }
 
-/* Valor */
 div[data-testid="metric-container"] > div {
     font-size: 48px !important;
     font-weight: 900 !important;
 }
 
-/* ===== ALERT CARDS (🔥 LETAL / DOMÍNIO / TENDÊNCIA) ===== */
-
+/* ===== ALERT CARDS ===== */
 div[data-testid="stAlert"] {
-    font-size: 22px !important;
+    font-size: 20px !important;
     font-weight: 700 !important;
     border-radius: 12px !important;
     padding: 12px 16px !important;
 }
 
+/* mantém cores originais do Streamlit */
 div[data-testid="stAlert"] p {
-    font-size: 22px !important;
+    font-size: 20px !important;
 }
 
 /* ===== TABS ===== */
@@ -90,40 +87,18 @@ div[data-baseweb="select"] {
 }
 
 /* ===== DATAFRAME ===== */
-div[data-testid="stDataFrame"] * {
-    font-size: 18px !important;
-}
-
-/* =========================
-   ALERTAS (sem quebrar cores)
-========================= */
-
-div[data-testid="stAlert"] p {
-    font-size: 18px !important;
-    font-weight: 600 !important;
-}
-
-
-/* =========================
-   DATAFRAME (grid interno)
-========================= */
-
 div[data-testid="stDataFrame"] table {
-    font-size: 18px !important;
+    font-size: 17px !important;
 }
 
 div[data-testid="stDataFrame"] th {
-    font-size: 18px !important;
+    font-size: 17px !important;
     font-weight: 700 !important;
 }
 
 div[data-testid="stDataFrame"] td {
-    font-size: 18px !important;
+    font-size: 17px !important;
 }
-
-
-</style>
-""", unsafe_allow_html=True)
 
 # =========================================
 # 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
