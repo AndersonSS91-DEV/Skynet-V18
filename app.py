@@ -1002,9 +1002,7 @@ with tab3:
         "Over/Under — Média de Gols (MGF)"
     )
 
-    st.dataframe(top_placares(matriz), use_container_width=True)
-
-    # ===== RADAR MGF =====
+       # ===== RADAR MGF =====
     ief_home = eficiencia_finalizacao(linha_mgf["CHM"])
     ief_away = eficiencia_finalizacao(linha_mgf["CAM"])
 
