@@ -917,23 +917,21 @@ st.markdown(
 
 st.pyplot(
     radar_comparativo(
-        radar_home_consenso,
-        radar_away_consenso,
+        radar_home,
+        radar_away,
         home_team,
         away_team
     )
 )
 
-    # ===== ALERTAS =====
+if time_letal(ief_home, exg_home):
+    st.success("🔥 Home LETAL hoje")
 
-    if time_letal(ief_home, exg_home):
-        st.success("🔥 Home LETAL hoje")
-
-    if time_letal(ief_away, exg_away):
-        st.success("🔥 Away LETAL hoje")
-
-    if over_valor_oculto(ief_home, ief_away, exg_home+exg_away):
-        st.warning("💰 Over com valor oculto detectado")
+if time_letal(ief_away, exg_away):
+    st.success("🔥 Away LETAL hoje")
+    
+if over_valor_oculto(ief_home, ief_away, exg_home+exg_away):
+    st.warning("💰 Over com valor oculto detectado")
 
     # ===== DOMÍNIO OFENSIVO =====
 
