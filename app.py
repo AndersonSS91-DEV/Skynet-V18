@@ -787,9 +787,10 @@ st.pyplot(
 )
 
 # ===== ALERTAS =====
+    st.pyplot(radar_comparativo(...))
 
     if time_letal(ief_home, exg_home):
-        st.success("🔥 Home LETAL hoje")
+        st.success("🔥 Home LETAL hoje"))
 
     if time_letal(ief_away, exg_away):
         st.success("🔥 Away LETAL hoje")
