@@ -550,11 +550,6 @@ def leitura_consenso(nome, radar_vals):
 {leitura}
 """
 
-
-🧠 **leitura**
-{leitura}
-"""
-
 # =========================================
 # RADAR COMPARATIVO
 # =========================================
