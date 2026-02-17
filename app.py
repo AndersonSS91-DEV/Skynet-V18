@@ -724,7 +724,7 @@ def cards_ofensivos(radar_home, radar_away, ief_home, ief_away, exg_total):
     if time_letal(ief_away, exg_total/2):
         st.success("🔥 Away LETAL hoje")
 
-    score = score_jogo(radar_home, radar_away)
+    #score = score_jogo(radar_home, radar_away)
     st.metric("🔥 Score Ofensivo", score)
 
     tendencia = tendencia_gols(ief_home, ief_away, exg_total)
