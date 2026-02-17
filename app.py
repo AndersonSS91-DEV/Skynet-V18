@@ -1164,13 +1164,6 @@ with tab1:
 
     st.pyplot(fig, use_container_width=False)
 
-    cards_ofensivos(
-        radar_home_consenso,
-        radar_away_consenso,
-        radar_home_consenso[0],
-        radar_away_consenso[0],
-        linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
-    )
     # =========================================
     # 🔥 SCORE OFENSIVO (ESCALA 0–100)
     # =========================================
