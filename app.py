@@ -188,7 +188,68 @@ df_vg  = pd.read_excel(xls, "Poisson_VG")  # <<< FALTAVA ISSO
 
 for df in (df_mgf, df_exg, df_vg):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
-    
+
+# =========================================
+# 🔥 SCORE OFENSIVO CONSENSO 0–100
+# =========================================
+
+score_raw = []
+
+for _, row in df_mgf.iterrows():
+
+    jogo = row["Home_Team"] + " x " + row["Visitor_Team"]
+
+    exg_row = df_exg[df_exg["Home_Team"].eq(row["Home_Team"]) &
+                     df_exg["Visitor_Team"].eq(row["Visitor_Team"])]
+
+    vg_row  = df_vg[df_vg["Home_Team"].eq(row["Home_Team"]) &
+                    df_vg["Visitor_Team"].eq(row["Visitor_Team"])]
+
+    if exg_row.empty or vg_row.empty:
+        score_raw.append(np.nan)
+        continue
+
+    exg_row = exg_row.iloc[0]
+    vg_row  = vg_row.iloc[0]
+
+    # eficiência
+    ief_home = (1 / row["CHM"]) * 100 if row["CHM"] > 0 else 0
+    ief_away = (1 / row["CAM"]) * 100 if row["CAM"] > 0 else 0
+
+    # normalizações radar
+    def norm_exg(x): return min(x * 40, 100)
+    def norm_shots(x): return min((x / 15) * 100, 100)
+
+    radar_home = np.mean([
+        [ief_home, norm_exg(row["ExG_Home_MGF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], row["BTTS_%"]],
+        [exg_row["FAH"], norm_exg(exg_row["ExG_Home_ATKxDEF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], exg_row["BTTS_%"]],
+        [exg_row["FAH"], norm_exg(vg_row["ExG_Home_VG"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], vg_row["BTTS_%"]]
+    ], axis=0)
+
+    radar_away = np.mean([
+        [ief_away, norm_exg(row["ExG_Away_MGF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], row["BTTS_%"]],
+        [exg_row["FAA"], norm_exg(exg_row["ExG_Away_ATKxDEF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], exg_row["BTTS_%"]],
+        [exg_row["FAA"], norm_exg(vg_row["ExG_Away_VG"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], vg_row["BTTS_%"]]
+    ], axis=0)
+
+    score = ((sum(radar_home)/5 + sum(radar_away)/5) / 2)
+    score_raw.append(score)
+
+df_mgf["Score_Ofensivo"] = score_raw
+
+# 🔥 recalibra para 0–100
+# df_mgf["Score_Ofensivo_100"] = recalibrar_0_100(df_mgf["Score_Ofensivo"])
+
+def recalibrar_0_100(serie):
+    minimo = serie.min()
+    maximo = serie.max()
+
+    if maximo == minimo:
+        return serie * 0
+
+    return ((serie - minimo) / (maximo - minimo)) * 100
+
+# =========================================    
 # 🔥 DEFINA AQUI (ANTES DAS TABS)
 jogos_lista = df_mgf["JOGO"].tolist()
 
@@ -482,62 +543,106 @@ def leitura_ofensiva(nome, eficiencia, exg, finalizacoes, precisao, btts):
     return texto
 
 # =========================================
+# 🔥 RECALIBRA SCORE OFENSIVO (0–100)
+# =========================================
+def recalibrar_0_100(serie):
+    minimo = serie.min()
+    maximo = serie.max()
+
+    if maximo == minimo:
+        return serie * 0
+
+    return ((serie - minimo) / (maximo - minimo)) * 100
+
+
+# =========================================
+# 🎯 CLASSIFICA INTENSIDADE OFENSIVA
+# =========================================
+def intensidade_ofensiva(score):
+
+    if score < 30:
+        return "❄️ baixa"
+
+    elif score < 50:
+        return "⚖️ moderada"
+
+    elif score < 70:
+        return "🔥 ofensiva"
+
+    elif score < 85:
+        return "🚀 muito ofensiva"
+
+    else:
+        return "💥 explosiva"
+
+# =========================================
 # LEITURA OFENSIVA
 # =========================================
 def leitura_consenso(nome, radar_vals):
 
     eficiencia, exg, finalizacoes, precisao, btts = radar_vals
 
-    texto = f"{nome}\n\n"
+    linhas = []
 
+    # Eficiência
     if eficiencia > 50:
-        texto += "✔ Eficiência ofensiva alta\n"
+        linhas.append("✓ Eficiência ofensiva alta")
     elif eficiencia > 35:
-        texto += "✔ Eficiência ofensiva média\n"
+        linhas.append("✓ Eficiência ofensiva média")
     else:
-        texto += "✔ Eficiência ofensiva baixa\n"
+        linhas.append("✓ Eficiência ofensiva baixa")
 
+    # Criação
     if exg > 70:
-        texto += "✔ Criação de chances muito alta\n"
+        linhas.append("✓ Criação de chances muito alta")
     elif exg > 45:
-        texto += "✔ Criação de chances moderada\n"
+        linhas.append("✓ Criação ofensiva moderada")
     else:
-        texto += "✔ Baixa criação ofensiva\n"
+        linhas.append("✓ Baixa criação ofensiva")
 
+    # Volume
     if finalizacoes > 70:
-        texto += "✔ Volume ofensivo intenso\n"
+        linhas.append("✓ Volume ofensivo intenso")
     elif finalizacoes < 30:
-        texto += "✔ Poucas finalizações\n"
+        linhas.append("✓ Poucas finalizações")
     else:
-        texto += "✔ Volume equilibrado\n"
+        linhas.append("✓ Volume equilibrado")
 
+    # Precisão
     if precisao > 55:
-        texto += "✔ Alta precisão nas finalizações\n"
+        linhas.append("✓ Alta precisão nas finalizações")
     else:
-        texto += "✔ Precisão mediana\n"
+        linhas.append("✓ Precisão mediana")
 
+    # Perfil do jogo
     if btts > 60:
-        texto += "✔ Jogos abertos com frequência\n"
+        linhas.append("✓ Jogos abertos com frequência")
     else:
-        texto += "✔ Tendência a jogos controlados\n"
+        linhas.append("✓ Tendência a jogos controlados")
 
-    texto += "\n🧠 leitura:\n"
-
+    # 🧠 leitura final
     if eficiencia > 50 and exg > 60:
-        texto += "👉 time cria chances claras\n"
-        texto += "👉 perfil ofensivo letal\n"
+        leitura = "👉 time cria chances claras\n👉 perfil ofensivo letal"
 
     elif finalizacoes > 70 and eficiencia < 40:
-        texto += "👉 volume alto com baixa qualidade\n"
-        texto += "👉 pode desperdiçar chances\n"
+        leitura = "👉 volume alto com baixa qualidade"
 
     elif exg < 40:
-        texto += "👉 dificuldade para criar oportunidades\n"
+        leitura = "👉 dificuldade para criar oportunidades"
 
     else:
-        texto += "👉 perfil ofensivo equilibrado\n"
+        leitura = "👉 perfil ofensivo equilibrado"
 
-    return texto
+    texto = "\n".join(linhas)
+
+    return f"""
+**{nome}**
+
+{texto}
+
+🧠 leitura:
+{leitura}
+"""
 
 # =========================================
 # RADAR COMPARATIVO
@@ -619,18 +724,53 @@ def cards_ofensivos(radar_home, radar_away, ief_home, ief_away, exg_total):
     if time_letal(ief_away, exg_total/2):
         st.success("🔥 Away LETAL hoje")
 
-    score = score_jogo(radar_home, radar_away)
-    st.metric("🔥 Score Ofensivo", score)
+    # score = score_jogo(radar_home, radar_away)
 
     tendencia = tendencia_gols(ief_home, ief_away, exg_total)
 
     if tendencia == "ALTÍSSIMA":
         st.error("🚨 Altíssima tendência de gols")
     elif tendencia == "ALTA":
-        st.warning("🔥 Tendência ALTA de gols")
+        st.warning("🔥 Tendência alta de gols")
     else:
         st.info(f"Tendência: {tendencia}")
 
+# =========================================
+# SCORE DEFENSIVO BASE
+# =========================================
+def score_defensivo(fd, clean_sheet, chs, mgc):
+
+    if pd.isna(fd): fd = 50
+    if pd.isna(clean_sheet): clean_sheet = 30
+    if pd.isna(chs) or chs == 0: chs = 10
+    if pd.isna(mgc) or mgc == 0: mgc = 1
+
+    resistencia = min((chs / 15) * 100, 100)
+    concessao = max(0, 100 - (mgc * 40))
+
+    score = (
+        fd * 0.35 +
+        clean_sheet * 0.25 +
+        resistencia * 0.20 +
+        concessao * 0.20
+    )
+
+    return round(score,1)
+
+
+def classificar_defesa(score):
+
+    if score >= 60:
+        return "🧱 Defesa MUITO sólida"
+
+    elif score >= 55:
+        return "🛡 Defesa confiável"
+
+    elif score >= 45:
+        return "⚠️ Defesa instável"
+
+    else:
+        return "🔥 Defesa vulnerável"
 
 # 🎨 BTTS (NOVO)
 def calcular_btts_e_odd(matriz):
@@ -1024,14 +1164,69 @@ with tab1:
     st.pyplot(fig, use_container_width=False)
 
     cards_ofensivos(
-        radar_home_consenso,
-        radar_away_consenso,
-        radar_home_consenso[0],
-        radar_away_consenso[0],
-        linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
+    radar_home_consenso,
+    radar_away_consenso,
+    radar_home_consenso[0],   # eficiência home
+    radar_away_consenso[0],   # eficiência away
+    lambda_home + lambda_away
+)
+
+    # =========================================
+    # 🔥 SCORE OFENSIVO (ESCALA 0–100)
+    # =========================================
+
+    score_raw = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5) / 2)
+
+    # recalibração simples para leitura
+    score_100 = max(min((score_raw - 35) * 2.2, 100), 0)
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric("🔥 Score Ofensivo", round(score_raw,1))
+
+    with c2:
+        st.metric("⚡ Intensidade Ofensiva", f"{score_100:.1f}")
+
+    # =========================================
+    # 🧱 DEFESA CONSENSO
+    # =========================================
+    st.markdown("### 🧱 Defesa Consenso")
+
+    base_home = score_defensivo(
+        linha_exg["FDH"],
+        linha_exg["Clean_Games_H"],
+        linha_mgf["CHS"],
+        linha_mgf["MGC_H"]
     )
 
+    base_away = score_defensivo(
+        linha_exg["FDA"],
+        linha_exg["Clean_Games_A"],
+        linha_mgf["CAS"],
+        linha_mgf["MGC_A"]
+    )
 
+    estrutura_home = max(min((linha_exg["FDH"] - linha_exg["FAA"] + 100)/2,100),0)
+    estrutura_away = max(min((linha_exg["FDA"] - linha_exg["FAH"] + 100)/2,100),0)
+
+    clean_home = linha_mgf["Clean_Sheet_Home_%"]
+    clean_away = linha_mgf["Clean_Sheet_Away_%"]
+
+    def_home = round(base_home*0.5 + estrutura_home*0.3 + clean_home*0.2,1)
+    def_away = round(base_away*0.5 + estrutura_away*0.3 + clean_away*0.2,1)
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric(linha_exg["Home_Team"], def_home)
+        st.info(classificar_defesa(def_home))
+
+    with c2:
+        st.metric(linha_exg["Visitor_Team"], def_away)
+        st.info(classificar_defesa(def_away))
+
+    
     # =========================================
     # 🧠 LEITURA CONSENSO
     # =========================================
@@ -1167,6 +1362,32 @@ with tab3:
     linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
 )
 
+    st.markdown("### 🧱 Defesa — Histórico (MGF)")
+
+    def_home = score_defensivo(
+        linha_exg["FDH"],
+        linha_mgf["Clean_Sheet_Home_%"],
+        linha_mgf["CHS"],
+        linha_mgf["MGC_H"]
+    )
+
+    def_away = score_defensivo(
+        linha_exg["FDA"],
+        linha_mgf["Clean_Sheet_Away_%"],
+        linha_mgf["CAS"],
+        linha_mgf["MGC_A"]
+    )
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric(linha_mgf["Home_Team"], def_home)
+        st.info(classificar_defesa(def_home))
+
+    with c2:
+        st.metric(linha_mgf["Visitor_Team"], def_away)
+        st.info(classificar_defesa(def_away))
+
     st.markdown("### 🧠 Leitura Ofensiva (Histórico)")
 
     col1, col2 = st.columns(2)
@@ -1278,6 +1499,22 @@ with tab4:
         radar_away_exg[0],
         linha_exg["ExG_Home_ATKxDEF"] + linha_exg["ExG_Away_ATKxDEF"]
     )
+    
+    st.markdown("### 🧱 Defesa Estrutural")
+
+    estrutura_home = max(min((linha_exg["FDH"] - linha_exg["FAA"] + 100)/2,100),0)
+    estrutura_away = max(min((linha_exg["FDA"] - linha_exg["FAH"] + 100)/2,100),0)
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric(linha_exg["Home_Team"], round(estrutura_home,1))
+        st.info(classificar_defesa(estrutura_home))
+
+    with c2:
+        st.metric(linha_exg["Visitor_Team"], round(estrutura_away,1))
+        st.info(classificar_defesa(estrutura_away))
+
 
     st.markdown("### 🧠 Leitura Tática")
 
@@ -1391,6 +1628,22 @@ with tab5:
         radar_away_vg[0],
         linha_vg["ExG_Home_VG"] + linha_vg["ExG_Away_VG"]
     )
+
+    
+    st.markdown("### 🧱 Defesa Probabilística")
+
+    def_home = linha_vg["Clean_Sheet_Home_%"]
+    def_away = linha_vg["Clean_Sheet_Away_%"]
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric(linha_vg["Home_Team"], round(def_home,1))
+        st.info(classificar_defesa(def_home))
+
+    with c2:
+        st.metric(linha_vg["Visitor_Team"], round(def_away,1))
+        st.info(classificar_defesa(def_away))
 
     st.markdown("### 🧠 Leitura de Valor Ofensivo")
 
