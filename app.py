@@ -488,56 +488,50 @@ def leitura_consenso(nome, radar_vals):
 
     eficiencia, exg, finalizacoes, precisao, btts = radar_vals
 
-    texto = f"{nome}\n\n"
+    linhas = []
 
+    # Eficiência
     if eficiencia > 50:
-        texto += "✔ Eficiência ofensiva alta\n"
+        linhas.append("✓ Eficiência ofensiva: **alta**")
     elif eficiencia > 35:
-        texto += "✔ Eficiência ofensiva média\n"
+        linhas.append("✓ Eficiência ofensiva: **média**")
     else:
-        texto += "✔ Eficiência ofensiva baixa\n"
+        linhas.append("✓ Eficiência ofensiva: **baixa**")
 
+    # Criação
     if exg > 70:
-        texto += "✔ Criação de chances muito alta\n"
+        linhas.append("✓ Criação de chances: **muito alta**")
     elif exg > 45:
-        texto += "✔ Criação de chances moderada\n"
+        linhas.append("✓ Criação de chances: moderada")
     else:
-        texto += "✔ Baixa criação ofensiva\n"
+        linhas.append("✓ Criação ofensiva: baixa")
 
+    # Volume
     if finalizacoes > 70:
-        texto += "✔ Volume ofensivo intenso\n"
+        linhas.append("✓ Volume ofensivo: intenso")
     elif finalizacoes < 30:
-        texto += "✔ Poucas finalizações\n"
+        linhas.append("✓ Volume ofensivo: baixo")
     else:
-        texto += "✔ Volume equilibrado\n"
+        linhas.append("✓ Volume ofensivo: equilibrado")
 
+    # Precisão
     if precisao > 55:
-        texto += "✔ Alta precisão nas finalizações\n"
+        linhas.append("✓ Precisão finalizações: alta")
     else:
-        texto += "✔ Precisão mediana\n"
+        linhas.append("✓ Precisão finalizações: mediana")
 
+    # Perfil do jogo
     if btts > 60:
-        texto += "✔ Jogos abertos com frequência\n"
+        linhas.append("✓ Perfil de jogo: aberto")
     else:
-        texto += "✔ Tendência a jogos controlados\n"
+        linhas.append("✓ Perfil de jogo: controlado")
 
-    texto += "\n🧠 leitura:\n"
+    leitura = ""
 
     if eficiencia > 50 and exg > 60:
-        texto += "👉 time cria chances claras\n"
-        texto += "👉 perfil ofensivo letal\n"
+        leitura = "👉 cria chances claras\n👉 perfil ofensivo letal"
 
-    elif finalizacoes > 70 and eficiencia < 40:
-        texto += "👉 volume alto com baixa qualidade\n"
-        texto += "👉 pode desperdiçar chances\n"
-
-    elif exg < 40:
-        texto += "👉 dificuldade para criar oportunidades\n"
-
-    else:
-        texto += "👉 perfil ofensivo equilibrado\n"
-
-    return texto
+    elif finalizacoes > 70 and eficiencia <
 
 # =========================================
 # RADAR COMPARATIVO
