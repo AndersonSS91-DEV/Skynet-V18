@@ -1238,7 +1238,7 @@ with tab3:
     linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
 )
 
-        st.markdown("### 🧱 Defesa — Histórico (MGF)")
+    st.markdown("### 🧱 Defesa — Histórico (MGF)")
 
     def_home = score_defensivo(
         linha_exg["FDH"],
