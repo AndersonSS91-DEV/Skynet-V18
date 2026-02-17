@@ -238,7 +238,7 @@ for _, row in df_mgf.iterrows():
 df_mgf["Score_Ofensivo"] = score_raw
 
 # 🔥 recalibra para 0–100
-df_mgf["Score_Ofensivo_100"] = recalibrar_0_100(df_mgf["Score_Ofensivo"])
+# df_mgf["Score_Ofensivo_100"] = recalibrar_0_100(df_mgf["Score_Ofensivo"])
 
 def recalibrar_0_100(serie):
     minimo = serie.min()
