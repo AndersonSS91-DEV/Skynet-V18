@@ -240,6 +240,15 @@ df_mgf["Score_Ofensivo"] = score_raw
 # 🔥 recalibra para 0–100
 df_mgf["Score_Ofensivo_100"] = recalibrar_0_100(df_mgf["Score_Ofensivo"])
 
+def recalibrar_0_100(serie):
+    minimo = serie.min()
+    maximo = serie.max()
+
+    if maximo == minimo:
+        return serie * 0
+
+    return ((serie - minimo) / (maximo - minimo)) * 100
+
 # =========================================    
 # 🔥 DEFINA AQUI (ANTES DAS TABS)
 jogos_lista = df_mgf["JOGO"].tolist()
