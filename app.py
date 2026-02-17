@@ -1164,6 +1164,14 @@ with tab1:
 
     st.pyplot(fig, use_container_width=False)
 
+    cards_resumo(
+    radar_home_consenso,
+    radar_away_consenso,
+    radar_home_consenso[0],
+    radar_away_consenso[0],
+    lambda_home + lambda_away
+)
+
     # =========================================
     # 🔥 SCORE OFENSIVO (ESCALA 0–100)
     # =========================================
