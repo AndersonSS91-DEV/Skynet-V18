@@ -638,7 +638,7 @@ def cards_ofensivos(radar_home, radar_away, ief_home, ief_away, exg_total):
     if tendencia == "ALTÍSSIMA":
         st.error("🚨 Altíssima tendência de gols")
     elif tendencia == "ALTA":
-        st.warning("🔥 Tendência ALTA de gols")
+        st.warning("🔥 Tendência alta de gols")
     else:
         st.info(f"Tendência: {tendencia}")
 
@@ -666,15 +666,18 @@ def score_defensivo(fd, clean_sheet, chs, mgc):
 
 
 def classificar_defesa(score):
-    if score >= 80:
-        return "🧱 Defesa ELITE"
-    elif score >= 65:
-        return "🛡 Defesa forte"
-    elif score >= 50:
-        return "⚖️ Defesa mediana"
+
+    if score >= 60:
+        return "🧱 Defesa MUITO sólida"
+
+    elif score >= 55:
+        return "🛡 Defesa confiável"
+
+    elif score >= 45:
+        return "⚠️ Defesa instável"
+
     else:
         return "🔥 Defesa vulnerável"
-
 
 # 🎨 BTTS (NOVO)
 def calcular_btts_e_odd(matriz):
