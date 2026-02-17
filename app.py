@@ -1164,11 +1164,11 @@ with tab1:
 
     st.pyplot(fig, use_container_width=False)
 
-    cards_resumo(
+    cards_ofensivos(
     radar_home_consenso,
     radar_away_consenso,
-    radar_home_consenso[0],
-    radar_away_consenso[0],
+    radar_home_consenso[0],   # eficiência home
+    radar_away_consenso[0],   # eficiência away
     lambda_home + lambda_away
 )
 
