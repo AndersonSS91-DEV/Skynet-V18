@@ -492,44 +492,43 @@ def leitura_consenso(nome, radar_vals):
 
     # Eficiência
     if eficiencia > 50:
-        linhas.append("✓ Eficiência ofensiva: **alta**")
+        linhas.append("✓ Eficiência ofensiva alta")
     elif eficiencia > 35:
-        linhas.append("✓ Eficiência ofensiva: **média**")
+        linhas.append("✓ Eficiência ofensiva média")
     else:
-        linhas.append("✓ Eficiência ofensiva: **baixa**")
+        linhas.append("✓ Eficiência ofensiva baixa")
 
     # Criação
     if exg > 70:
-        linhas.append("✓ Criação de chances: **muito alta**")
+        linhas.append("✓ Criação de chances muito alta")
     elif exg > 45:
-        linhas.append("✓ Criação de chances: moderada")
+        linhas.append("✓ Criação ofensiva moderada")
     else:
-        linhas.append("✓ Criação ofensiva: baixa")
+        linhas.append("✓ Baixa criação ofensiva")
 
     # Volume
     if finalizacoes > 70:
-        linhas.append("✓ Volume ofensivo: intenso")
+        linhas.append("✓ Volume ofensivo intenso")
     elif finalizacoes < 30:
-        linhas.append("✓ Volume ofensivo: baixo")
+        linhas.append("✓ Poucas finalizações")
     else:
-        linhas.append("✓ Volume ofensivo: equilibrado")
+        linhas.append("✓ Volume equilibrado")
 
     # Precisão
     if precisao > 55:
-        linhas.append("✓ Precisão finalizações: alta")
+        linhas.append("✓ Alta precisão nas finalizações")
     else:
-        linhas.append("✓ Precisão finalizações: mediana")
+        linhas.append("✓ Precisão mediana")
 
     # Perfil do jogo
     if btts > 60:
-        linhas.append("✓ Perfil de jogo: aberto")
+        linhas.append("✓ Jogos abertos com frequência")
     else:
-        linhas.append("✓ Perfil de jogo: controlado")
+        linhas.append("✓ Tendência a jogos controlados")
 
-    leitura = ""
-
+    # 🧠 leitura final
     if eficiencia > 50 and exg > 60:
-        leitura = "👉 cria chances claras\n👉 perfil ofensivo letal"
+        leitura = "👉 time cria chances claras\n👉 perfil ofensivo letal"
 
     elif finalizacoes > 70 and eficiencia < 40:
         leitura = "👉 volume alto com baixa qualidade"
@@ -546,6 +545,11 @@ def leitura_consenso(nome, radar_vals):
 **{nome}**
 
 {texto}
+
+🧠 leitura:
+{leitura}
+"""
+
 
 🧠 **leitura**
 {leitura}
