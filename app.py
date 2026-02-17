@@ -531,7 +531,25 @@ def leitura_consenso(nome, radar_vals):
     if eficiencia > 50 and exg > 60:
         leitura = "👉 cria chances claras\n👉 perfil ofensivo letal"
 
-    elif finalizacoes > 70 and eficiencia <
+    elif finalizacoes > 70 and eficiencia < 40:
+        leitura = "👉 volume alto com baixa qualidade"
+
+    elif exg < 40:
+        leitura = "👉 dificuldade para criar oportunidades"
+
+    else:
+        leitura = "👉 perfil ofensivo equilibrado"
+
+    texto = "\n".join(linhas)
+
+    return f"""
+**{nome}**
+
+{texto}
+
+🧠 **leitura**
+{leitura}
+"""
 
 # =========================================
 # RADAR COMPARATIVO
