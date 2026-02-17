@@ -631,6 +631,39 @@ def cards_ofensivos(radar_home, radar_away, ief_home, ief_away, exg_total):
     else:
         st.info(f"Tendência: {tendencia}")
 
+# =========================================
+# SCORE DEFENSIVO BASE
+# =========================================
+def score_defensivo(fd, clean_sheet, chs, mgc):
+
+    if pd.isna(fd): fd = 50
+    if pd.isna(clean_sheet): clean_sheet = 30
+    if pd.isna(chs) or chs == 0: chs = 10
+    if pd.isna(mgc) or mgc == 0: mgc = 1
+
+    resistencia = min((chs / 15) * 100, 100)
+    concessao = max(0, 100 - (mgc * 40))
+
+    score = (
+        fd * 0.35 +
+        clean_sheet * 0.25 +
+        resistencia * 0.20 +
+        concessao * 0.20
+    )
+
+    return round(score,1)
+
+
+def classificar_defesa(score):
+    if score >= 80:
+        return "🧱 Defesa ELITE"
+    elif score >= 65:
+        return "🛡 Defesa forte"
+    elif score >= 50:
+        return "⚖️ Defesa mediana"
+    else:
+        return "🔥 Defesa vulnerável"
+
 
 # 🎨 BTTS (NOVO)
 def calcular_btts_e_odd(matriz):
@@ -1031,7 +1064,45 @@ with tab1:
         linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
     )
 
+    # =========================================
+    # 🧱 DEFESA CONSENSO
+    # =========================================
+    st.markdown("### 🧱 Defesa Consenso")
 
+    base_home = score_defensivo(
+        linha_exg["FDH"],
+        linha_exg["Clean_Games_H"],
+        linha_mgf["CHS"],
+        linha_mgf["MGC_H"]
+    )
+
+    base_away = score_defensivo(
+        linha_exg["FDA"],
+        linha_exg["Clean_Games_A"],
+        linha_mgf["CAS"],
+        linha_mgf["MGC_A"]
+    )
+
+    estrutura_home = max(min((linha_exg["FDH"] - linha_exg["FAA"] + 100)/2,100),0)
+    estrutura_away = max(min((linha_exg["FDA"] - linha_exg["FAH"] + 100)/2,100),0)
+
+    clean_home = linha_mgf["Clean_Sheet_Home_%"]
+    clean_away = linha_mgf["Clean_Sheet_Away_%"]
+
+    def_home = round(base_home*0.5 + estrutura_home*0.3 + clean_home*0.2,1)
+    def_away = round(base_away*0.5 + estrutura_away*0.3 + clean_away*0.2,1)
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric(linha_exg["Home_Team"], def_home)
+        st.info(classificar_defesa(def_home))
+
+    with c2:
+        st.metric(linha_exg["Visitor_Team"], def_away)
+        st.info(classificar_defesa(def_away))
+
+    
     # =========================================
     # 🧠 LEITURA CONSENSO
     # =========================================
@@ -1167,6 +1238,32 @@ with tab3:
     linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
 )
 
+        st.markdown("### 🧱 Defesa — Histórico (MGF)")
+
+    def_home = score_defensivo(
+        linha_exg["FDH"],
+        linha_mgf["Clean_Sheet_Home_%"],
+        linha_mgf["CHS"],
+        linha_mgf["MGC_H"]
+    )
+
+    def_away = score_defensivo(
+        linha_exg["FDA"],
+        linha_mgf["Clean_Sheet_Away_%"],
+        linha_mgf["CAS"],
+        linha_mgf["MGC_A"]
+    )
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric(linha_mgf["Home_Team"], def_home)
+        st.info(classificar_defesa(def_home))
+
+    with c2:
+        st.metric(linha_mgf["Visitor_Team"], def_away)
+        st.info(classificar_defesa(def_away))
+
     st.markdown("### 🧠 Leitura Ofensiva (Histórico)")
 
     col1, col2 = st.columns(2)
@@ -1278,6 +1375,22 @@ with tab4:
         radar_away_exg[0],
         linha_exg["ExG_Home_ATKxDEF"] + linha_exg["ExG_Away_ATKxDEF"]
     )
+    
+    st.markdown("### 🧱 Defesa Estrutural")
+
+    estrutura_home = max(min((linha_exg["FDH"] - linha_exg["FAA"] + 100)/2,100),0)
+    estrutura_away = max(min((linha_exg["FDA"] - linha_exg["FAH"] + 100)/2,100),0)
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric(linha_exg["Home_Team"], round(estrutura_home,1))
+        st.info(classificar_defesa(estrutura_home))
+
+    with c2:
+        st.metric(linha_exg["Visitor_Team"], round(estrutura_away,1))
+        st.info(classificar_defesa(estrutura_away))
+
 
     st.markdown("### 🧠 Leitura Tática")
 
@@ -1391,6 +1504,22 @@ with tab5:
         radar_away_vg[0],
         linha_vg["ExG_Home_VG"] + linha_vg["ExG_Away_VG"]
     )
+
+    
+    st.markdown("### 🧱 Defesa Probabilística")
+
+    def_home = linha_vg["Clean_Sheet_Home_%"]
+    def_away = linha_vg["Clean_Sheet_Away_%"]
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric(linha_vg["Home_Team"], round(def_home,1))
+        st.info(classificar_defesa(def_home))
+
+    with c2:
+        st.metric(linha_vg["Visitor_Team"], round(def_away,1))
+        st.info(classificar_defesa(def_away))
 
     st.markdown("### 🧠 Leitura de Valor Ofensivo")
 
