@@ -188,7 +188,59 @@ df_vg  = pd.read_excel(xls, "Poisson_VG")  # <<< FALTAVA ISSO
 
 for df in (df_mgf, df_exg, df_vg):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
-    
+
+# =========================================
+# 🔥 SCORE OFENSIVO CONSENSO 0–100
+# =========================================
+
+score_raw = []
+
+for _, row in df_mgf.iterrows():
+
+    jogo = row["Home_Team"] + " x " + row["Visitor_Team"]
+
+    exg_row = df_exg[df_exg["Home_Team"].eq(row["Home_Team"]) &
+                     df_exg["Visitor_Team"].eq(row["Visitor_Team"])]
+
+    vg_row  = df_vg[df_vg["Home_Team"].eq(row["Home_Team"]) &
+                    df_vg["Visitor_Team"].eq(row["Visitor_Team"])]
+
+    if exg_row.empty or vg_row.empty:
+        score_raw.append(np.nan)
+        continue
+
+    exg_row = exg_row.iloc[0]
+    vg_row  = vg_row.iloc[0]
+
+    # eficiência
+    ief_home = (1 / row["CHM"]) * 100 if row["CHM"] > 0 else 0
+    ief_away = (1 / row["CAM"]) * 100 if row["CAM"] > 0 else 0
+
+    # normalizações radar
+    def norm_exg(x): return min(x * 40, 100)
+    def norm_shots(x): return min((x / 15) * 100, 100)
+
+    radar_home = np.mean([
+        [ief_home, norm_exg(row["ExG_Home_MGF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], row["BTTS_%"]],
+        [exg_row["FAH"], norm_exg(exg_row["ExG_Home_ATKxDEF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], exg_row["BTTS_%"]],
+        [exg_row["FAH"], norm_exg(vg_row["ExG_Home_VG"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], vg_row["BTTS_%"]]
+    ], axis=0)
+
+    radar_away = np.mean([
+        [ief_away, norm_exg(row["ExG_Away_MGF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], row["BTTS_%"]],
+        [exg_row["FAA"], norm_exg(exg_row["ExG_Away_ATKxDEF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], exg_row["BTTS_%"]],
+        [exg_row["FAA"], norm_exg(vg_row["ExG_Away_VG"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], vg_row["BTTS_%"]]
+    ], axis=0)
+
+    score = ((sum(radar_home)/5 + sum(radar_away)/5) / 2)
+    score_raw.append(score)
+
+df_mgf["Score_Ofensivo"] = score_raw
+
+# 🔥 recalibra para 0–100
+df_mgf["Score_Ofensivo_100"] = recalibrar_0_100(df_mgf["Score_Ofensivo"])
+
+# =========================================    
 # 🔥 DEFINA AQUI (ANTES DAS TABS)
 jogos_lista = df_mgf["JOGO"].tolist()
 
@@ -480,6 +532,39 @@ def leitura_ofensiva(nome, eficiencia, exg, finalizacoes, precisao, btts):
         texto += "👉 perfil ofensivo equilibrado\n"
 
     return texto
+
+# =========================================
+# 🔥 RECALIBRA SCORE OFENSIVO (0–100)
+# =========================================
+def recalibrar_0_100(serie):
+    minimo = serie.min()
+    maximo = serie.max()
+
+    if maximo == minimo:
+        return serie * 0
+
+    return ((serie - minimo) / (maximo - minimo)) * 100
+
+
+# =========================================
+# 🎯 CLASSIFICA INTENSIDADE OFENSIVA
+# =========================================
+def intensidade_ofensiva(score):
+
+    if score < 30:
+        return "❄️ baixa"
+
+    elif score < 50:
+        return "⚖️ moderada"
+
+    elif score < 70:
+        return "🔥 ofensiva"
+
+    elif score < 85:
+        return "🚀 muito ofensiva"
+
+    else:
+        return "💥 explosiva"
 
 # =========================================
 # LEITURA OFENSIVA
@@ -1077,6 +1162,22 @@ with tab1:
         radar_away_consenso[0],
         linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
     )
+    # =========================================
+    # 🔥 SCORE OFENSIVO (ESCALA 0–100)
+    # =========================================
+
+    score_raw = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5) / 2)
+
+    # recalibração simples para leitura
+    score_100 = max(min((score_raw - 35) * 2.2, 100), 0)
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric("🔥 Score Ofensivo", round(score_raw,1))
+
+    with c2:
+        st.metric("⚡ Intensidade Ofensiva", f"{score_100:.1f}")
 
     # =========================================
     # 🧱 DEFESA CONSENSO
