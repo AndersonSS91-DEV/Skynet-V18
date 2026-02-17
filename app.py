@@ -520,31 +520,36 @@ def leitura_consenso(nome, radar_vals):
     else:
         linhas.append("✓ Precisão mediana")
 
-    # Perfil
+    # Perfil do jogo
     if btts > 60:
         linhas.append("✓ Jogos abertos com frequência")
     else:
         linhas.append("✓ Tendência a jogos controlados")
 
-    # leitura final
+    # 🧠 leitura final
     if eficiencia > 50 and exg > 60:
-        leitura = "👉 time cria chances claras<br>👉 perfil ofensivo letal"
+        leitura = "👉 time cria chances claras\n👉 perfil ofensivo letal"
+
     elif finalizacoes > 70 and eficiencia < 40:
         leitura = "👉 volume alto com baixa qualidade"
+
     elif exg < 40:
         leitura = "👉 dificuldade para criar oportunidades"
+
     else:
         leitura = "👉 perfil ofensivo equilibrado"
 
-    texto = "<br>".join(linhas)
+    texto = "\n".join(linhas)
 
     return f"""
-    <b>{nome}</b><br><br>
-    {texto}
-    <br><br>
-    🧠 <b>leitura:</b><br>
-    {leitura}
-    """
+**{nome}**
+
+{texto}
+
+🧠 leitura:
+{leitura}
+"""
+
 # =========================================
 # RADAR COMPARATIVO
 # =========================================
