@@ -761,16 +761,16 @@ def score_defensivo(fd, clean_sheet, chs, mgc):
 def classificar_defesa(score):
 
     if score >= 60:
-        return "🧱 Defesa MUITO sólida"
+        return "⛰️🚫⚽ Defesa MUITO sólida"
 
     elif score >= 55:
-        return "🛡 Defesa confiável"
+        return "🛡️🚫⚽ Defesa confiável"
 
     elif score >= 45:
-        return "⚠️ Defesa instável"
+        return "⚠️🚫⚽ Defesa instável"
 
     else:
-        return "🔥 Defesa vulnerável"
+        return "🔥🔥🔥⚽⚽⚽Defesa vulnerável"
 
 # 🎨 BTTS (NOVO)
 def calcular_btts_e_odd(matriz):
