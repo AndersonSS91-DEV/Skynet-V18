@@ -1188,13 +1188,13 @@ with tab1:
 
     c1, c2 = st.columns(2)
 
-    with c1:
-    st.metric("🔥 Score Ofensivo", round(score_raw,1))
-    st.info("Força ofensiva base")
-    
+    with c1: 
+        st.metric("🔥 Score Ofensivo", round(score_100,1))
+        st.info(classificar_intensidade(score_100))
+        
     with c2:
-    st.metric("⚡ Intensidade Ofensiva", f"{score_100:.1f}")
-    st.info(classificar_intensidade(score_100))
+        st.metric("⚡ Intensidade Ofensiva", f"{score_100:.1f}")
+        st.info(classificar_intensidade(score_100))
 
 
     # =========================================
