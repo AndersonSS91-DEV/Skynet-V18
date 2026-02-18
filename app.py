@@ -1011,11 +1011,13 @@ with tab1:
     with a2:
         st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
-
+        st.metric("Home Marcar 1º Gol1️⃣⚽", get_val(linha_mgf, "Home_Abrir_Placar"))
+        
     with a3:
         st.metric("ExG_Away_MGF", get_val(linha_mgf, "ExG_Away_MGF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
-
+        st.metric("Away Marcar 1º Gol1️⃣⚽", get_val(linha_mgf, "Away_Abrir_Placar"))
+        
     st.markdown("---")
     
     # -------- LINHA 4 — ATK x DEF
@@ -1029,10 +1031,12 @@ with tab1:
     with e2:
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
+        st.metric("Home Marcar 1º Gol1️⃣⚽", get_val(linha_exg, "Home_Abrir_Placar"))
         
     with e3:
         st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_exg, "Clean_Sheet_Away_%", "{:.2f}"))
+        st.metric("Away Marcar 1º Gol1️⃣⚽", get_val(linha_exg, "Away_Abrir_Placar"))
 
     st.markdown("---")
     
@@ -1047,11 +1051,13 @@ with tab1:
     with b2:
         st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_vg, "Clean_Sheet_Home_%", "{:.2f}"))
-
+        st.metric("Home Marcar 1º Gol1️⃣⚽", get_val(linha_vg, "Home_Abrir_Placar"))
+        
     with b3:
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
-
+        st.metric("Away Marcar 1º Gol1️⃣⚽", get_val(linha_vg, "Away_Abrir_Placar")
+                  
     st.markdown("---")
 
     # =========================================
@@ -1294,6 +1300,7 @@ with tab3:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
+        st.metric("Home Marcar 1º Gol1️⃣⚽", get_val(linha_exg, "Home_Abrir_Placar"))
         st.metric("BTTS_YES_VG (%)", linha_mgf["BTTS_%"])
         
     with o3:
@@ -1303,6 +1310,7 @@ with tab3:
         st.metric("EV", f"{ev*100:.2f}%") 
         st.metric("ExG_Away_MGF", get_val(linha_mgf, "ExG_Away_MGF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
+        st.metric("Away Marcar 1º Gol1️⃣⚽", get_val(linha_exg, "Away_Abrir_Placar"))
 
     st.markdown("---")
 
@@ -1435,6 +1443,7 @@ with tab4:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
+        st.metric("Home Marcar 1º Gol1️⃣⚽", get_val(linha_exg, "Home_Abrir_Placar"))
         st.metric("BTTS_YES_VG (%)", linha_exg["BTTS_%"])
         
     with o3:
@@ -1444,6 +1453,7 @@ with tab4:
         st.metric("EV", f"{ev*100:.2f}%") 
         st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_exg, "Clean_Sheet_Away_%", "{:.2f}"))
+        st.metric("Away Marcar 1º Gol1️⃣⚽", get_val(linha_exg, "Away_Abrir_Placar"))
         
     st.markdown("---")
 
@@ -1564,6 +1574,7 @@ with tab5:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_vg, "Clean_Sheet_Home_%", "{:.2f}"))
+        st.metric("Home Marcar 1º Gol1️⃣⚽", get_val(linha_vg, "Home_Abrir_Placar")
         st.metric("BTTS_YES_VG (%)", linha_vg["BTTS_%"])
 
     with o3:
@@ -1573,6 +1584,7 @@ with tab5:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
+        st.metric("Away Marcar 1º Gol1️⃣⚽", get_val(linha_vg, "Away_Abrir_Placar")
 
     st.markdown("---")
 
