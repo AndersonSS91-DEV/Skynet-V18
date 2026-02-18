@@ -1194,9 +1194,9 @@ with tab1:
     st.markdown("---")
 
     # =========================================
-    # 🧱 DEFESA CONSENSO
+    # 🛡️🏔️🧤🥅 DEFESA CONSENSO
     # =========================================
-    st.markdown("### 🧱 Defesa Consenso")
+    st.markdown("### 🛡️🏔️🧤🥅 Defesa Consenso")
 
     base_home = score_defensivo(
         linha_exg["FDH"],
