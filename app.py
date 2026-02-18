@@ -558,22 +558,22 @@ def recalibrar_0_100(serie):
 # =========================================
 # 🎯 CLASSIFICA INTENSIDADE OFENSIVA
 # =========================================
-def intensidade_ofensiva(score):
+def classificar_intensidade(score):
 
-    if score < 30:
-        return "❄️ baixa"
+    if score < 35:
+        return "❄️🧊 Jogo frio"
 
-    elif score < 50:
-        return "⚖️ moderada"
+    elif score < 60:
+        return "⚡⚽ Equilibrado"
 
-    elif score < 70:
-        return "🔥 ofensiva"
+    elif score < 80:
+        return "⚡💥🔥⚽ Pressão ofensiva"
 
     elif score < 85:
-        return "🚀 muito ofensiva"
+        return "🔥💣💥⚽ Jogo Quente"
 
     else:
-        return "💥 explosiva"
+        return "💀💣🔥💥⚽ Jogo Pirotécnico"
 
 # =========================================
 # LEITURA OFENSIVA
@@ -719,19 +719,19 @@ def cards_ofensivos(radar_home, radar_away, ief_home, ief_away, exg_total):
         st.warning("⚖️ Jogo equilibrado")
 
     if time_letal(ief_home, exg_total/2):
-        st.success("🔥 Home LETAL hoje")
+        st.success("💀🔥⚽ Home LETAL hoje")
 
     if time_letal(ief_away, exg_total/2):
-        st.success("🔥 Away LETAL hoje")
+        st.success("💀🔥⚽ Away LETAL hoje")
 
     # score = score_jogo(radar_home, radar_away)
 
     tendencia = tendencia_gols(ief_home, ief_away, exg_total)
 
     if tendencia == "ALTÍSSIMA":
-        st.error("🚨 Altíssima tendência de gols")
+        st.error("🚨🔥⚽🚨🔥⚽ Altíssima tendência de gols")
     elif tendencia == "ALTA":
-        st.warning("🔥 Tendência alta de gols")
+        st.warning("🔥⚽🔥⚽ Tendência alta de gols")
     else:
         st.info(f"Tendência: {tendencia}")
 
@@ -761,16 +761,16 @@ def score_defensivo(fd, clean_sheet, chs, mgc):
 def classificar_defesa(score):
 
     if score >= 60:
-        return "🧱 Defesa MUITO sólida"
+        return "⛰️🚫⚽ Defesa MUITO sólida"
 
     elif score >= 55:
-        return "🛡 Defesa confiável"
+        return "🛡️🚫⚽ Defesa confiável"
 
     elif score >= 45:
-        return "⚠️ Defesa instável"
+        return "⚠️🚫⚽ Defesa instável"
 
     else:
-        return "🔥 Defesa vulnerável"
+        return "🔥🔥🔥⚽⚽⚽Defesa vulnerável"
 
 # 🎨 BTTS (NOVO)
 def calcular_btts_e_odd(matriz):
@@ -851,6 +851,9 @@ def mostrar_card(df_base, jogo):
     """
 
     st.markdown(card, unsafe_allow_html=True)
+
+media_score = df_mgf["Score_Ofensivo"].mean()
+desvio_score = df_mgf["Score_Ofensivo"].std()
 
 # =========================================
 # ABAS
@@ -1011,11 +1014,13 @@ with tab1:
     with a2:
         st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
-
+        st.metric("Home Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_mgf, "Home_Abrir_Placar"))
+        
     with a3:
         st.metric("ExG_Away_MGF", get_val(linha_mgf, "ExG_Away_MGF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
-
+        st.metric("Away Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_mgf, "Away_Abrir_Placar"))
+        
     st.markdown("---")
     
     # -------- LINHA 4 — ATK x DEF
@@ -1029,10 +1034,12 @@ with tab1:
     with e2:
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
+        st.metric("Home Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_exg, "Home_Abrir_Placar"))
         
     with e3:
         st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_exg, "Clean_Sheet_Away_%", "{:.2f}"))
+        st.metric("Away Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_exg, "Away_Abrir_Placar"))
 
     st.markdown("---")
     
@@ -1047,11 +1054,13 @@ with tab1:
     with b2:
         st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_vg, "Clean_Sheet_Home_%", "{:.2f}"))
-
+        st.metric("Home Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_vg, "Home_Abrir_Placar"))
+        
     with b3:
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
-
+        st.metric("Away Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_vg, "Away_Abrir_Placar"))
+                  
     st.markdown("---")
 
     # =========================================
@@ -1172,26 +1181,22 @@ with tab1:
 )
 
     # =========================================
-    # 🔥 SCORE OFENSIVO (ESCALA 0–100)
+    # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
     # =========================================
+    score_bruto = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5)/2)
+    z = (score_bruto - media_score) / desvio_score
+    score_ofensivo = 50 + (z * 18)
+    score_ofensivo = max(min(score_ofensivo, 100), 0)
 
-    score_raw = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5) / 2)
-
-    # recalibração simples para leitura
-    score_100 = max(min((score_raw - 35) * 2.2, 100), 0)
-
-    c1, c2 = st.columns(2)
-
-    with c1:
-        st.metric("🔥 Score Ofensivo", round(score_raw,1))
-
-    with c2:
-        st.metric("⚡ Intensidade Ofensiva", f"{score_100:.1f}")
+    st.metric("🔥 Score Ofensivo", f"{score_ofensivo:.0f}")
+    st.info(classificar_intensidade(score_ofensivo))
+    
+    st.markdown("---")
 
     # =========================================
-    # 🧱 DEFESA CONSENSO
+    # 🛡️🏔️🧤🥅 DEFESA CONSENSO
     # =========================================
-    st.markdown("### 🧱 Defesa Consenso")
+    st.markdown("### 🛡️🏔️🧤🥅 Defesa Consenso")
 
     base_home = score_defensivo(
         linha_exg["FDH"],
@@ -1294,7 +1299,8 @@ with tab3:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
-        st.metric("BTTS_YES_VG (%)", linha_mgf["BTTS_%"])
+        st.metric("Home Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_mgf, "Home_Abrir_Placar"))
+        st.metric("BTTS_YES_MGF (%)", linha_mgf["BTTS_%"])
         
     with o3:
         ev = calc_ev(linha_mgf["Odds_Visitante"], linha_mgf["Odd_Justa_Away"])
@@ -1303,6 +1309,7 @@ with tab3:
         st.metric("EV", f"{ev*100:.2f}%") 
         st.metric("ExG_Away_MGF", get_val(linha_mgf, "ExG_Away_MGF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
+        st.metric("Away Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_mgf, "Away_Abrir_Placar"))
 
     st.markdown("---")
 
@@ -1435,7 +1442,8 @@ with tab4:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
-        st.metric("BTTS_YES_VG (%)", linha_exg["BTTS_%"])
+        st.metric("Home Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_exg, "Home_Abrir_Placar"))
+        st.metric("BTTS_YES_ATKxDEF (%)", linha_exg["BTTS_%"])
         
     with o3:
         ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
@@ -1444,6 +1452,7 @@ with tab4:
         st.metric("EV", f"{ev*100:.2f}%") 
         st.metric("ExG_Away_ATKxDEF", get_val(linha_exg, "ExG_Away_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_exg, "Clean_Sheet_Away_%", "{:.2f}"))
+        st.metric("Away Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_exg, "Away_Abrir_Placar"))
         
     st.markdown("---")
 
@@ -1564,6 +1573,7 @@ with tab5:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_vg, "Clean_Sheet_Home_%", "{:.2f}"))
+        st.metric("Home Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_vg, "Home_Abrir_Placar"))
         st.metric("BTTS_YES_VG (%)", linha_vg["BTTS_%"])
 
     with o3:
@@ -1573,6 +1583,7 @@ with tab5:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
+        st.metric("Away Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_vg, "Away_Abrir_Placar"))
 
     st.markdown("---")
 
