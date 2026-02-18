@@ -1574,7 +1574,7 @@ with tab5:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_VG", get_val(linha_vg, "ExG_Home_VG", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_vg, "Clean_Sheet_Home_%", "{:.2f}"))
-        st.metric("Home Marcar 1º Gol1️⃣⚽", get_val(linha_vg, "Home_Abrir_Placar")
+        st.metric("Home Marcar 1º Gol1️⃣⚽", get_val(linha_vg, "Home_Abrir_Placar"))
         st.metric("BTTS_YES_VG (%)", linha_vg["BTTS_%"])
 
     with o3:
