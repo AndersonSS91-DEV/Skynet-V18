@@ -558,22 +558,23 @@ def recalibrar_0_100(serie):
 # =========================================
 # 🎯 CLASSIFICA INTENSIDADE OFENSIVA
 # =========================================
-def intensidade_ofensiva(score):
+def classificar_intensidade(score):
 
     if score < 30:
-        return "❄️ baixa"
+        return "❄️❄️🧊🧊 Baixa pressão"
 
     elif score < 50:
-        return "⚖️ moderada"
+        return "❄️🧊⚽ Equilibrado"
 
     elif score < 70:
-        return "🔥 ofensiva"
+        return "⚡⚽ Pressão ofensiva forte"
 
     elif score < 85:
-        return "🚀 muito ofensiva"
+        return "🔥💣💥⚽ Domínio ofensivo"
 
     else:
-        return "💥 explosiva"
+        return "💀💣🔥💥⚽ Sufocamento total"
+
 
 # =========================================
 # LEITURA OFENSIVA
@@ -1193,6 +1194,8 @@ with tab1:
 
     with c2:
         st.metric("⚡ Intensidade Ofensiva", f"{score_100:.1f}")
+
+st.info(classificar_intensidade(score_100))
 
     # =========================================
     # 🧱 DEFESA CONSENSO
