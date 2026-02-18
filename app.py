@@ -1177,24 +1177,24 @@ with tab1:
     lambda_home + lambda_away
 )
 
-    # =========================================
-    # 🔥 SCORE OFENSIVO (ESCALA 0–100)
-    # =========================================
+# 🔥 QUALIDADE OFENSIVA
+score_ofensivo = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5) / 2)
 
-    score_raw = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5) / 2)
+# ⚡ RITMO / PRESSÃO DO JOGO
+intensidade = (lambda_home + lambda_away) * 18
 
-    # recalibração simples para leitura
-    score_100 = max(min((score_raw - 35) * 2.2, 100), 0)
+intensidade = max(min(intensidade, 100), 0)
 
-    c1, c2 = st.columns(2)
+c1, c2 = st.columns(2)
 
-    with c1: 
-        st.metric("🔥 Score Ofensivo", round(score_100,1))
-        st.info(classificar_intensidade(score_100))
-        
-    with c2:
-        st.metric("⚡ Intensidade Ofensiva", f"{score_100:.1f}")
-        st.info(classificar_intensidade(score_100))
+with c1:
+    st.metric("🔥 Score Ofensivo", round(score_ofensivo,1))
+    st.info("Qualidade ofensiva estrutural")
+
+with c2:
+    st.metric("⚡ Intensidade Ofensiva", round(intensidade,1))
+    st.info(classificar_intensidade(intensidade))
+
 
 
     # =========================================
