@@ -1183,14 +1183,10 @@ with tab1:
     # =========================================
     # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
     # =========================================
-
     score_bruto = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5)/2)
-
     z = (score_bruto - media_score) / desvio_score
-
     score_ofensivo = 50 + (z * 18)
-
-    score_ofensivo = max(min(score, 100), 0)
+    score_ofensivo = max(min(score_ofensivo, 100), 0)
 
     st.metric("🔥 Score Ofensivo", f"{score_ofensivo:.0f}")
     st.info(classificar_intensidade(score_ofensivo))
