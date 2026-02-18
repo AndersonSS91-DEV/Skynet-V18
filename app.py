@@ -1299,8 +1299,8 @@ with tab3:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Home_MGF", get_val(linha_mgf, "ExG_Home_MGF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_mgf, "Clean_Sheet_Home_%", "{:.2f}"))
-        st.metric("Home Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_exg, "Home_Abrir_Placar"))
-        st.metric("BTTS_YES_VG (%)", linha_mgf["BTTS_%"])
+        st.metric("Home Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_mgf, "Home_Abrir_Placar"))
+        st.metric("BTTS_YES_MGF (%)", linha_mgf["BTTS_%"])
         
     with o3:
         ev = calc_ev(linha_mgf["Odds_Visitante"], linha_mgf["Odd_Justa_Away"])
@@ -1309,7 +1309,7 @@ with tab3:
         st.metric("EV", f"{ev*100:.2f}%") 
         st.metric("ExG_Away_MGF", get_val(linha_mgf, "ExG_Away_MGF", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_mgf, "Clean_Sheet_Away_%", "{:.2f}"))
-        st.metric("Away Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_exg, "Away_Abrir_Placar"))
+        st.metric("Away Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_mgf, "Away_Abrir_Placar"))
 
     st.markdown("---")
 
@@ -1443,7 +1443,7 @@ with tab4:
         st.metric("ExG_Home_ATKxDEF", get_val(linha_exg, "ExG_Home_ATKxDEF", "{:.2f}"))
         st.metric("Clean Sheet Home (%)", get_val(linha_exg, "Clean_Sheet_Home_%", "{:.2f}"))
         st.metric("Home Marcar 1º Gol1️⃣⚽ (%)", get_val(linha_exg, "Home_Abrir_Placar"))
-        st.metric("BTTS_YES_VG (%)", linha_exg["BTTS_%"])
+        st.metric("BTTS_YES_ATKxDEF (%)", linha_exg["BTTS_%"])
         
     with o3:
         ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
