@@ -852,6 +852,9 @@ def mostrar_card(df_base, jogo):
 
     st.markdown(card, unsafe_allow_html=True)
 
+media_score = df_mgf["Score_Ofensivo"].mean()
+desvio_score = df_mgf["Score_Ofensivo"].std()
+
 # =========================================
 # ABAS
 # =========================================
@@ -1178,14 +1181,14 @@ with tab1:
 )
 
     # =========================================
-    # 🔥 SCORE OFENSIVO (ESCALA INTELIGENTE)
+    # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
     # =========================================
 
     score_bruto = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5) / 2)
 
-    # centro real do futebol ≈ 47
-    # escala baseada no comportamento real dos jogos
-    score_ofensivo = (score_bruto - 47) * 3.5 + 50
+    z = (score_bruto - media_score) / desvio_score
+
+    score_ofensivo = 50 + (z * 18)
 
     score_ofensivo = max(min(score_ofensivo, 100), 0)
 
