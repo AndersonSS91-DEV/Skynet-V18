@@ -1184,7 +1184,7 @@ with tab1:
     # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
     # =========================================
 
-    score_bruto = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5) / 2)
+    score_bruto = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5))
 
     z = (score_bruto - media_score) / desvio_score
 
