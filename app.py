@@ -1194,8 +1194,7 @@ with tab1:
 
     with c2:
         st.metric("⚡ Intensidade Ofensiva", f"{score_100:.1f}")
-
-st.info(classificar_intensidade(score_100))
+        st.info(classificar_intensidade(score_100))
 
     # =========================================
     # 🧱 DEFESA CONSENSO
