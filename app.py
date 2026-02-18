@@ -1190,7 +1190,7 @@ with tab1:
 
     score_ofensivo = 50 + (z * 18)
 
-    score_ofensivo = round(max(min(score, 100), 0), 2)
+    score_ofensivo = max(min(score, 100), 0)
 
     st.metric("🔥 Score Ofensivo", f"{score_ofensivo:.0f}")
     st.info(classificar_intensidade(score_ofensivo))
