@@ -1056,7 +1056,7 @@ with tab1:
     with b3:
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
-        st.metric("Away Marcar 1º Gol1️⃣⚽", get_val(linha_vg, "Away_Abrir_Placar")
+        st.metric("Away Marcar 1º Gol1️⃣⚽", get_val(linha_vg, "Away_Abrir_Placar"))
                   
     st.markdown("---")
 
