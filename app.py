@@ -1178,12 +1178,17 @@ with tab1:
 )
 
     # =========================================
-    # 🔥 SCORE OFENSIVO (0–100)
+    # 🔥 SCORE OFENSIVO (ESCALA REAL 0–100)
     # =========================================
-    score_ofensivo = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5) / 2)
+
+    score_bruto = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5) / 2)
+
+    # recalibração → transforma faixa real (35–60) em 0–100
+    score_ofensivo = (score_bruto - 35) * 4
+
     score_ofensivo = max(min(score_ofensivo, 100), 0)
-    
-    st.metric("🔥 Score Ofensivo", f"{score_ofensivo:.1f}")
+
+    st.metric("🔥 Score Ofensivo", f"{score_ofensivo:.0f}")
     st.info(classificar_intensidade(score_ofensivo))
     
     st.markdown("---")
