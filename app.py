@@ -560,21 +560,20 @@ def recalibrar_0_100(serie):
 # =========================================
 def classificar_intensidade(score):
 
-    if score < 30:
-        return "❄️❄️🧊🧊 Baixa pressão"
+    if score < 35:
+        return "❄️🧊 Jogo frio"
 
-    elif score < 50:
-        return "❄️🧊⚽ Equilibrado"
+    elif score < 60:
+        return "⚡⚽ Equilibrado"
 
-    elif score < 70:
-        return "⚡⚽ Pressão ofensiva forte"
+    elif score < 80:
+        return "⚡💥🔥⚽ Pressão ofensiva"
 
     elif score < 85:
-        return "🔥💣💥⚽ Domínio ofensivo"
+        return "🔥💣💥⚽ Jogo Quente"
 
     else:
-        return "💀💣🔥💥⚽ Sufocamento total"
-
+        return "💀💣🔥💥⚽ Jogo Pirotécnico"
 
 # =========================================
 # LEITURA OFENSIVA
@@ -720,19 +719,19 @@ def cards_ofensivos(radar_home, radar_away, ief_home, ief_away, exg_total):
         st.warning("⚖️ Jogo equilibrado")
 
     if time_letal(ief_home, exg_total/2):
-        st.success("🔥 Home LETAL hoje")
+        st.success("💀🔥⚽ Home LETAL hoje")
 
     if time_letal(ief_away, exg_total/2):
-        st.success("🔥 Away LETAL hoje")
+        st.success("💀🔥⚽ Away LETAL hoje")
 
     # score = score_jogo(radar_home, radar_away)
 
     tendencia = tendencia_gols(ief_home, ief_away, exg_total)
 
     if tendencia == "ALTÍSSIMA":
-        st.error("🚨 Altíssima tendência de gols")
+        st.error("🚨🔥⚽🚨🔥⚽ Altíssima tendência de gols")
     elif tendencia == "ALTA":
-        st.warning("🔥 Tendência alta de gols")
+        st.warning("🔥⚽🔥⚽ Tendência alta de gols")
     else:
         st.info(f"Tendência: {tendencia}")
 
@@ -1190,7 +1189,8 @@ with tab1:
     c1, c2 = st.columns(2)
 
     with c1:
-        st.metric("🔥 Score Ofensivo", round(score_raw,1))
+        st.metric("🔥 Score Ofensivo", round(score_100,1))
+        st.info(classificar_intensidade(score_100))
 
     with c2:
         st.metric("⚡ Intensidade Ofensiva", f"{score_100:.1f}")
