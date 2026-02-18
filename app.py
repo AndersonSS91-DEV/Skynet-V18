@@ -1177,25 +1177,29 @@ with tab1:
     lambda_home + lambda_away
 )
 
-# 🔥 QUALIDADE OFENSIVA
-score_ofensivo = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5) / 2)
+    # =========================================
+    # 🔥 QUALIDADE OFENSIVA vs ⚡ INTENSIDADE
+    # =========================================
 
-# ⚡ RITMO / PRESSÃO DO JOGO
-intensidade = (lambda_home + lambda_away) * 18
+    # 🔥 qualidade ofensiva estrutural (0–100)
+    score_ofensivo = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5) / 2)
+    score_ofensivo = max(min(score_ofensivo, 100), 0)
 
-intensidade = max(min(intensidade, 100), 0)
+    # ⚡ ritmo / pressão do jogo (0–100)
+    intensidade = (lambda_home + lambda_away) * 18
+    intensidade = max(min(intensidade, 100), 0)
 
-c1, c2 = st.columns(2)
+    c1, c2 = st.columns(2)
 
-with c1:
-    st.metric("🔥 Score Ofensivo", round(score_ofensivo,1))
-    st.info("Qualidade ofensiva estrutural")
+    with c1:
+        st.metric("🔥 Score Ofensivo", f"{score_ofensivo:.1f}")
+        st.info(classificar_intensidade(score_ofensivo))
 
-with c2:
-    st.metric("⚡ Intensidade Ofensiva", round(intensidade,1))
-    st.info(classificar_intensidade(intensidade))
+    with c2:
+        st.metric("⚡ Intensidade Ofensiva", f"{intensidade:.1f}")
+        st.info(classificar_intensidade(intensidade))
 
-
+    st.markdown("---")
 
     # =========================================
     # 🧱 DEFESA CONSENSO
