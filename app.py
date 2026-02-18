@@ -1178,13 +1178,14 @@ with tab1:
 )
 
     # =========================================
-    # 🔥 SCORE OFENSIVO (ESCALA REAL 0–100)
+    # 🔥 SCORE OFENSIVO (ESCALA INTELIGENTE)
     # =========================================
 
     score_bruto = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5) / 2)
 
-    # recalibração → transforma faixa real (35–60) em 0–100
-    score_ofensivo = (score_bruto - 35) * 4
+    # centro real do futebol ≈ 47
+    # escala baseada no comportamento real dos jogos
+    score_ofensivo = (score_bruto - 47) * 3.5 + 50
 
     score_ofensivo = max(min(score_ofensivo, 100), 0)
 
