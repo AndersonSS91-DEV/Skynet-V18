@@ -1182,9 +1182,9 @@ with tab1:
     # =========================================
     score_ofensivo = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5) / 2)
     score_ofensivo = max(min(score_ofensivo, 100), 0)
-
-        st.metric("🔥 Score Ofensivo", f"{score_ofensivo:.1f}")
-        st.info(classificar_intensidade(score_ofensivo))
+    
+    st.metric("🔥 Score Ofensivo", f"{score_ofensivo:.1f}")
+    st.info(classificar_intensidade(score_ofensivo))
 
 st.markdown("---")
 
