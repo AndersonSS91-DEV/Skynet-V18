@@ -1584,7 +1584,7 @@ with tab5:
         st.metric("EV", f"{ev*100:.2f}%")
         st.metric("ExG_Away_VG", get_val(linha_vg, "ExG_Away_VG", "{:.2f}"))
         st.metric("Clean Sheet Away (%)", get_val(linha_vg, "Clean_Sheet_Away_%", "{:.2f}"))
-        st.metric("Away Marcar 1º Gol1️⃣⚽", get_val(linha_vg, "Away_Abrir_Placar")
+        st.metric("Away Marcar 1º Gol1️⃣⚽", get_val(linha_vg, "Away_Abrir_Placar"))
 
     st.markdown("---")
 
