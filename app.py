@@ -331,7 +331,7 @@ def mostrar_over_under(matriz, titulo):
         "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
     }).round(2)
 
-    fig = plt.figure(figsize=(3.2, 2.8), dpi=120)
+    fig = plt.figure(figsize=(2.8, 2.0), dpi=120)
     ax = fig.add_axes([0.05, 0.05, 0.9, 0.9])
     ax.axis('off')
 
