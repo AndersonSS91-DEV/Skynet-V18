@@ -989,8 +989,9 @@ with tab1:
             unsafe_allow_html=True
         )
 
-           else:
+else:
     st.info("⏳ Jogo ainda não finalizado")
+    radar_live_simples(linha_exg["Home_Team"], linha_exg["Visitor_Team"])
     radar_live_simples(linha_exg["Home_Team"], linha_exg["Visitor_Team"])
     ball_x = random.randint(20, 80)
 
