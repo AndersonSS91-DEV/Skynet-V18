@@ -852,68 +852,6 @@ def mostrar_card(df_base, jogo):
     </div>
     """
 
-def radar_live_simples(home_team, away_team):
-
-    ball_x = random.randint(20, 80)
-    ball_y = random.randint(10, 40)
-
-    momentum_home = [random.randint(0,5) for _ in range(15)]
-    momentum_away = [random.randint(0,5) for _ in range(15)]
-
-    st.markdown("### ⚡ Radar Live")
-
-    c1, c2, c3 = st.columns([1,3,1])
-
-    with c2:
-
-        fig_m = go.Figure()
-        fig_m.add_bar(y=momentum_home)
-        fig_m.add_bar(y=[-x for x in momentum_away])
-
-        fig_m.update_layout(
-            height=120,
-            margin=dict(l=0,r=0,t=0,b=0),
-            showlegend=False,
-            yaxis_visible=False,
-            xaxis_visible=False
-        )
-
-        st.plotly_chart(fig_m, use_container_width=True)
-
-        field = go.Figure()
-
-        field.add_shape(type="rect", x0=0, y0=0, x1=100, y1=60,
-                        fillcolor="#2e7d32", line_width=0)
-
-        field.add_shape(type="rect", x0=0, y0=0, x1=100, y1=60,
-                        line=dict(color="white", width=2))
-
-        field.add_shape(type="line", x0=50, y0=0, x1=50, y1=60,
-                        line=dict(color="white", width=2))
-
-        field.add_trace(go.Scatter(
-            x=[ball_x],
-            y=[ball_y],
-            mode="markers",
-            marker=dict(size=12, color="white"),
-        ))
-
-        field.update_layout(
-            height=260,
-            margin=dict(l=0,r=0,t=0,b=0),
-            xaxis=dict(visible=False),
-            yaxis=dict(visible=False),
-        )
-
-        st.plotly_chart(field, use_container_width=True)
-
-        if ball_x < 35:
-            st.success(f"Pressão {home_team}")
-        elif ball_x > 65:
-            st.error(f"Pressão {away_team}")
-        else:
-            st.info("Jogo equilibrado")
-
     st.markdown(card, unsafe_allow_html=True)
 
 media_score = df_mgf["Score_Ofensivo"].mean()
@@ -989,26 +927,6 @@ with tab1:
             unsafe_allow_html=True
         )
 
-    if pd.notna(gh) and pd.notna(ga):
-
-        gh = int(gh)
-        ga = int(ga)
-
-        home = linha_exg["Home_Team"]
-        away = linha_exg["Visitor_Team"]
-
-        st.markdown(
-            f"<div style='font-size:26px;font-weight:700'>{home} {gh} x {ga} {away}</div>",
-            unsafe_allow_html=True
-        )
-
-    else:
-        st.info("⏳ Jogo ainda não finalizado")
-        radar_live_simples(
-    linha_exg["Home_Team"],
-    linha_exg["Visitor_Team"]
-)
-   
     
     st.markdown("---")
 
