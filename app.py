@@ -118,13 +118,13 @@ div[data-testid="stDataFrame"] table {
 }
 
 div[data-testid="stDataFrame"] th {
-    font-size: 18px !important;
+    font-size: 20px !important;
     font-weight: 800 !important;
 }
 
 div[data-testid="stDataFrame"] td {
-    font-size: 20px !important;
-    font-weight: 600 !important;
+    font-size: 22px !important;
+    font-weight: 800 !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -337,7 +337,7 @@ def mostrar_over_under(matriz, titulo):
         "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
     }).round(2)
 
-    st.table(df_ou)
+    st.table(df_ou).round(2)
     
 def exibir_matriz(matriz, home, away, titulo):
     df = pd.DataFrame(
