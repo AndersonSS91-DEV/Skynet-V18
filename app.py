@@ -337,7 +337,7 @@ def mostrar_over_under(matriz, titulo):
         "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
     }).round(2)
 
-    st.markdown(df_ou.to_html(index=False) + "<style>td{text-align:center}</style>",
+    st.markdown(df_ou.to_html(index=False, float_format="%.2f"),
     unsafe_allow_html=True)
     
     st.table(df_ou)
