@@ -331,7 +331,29 @@ def mostrar_over_under(matriz, titulo):
         "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
     }).round(2)
 
-    st.table(df_ou)
+    fig, ax = plt.subplots(figsize=(3.2, 2.2))
+    ax.axis('off')
+
+    tabela = ax.table(
+        cellText=df_ou.values,
+        colLabels=df_ou.columns,
+        loc='center',
+        cellLoc='center'
+    )
+
+    tabela.auto_set_font_size(False)
+    tabela.set_fontsize(10)
+    tabela.scale(1.2, 1.2)
+
+    # estilo igual ao bloco do Poisson
+    for (row, col), cell in tabela.get_celld().items():
+        cell.set_edgecolor("#DDDDDD")
+        if row == 0:
+            cell.set_facecolor("#F2F2F2")
+            cell.set_text_props(weight='bold')
+
+    st.pyplot(fig, use_container_width=False)
+    plt.close(fig)
     
 def exibir_matriz(matriz, home, away, titulo):
     df = pd.DataFrame(
