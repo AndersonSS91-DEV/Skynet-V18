@@ -331,21 +331,21 @@ def mostrar_over_under(matriz, titulo):
         "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
     }).round(2)
 
-    fig, ax = plt.subplots(figsize=(2.8, 2.0))
+    fig = plt.figure(figsize=(3.2, 2.8), dpi=120)
+    ax = fig.add_axes([0.05, 0.05, 0.9, 0.9])
     ax.axis('off')
 
     tabela = ax.table(
         cellText=df_ou.values,
         colLabels=df_ou.columns,
-        loc='center',
-        cellLoc='center'
+        cellLoc='center',
+        loc='center'
     )
 
     tabela.auto_set_font_size(False)
-    tabela.set_fontsize(10)
-    tabela.scale(1.2, 1.2)
+    tabela.set_fontsize(8)      # 👈 tamanho igual ao Poisson
+    tabela.scale(1.1, 1.2)      # 👈 altura e largura das células
 
-    # estilo igual ao bloco do Poisson
     for (row, col), cell in tabela.get_celld().items():
         cell.set_edgecolor("#DDDDDD")
         if row == 0:
