@@ -989,12 +989,24 @@ with tab1:
             unsafe_allow_html=True
         )
 
-else:
-    st.info("⏳ Jogo ainda não finalizado")
-    radar_live_simples(linha_exg["Home_Team"], linha_exg["Visitor_Team"])
-    radar_live_simples(linha_exg["Home_Team"], linha_exg["Visitor_Team"])
-    ball_x = random.randint(20, 80)
+    if pd.notna(gh) and pd.notna(ga):
 
+        gh = int(gh)
+        ga = int(ga)
+
+        home = linha_exg["Home_Team"]
+        away = linha_exg["Visitor_Team"]
+
+        st.markdown(
+            f"<div style='font-size:26px;font-weight:700'>{home} {gh} x {ga} {away}</div>",
+            unsafe_allow_html=True
+        )
+
+    else:
+        st.info("⏳ Jogo ainda não finalizado")
+        radar_live_simples(home, away)
+   
+    
     st.markdown("---")
 
 
