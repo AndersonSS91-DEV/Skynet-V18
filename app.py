@@ -114,9 +114,11 @@ div[data-testid="stAlert"] p {
 /* ===== TABELAS DATAFRAME ===== */
 
 div[data-testid="stDataFrame"] table {
-    font-size: 20px !important;
+    font-size: 24px !important;
 }
-
+div[data-testid="stDataFrame"] th {
+    font-size: 22px !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -329,7 +331,7 @@ def mostrar_over_under(matriz, titulo):
         "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
     }).round(2)
 
-    st.dataframe(df_ou, use_container_width=False, hide_index=True)
+    st.dataframe(df_ou, width=360, hide_index=True)
     
 def exibir_matriz(matriz, home, away, titulo):
     df = pd.DataFrame(
