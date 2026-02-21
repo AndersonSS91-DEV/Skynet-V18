@@ -989,13 +989,8 @@ with tab1:
     else:
         st.info("⏳ Jogo ainda não finalizado")  
         
-        radar_live_simples()
-        def radar_live_simples():
+        def radar_live_simples(home_team, away_team):
 
-    home = "KOL"
-    away = "TSG"
-
-    # simulação
     ball_x = random.randint(20, 80)
     ball_y = random.randint(10, 40)
 
@@ -1008,9 +1003,7 @@ with tab1:
 
     with c2:
 
-        # MOMENTUM
         fig_m = go.Figure()
-
         fig_m.add_bar(y=momentum_home)
         fig_m.add_bar(y=[-x for x in momentum_away])
 
@@ -1026,31 +1019,37 @@ with tab1:
 
         st.plotly_chart(fig_m, use_container_width=True)
 
-        # CAMPO
         field = go.Figure()
 
+        # gramado
         field.add_shape(type="rect", x0=0, y0=0, x1=100, y1=60,
                         fillcolor="#2e7d32", line_width=0)
 
+        # linhas externas
         field.add_shape(type="rect", x0=0, y0=0, x1=100, y1=60,
                         line=dict(color="white", width=2))
 
+        # meio campo
         field.add_shape(type="line", x0=50, y0=0, x1=50, y1=60,
                         line=dict(color="white", width=2))
 
+        # círculo central
         field.add_shape(type="circle", x0=40, y0=20, x1=60, y1=40,
                         line=dict(color="white", width=2))
 
+        # áreas
         field.add_shape(type="rect", x0=0, y0=18, x1=16, y1=42,
                         line=dict(color="white", width=2))
         field.add_shape(type="rect", x0=84, y0=18, x1=100, y1=42,
                         line=dict(color="white", width=2))
 
+        # pequena área
         field.add_shape(type="rect", x0=0, y0=24, x1=6, y1=36,
                         line=dict(color="white", width=2))
         field.add_shape(type="rect", x0=94, y0=24, x1=100, y1=36,
                         line=dict(color="white", width=2))
 
+        # bola
         field.add_trace(go.Scatter(
             x=[ball_x],
             y=[ball_y],
@@ -1069,9 +1068,9 @@ with tab1:
         st.plotly_chart(field, use_container_width=True)
 
         if ball_x < 35:
-            st.success(f"Pressão {home}")
+            st.success(f"Pressão {home_team}")
         elif ball_x > 65:
-            st.error(f"Pressão {away}")
+            st.error(f"Pressão {away_team}")
         else:
             st.info("Jogo equilibrado")
 
