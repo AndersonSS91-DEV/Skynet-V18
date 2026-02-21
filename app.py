@@ -114,10 +114,10 @@ div[data-testid="stAlert"] p {
 /* ===== TABELAS DATAFRAME ===== */
 
 div[data-testid="stDataFrame"] table {
-    font-size: 44px !important;
+    font-size: 22px !important;
 }
 div[data-testid="stDataFrame"] th {
-    font-size: 40px !important;
+    font-size: 20px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -331,7 +331,7 @@ def mostrar_over_under(matriz, titulo):
         "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
     }).round(2)
 
-    fig, ax = plt.subplots(figsize=(3.2, 2.2))
+    fig, ax = plt.subplots(figsize=(2.8, 2.0))
     ax.axis('off')
 
     tabela = ax.table(
