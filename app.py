@@ -332,14 +332,34 @@ def mostrar_over_under(matriz, titulo):
     html = df_ou.to_html(index=False)
 
     st.markdown(f"""
-    <div style="
-        background:white;
-        padding:8px;
-        border-radius:6px;
-        width:320px;
-        box-shadow:0 0 0 1px #ccc inset;
-    ">
-    {html}
+    <div style="width:340px;">
+        <style>
+            table {{
+                width:100%;
+                border-collapse: collapse;
+                font-size:18px;
+                color:white;
+            }}
+
+            th {{
+                border-bottom: 2px solid white;
+                font-weight:700;
+                padding:6px;
+                text-align:center;
+            }}
+
+            td {{
+                border-bottom: 1px solid rgba(255,255,255,0.25);
+                padding:6px;
+                text-align:center;
+            }}
+
+            table, tr {{
+                border-top: 2px solid white;
+                border-bottom: 2px solid white;
+            }}
+        </style>
+        {html}
     </div>
     """, unsafe_allow_html=True)
     
