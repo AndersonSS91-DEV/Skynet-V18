@@ -850,6 +850,65 @@ def mostrar_card(df_base, jogo):
     </div>
     """
 
+    import plotly.graph_objects as go
+import random
+
+def radar_live_simples():
+    # pressão simulada
+    home_pressure = [random.randint(0,10) for _ in range(20)]
+    away_pressure = [random.randint(0,10) for _ in range(20)]
+    ball_position = random.randint(0,100)
+
+    col1, col2, col3 = st.columns([1,2,1])
+    
+    with col2:  # centraliza
+        st.markdown("### 🔴 Radar Live")
+
+        # MOMENTUM
+        fig = go.Figure()
+
+        fig.add_trace(go.Bar(y=home_pressure, name="Home"))
+        fig.add_trace(go.Bar(y=[-x for x in away_pressure], name="Away"))
+
+        fig.update_layout(
+            barmode='relative',
+            height=160,
+            margin=dict(l=0,r=0,t=10,b=0)
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+        # CAMPO
+        field = go.Figure()
+
+        field.add_shape(type="rect", x0=0, y0=0, x1=100, y1=50)
+        field.add_shape(type="line", x0=50, y0=0, x1=50, y1=50)
+
+        field.add_trace(go.Scatter(
+            x=[ball_position],
+            y=[25],
+            mode="markers+text",
+            text=["⚽"],
+            textfont_size=22
+        ))
+
+        field.update_layout(
+            height=220,
+            margin=dict(l=0,r=0,t=10,b=0),
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+        )
+
+        st.plotly_chart(field, use_container_width=True)
+
+        # interpretação
+        if ball_position < 30:
+            st.success("Pressão da casa")
+        elif ball_position > 70:
+            st.error("Pressão visitante")
+        else:
+            st.info("Jogo equilibrado")
+
     st.markdown(card, unsafe_allow_html=True)
 
 media_score = df_mgf["Score_Ofensivo"].mean()
@@ -926,7 +985,9 @@ with tab1:
         )
 
     else:
-        st.info("⏳ Jogo ainda não finalizado")
+        st.info("⏳ Jogo ainda não finalizado")  
+        
+        radar_live_simples()
 
     st.markdown("---")
 
