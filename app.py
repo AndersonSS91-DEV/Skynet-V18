@@ -1004,7 +1004,10 @@ with tab1:
 
     else:
         st.info("⏳ Jogo ainda não finalizado")
-        radar_live_simples(home, away)
+        radar_live_simples(
+    linha_exg["Home_Team"],
+    linha_exg["Visitor_Team"]
+)
    
     
     st.markdown("---")
