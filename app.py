@@ -117,15 +117,6 @@ div[data-testid="stDataFrame"] table {
     font-size: 20px !important;
 }
 
-div[data-testid="stDataFrame"] th {
-    font-size: 26px !important;
-    font-weight: 800 !important;
-}
-
-div[data-testid="stDataFrame"] td {
-    font-size: 26px !important;
-    font-weight: 800 !important;
-}
 </style>
 """, unsafe_allow_html=True)
 
