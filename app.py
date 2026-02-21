@@ -852,7 +852,7 @@ def mostrar_card(df_base, jogo):
     </div>
     """
 
-    def radar_live_simples(home_team, away_team):
+def radar_live_simples(home_team, away_team):
 
     ball_x = random.randint(20, 80)
     ball_y = random.randint(10, 40)
