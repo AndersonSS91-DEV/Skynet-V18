@@ -331,7 +331,7 @@ def mostrar_over_under(matriz, titulo):
         "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
     }).round(2)
 
-    st.dataframe(df_ou, width=720, hide_index=True)
+    st.dataframe(df_ou, width=600, hide_index=True)
     
 def exibir_matriz(matriz, home, away, titulo):
     df = pd.DataFrame(
