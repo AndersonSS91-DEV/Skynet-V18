@@ -337,8 +337,8 @@ def mostrar_over_under(matriz, titulo):
         "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
     }).round(2)
 
-    df_ou["Over %"] = df_ou["Over %"].map(lambda x: f"{x:.2f}")
-    df_ou["Under %"] = df_ou["Under %"].map(lambda x: f"{x:.2f}")
+    df_ou = df_ou.round(2)
+    
     st.table(df_ou)
     
 def exibir_matriz(matriz, home, away, titulo):
