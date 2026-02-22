@@ -181,6 +181,7 @@ ul[role="listbox"] li {
 </style>
 """, unsafe_allow_html=True)
 
+
 # =========================================
 # 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
 # =========================================
@@ -341,7 +342,13 @@ st.session_state["jogo"] = jogo
 # =========================================
 # FUNÇÕES AUX
 # =========================================
-def get_val(linha, col, fmt=None, default="—"):
+def escudo_time(nome):
+    caminho = f"assets/escudos/{nome.lower()}.png"
+    if os.path.exists(caminho):
+        return caminho
+    return "assets/escudos/default.png"
+
+def get_val(linha, col, fmt=None, default="—"):def get_val(linha, col, fmt=None, default="—"):
     if col in linha.index and pd.notna(linha[col]):
         try:
             return fmt.format(linha[col]) if fmt else linha[col]
@@ -970,60 +977,58 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 with tab1:
 
-    st.markdown("### 🏁 Resultado")
+    home = linha_exg["Home_Team"]
+away = linha_exg["Visitor_Team"]
 
-    gh = linha_exg.get("Result Home")
-    ga = linha_exg.get("Result Visitor")
-    gh_ht = linha_exg.get("Result_Home_HT")
-    ga_ht = linha_exg.get("Result_Visitor_HT")
+esc_home = escudo_time(home)
+esc_away = escudo_time(away)
 
-    if pd.notna(gh) and pd.notna(ga):
+liga = linha_exg.get("League", "")
+hora = linha_exg.get("Time", "")
 
-        gh = int(gh)
-        ga = int(ga)
-        gh_ht = int(gh_ht) if pd.notna(gh_ht) else 0
-        ga_ht = int(ga_ht) if pd.notna(ga_ht) else 0
+gh = linha_exg.get("Result Home", "")
+ga = linha_exg.get("Result Visitor", "")
+gh_ht = linha_exg.get("Result_Home_HT", "")
+ga_ht = linha_exg.get("Result_Visitor_HT", "")
 
-        home = linha_exg["Home_Team"]
-        away = linha_exg["Visitor_Team"]
+st.markdown(
+    f"""
+    <div style="text-align:center">
 
-        if gh > ga:
-            home_display = f"🔵 {home}"
-            away_display = away
-        elif ga > gh:
-            home_display = home
-            away_display = f"🔵 {away}"
-        else:
-            home_display = home
-            away_display = away
+        <div style="font-size:20px; opacity:0.8;">
+            🏆 {liga}
+        </div>
 
-        st.markdown(
-            f"""
-            <div style="font-size:26px; font-weight:700; margin-bottom:16px;">
-                {home_display} {gh} x {ga} {away_display}
+        <div style="font-size:18px; margin-bottom:8px;">
+            {hora}
+        </div>
+
+        <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:20px 0;">
+
+            <div>
+                <img src="{esc_home}" width="70">
+                <div style="font-size:18px; font-weight:700;">{home}</div>
             </div>
-            """,
-            unsafe_allow_html=True
-        )
 
-        st.markdown(
-            """
-            <div style="font-size:14px; margin-bottom:6px; opacity:0.6;">
-                Resultado HT
+            <div style="font-size:26px; font-weight:900;">
+                {gh} x {ga}
             </div>
-            """,
-            unsafe_allow_html=True
-        )
 
-        st.markdown(
-            f"""
-            <div style="font-size:24px; font-weight:700;">
-                {home} {gh_ht} x {ga_ht} {away}
+            <div>
+                <img src="{esc_away}" width="70">
+                <div style="font-size:18px; font-weight:700;">{away}</div>
             </div>
-            """,
-            unsafe_allow_html=True
-        )
-        
+
+        </div>
+
+        <div style="font-size:14px; opacity:0.7;">
+            HT: {gh_ht} x {ga_ht}
+        </div>
+
+    </div>
+    """,
+    unsafe_allow_html=True
+)        
     st.markdown("---")
 
 
