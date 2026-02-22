@@ -229,12 +229,7 @@ desvio_score = df_mgf["Score_Ofensivo"].std()
 
 import base64
 from pathlib import Path
-
 def escudo_time_base64(nome_time):
-    """
-    Retorna o escudo do time.
-    Se não existir, usa team_vazio.png
-    """
 
     pasta = Path("assets/escudos")
 
@@ -245,7 +240,6 @@ def escudo_time_base64(nome_time):
 
     caminho = pasta / f"{nome_arquivo}.png"
 
-    # se não existir → usa escudo vazio
     if not caminho.exists():
         caminho = pasta / "team_vazio.png"
 
