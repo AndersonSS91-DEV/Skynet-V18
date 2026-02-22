@@ -1276,9 +1276,6 @@ with tab1:
     lambda_home + lambda_away
 )     
 
-
-
-
 # =============================
 # ⚡ CARD HT
 # =============================
@@ -1308,8 +1305,6 @@ if not jogo_ht.empty:
     st.metric("🔥 Score Ofensivo", f"{score_ofensivo:.0f}")
     st.info(classificar_intensidade(score_ofensivo))
     
-    st.markdown("---")
-
     # =========================================
     # 🛡️🏔️🧤🥅 DEFESA CONSENSO
     # =========================================
