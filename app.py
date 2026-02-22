@@ -196,8 +196,9 @@ else:
 df_mgf = pd.read_excel(xls, "Poisson_Media_Gols")
 df_exg = pd.read_excel(xls, "Poisson_Ataque_Defesa")
 df_vg  = pd.read_excel(xls, "Poisson_VG")  # <<< FALTAVA ISSO
+df_ht = pd.read_excel(xls,  "Poisson_HT")
 
-for df in (df_mgf, df_exg, df_vg):
+for df in (df_mgf, df_exg, df_vg, df_ht):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
 
 # =========================================
@@ -1126,7 +1127,34 @@ with tab1:
         matriz_consenso,
         "Over/Under — Consenso"
     )
-  
+
+    st.subheader("⚡ Probabilidades HT")
+
+st.dataframe(
+    df_ht[[
+        "League",
+        "Home_Team",
+        "Visitor_Team",
+        "Prob_Gol_HT",
+        "Prob_0x0_HT",
+        "Gol_HT_Home_%",
+        "Gol_HT_Away_%",
+        "Selo_HT"
+    ]],
+    use_container_width=True
+    st.markdown("### 🔥 Jogos com maior probabilidade de gol HT")
+
+    top_ht = df_ht.sort_values("Prob_Gol_HT", ascending=False).head(5)
+
+for _, row in top_ht.iterrows():
+    st.markdown(f"""
+    ### ⚡ {row['Home_Team']} x {row['Visitor_Team']}
+
+    🔥 Prob Gol HT: **{row['Prob_Gol_HT']}%**  
+    🏠 Home marca: **{row['Gol_HT_Home_%']}%**  
+    ✈️ Away marca: **{row['Gol_HT_Away_%']}%**  
+    {row['Selo_HT']}
+    """)
     # =========================================
     # 🎯 RADAR CONSENSO
     # =========================================
