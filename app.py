@@ -26,18 +26,23 @@ banners = sorted(str(p) for p in ASSETS.glob("banner*.*"))
 
 if banners:
     refresh = st_autorefresh(interval=120000, key="banner")
+
     if "banner_idx" not in st.session_state:
         st.session_state.banner_idx = 0
+
     if refresh:
         st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(banners)
 
     c1,c2,c3 = st.columns([1,8,1])
+
     with c1:
         if st.button("◀"):
             st.session_state.banner_idx -= 1
+
     with c3:
         if st.button("▶"):
             st.session_state.banner_idx += 1
+
     with c2:
         st.image(banners[st.session_state.banner_idx % len(banners)], use_container_width=True)
 
@@ -73,6 +78,11 @@ for df in (df_mgf,df_exg,df_vg,df_ht):
 # =========================================
 def norm_exg(x): return min(x*40,100)
 def norm_shots(x): return min((x/15)*100,100)
+
+def eficiencia_finalizacao(chutes):
+    if pd.isna(chutes) or chutes == 0:
+        return 0
+    return min((1/chutes)*100,100)
 
 # =========================================
 # 🔥 SCORE OFENSIVO CONSENSO
@@ -120,12 +130,12 @@ jogo = st.selectbox("⚽ Escolha o jogo", df_mgf["JOGO"])
 linha_mgf=df_mgf[df_mgf.JOGO==jogo].iloc[0]
 linha_exg=df_exg[df_exg.JOGO==jogo].iloc[0]
 linha_vg=df_vg[df_vg.JOGO==jogo].iloc[0]
-linha_ht = df_ht[df_ht["JOGO"] == jogo].iloc[0]
+linha_ht=df_ht[df_ht.JOGO==jogo].iloc[0]
 
 radar_home, radar_away, ief_home, ief_away = radar_map[jogo]
 
 # =========================================
-# 📡 RADAR COMPARATIVO
+# 📡 RADAR
 # =========================================
 def radar_plot(home,away):
     labels=["Eficiência","ExG","Finalizações","Precisão","BTTS"]
@@ -235,10 +245,6 @@ st.header(intensidade(score_jogo))
 # FUNÇÕES AUX
 # =========================================
 def get_val(linha, col, fmt=None, default="—"):
-    """
-    Retorna valor seguro da coluna.
-    Evita crash se coluna não existir ou for NaN.
-    """
     if col in linha.index and pd.notna(linha[col]):
         try:
             return fmt.format(linha[col]) if fmt else linha[col]
@@ -246,20 +252,14 @@ def get_val(linha, col, fmt=None, default="—"):
             return default
     return default
 
-
 def calc_ev(odd_real, odd_justa):
-    """
-    Calcula Valor Esperado (EV)
-    > 0  = valor positivo
-    < 0  = valor negativo
-    """
     try:
         return (odd_real / odd_justa) - 1
     except:
         return None
-        
+
 # =========================================
-# ESTATÍSTICAS DO SCORE (CONSENSO)
+# ESTATÍSTICAS DO SCORE
 # =========================================
 media_score = df_mgf["Score_Ofensivo"].mean()
 desvio_score = df_mgf["Score_Ofensivo"].std()
