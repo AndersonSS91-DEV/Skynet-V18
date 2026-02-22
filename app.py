@@ -994,37 +994,22 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 with tab1:
 
-    import base64
-import unicodedata
-import os
+    import base64, os
 
 def escudo_time_base64(nome):
-
     pasta = "assets/escudos"
+    nome = str(nome).lower().replace(" ", "_")
 
-    try:
-        # normaliza nome
-        nome = str(nome).lower().strip()
-        nome = unicodedata.normalize('NFKD', nome).encode('ASCII','ignore').decode('ASCII')
-        nome = nome.replace(" ", "_")
+    for arq in os.listdir(pasta):
+        if nome in arq.lower():
+            caminho = os.path.join(pasta, arq)
+            with open(caminho, "rb") as f:
+                return f"data:image/png;base64,{base64.b64encode(f.read()).decode()}"
 
-        # procura escudo correspondente
-        for arq in os.listdir(pasta):
-            if nome in arq.lower():
-                caminho = os.path.join(pasta, arq)
-                with open(caminho, "rb") as img:
-                    encoded = base64.b64encode(img.read()).decode()
-                    return f"data:image/png;base64,{encoded}"
-
-        # 🔥 SE NÃO ENCONTRAR → team_vazio
-        caminho = os.path.join(pasta, "team_vazio.png")
-
-        with open(caminho, "rb") as img:
-            encoded = base64.b64encode(img.read()).decode()
-            return f"data:image/png;base64,{encoded}"
-
-    except Exception:
-        return ""
+    # fallback obrigatório
+    caminho = os.path.join(pasta, "team_vazio.png")
+    with open(caminho, "rb") as f:
+        return f"data:image/png;base64,{base64.b64encode(f.read()).decode()}"
     st.markdown("---")
 
     # ODDS
