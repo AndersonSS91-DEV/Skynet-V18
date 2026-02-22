@@ -992,77 +992,51 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
-with tab1:
-    home = linha_exg["Home_Team"]
-    away = linha_exg["Visitor_Team"]
+home = linha_exg["Home_Team"]
+away = linha_exg["Visitor_Team"]
 
-    esc_home = escudo_time_base64(home)
-    esc_away = escudo_time_base64(away)
+esc_home = escudo_time_base64(home)
+esc_away = escudo_time_base64(away)
 
-    liga = linha_exg.get("League", "")
-    
-    st.markdown(
-    f"<h4 style='text-align:center; opacity:0.8;'>🏆 {liga}</h4>",
+liga = linha_exg.get("League", "")
+
+# ===== placar =====
+gh = linha_exg.get("Result Home")
+ga = linha_exg.get("Result Visitor")
+
+if pd.notna(gh) and pd.notna(ga):
+    placar = f"{int(gh)} x {int(ga)}"
+else:
+    placar = "X"
+
+# ===== LIGA CENTRALIZADA =====
+st.markdown(
+    f"<h4 style='text-align:center; opacity:0.85;'>🏆 {liga}</h4>",
     unsafe_allow_html=True
 )
 
+# ===== TIMES + PLACAR CENTRALIZADOS =====
 col1, col2, col3 = st.columns([1,1,1])
 
 with col1:
     st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
     st.image(esc_home, width=90)
-    st.markdown(f"<b>{home}</b>", unsafe_allow_html=True)
+    st.markdown(f"**{home}**")
     st.markdown("</div>", unsafe_allow_html=True)
 
 with col2:
-    st.markdown(f"<h1 style='text-align:center; margin-top:20px'>{placar}</h1>",
-        unsafe_allow_html=True)
+    st.markdown(
+        f"<h1 style='text-align:center; margin-top:20px'>{placar}</h1>",
+        unsafe_allow_html=True
+    )
 
 with col3:
     st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
     st.image(esc_away, width=90)
-    st.markdown(f"<b>{away}</b>", unsafe_allow_html=True)
+    st.markdown(f"**{away}**")
     st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("---")
-
-    gh = linha_exg.get("Result Home")
-    ga = linha_exg.get("Result Visitor")
-
-    # placar
-    if pd.notna(gh) and pd.notna(ga):
-        placar = f"{int(gh)} x {int(ga)}"
-    else:
-        placar = "X"
-
-    # ===== LIGA CENTRALIZADA =====
-    st.markdown(
-        f"<h3 style='text-align:center;'>🏆 {liga}</h3>",
-        unsafe_allow_html=True
-    )
-
-    # ===== TIMES CENTRALIZADOS =====
-    c1, c2, c3 = st.columns([3,2,3])
-
-    with c1:
-        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-        st.image(esc_home, width=80)
-        st.markdown(f"**{home}**")
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    with c2:
-        st.markdown(
-            f"<h1 style='text-align:center; margin-top:20px'>{placar}</h1>",
-            unsafe_allow_html=True
-        )
-
-    with c3:
-        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-        st.image(esc_away, width=80)
-        st.markdown(f"**{away}**")
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("---")
+st.markdown("---")
 
     # ODDS
     st.markdown("### 🎯 Odds")
