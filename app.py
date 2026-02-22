@@ -996,27 +996,41 @@ with tab1:
 
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
+    liga = linha_exg.get("League", "")
 
     esc_home = escudo_time_base64(home)
     esc_away = escudo_time_base64(away)
 
     placar = "X"
 
-    col_esq, col_meio, col_dir = st.columns([3,2,3])
+    # 🏆 Liga
+    st.markdown(
+        f"<h3 style='text-align:center; opacity:0.8;'>🏆 {liga}</h3>",
+        unsafe_allow_html=True
+    )
 
-    with col_esq:
-        st.image(esc_home, width=90)
-        st.markdown(f"<div style='text-align:center'>{home}</div>", unsafe_allow_html=True)
+    esp1, col_home, col_score, col_away, esp2 = st.columns([1,3,2,3,1])
 
-    with col_meio:
+    # HOME
+    with col_home:
+        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+        st.image(esc_home, width=85)
+        st.markdown(f"<div style='font-weight:700'>{home}</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # PLACAR
+    with col_score:
         st.markdown(
-            f"<h1 style='text-align:center;margin-top:25px'>{placar}</h1>",
+            f"<h1 style='text-align:center; margin-top:20px'>{placar}</h1>",
             unsafe_allow_html=True
         )
 
-    with col_dir:
-        st.image(esc_away, width=90)
-        st.markdown(f"<div style='text-align:center'>{away}</div>", unsafe_allow_html=True)
+    # AWAY
+    with col_away:
+        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+        st.image(esc_away, width=85)
+        st.markdown(f"<div style='font-weight:700'>{away}</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("---")
 
