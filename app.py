@@ -1274,8 +1274,12 @@ with tab1:
     radar_home_consenso[0],   # eficiência home
     radar_away_consenso[0],   # eficiência away
     lambda_home + lambda_away
-)
-    # =============================
+)     
+
+
+
+
+# =============================
 # ⚡ CARD HT
 # =============================
 jogo_ht = df_ht[df_ht["JOGO"] == jogo]
@@ -1368,6 +1372,9 @@ if not jogo_ht.empty:
                 radar_away_consenso
             )
         )
+
+
+
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
