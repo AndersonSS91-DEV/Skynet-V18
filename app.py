@@ -239,46 +239,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
-with tab1:
-    home = linha_exg["Home_Team"]
-    away = linha_exg["Visitor_Team"]
-
-    esc_home = escudo_time_base64(home)
-    esc_away = escudo_time_base64(away)
-
-    liga = linha_exg.get("League", "")
-
-# ===== placar =====
-gh = linha_exg.get("Result Home")
-ga = linha_exg.get("Result Visitor")
-
-if pd.notna(gh) and pd.notna(ga):
-    placar = f"{int(gh)} x {int(ga)}"
-else:
-    placar = "X"
-
-# ===== LIGA CENTRALIZADA =====
-st.markdown(
-    f"<h4 style='text-align:center; opacity:0.85;'>🏆 {liga}</h4>",
-    unsafe_allow_html=True
-)
-
-# ===== HEADER TIMES =====
-col_home, col_score, col_away = st.columns([1,1,1])
-
-col_home.image(esc_home, width=90)
-col_home.markdown(f"<p style='text-align:center'><b>{home}</b></p>", unsafe_allow_html=True)
-
-col_score.markdown(
-    f"<h1 style='text-align:center; margin-top:20px'>{placar}</h1>",
-    unsafe_allow_html=True
-)
-
-col_away.image(esc_away, width=90)
-col_away.markdown(f"<p style='text-align:center'><b>{away}</b></p>", unsafe_allow_html=True)
-
-st.markdown("---")
-
 st.markdown("### 🎯 Odds")
 
 o1, o2, o3 = st.columns(3)
