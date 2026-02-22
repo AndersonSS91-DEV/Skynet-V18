@@ -1035,9 +1035,6 @@ with tab1:
 
     # ODDS
     st.markdown("### 🎯 Odds")
-
-sp1, main, sp2 = st.columns([1,6,1])
-
 with main:
     o1, o2, o3 = st.columns(3)
 
