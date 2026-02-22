@@ -972,10 +972,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "⚔️⚽ ATK x DEF",
 "💎⚽ VG"
 ])
-
-# =========================================
-# ABA 1 — RESUMO
-# =========================================
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
@@ -996,43 +992,43 @@ with tab1:
     ga_ht = linha_exg.get("Result_Visitor_HT", "")
 
     st.markdown(
-        f"""
-        <div style="text-align:center">
+f"""
+<div style="text-align:center">
 
-            <div style="font-size:20px; opacity:0.8;">
-                🏆 {liga}
-            </div>
+<div style="font-size:20px; opacity:0.8;">
+🏆 {liga}
+</div>
 
-            <div style="font-size:18px; margin-bottom:8px;">
-                {hora}
-            </div>
+<div style="font-size:18px; margin-bottom:8px;">
+{hora}
+</div>
 
-            <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:20px 0;">
+<div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:20px 0;">
 
-                <div>
-                    <img src="{esc_home}" width="70">
-                    <div style="font-size:18px; font-weight:700;">{home}</div>
-                </div>
+<div>
+<img src="{esc_home}" width="70">
+<div style="font-size:18px; font-weight:700;">{home}</div>
+</div>
 
-                <div style="font-size:26px; font-weight:900;">
-                    {gh} x {ga}
-                </div>
+<div style="font-size:26px; font-weight:900;">
+{gh} x {ga}
+</div>
 
-                <div>
-                    <img src="{esc_away}" width="70">
-                    <div style="font-size:18px; font-weight:700;">{away}</div>
-                </div>
+<div>
+<img src="{esc_away}" width="70">
+<div style="font-size:18px; font-weight:700;">{away}</div>
+</div>
 
-            </div>
+</div>
 
-            <div style="font-size:14px; opacity:0.7;">
-                HT: {gh_ht} x {ga_ht}
-            </div>
+<div style="font-size:14px; opacity:0.7;">
+HT: {gh_ht} x {ga_ht}
+</div>
 
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+</div>
+""",
+unsafe_allow_html=True
+)
 
     st.markdown("---")
 
