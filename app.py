@@ -35,6 +35,19 @@ st.markdown("""
 html, body, [class*="css"]  {
     font-family: 'Inter', sans-serif;
 }
+st.markdown("""
+<style>
+
+/* Aumenta fonte das abas */
+button[data-baseweb="tab"] {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* aumenta altura das abas */
+button[data-baseweb="tab"] {
+    padding: 10px 18px;
+}
 
 /* ===== Título Principal ===== */
 h1 {
