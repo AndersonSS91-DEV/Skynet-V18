@@ -1039,28 +1039,28 @@ with col_away:
 st.markdown("---")
 
 st.markdown("### 🎯 Odds")
-    o1, o2, o3 = st.columns(3)
 
-    with o1:
-        ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
-        st.metric("Odds Casa", linha_exg["Odds_Casa"])
+o1, o2, o3 = st.columns(3)
 
-        st.metric("Odd_Over_1,5FT", linha_exg["Odd_Over_1,5FT"])
-        st.metric("VR01", get_val(linha_exg, "VR01", "{:.2f}"))
+with o1:
+    ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
+    st.metric("Odds Casa", linha_exg["Odds_Casa"])
+    st.metric("Odd_Over_1,5FT", linha_exg["Odd_Over_1,5FT"])
+    st.metric("VR01", get_val(linha_exg, "VR01", "{:.2f}"))
 
-    with o2:
-        ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
-        st.metric("Odds Empate", linha_exg["Odds_Empate"])
-        st.metric("Odds_Over_2,5FT", linha_exg["Odds_Over_2,5FT"])
-        st.metric("COEF_OVER1FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
+with o2:
+    ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
+    st.metric("Odds Empate", linha_exg["Odds_Empate"])
+    st.metric("Odds_Over_2,5FT", linha_exg["Odds_Over_2,5FT"])
+    st.metric("COEF_OVER1FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
 
-    with o3:
-        ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
-        st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
-        st.metric("Odds_Under_2,5FT", linha_exg["Odds_Under_2,5FT"])
-        st.metric("Odd_BTTS_YES", linha_exg["Odd_BTTS_YES"])
+with o3:
+    ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
+    st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
+    st.metric("Odds_Under_2,5FT", linha_exg["Odds_Under_2,5FT"])
+    st.metric("Odd_BTTS_YES", linha_exg["Odd_BTTS_YES"])
 
-    st.markdown("---")
+st.markdown("---")
 
     # -------- LINHA 2 — Métricas
     st.markdown("### 📊📈Métricas")
