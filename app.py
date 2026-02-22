@@ -1,371 +1,236 @@
+st.write("VERSAO NOVA RODANDO ✅")
+
 # =========================================
-# STREAMLIT — POISSON SKYNET (HÍBRIDO)
+# ⚽🏆 POISSON SKYNET 🏆⚽
 # =========================================
+
 import streamlit as st
 import pandas as pd
 import numpy as np
 import os
-import re
-import glob
 from pathlib import Path
 from scipy.stats import poisson
 import matplotlib.pyplot as plt
 import seaborn as sns
-import plotly.graph_objects as go
-import random
 from streamlit_autorefresh import st_autorefresh
-from PIL import Image
 
 # =========================================
 # CONFIG
 # =========================================
-st.set_page_config(
-    page_title="⚽🏆Poisson Skynet🏆⚽",
-    layout="wide"
-)
-st.markdown(
-    """
-    <h1 style="text-align:center;">⚽🏆 Poisson Skynet 🏆⚽</h1>
-    <hr style="width:560px; margin:auto; border:4px solid #FFD700;">
-    """,
-    unsafe_allow_html=True
-)
-st.markdown("""
-<style>
-
-/* ===== Fonte Global ===== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
-
-html, body, [class*="css"]  {
-    font-family: 'Inter', sans-serif;
-}
-
-/* ===== Título Principal ===== */
-h1 {
-    font-size: 46px !important;
-    font-weight: 900 !important;
-}
-
-/* ===== Subheader ===== */
-h3 {
-    font-size: 28px !important;
-    font-weight: 800 !important;
-}
-
-/* ===== MÉTRICAS ===== */
-div[data-testid="metric-container"] label {
-    font-size: 13px !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-    opacity: 0.6 !important;
-    font-weight: 700 !important;
-}
-
-div[data-testid="metric-container"] > div {
-    font-size: 48px !important;
-    font-weight: 900 !important;
-}
-
-/* ===== ALERT CARDS ===== */
-div[data-testid="stAlert"] {
-    font-size: 20px !important;
-    font-weight: 700 !important;
-    border-radius: 12px !important;
-    padding: 12px 16px !important;
-}
-
-/* mantém cores originais do Streamlit */
-div[data-testid="stAlert"] p {
-    font-size: 20px !important;
-}
-
-/* ===== TABS ===== */
-button[data-baseweb="tab"] {
-    font-size: 18px !important;
-    font-weight: 700 !important;
-}
-
-/* ===== SELECTBOX ===== */
-div[data-baseweb="select"] {
-    font-size: 20px !important;
-    font-weight: 700 !important;
-}
-
-/* ===== DATAFRAME ===== */
-div[data-testid="stDataFrame"] table {
-    font-size: 17px !important;
-}
-
-div[data-testid="stDataFrame"] th {
-    font-size: 17px !important;
-    font-weight: 700 !important;
-}
-
-div[data-testid="stDataFrame"] td {
-    font-size: 17px !important;
-}
-
-/* texto dos cards st.info */
-div[data-testid="stAlert"] {
-    color: white !important;
-}
-
-div[data-testid="stAlert"] p {
-    color: white !important;
-}
-
-
-/* ===== TABELAS DATAFRAME ===== */
-
-div[data-testid="stDataFrame"] table {
-    font-size: 22px !important;
-}
-div[data-testid="stDataFrame"] th {
-    font-size: 20px !important;
-}
-
-/* ===== TABELAS DATAFRAME ===== */
-
-div[data-testid="stDataFrame"] table {
-    font-size: 22px !important;
-}
-div[data-testid="stDataFrame"] th {
-    font-size: 20px !important;
-}
-
-/* texto do valor selecionado */
-div[data-baseweb="select"] div {
-    font-size: 22px !important;
-    font-weight: 700 !important;
-}
-
-/* opções dentro da lista */
-ul[role="listbox"] li {
-    font-size: 16px !important;
-}
-
-button[aria-selected="true"] {
-    font-size: 22px !important;
-    color: #00E5FF !important;
-}
-
-button[data-baseweb="tab"][aria-selected="true"] * {
-    font-size: 26px !important;
-    color: #00E5FF !important;
-}
-/* ===== SELECTBOX TAMANHO ===== */
-
-/* caixa externa */
-div[data-baseweb="select"] {
-    min-height: 55px !important;
-}
-
-/* área clicável */
-div[data-baseweb="select"] > div {
-    min-height: 55px !important;
-    display: flex;
-    align-items: center;
-}
-
-/* texto selecionado */
-div[data-baseweb="select"] span {
-    font-size: 22px !important;
-    font-weight: 700 !important;
-}
-
-/* itens do dropdown */
-ul[role="listbox"] li {
-    font-size: 18px !important;
-    padding: 10px !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
+st.set_page_config(page_title="⚽🏆Poisson Skynet🏆⚽", layout="wide")
+st.title("⚽🏆 Poisson Skynet 🏆⚽")
 
 # =========================================
-# 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
+# 🎬 BANNER
 # =========================================
-import streamlit as st
-from pathlib import Path
-from streamlit_autorefresh import st_autorefresh
-
 ASSETS = Path("assets")
+banners = sorted(str(p) for p in ASSETS.glob("banner*.*"))
 
-BANNERS = sorted(str(p) for p in ASSETS.glob("banner*.*"))
-
-if not BANNERS:
-    st.warning("⚠️ Coloque imagens em /assets/banner1.png, banner2.png ...")
-
-else:
-    total = len(BANNERS)
-
-    # autoplay (a cada 2 min)
-    refresh_count = st_autorefresh(interval=120000, key="banner_refresh")
-
-    # inicia estado
+if banners:
+    refresh = st_autorefresh(interval=120000, key="banner")
     if "banner_idx" not in st.session_state:
         st.session_state.banner_idx = 0
+    if refresh:
+        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(banners)
 
-    # autoplay só incrementa (não sobrescreve)
-    if refresh_count:
-        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
-
-    c1, c2, c3 = st.columns([1, 8, 1])
-
-    # ◀
+    c1,c2,c3 = st.columns([1,8,1])
     with c1:
-        if st.button("◀", use_container_width=True):
-            st.session_state.banner_idx = (st.session_state.banner_idx - 1) % total
-
-    # ▶
+        if st.button("◀"):
+            st.session_state.banner_idx -= 1
     with c3:
-        if st.button("▶", use_container_width=True):
-            st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
-
-    c1, c2, c3 = st.columns([1,2,1])
-
-with c2:
-    st.image(BANNERS[st.session_state.banner_idx], width=800)
-
+        if st.button("▶"):
+            st.session_state.banner_idx += 1
+    with c2:
+        st.image(banners[st.session_state.banner_idx % len(banners)], use_container_width=True)
 
 # =========================================
-# HÍBRIDO — ARQUIVO PADRÃO + UPLOAD OPCIONAL
+# 📂 CARREGAR DADOS
 # =========================================
 ARQUIVO_PADRAO = "data/POISSON_DUAS_MATRIZES.xlsx"
 
 with st.sidebar:
-    st.header("📂 Dados")
-    arquivo_upload = st.file_uploader(
-        "Enviar outro Excel (opcional)",
-        type=["xlsx"]
-    )
+    arquivo = st.file_uploader("Enviar Excel", type=["xlsx"])
 
-if arquivo_upload:
-    xls = pd.ExcelFile(arquivo_upload)
-    st.success("📤 Utilizando arquivo enviado pelo usuário")
-
+if arquivo:
+    xls = pd.ExcelFile(arquivo)
 elif os.path.exists(ARQUIVO_PADRAO):
     xls = pd.ExcelFile(ARQUIVO_PADRAO)
-    st.info("📊 Utilizando arquivo padrão")
-
 else:
-    st.error("❌ Nenhum arquivo disponível (nem upload nem padrão)")
+    st.error("Arquivo não encontrado")
     st.stop()
 
 # =========================================
-# LEITURA DAS ABAS
+# 📊 LEITURA
 # =========================================
-df_mgf = pd.read_excel(xls, "Poisson_Media_Gols")
-df_exg = pd.read_excel(xls, "Poisson_Ataque_Defesa")
-df_vg  = pd.read_excel(xls, "Poisson_VG")  # <<< FALTAVA ISSO
-df_ht = pd.read_excel(xls,  "Poisson_HT")
+df_mgf = pd.read_excel(xls,"Poisson_Media_Gols")
+df_exg = pd.read_excel(xls,"Poisson_Ataque_Defesa")
+df_vg  = pd.read_excel(xls,"Poisson_VG")
+df_ht  = pd.read_excel(xls,"Poisson_HT")
 
-for df in (df_mgf, df_exg, df_vg, df_ht):
+for df in (df_mgf,df_exg,df_vg,df_ht):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
-    df_ht["JOGO"] = df_ht["Home_Team"] + " x " + df_ht["Visitor_Team"]
 
 # =========================================
-# 🔥 SCORE OFENSIVO CONSENSO 0–100
+# 🔧 NORMALIZAÇÕES
 # =========================================
+def norm_exg(x): return min(x*40,100)
+def norm_shots(x): return min((x/15)*100,100)
 
-score_raw = []
+# =========================================
+# 🔥 SCORE OFENSIVO CONSENSO
+# =========================================
+scores=[]
+radar_map={}
 
-for _, row in df_mgf.iterrows():
+for _,row in df_mgf.iterrows():
 
-    jogo = row["Home_Team"] + " x " + row["Visitor_Team"]
-
-    exg_row = df_exg[df_exg["Home_Team"].eq(row["Home_Team"]) &
-                     df_exg["Visitor_Team"].eq(row["Visitor_Team"])]
-
-    vg_row  = df_vg[df_vg["Home_Team"].eq(row["Home_Team"]) &
-                    df_vg["Visitor_Team"].eq(row["Visitor_Team"])]
+    exg_row=df_exg[(df_exg.Home_Team==row.Home_Team)&(df_exg.Visitor_Team==row.Visitor_Team)]
+    vg_row=df_vg[(df_vg.Home_Team==row.Home_Team)&(df_vg.Visitor_Team==row.Visitor_Team)]
 
     if exg_row.empty or vg_row.empty:
-        score_raw.append(np.nan)
+        scores.append(np.nan)
         continue
 
-    exg_row = exg_row.iloc[0]
-    vg_row  = vg_row.iloc[0]
+    exg_row=exg_row.iloc[0]
+    vg_row=vg_row.iloc[0]
 
-    # eficiência
-    ief_home = (1 / row["CHM"]) * 100 if row["CHM"] > 0 else 0
-    ief_away = (1 / row["CAM"]) * 100 if row["CAM"] > 0 else 0
+    ief_home=(1/row.CHM)*100 if row.CHM>0 else 0
+    ief_away=(1/row.CAM)*100 if row.CAM>0 else 0
 
-    # normalizações radar
-    def norm_exg(x): return min(x * 40, 100)
-    def norm_shots(x): return min((x / 15) * 100, 100)
+    radar_home=np.mean([
+        [ief_home,norm_exg(row.ExG_Home_MGF),norm_shots(row.CHM),exg_row.Precisao_CG_H,row["BTTS_%"]],
+        [exg_row.FAH,norm_exg(exg_row.ExG_Home_ATKxDEF),norm_shots(row.CHM),exg_row.Precisao_CG_H,exg_row["BTTS_%"]],
+        [exg_row.FAH,norm_exg(vg_row.ExG_Home_VG),norm_shots(row.CHM),exg_row.Precisao_CG_H,vg_row["BTTS_%"]]
+    ],axis=0)
 
-    radar_home = np.mean([
-        [ief_home, norm_exg(row["ExG_Home_MGF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], row["BTTS_%"]],
-        [exg_row["FAH"], norm_exg(exg_row["ExG_Home_ATKxDEF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], exg_row["BTTS_%"]],
-        [exg_row["FAH"], norm_exg(vg_row["ExG_Home_VG"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], vg_row["BTTS_%"]]
-    ], axis=0)
+    radar_away=np.mean([
+        [ief_away,norm_exg(row.ExG_Away_MGF),norm_shots(row.CAM),exg_row.Precisao_CG_A,row["BTTS_%"]],
+        [exg_row.FAA,norm_exg(exg_row.ExG_Away_ATKxDEF),norm_shots(row.CAM),exg_row.Precisao_CG_A,exg_row["BTTS_%"]],
+        [exg_row.FAA,norm_exg(vg_row.ExG_Away_VG),norm_shots(row.CAM),exg_row.Precisao_CG_A,vg_row["BTTS_%"]]
+    ],axis=0)
 
-    radar_away = np.mean([
-        [ief_away, norm_exg(row["ExG_Away_MGF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], row["BTTS_%"]],
-        [exg_row["FAA"], norm_exg(exg_row["ExG_Away_ATKxDEF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], exg_row["BTTS_%"]],
-        [exg_row["FAA"], norm_exg(vg_row["ExG_Away_VG"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], vg_row["BTTS_%"]]
-    ], axis=0)
+    radar_map[row["JOGO"]] = (radar_home, radar_away, ief_home, ief_away)
+    scores.append(((sum(radar_home)/5 + sum(radar_away)/5)/2))
 
-    score = ((sum(radar_home)/5 + sum(radar_away)/5) / 2)
-    score_raw.append(score)
+df_mgf["Score_Ofensivo"]=scores
 
-df_mgf["Score_Ofensivo"] = score_raw
+# =========================================
+# 🎯 ESCOLHER JOGO
+# =========================================
+jogo = st.selectbox("⚽ Escolha o jogo", df_mgf["JOGO"])
 
-# 🔥 recalibra para 0–100
-# df_mgf["Score_Ofensivo_100"] = recalibrar_0_100(df_mgf["Score_Ofensivo"])
+linha_mgf=df_mgf[df_mgf.JOGO==jogo].iloc[0]
+linha_exg=df_exg[df_exg.JOGO==jogo].iloc[0]
+linha_vg=df_vg[df_vg.JOGO==jogo].iloc[0]
 
-def recalibrar_0_100(serie):
-    minimo = serie.min()
-    maximo = serie.max()
+radar_home, radar_away, ief_home, ief_away = radar_map[jogo]
 
-    if maximo == minimo:
-        return serie * 0
+# =========================================
+# 📡 RADAR COMPARATIVO
+# =========================================
+def radar_plot(home,away):
+    labels=["Eficiência","ExG","Finalizações","Precisão","BTTS"]
+    ang=np.linspace(0,2*np.pi,len(labels),endpoint=False)
+    ang=np.concatenate((ang,[ang[0]]))
+    home=np.concatenate((home,[home[0]]))
+    away=np.concatenate((away,[away[0]]))
 
-    return ((serie - minimo) / (maximo - minimo)) * 100
+    fig=plt.figure(figsize=(4,4))
+    ax=fig.add_subplot(111,polar=True)
+    ax.plot(ang,home,linewidth=2)
+    ax.fill(ang,home,alpha=0.25)
+    ax.plot(ang,away,linewidth=2)
+    ax.fill(ang,away,alpha=0.15)
+    ax.set_xticks(ang[:-1])
+    ax.set_xticklabels(labels)
+    ax.set_ylim(0,100)
+    return fig
 
-# =========================================    
-# 🔥 DEFINA AQUI (ANTES DAS TABS)
-jogos_lista = df_mgf["JOGO"].tolist()
+st.pyplot(radar_plot(radar_home,radar_away))
 
-if "jogo" not in st.session_state or st.session_state["jogo"] not in jogos_lista:
-    st.session_state["jogo"] = jogos_lista[0]
+# =========================================
+# ⚔️ DOMÍNIO
+# =========================================
+def dominio(home,away):
+    if sum(home)>sum(away)*1.15: return "HOME ⚔️"
+    if sum(away)>sum(home)*1.15: return "AWAY ⚔️"
+    return "EQUILIBRADO ⚖️"
 
-st.markdown("### ⚽ Escolha o jogo")
-jogo = st.selectbox(label="",options=jogos_lista)
-linha_mgf = df_mgf[df_mgf["JOGO"] == jogo].iloc[0]
-linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
-linha_vg  = df_vg[df_vg["JOGO"] == jogo].iloc[0]
-linha_ht  = df_ht[df_ht["JOGO"] == jogo].iloc[0]  # ✅ ADICIONE ESTA
+st.subheader(dominio(radar_home,radar_away))
 
-st.session_state["jogo"] = jogo
+# =========================================
+# 🔥 TENDÊNCIA GOLS
+# =========================================
+exg_total = linha_exg.ExG_Home_ATKxDEF + linha_exg.ExG_Away_ATKxDEF
+
+def tendencia(exg_total,ief_h,ief_a):
+    if exg_total>2.6 and ief_h+ief_a>70: return "🚨🔥 ALTÍSSIMA"
+    if exg_total>2.2: return "🔥 ALTA"
+    if exg_total>1.8: return "⚡ MODERADA"
+    return "❄️ BAIXA"
+
+st.info(tendencia(exg_total,ief_home,ief_away))
+
+# =========================================
+# 💀 TIME LETAL
+# =========================================
+if ief_home>45 and exg_total/2>1.2:
+    st.success("💀🔥⚽ HOME LETAL")
+if ief_away>45 and exg_total/2>1.2:
+    st.success("💀🔥⚽ AWAY LETAL")
+
+# =========================================
+# 🎯 MATRIZ POISSON + BTTS
+# =========================================
+def matriz_poisson(lh,la):
+    m=np.zeros((5,5))
+    for i in range(5):
+        for j in range(5):
+            m[i,j]=poisson.pmf(i,lh)*poisson.pmf(j,la)
+    return m
+
+matriz = matriz_poisson(linha_exg.ExG_Home_ATKxDEF, linha_exg.ExG_Away_ATKxDEF)
+
+btts = sum(matriz[i][j] for i in range(1,5) for j in range(1,5))*100
+st.metric("BTTS %", f"{btts:.1f}%")
+
+# =========================================
+# 🛡️ SCORE DEFENSIVO
+# =========================================
+def score_def(fd,cs,chs,mgc):
+    if pd.isna(fd): fd=50
+    if pd.isna(cs): cs=30
+    if pd.isna(chs) or chs==0: chs=10
+    if pd.isna(mgc) or mgc==0: mgc=1
+    res=min((chs/15)*100,100)
+    conc=max(0,100-(mgc*40))
+    return round(fd*0.35+cs*0.25+res*0.2+conc*0.2,1)
+
+st.metric("Score Defesa Home", score_def(linha_exg.FDH, linha_exg.CS_H, linha_mgf.CHM, linha_exg.MGC_H))
+st.metric("Score Defesa Away", score_def(linha_exg.FDA, linha_exg.CS_A, linha_mgf.CAM, linha_exg.MGC_A))
+
+# =========================================
+# 💣 INTENSIDADE DO JOGO
+# =========================================
+score_jogo = df_mgf[df_mgf.JOGO==jogo]["Score_Ofensivo"].values[0]
+
+def intensidade(s):
+    if s<35: return "❄️🧊 FRIO"
+    if s<60: return "⚡ EQUILIBRADO"
+    if s<80: return "🔥 PRESSÃO"
+    if s<85: return "💣 QUENTE"
+    return "💀 PIROTÉCNICO"
+
+st.header(intensidade(score_jogo))
+
 # =========================================
 # FUNÇÕES AUX
 # =========================================
-import base64
-
-def escudo_time_base64(nome):
-    import unicodedata
-    nome = str(nome).lower().strip()
-    nome = unicodedata.normalize('NFKD', nome).encode('ASCII','ignore').decode('ASCII')
-    nome = nome.replace(" ", "_")
-
-    pasta = "assets/escudos"
-
-    for arq in os.listdir(pasta):
-        if nome in arq.lower():
-            caminho = os.path.join(pasta, arq)
-            with open(caminho, "rb") as img:
-                encoded = base64.b64encode(img.read()).decode()
-                return f"data:image/png;base64,{encoded}"
-
-    # default
-    caminho = os.path.join(pasta, "default.png")
-    with open(caminho, "rb") as img:
-        encoded = base64.b64encode(img.read()).decode()
-        return f"data:image/png;base64,{encoded}"
-        
 def get_val(linha, col, fmt=None, default="—"):
+    """
+    Retorna valor seguro da coluna.
+    Evita crash se coluna não existir ou for NaN.
+    """
     if col in linha.index and pd.notna(linha[col]):
         try:
             return fmt.format(linha[col]) if fmt else linha[col]
@@ -375,606 +240,19 @@ def get_val(linha, col, fmt=None, default="—"):
 
 
 def calc_ev(odd_real, odd_justa):
+    """
+    Calcula Valor Esperado (EV)
+    > 0  = valor positivo
+    < 0  = valor negativo
+    """
     try:
         return (odd_real / odd_justa) - 1
     except:
         return None
-
-
-def calcular_matriz_poisson(lh, la, max_gols=4):
-    matriz = np.zeros((max_gols + 1, max_gols + 1))
-    for i in range(max_gols + 1):
-        for j in range(max_gols + 1):
-            matriz[i, j] = poisson.pmf(i, lh) * poisson.pmf(j, la)
-    return matriz * 100
-
-    
-def calcular_over_under(matriz, max_gols=4):
-    linhas = [0.5, 1.5, 2.5, 3.5, 4.5]
-    resultados = {}
-
-    # converter para probabilidade
-    matriz_prob = matriz / 100
-
-    for linha in linhas:
-        over = sum(
-            matriz_prob[i][j]
-            for i in range(max_gols+1)
-            for j in range(max_gols+1)
-            if i + j > linha
-        )
-        resultados[f'Over {linha}'] = over * 100
-        resultados[f'Under {linha}'] = (1 - over) * 100
-
-    return resultados
-
-def mostrar_over_under(matriz, titulo):
-
-    ou = calcular_over_under(matriz)
-
-    st.markdown(f"### ⚽ {titulo}")
-
-    df_ou = pd.DataFrame({
-        "Linha": ["0.5","1.5","2.5","3.5","4.5"],
-        "Over %": [ou['Over 0.5'], ou['Over 1.5'], ou['Over 2.5'], ou['Over 3.5'], ou['Over 4.5']],
-        "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
-    }).round(2)
-
-    fig = plt.figure(figsize=(2.4, 2.0), dpi=120)
-    ax = fig.add_axes([0.05, 0.05, 0.9, 0.9])
-    ax.axis('off')
-
-    tabela = ax.table(
-        cellText=df_ou.values,
-        colLabels=df_ou.columns,
-        cellLoc='center',
-        loc='center'
-    )
-
-    tabela.auto_set_font_size(False)
-    tabela.set_fontsize(7)      # 👈 tamanho igual ao Poisson
-    tabela.scale(1.1, 1.2)      # 👈 altura e largura das células
-
-    for (row, col), cell in tabela.get_celld().items():
-        cell.set_edgecolor("#DDDDDD")
-        if row == 0:
-            cell.set_facecolor("#F2F2F2")
-            cell.set_text_props(weight='bold')
-
-    st.pyplot(fig, use_container_width=False)
-    plt.close(fig)
-    
-def exibir_matriz(matriz, home, away, titulo):
-    df = pd.DataFrame(
-        matriz,
-        index=[str(i) for i in range(matriz.shape[0])],
-        columns=[str(i) for i in range(matriz.shape[1])]
-    )
-
-    st.subheader(titulo)
-
-    fig = plt.figure(figsize=(3.2, 2.8), dpi=120)
-    ax = fig.add_axes([0.12, 0.18, 0.78, 0.72])
-
-    sns.heatmap(
-        df,
-        annot=True,
-        fmt=".1f",
-        cmap="RdYlGn",
-        square=True,
-        cbar=False,
-        linewidths=0.3,
-        annot_kws={"size": 7},
-        ax=ax
-    )
-
-    ax.set_xlabel(away, fontsize=8)
-    ax.set_ylabel(home, fontsize=8)
-    ax.tick_params(labelsize=7)
-
-    st.pyplot(fig, use_container_width=False)
-    plt.close(fig)
-
-
-def top_placares(matriz, n=6):
-    df = pd.DataFrame(matriz)
-    m = df.reset_index().melt(id_vars="index")
-    m.columns = ["Gols_Home", "Gols_Away", "Probabilidade%"]
-
-    m = (
-        m.sort_values("Probabilidade%", ascending=False)
-        .head(n)
-        .reset_index(drop=True)
-    )
-
-    m["Probabilidade%"] = m["Probabilidade%"].map(lambda x: f"{x:.2f}%")
-    return m
+        
 # =========================================
-# ⚽ MÉTRICAS OFENSIVAS SKYNET
+# ESTATÍSTICAS DO SCORE (CONSENSO)
 # =========================================
-
-def eficiencia_finalizacao(chutes_por_gol):
-    if chutes_por_gol == 0:
-        return 0
-    return (1 / chutes_por_gol) * 100
-
-
-def ajustar_exg_por_eficiencia(exg, ief, media_liga=30):
-    fator = ief / media_liga
-    return exg * fator
-
-
-def time_letal(ief, exg):
-    return ief > 45 and exg > 1.2
-
-
-def over_valor_oculto(ief_home, ief_away, exg_total):
-    return (ief_home + ief_away) > 80 and exg_total > 2.2
-
-
-def anti_xg(gols, exg):
-    if exg == 0:
-        return 0
-    return gols / exg
-
-
-def score_ofensivo(ief, exg, finalizacoes):
-    score = (ief*0.4) + (exg*20*0.4) + (finalizacoes*0.2)
-    return min(round(score,1), 99)
-
-
-def rank_time(score):
-    if score > 85: return "S"
-    if score > 75: return "A"
-    if score > 65: return "B"
-    if score > 55: return "C"
-    return "D"
-
-# =========================================
-# RADAR PROFISSIONAL
-# =========================================
-import numpy as np
-import matplotlib.pyplot as plt
-
-def radar_profissional(valores, titulo="Radar Ofensivo", cor="#00E5FF"):
-    labels = [
-    "Eficiência",
-    "ExG",
-    "Finalizações",
-    "Precisão",
-    "BTTS"
-]
-    valores = np.array(valores)
-    angulos = np.linspace(0, 2*np.pi, len(labels), endpoint=False)
-
-    valores = np.concatenate((valores, [valores[0]]))
-    angulos = np.concatenate((angulos, [angulos[0]]))
-
-    fig = plt.figure(figsize=(4,4), facecolor="#0e1117")
-    ax = fig.add_subplot(111, polar=True)
-    ax.set_facecolor("#0e1117")
-
-    ax.set_ylim(0, 100)
-    ax.plot(angulos, valores, linewidth=2, color=cor)
-
-    ax.fill(angulos, valores, alpha=0.25, color=cor)
-
-    ax.set_xticks(angulos[:-1])
-    ax.set_xticklabels(labels, fontsize=8, color="white")
-
-    ax.tick_params(colors="white")
-    ax.spines["polar"].set_color("#444")
-
-    ax.set_title(titulo, fontsize=11, color="white")
-
-    return fig
-# =========================================
-# DOMÍNIO OFENSIVO
-# =========================================
-def dominio_ofensivo(home_vals, away_vals):
-    score_home = sum(home_vals)
-    score_away = sum(away_vals)
-
-    if score_home > score_away * 1.15:
-        return "HOME"
-    elif score_away > score_home * 1.15:
-        return "AWAY"
-    else:
-        return "EQUILIBRADO"
-
-
-# =========================================
-# RADAR ESTILO FIFA
-# =========================================
-def radar_fifa(valores, titulo="Atributos Ofensivos"):
-    return radar_profissional(valores, titulo, "#FFD166")
-
-
-# =========================================
-# SCORE GERAL DO JOGO
-# =========================================
-def score_jogo(home_vals, away_vals):
-    s_home = sum(home_vals)/len(home_vals)
-    s_away = sum(away_vals)/len(away_vals)
-    total = (s_home + s_away) / 2
-    return round(total,1)
-
-
-# =========================================
-# TENDÊNCIA DE GOLS
-# =========================================
-def tendencia_gols(ief_home, ief_away, exg_total):
-    if exg_total > 2.6 and (ief_home + ief_away) > 70:
-        return "ALTÍSSIMA"
-    elif exg_total > 2.2:
-        return "ALTA"
-    elif exg_total > 1.8:
-        return "MODERADA"
-    else:
-        return "BAIXA"
-
-# =========================================
-# LEITURA OFENSIVA
-# =========================================
-def leitura_ofensiva(nome, eficiencia, exg, finalizacoes, precisao, btts):
-    
-    texto = f"{nome}\n\n"
-
-    if eficiencia > 50:
-        texto += "✔ Eficiência alta\n"
-    elif eficiencia > 35:
-        texto += "✔ Eficiência média\n"
-    else:
-        texto += "✔ Eficiência baixa\n"
-
-    if exg > 70:
-        texto += "✔ ExG muito alto\n"
-    elif exg > 45:
-        texto += "✔ ExG moderado\n"
-    else:
-        texto += "✔ ExG baixo\n"
-
-    if finalizacoes < 30:
-        texto += "✔ Poucas finalizações\n"
-    elif finalizacoes > 70:
-        texto += "✔ Muitas finalizações\n"
-    else:
-        texto += "✔ Volume equilibrado\n"
-
-    if precisao > 55:
-        texto += "✔ Alta precisão\n"
-    else:
-        texto += "✔ Precisão média\n"
-
-    if btts < 45:
-        texto += "✔ BTTS baixo\n"
-    else:
-        texto += "✔ BTTS moderado/alto\n"
-
-    texto += "\n🧠 leitura:\n"
-
-    if eficiencia > 50 and exg > 60:
-        texto += "👉 cria chances de alta qualidade\n"
-        texto += "🎯🔫 precisa de poucas oportunidades\n"
-        texto += "🎯🔥 perfil letal\n"
-    elif finalizacoes > 70 and eficiencia < 40:
-        texto += "👉 volume alto, qualidade baixa\n"
-        texto += "👉 chuta muito e marca pouco\n"
-    else:
-        texto += "👉 perfil ofensivo equilibrado\n"
-
-    return texto
-
-# =========================================
-# 🔥 RECALIBRA SCORE OFENSIVO (0–100)
-# =========================================
-def recalibrar_0_100(serie):
-    minimo = serie.min()
-    maximo = serie.max()
-
-    if maximo == minimo:
-        return serie * 0
-
-    return ((serie - minimo) / (maximo - minimo)) * 100
-
-
-# =========================================
-# 🎯 CLASSIFICA INTENSIDADE OFENSIVA
-# =========================================
-def classificar_intensidade(score):
-
-    if score < 35:
-        return "❄️🧊 Jogo frio"
-
-    elif score < 60:
-        return "⚡⚽ Equilibrado"
-
-    elif score < 80:
-        return "⚡💥🔥⚽ Pressão ofensiva"
-
-    elif score < 85:
-        return "🔥💣💥⚽ Jogo Quente"
-
-    else:
-        return "💀💣🔥💥⚽ Jogo Pirotécnico"
-
-# =========================================
-# LEITURA OFENSIVA
-# =========================================
-def leitura_consenso(nome, radar_vals):
-
-    eficiencia, exg, finalizacoes, precisao, btts = radar_vals
-
-    linhas = []
-
-    # Eficiência
-    if eficiencia > 50:
-        linhas.append("✓ Eficiência ofensiva alta")
-    elif eficiencia > 35:
-        linhas.append("✓ Eficiência ofensiva média")
-    else:
-        linhas.append("✓ Eficiência ofensiva baixa")
-
-    # Criação
-    if exg > 70:
-        linhas.append("✓ Criação de chances muito alta")
-    elif exg > 45:
-        linhas.append("✓ Criação ofensiva moderada")
-    else:
-        linhas.append("✓ Baixa criação ofensiva")
-
-    # Volume
-    if finalizacoes > 70:
-        linhas.append("✓ Volume ofensivo intenso")
-    elif finalizacoes < 30:
-        linhas.append("✓ Poucas finalizações")
-    else:
-        linhas.append("✓ Volume equilibrado")
-
-    # Precisão
-    if precisao > 55:
-        linhas.append("✓ Alta precisão nas finalizações")
-    else:
-        linhas.append("✓ Precisão mediana")
-
-    # Perfil do jogo
-    if btts > 60:
-        linhas.append("✓ Jogos abertos com frequência")
-    else:
-        linhas.append("✓ Tendência a jogos controlados")
-
-    # 🧠 leitura final
-    if eficiencia > 50 and exg > 60:
-        leitura = "👉 time cria chances claras\n👉 perfil ofensivo letal"
-
-    elif finalizacoes > 70 and eficiencia < 40:
-        leitura = "👉 volume alto com baixa qualidade"
-
-    elif exg < 40:
-        leitura = "👉 dificuldade para criar oportunidades"
-
-    else:
-        leitura = "👉 perfil ofensivo equilibrado"
-
-    texto = "\n".join(linhas)
-
-    return f"""
-**{nome}**
-
-{texto}
-
-🧠 leitura:
-{leitura}
-"""
-
-# =========================================
-# RADAR COMPARATIVO
-# =========================================
-def radar_comparativo(home_vals, away_vals, home, away):
-
-    labels = [
-        "Eficiência",
-        "ExG",
-        "Finalizações",
-        "Precisão",
-        "BTTS"
-    ]
-
-    home_vals = np.array(home_vals, dtype=float)
-    away_vals = np.array(away_vals, dtype=float)
-
-    if len(home_vals) != len(labels):
-        st.error(f"Radar HOME inválido: {len(home_vals)} valores")
-        return
-
-    if len(away_vals) != len(labels):
-        st.error(f"Radar AWAY inválido: {len(away_vals)} valores")
-        return
-
-    angulos = np.linspace(0, 2*np.pi, len(labels), endpoint=False)
-    angulos = np.concatenate((angulos, [angulos[0]]))
-
-    home_vals = np.concatenate((home_vals, [home_vals[0]]))
-    away_vals = np.concatenate((away_vals, [away_vals[0]]))
-
-    fig = plt.figure(figsize=(3.2, 2.8), dpi=120, facecolor="#0e1117")
-    ax = fig.add_subplot(111, polar=True)
-    ax.set_facecolor("#0e1117")
-
-    # HOME azul
-    ax.plot(angulos, home_vals, linewidth=2, color="#00BFFF")
-    ax.fill(angulos, home_vals, alpha=0.25, color="#00BFFF")
-
-    # AWAY laranja
-    ax.plot(angulos, away_vals, linewidth=2, color="#FF7A00")
-    ax.fill(angulos, away_vals, alpha=0.18, color="#FF7A00")
-
-    ax.set_xticks(angulos[:-1])
-    ax.set_xticklabels(labels, fontsize=7, color="white")
-
-    ax.set_ylim(0, 100)
-
-    ax.tick_params(axis='y', labelsize=6, colors="white")
-    ax.spines["polar"].set_color("#444")
-
-    return fig
-
-def radar_consenso(radars):
-    return np.mean(radars, axis=0)
-
-def norm_exg(x): 
-    return min(x * 40, 100)
-
-def norm_shots(x): 
-    return min((x / 15) * 100, 100)
-
-
-#CARDS
-def cards_ofensivos(radar_home, radar_away, ief_home, ief_away, exg_total):
-    
-    dominio = dominio_ofensivo(radar_home, radar_away)
-
-    if dominio == "HOME":
-        st.success("⚔️ Domínio Ofensivo: HOME")
-    elif dominio == "AWAY":
-        st.error("⚔️ Domínio Ofensivo: AWAY")
-    else:
-        st.warning("⚖️ Jogo equilibrado")
-
-    if time_letal(ief_home, exg_total/2):
-        st.success("💀🔥⚽ Home LETAL hoje")
-
-    if time_letal(ief_away, exg_total/2):
-        st.success("💀🔥⚽ Away LETAL hoje")
-
-    # score = score_jogo(radar_home, radar_away)
-
-    tendencia = tendencia_gols(ief_home, ief_away, exg_total)
-
-    if tendencia == "ALTÍSSIMA":
-        st.error("🚨🔥⚽🚨🔥⚽ Altíssima tendência de gols")
-    elif tendencia == "ALTA":
-        st.warning("🔥⚽🔥⚽ Tendência alta de gols")
-    else:
-        st.info(f"Tendência: {tendencia}")
-
-# =========================================
-# SCORE DEFENSIVO BASE
-# =========================================
-def score_defensivo(fd, clean_sheet, chs, mgc):
-
-    if pd.isna(fd): fd = 50
-    if pd.isna(clean_sheet): clean_sheet = 30
-    if pd.isna(chs) or chs == 0: chs = 10
-    if pd.isna(mgc) or mgc == 0: mgc = 1
-
-    resistencia = min((chs / 15) * 100, 100)
-    concessao = max(0, 100 - (mgc * 40))
-
-    score = (
-        fd * 0.35 +
-        clean_sheet * 0.25 +
-        resistencia * 0.20 +
-        concessao * 0.20
-    )
-
-    return round(score,1)
-
-
-def classificar_defesa(score):
-
-    if score >= 60:
-        return "⛰️🚫⚽ Defesa MUITO sólida"
-
-    elif score >= 55:
-        return "🛡️🚫⚽ Defesa confiável"
-
-    elif score >= 45:
-        return "⚠️🚫⚽ Defesa instável"
-
-    else:
-        return "🔥🔥🔥⚽⚽⚽Defesa vulnerável"
-
-# 🎨 BTTS (NOVO)
-def calcular_btts_e_odd(matriz):
-    # matriz deve estar em PROBABILIDADE (0–1), NÃO %
-    btts_prob = sum(
-        matriz[i][j]
-        for i in range(1, matriz.shape[0])
-        for j in range(1, matriz.shape[1])
-    )
-
-    btts_pct = btts_prob * 100
-    odd_justa = round(1 / btts_prob, 2) if btts_prob > 0 else np.nan
-
-    return btts_pct, odd_justa
-    
-# =========================================
-# 🎨 ESTILO CARDS (NOVO)
-# =========================================
-def cor_card(txt):
-    if not isinstance(txt, str):
-        return "#2b2b2b"
-
-    txt = txt.lower()
-
-    if "domínio" in txt:
-        return "#123524"   # verde
-    if "favorito" in txt:
-        return "#3a3a1a"   # amarelo
-    if "btts" in txt or "aberto" in txt or "caos" in txt:
-        return "#3a1414"   # vermelho
-
-    return "#2b2b2b"       # neutro
-
-
-def calcular_score(row):
-    try:
-        ph = 1 / row["Odd_Justa_Home"]
-        pa = 1 / row["Odd_Justa_Away"]
-
-        edge = abs(ph - pa)
-
-        score = edge * 20   # normaliza 0–10
-        return round(min(score, 10), 2)
-
-    except:
-        return 0
-# =========================================
-# 🎯 CARD REUTILIZÁVEL (BANNER INTERPRETAÇÃO)
-# =========================================
-def mostrar_card(df_base, jogo):
-
-    if "Interpretacao" not in df_base.columns:
-        return
-
-    linha = df_base[df_base["JOGO"] == jogo]
-    if linha.empty:
-        return
-
-    row = linha.iloc[0]
-
-    score = calcular_score(row)
-    estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
-    cor = cor_card(row["Interpretacao"])
-
-    card = f"""
-    <div style="background:{cor};
-                padding:18px;
-                border-radius:14px;
-                box-shadow:0 0 10px rgba(0,0,0,0.45);
-                color:white;
-                font-size:18px;
-                font-weight:600;
-                margin-bottom:18px;">
-        🧠 {row["Interpretacao"]}
-        <br>
-        <span style="font-size:26px;">{estrelas}</span>
-    </div>
-    """
-
-    st.markdown(card, unsafe_allow_html=True)
-
 media_score = df_mgf["Score_Ofensivo"].mean()
 desvio_score = df_mgf["Score_Ofensivo"].std()
 
@@ -988,89 +266,28 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "⚔️⚽ ATK x DEF",
 "💎⚽ VG"
 ])
+
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
-with tab1:
-
-    home = linha_exg["Home_Team"]
-    away = linha_exg["Visitor_Team"]
-
-    esc_home = escudo_time_base64(home)
-    esc_away = escudo_time_base64(away)
-
-    liga = linha_exg.get("League", "")
-    hora = linha_exg.get("Time", "")
-
-    gh = linha_exg.get("Result Home", "")
-    ga = linha_exg.get("Result Visitor", "")
-    gh_ht = linha_exg.get("Result_Home_HT", "")
-    ga_ht = linha_exg.get("Result_Visitor_HT", "")
-
-    st.markdown(
-f"""
-<div style="text-align:center">
-
-<div style="font-size:20px; opacity:0.8;">
-🏆 {liga}
-</div>
-
-<div style="font-size:18px; margin-bottom:8px;">
-{hora}
-</div>
-
-<div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:20px 0;">
-
-<div>
-<img src="{esc_home}" width="70">
-<div style="font-size:18px; font-weight:700;">{home}</div>
-</div>
-
-<div style="font-size:26px; font-weight:900;">
-{gh} x {ga}
-</div>
-
-<div>
-<img src="{esc_away}" width="70">
-<div style="font-size:18px; font-weight:700;">{away}</div>
-</div>
-
-</div>
-
-<div style="font-size:14px; opacity:0.7;">
-HT: {gh_ht} x {ga_ht}
-</div>
-
-</div>
-""",
-unsafe_allow_html=True
-)
-
-    st.markdown("---")
-
-    # 👇 continua normal
     st.markdown("### 🎯 Odds")
 
-    o1, o2, o3 = st.columns(3)
+o1, o2, o3 = st.columns(3)
 
-    with o1:
-        ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
-        st.metric("Odds Casa", linha_exg["Odds_Casa"])
+with o1:
+    st.metric("Odds Casa", linha_exg["Odds_Casa"])
+    st.metric("Odd Over 1.5", linha_exg["Odd_Over_1,5FT"])
+    st.metric("VR01", get_val(linha_exg, "VR01", "{:.2f}"))
 
-        st.metric("Odd_Over_1,5FT", linha_exg["Odd_Over_1,5FT"])
-        st.metric("VR01", get_val(linha_exg, "VR01", "{:.2f}"))
+with o2:
+    st.metric("Odds Empate", linha_exg["Odds_Empate"])
+    st.metric("Odd Over 2.5", linha_exg["Odds_Over_2,5FT"])
+    st.metric("COEF_OVER1FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
 
-    with o2:
-        ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
-        st.metric("Odds Empate", linha_exg["Odds_Empate"])
-        st.metric("Odds_Over_2,5FT", linha_exg["Odds_Over_2,5FT"])
-        st.metric("COEF_OVER1FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
-
-    with o3:
-        ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
-        st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
-        st.metric("Odds_Under_2,5FT", linha_exg["Odds_Under_2,5FT"])
-        st.metric("Odd_BTTS_YES", linha_exg["Odd_BTTS_YES"])
+with o3:
+    st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
+    st.metric("Odd Under 2.5", linha_exg["Odds_Under_2,5FT"])
+    st.metric("BTTS Yes", linha_exg["Odd_BTTS_YES"])
 
     st.markdown("---")
 
@@ -1306,25 +523,29 @@ unsafe_allow_html=True
         lambda_home + lambda_away
     )
 
-    # =============================
-    # ⚡ CARD HT
-    # =============================
-    jogo_ht = df_ht[df_ht["JOGO"] == jogo]
+# =============================
+# ⚡ CARD HT
+# =============================
+jogo_ht = df_ht[df_ht["JOGO"] == jogo]
 
-    if not jogo_ht.empty:
+if not jogo_ht.empty:
 
-        ht = jogo_ht.iloc[0]
+    ht = jogo_ht.iloc[0]
 
-        st.info(
-            f"""⚡ Probabilidade de Gol no 1º Tempo
+    selo_ht = ht.get("Selo_HT", "")
+    if pd.isna(selo_ht):
+        selo_ht = ""
+
+    st.info(
+        f"""⚡ Probabilidade de Gol no 1º Tempo
 
 🔥 Gol HT: {ht['Prob_Gol_HT']}%   |   ❄️ 0x0 HT: {ht['Prob_0x0_HT']}%
 
 🏠 Home marca HT: {ht['Gol_HT_Home_%']}%   |   ✈️ Away marca HT: {ht['Gol_HT_Away_%']}%
 
-{ht['Selo_HT']}
+{selo_ht}
 """
-        )
+    )
     
     # =========================================
     # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
@@ -1783,37 +1004,5 @@ with tab5:
         radar_home_vg[0],
         radar_away_vg[0],
         linha_vg["ExG_Home_VG"] + linha_vg["ExG_Away_VG"]
-    )
-
-    
-    st.markdown("### 🧱 Defesa Probabilística")
-
-    def_home = linha_vg["Clean_Sheet_Home_%"]
-    def_away = linha_vg["Clean_Sheet_Away_%"]
-
-    c1, c2 = st.columns(2)
-
-    with c1:
-        st.metric(linha_vg["Home_Team"], round(def_home,1))
-        st.info(classificar_defesa(def_home))
-
-    with c2:
-        st.metric(linha_vg["Visitor_Team"], round(def_away,1))
-        st.info(classificar_defesa(def_away))
-
-    st.markdown("### 🧠 Leitura de Valor Ofensivo")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.info(leitura_ofensiva(
-            linha_vg["Home_Team"],
-            *radar_home_vg
-        ))
-
-    with col2:
-        st.info(leitura_ofensiva(
-            linha_vg["Visitor_Team"],
-            *radar_away_vg
-        ))
-
+    )       
+    st.markdown("---")
