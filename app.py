@@ -182,47 +182,6 @@ ul[role="listbox"] li {
 """, unsafe_allow_html=True)
 
 
-# =========================================
-# 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
-# =========================================
-ASSETS = Path("assets")
-
-BANNERS = sorted(str(p) for p in ASSETS.glob("banner*.*"))
-
-if not BANNERS:
-    st.warning("⚠️ Coloque imagens em /assets/banner1.png, banner2.png ...")
-
-else:
-    total = len(BANNERS)
-
-    # autoplay (a cada 2 min)
-    refresh_count = st_autorefresh(interval=120000, key="banner_refresh")
-
-    # inicia estado
-    if "banner_idx" not in st.session_state:
-        st.session_state.banner_idx = 0
-
-    # autoplay só incrementa (não sobrescreve)
-    if refresh_count:
-        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
-
-    c1, c2, c3 = st.columns([1, 8, 1])
-
-    # ◀
-    with c1:
-        if st.button("◀", use_container_width=True):
-            st.session_state.banner_idx = (st.session_state.banner_idx - 1) % total
-
-    # ▶
-    with c3:
-        if st.button("▶", use_container_width=True):
-            st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
-
-    c1, c2, c3 = st.columns([1,2,1])
-
-with c2:
-    st.image(BANNERS[st.session_state.banner_idx], width=800)
-
 
 # =========================================
 # HÍBRIDO — ARQUIVO PADRÃO + UPLOAD OPCIONAL
@@ -988,10 +947,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 # 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
 # =========================================
-import streamlit as st
-from pathlib import Path
-from streamlit_autorefresh import st_autorefresh
-
 ASSETS = Path("assets")
 
 BANNERS = sorted(str(p) for p in ASSETS.glob("banner*.*"))
