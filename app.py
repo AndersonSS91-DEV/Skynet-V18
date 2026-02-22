@@ -120,13 +120,13 @@ div[data-testid="stDataFrame"] th {
     font-size: 20px !important;
 }
 
+/* ===== TABELAS DATAFRAME ===== */
 
-st.markdown("""
-<style>
-button[data-baseweb="tab"] {
-    font-size: 18px;
-    font-weight: 600;
-    padding: 10px 18px;
+div[data-testid="stDataFrame"] table {
+    font-size: 22px !important;
+}
+div[data-testid="stDataFrame"] th {
+    font-size: 20px !important;
 }
 
 </style>
