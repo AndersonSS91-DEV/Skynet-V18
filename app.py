@@ -1062,11 +1062,10 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
 st.markdown("---")
 
     # 👇 ESTA LINHA DEVE TER ESTE RECUO
-    st.markdown("### 🎯 Odds")
+st.markdown("### 🎯 Odds")
 
     sp1, main, sp2 = st.columns([1,6,1])
 
