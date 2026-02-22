@@ -1038,8 +1038,7 @@ with col_away:
 
 st.markdown("---")
 
-    # ODDS
-    st.markdown("### 🎯 Odds")
+st.markdown("### 🎯 Odds"))
     o1, o2, o3 = st.columns(3)
 
     with o1:
