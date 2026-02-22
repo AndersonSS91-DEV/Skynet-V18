@@ -976,63 +976,67 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
+# =========================================
+# ABA 1 — RESUMO
+# =========================================
 with tab1:
 
     home = linha_exg["Home_Team"]
-away = linha_exg["Visitor_Team"]
+    away = linha_exg["Visitor_Team"]
 
-esc_home = escudo_time(home)
-esc_away = escudo_time(away)
+    esc_home = escudo_time(home)
+    esc_away = escudo_time(away)
 
-liga = linha_exg.get("League", "")
-hora = linha_exg.get("Time", "")
+    liga = linha_exg.get("League", "")
+    hora = linha_exg.get("Time", "")
 
-gh = linha_exg.get("Result Home", "")
-ga = linha_exg.get("Result Visitor", "")
-gh_ht = linha_exg.get("Result_Home_HT", "")
-ga_ht = linha_exg.get("Result_Visitor_HT", "")
+    gh = linha_exg.get("Result Home", "")
+    ga = linha_exg.get("Result Visitor", "")
+    gh_ht = linha_exg.get("Result_Home_HT", "")
+    ga_ht = linha_exg.get("Result_Visitor_HT", "")
 
-st.markdown(
-    f"""
-    <div style="text-align:center">
+    st.markdown(
+        f"""
+        <div style="text-align:center">
 
-        <div style="font-size:20px; opacity:0.8;">
-            🏆 {liga}
-        </div>
-
-        <div style="font-size:18px; margin-bottom:8px;">
-            {hora}
-        </div>
-
-        <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:20px 0;">
-
-            <div>
-                <img src="{esc_home}" width="70">
-                <div style="font-size:18px; font-weight:700;">{home}</div>
+            <div style="font-size:20px; opacity:0.8;">
+                🏆 {liga}
             </div>
 
-            <div style="font-size:26px; font-weight:900;">
-                {gh} x {ga}
+            <div style="font-size:18px; margin-bottom:8px;">
+                {hora}
             </div>
 
-            <div>
-                <img src="{esc_away}" width="70">
-                <div style="font-size:18px; font-weight:700;">{away}</div>
+            <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:20px 0;">
+
+                <div>
+                    <img src="{esc_home}" width="70">
+                    <div style="font-size:18px; font-weight:700;">{home}</div>
+                </div>
+
+                <div style="font-size:26px; font-weight:900;">
+                    {gh} x {ga}
+                </div>
+
+                <div>
+                    <img src="{esc_away}" width="70">
+                    <div style="font-size:18px; font-weight:700;">{away}</div>
+                </div>
+
             </div>
 
-        </div>
+            <div style="font-size:14px; opacity:0.7;">
+                HT: {gh_ht} x {ga_ht}
+            </div>
 
-        <div style="font-size:14px; opacity:0.7;">
-            HT: {gh_ht} x {ga_ht}
-        </div>
         </div>
         """,
-        unsafe_allow_html=True)    
-        
+        unsafe_allow_html=True
+    )
+
     st.markdown("---")
 
-
-    # 👇 AQUI CONTINUA SUA ABA NORMAL
+    # 👇 continua normal
     st.markdown("### 🎯 Odds")
 
     o1, o2, o3 = st.columns(3)
