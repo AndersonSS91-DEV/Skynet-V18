@@ -218,7 +218,7 @@ else:
             st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
 
     with c2:
-        st.image(BANNERS[st.session_state.banner_idx], use_container_width=True)
+        st.image(BANNERS[st.session_state.banner_idx], width=500)
 
 
 # =========================================
