@@ -1269,22 +1269,24 @@ with tab1:
 
 
     cards_ofensivos(
-    radar_home_consenso,
-    radar_away_consenso,
-    radar_home_consenso[0],   # eficiência home
-    radar_away_consenso[0],   # eficiência away
-    lambda_home + lambda_away
-)     
+        radar_home_consenso,
+        radar_away_consenso,
+        radar_home_consenso[0],   # eficiência home
+        radar_away_consenso[0],   # eficiência away
+        lambda_home + lambda_away
+    )
 
-# =============================
-# ⚡ CARD HT
-# =============================
+    # =============================
+    # ⚡ CARD HT
+    # =============================
     jogo_ht = df_ht[df_ht["JOGO"] == jogo]
-    if not jogo_ht.empty:
-    ht = jogo_ht.iloc[0]
 
-    st.info(
-    f"""⚡ Probabilidade de Gol no 1º Tempo
+    if not jogo_ht.empty:
+
+        ht = jogo_ht.iloc[0]
+
+        st.info(
+            f"""⚡ Probabilidade de Gol no 1º Tempo
 
 🔥 Gol HT: {ht['Prob_Gol_HT']}%   |   ❄️ 0x0 HT: {ht['Prob_0x0_HT']}%
 
@@ -1292,7 +1294,7 @@ with tab1:
 
 {ht['Selo_HT']}
 """
-)
+        )
     
     # =========================================
     # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
