@@ -239,7 +239,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
-st.markdown("### 🎯 Odds")
+    st.markdown("### 🎯 Odds")
 
 o1, o2, o3 = st.columns(3)
 
