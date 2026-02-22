@@ -959,8 +959,7 @@ with tab1:
             """,
             unsafe_allow_html=True
         )
-
-    
+        
     st.markdown("---")
 
 
@@ -1128,35 +1127,35 @@ with tab1:
         "Over/Under — Consenso"
     )
 
-    st.subheader("⚡ Probabilidades HT")
+# =============================
+# ⚡ CARD HT
+# =============================
 
-    st.dataframe(
-        df_ht[[
-            "League",
-            "Home_Team",
-            "Visitor_Team",
-            "Prob_Gol_HT",
-            "Prob_0x0_HT",
-            "Gol_HT_Home_%",
-            "Gol_HT_Away_%",
-            "Selo_HT"
-        ]],
-        use_container_width=True
-    )
+jogo_ht = df_ht[df_ht["JOGO"] == jogo]
 
-    st.markdown("### 🔥 Jogos com maior probabilidade de gol HT")
+if not jogo_ht.empty:
 
-    top_ht = df_ht.sort_values("Prob_Gol_HT", ascending=False).head(5)
+    ht = jogo_ht.iloc[0]
 
-    for _, row in top_ht.iterrows():
-        st.markdown(f"""
-### ⚡ {row['Home_Team']} x {row['Visitor_Team']}
+    st.markdown(f"""
+    <div style="
+        background: linear-gradient(90deg,#0f2027,#203a43,#2c5364);
+        padding:14px;
+        border-radius:10px;
+        margin-top:10px;
+        margin-bottom:10px;
+        font-size:18px;
+    ">
+    ⚡ <b>Probabilidade de Gol no 1º Tempo</b><br>
+    🔥 Gol HT: <b>{ht['Prob_Gol_HT']}%</b> &nbsp;&nbsp;
+    ❄️ 0x0 HT: <b>{ht['Prob_0x0_HT']}%</b><br>
+    🏠 Home marca: <b>{ht['Gol_HT_Home_%']}%</b> &nbsp;&nbsp;
+    ✈️ Away marca: <b>{ht['Gol_HT_Away_%']}%</b><br>
+    <b>{ht['Selo_HT']}</b>
+    </div>
+    """, unsafe_allow_html=True)
 
-🔥 Prob Gol HT: **{row['Prob_Gol_HT']}%**  
-🏠 Home marca: **{row['Gol_HT_Home_%']}%**  
-✈️ Away marca: **{row['Gol_HT_Away_%']}%**  
-{row['Selo_HT']}
-""")
+
     # =========================================
     # 🎯 RADAR CONSENSO
     # =========================================
