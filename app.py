@@ -23,9 +23,13 @@ st.set_page_config(
     page_title="⚽🏆Poisson Skynet🏆⚽",
     layout="wide"
 )
-
-st.title("⚽🏆 Poisson Skynet 🏆⚽")
-
+st.markdown(
+    """
+    <h1 style="text-align:center;">⚽🏆 Poisson Skynet 🏆⚽</h1>
+    <hr style="width:560px; margin:auto; border:4px solid #FFD700;">
+    """,
+    unsafe_allow_html=True
+)
 st.markdown("""
 <style>
 
@@ -119,8 +123,64 @@ div[data-testid="stDataFrame"] table {
 div[data-testid="stDataFrame"] th {
     font-size: 20px !important;
 }
+
+/* ===== TABELAS DATAFRAME ===== */
+
+div[data-testid="stDataFrame"] table {
+    font-size: 22px !important;
+}
+div[data-testid="stDataFrame"] th {
+    font-size: 20px !important;
+}
+
+/* texto do valor selecionado */
+div[data-baseweb="select"] div {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+}
+
+/* opções dentro da lista */
+ul[role="listbox"] li {
+    font-size: 16px !important;
+}
+
+button[aria-selected="true"] {
+    font-size: 22px !important;
+    color: #00E5FF !important;
+}
+
+button[data-baseweb="tab"][aria-selected="true"] * {
+    font-size: 26px !important;
+    color: #00E5FF !important;
+}
+/* ===== SELECTBOX TAMANHO ===== */
+
+/* caixa externa */
+div[data-baseweb="select"] {
+    min-height: 55px !important;
+}
+
+/* área clicável */
+div[data-baseweb="select"] > div {
+    min-height: 55px !important;
+    display: flex;
+    align-items: center;
+}
+
+/* texto selecionado */
+div[data-baseweb="select"] span {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+}
+
+/* itens do dropdown */
+ul[role="listbox"] li {
+    font-size: 18px !important;
+    padding: 10px !important;
+}
 </style>
 """, unsafe_allow_html=True)
+
 
 # =========================================
 # 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
@@ -162,8 +222,10 @@ else:
         if st.button("▶", use_container_width=True):
             st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
 
-    with c2:
-        st.image(BANNERS[st.session_state.banner_idx], use_container_width=True)
+    c1, c2, c3 = st.columns([1,2,1])
+
+with c2:
+    st.image(BANNERS[st.session_state.banner_idx], width=800)
 
 
 # =========================================
@@ -269,20 +331,29 @@ jogos_lista = df_mgf["JOGO"].tolist()
 if "jogo" not in st.session_state or st.session_state["jogo"] not in jogos_lista:
     st.session_state["jogo"] = jogos_lista[0]
 
-jogo = st.selectbox("⚽ Escolha o jogo", jogos_lista)
+st.markdown("### ⚽ Escolha o jogo")
+jogo = st.selectbox(label="",options=jogos_lista)
 linha_mgf = df_mgf[df_mgf["JOGO"] == jogo].iloc[0]
 linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
-linha_vg  = df_vg[df_vg["JOGO"] == jogo].iloc[0]  # <<< FALTAVA ISSO
+linha_vg  = df_vg[df_vg["JOGO"] == jogo].iloc[0]
+linha_ht  = df_ht[df_ht["JOGO"] == jogo].iloc[0]  # ✅ ADICIONE ESTA
 
 st.session_state["jogo"] = jogo
 # =========================================
 # FUNÇÕES AUX
 # =========================================
+def escudo_time(nome):
+    caminho = f"assets/escudos/{nome.lower()}.png"
+    if os.path.exists(caminho):
+        return caminho
+    return "assets/escudos/default.png"
+
+
 def get_val(linha, col, fmt=None, default="—"):
     if col in linha.index and pd.notna(linha[col]):
         try:
             return fmt.format(linha[col]) if fmt else linha[col]
-        except Exception:
+        except:
             return default
     return default
 
@@ -290,7 +361,7 @@ def get_val(linha, col, fmt=None, default="—"):
 def calc_ev(odd_real, odd_justa):
     try:
         return (odd_real / odd_justa) - 1
-    except Exception:
+    except:
         return None
 
 
@@ -345,7 +416,7 @@ def mostrar_over_under(matriz, titulo):
     )
 
     tabela.auto_set_font_size(False)
-    tabela.set_fontsize(8)      # 👈 tamanho igual ao Poisson
+    tabela.set_fontsize(7)      # 👈 tamanho igual ao Poisson
     tabela.scale(1.1, 1.2)      # 👈 altura e largura das células
 
     for (row, col), cell in tabela.get_celld().items():
@@ -901,70 +972,67 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "⚔️⚽ ATK x DEF",
 "💎⚽ VG"
 ])
-
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
 
-    st.markdown("### 🏁 Resultado")
+    home = linha_exg["Home_Team"]
+    away = linha_exg["Visitor_Team"]
 
-    gh = linha_exg.get("Result Home")
-    ga = linha_exg.get("Result Visitor")
-    gh_ht = linha_exg.get("Result_Home_HT")
-    ga_ht = linha_exg.get("Result_Visitor_HT")
+    esc_home = escudo_time(home)
+    esc_away = escudo_time(away)
 
-    if pd.notna(gh) and pd.notna(ga):
+    liga = linha_exg.get("League", "")
+    hora = linha_exg.get("Time", "")
 
-        gh = int(gh)
-        ga = int(ga)
-        gh_ht = int(gh_ht) if pd.notna(gh_ht) else 0
-        ga_ht = int(ga_ht) if pd.notna(ga_ht) else 0
+    gh = linha_exg.get("Result Home", "")
+    ga = linha_exg.get("Result Visitor", "")
+    gh_ht = linha_exg.get("Result_Home_HT", "")
+    ga_ht = linha_exg.get("Result_Visitor_HT", "")
 
-        home = linha_exg["Home_Team"]
-        away = linha_exg["Visitor_Team"]
+    st.markdown(
+f"""
+<div style="text-align:center">
 
-        if gh > ga:
-            home_display = f"🔵 {home}"
-            away_display = away
-        elif ga > gh:
-            home_display = home
-            away_display = f"🔵 {away}"
-        else:
-            home_display = home
-            away_display = away
+<div style="font-size:20px; opacity:0.8;">
+🏆 {liga}
+</div>
 
-        st.markdown(
-            f"""
-            <div style="font-size:26px; font-weight:700; margin-bottom:16px;">
-                {home_display} {gh} x {ga} {away_display}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+<div style="font-size:18px; margin-bottom:8px;">
+{hora}
+</div>
 
-        st.markdown(
-            """
-            <div style="font-size:14px; margin-bottom:6px; opacity:0.6;">
-                Resultado HT
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+<div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:20px 0;">
 
-        st.markdown(
-            f"""
-            <div style="font-size:24px; font-weight:700;">
-                {home} {gh_ht} x {ga_ht} {away}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        
+<div>
+<img src="{esc_home}" width="70">
+<div style="font-size:18px; font-weight:700;">{home}</div>
+</div>
+
+<div style="font-size:26px; font-weight:900;">
+{gh} x {ga}
+</div>
+
+<div>
+<img src="{esc_away}" width="70">
+<div style="font-size:18px; font-weight:700;">{away}</div>
+</div>
+
+</div>
+
+<div style="font-size:14px; opacity:0.7;">
+HT: {gh_ht} x {ga_ht}
+</div>
+
+</div>
+""",
+unsafe_allow_html=True
+)
+
     st.markdown("---")
 
-
-    # 👇 AQUI CONTINUA SUA ABA NORMAL
+    # 👇 continua normal
     st.markdown("### 🎯 Odds")
 
     o1, o2, o3 = st.columns(3)
@@ -1012,6 +1080,8 @@ with tab1:
         st.metric("Chutes H (Marcar)", get_val(linha_mgf, "CHM", "{:.2f}"))
         st.metric("MGF_H", get_val(linha_mgf, "MGF_H", "{:.2f}"))
         st.metric("CV_GF_H", get_val(linha_mgf, "CV_GF_H", "{:.2f}"))
+        st.metric("MGF_HT_Home", get_val(linha_ht, "MGF_HT_Home", "{:.2f}"))
+        st.metric("CV_MGF_HT_Home", get_val(linha_ht, "CV_MGF_HT_Home", "{:.2f}"))
 
     with c4:
         st.metric("Força Ataque Away (%)", get_val(linha_exg, "FAA", "{:.2f}"))
@@ -1019,21 +1089,27 @@ with tab1:
         st.metric("Chutes A (Marcar)", get_val(linha_mgf, "CAM", "{:.2f}"))
         st.metric("MGF_A", get_val(linha_mgf, "MGF_A", "{:.2f}"))
         st.metric("CV_GF_A", get_val(linha_mgf, "CV_GF_A", "{:.2f}"))
-
+        st.metric("MGF_HT_Away", get_val(linha_ht, "MGF_HT_Away", "{:.2f}"))
+        st.metric("CV_MGF_HT_Away", get_val(linha_ht, "CV_MGF_HT_Away", "{:.2f}"))
+                  
     with c5:
         st.metric("Força Defesa Home (%)", get_val(linha_exg, "FDH", "{:.2f}"))
         st.metric("Clean Games Home (%)", get_val(linha_exg, "Clean_Games_H"))
         st.metric("Chutes H (Sofrer)", get_val(linha_mgf, "CHS", "{:.2f}"))
         st.metric("MGC_H", get_val(linha_mgf, "MGC_H", "{:.2f}"))
         st.metric("CV_GC_H", get_val(linha_mgf, "CV_GC_H", "{:.2f}"))
-
+        st.metric("MGC_HT_Home", get_val(linha_ht, "MGC_HT_Home", "{:.2f}"))
+        st.metric("CV_MGC_HT_Home", get_val(linha_ht, "CV_MGC_HT_Home", "{:.2f}"))
+        
     with c6:
         st.metric("Força Defesa Away (%)", get_val(linha_exg, "FDA", "{:.2f}"))
         st.metric("Clean Games Away (%)", get_val(linha_exg, "Clean_Games_A"))
         st.metric("Chutes A (Sofrer)", get_val(linha_mgf, "CAS", "{:.2f}"))
         st.metric("MGC_A", get_val(linha_mgf, "MGC_A", "{:.2f}"))
         st.metric("CV_GC_A", get_val(linha_mgf, "CV_GC_A", "{:.2f}"))
-
+        st.metric("MGC_HT_Away", get_val(linha_ht, "MGC_HT_Away", "{:.2f}"))
+        st.metric("CV_MGC_HT_Away", get_val(linha_ht, "CV_MGC_HT_Away", "{:.2f}"))
+        
     st.markdown("---")
 
     # -------- LINHA 3 — MGF
@@ -1207,29 +1283,32 @@ with tab1:
 
 
     cards_ofensivos(
-    radar_home_consenso,
-    radar_away_consenso,
-    radar_home_consenso[0],   # eficiência home
-    radar_away_consenso[0],   # eficiência away
-    lambda_home + lambda_away
-)
-    # =============================
-# ⚡ CARD HT
-# =============================
-jogo_ht = df_ht[df_ht["JOGO"] == jogo]
-if not jogo_ht.empty:
-    ht = jogo_ht.iloc[0]
+        radar_home_consenso,
+        radar_away_consenso,
+        radar_home_consenso[0],   # eficiência home
+        radar_away_consenso[0],   # eficiência away
+        lambda_home + lambda_away
+    )
 
-    st.info(
-    f"""⚡ Probabilidade de Gol no 1º Tempo
+    # =============================
+    # ⚡ CARD HT
+    # =============================
+    jogo_ht = df_ht[df_ht["JOGO"] == jogo]
+
+    if not jogo_ht.empty:
+
+        ht = jogo_ht.iloc[0]
+
+        st.info(
+            f"""⚡ Probabilidade de Gol no 1º Tempo
 
 🔥 Gol HT: {ht['Prob_Gol_HT']}%   |   ❄️ 0x0 HT: {ht['Prob_0x0_HT']}%
 
-🏠 Home marca: {ht['Gol_HT_Home_%']}%   |   ✈️ Away marca: {ht['Gol_HT_Away_%']}%
+🏠 Home marca HT: {ht['Gol_HT_Home_%']}%   |   ✈️ Away marca HT: {ht['Gol_HT_Away_%']}%
 
 {ht['Selo_HT']}
 """
-)
+        )
     
     # =========================================
     # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
@@ -1242,8 +1321,6 @@ if not jogo_ht.empty:
     st.metric("🔥 Score Ofensivo", f"{score_ofensivo:.0f}")
     st.info(classificar_intensidade(score_ofensivo))
     
-    st.markdown("---")
-
     # =========================================
     # 🛡️🏔️🧤🥅 DEFESA CONSENSO
     # =========================================
@@ -1307,16 +1384,17 @@ if not jogo_ht.empty:
             )
         )
 
+
+
+
 # =========================================
 # ABA 2 — DADOS COMPLETOS
 # =========================================
 with tab2:
     for aba in xls.sheet_names:
         with st.expander(aba):
-            st.dataframe(
-                pd.read_excel(xls, aba),
-                use_container_width=True
-            )
+            df_temp = pd.read_excel(xls, aba)
+            st.dataframe(df_temp, use_container_width=True)
 
 
 # =========================================
