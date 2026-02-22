@@ -144,6 +144,11 @@ button[aria-selected="true"] {
     font-size: 22px !important;
     color: #00E5FF !important;
 }
+
+button[data-baseweb="tab"][aria-selected="true"] * {
+    font-size: 22px !important;
+    color: #00E5FF !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
