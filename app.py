@@ -38,21 +38,13 @@ html, body, [class*="css"]  {
 
 st.markdown("""
 <style>
-
-/* Aumenta fonte das abas */
 button[data-baseweb="tab"] {
     font-size: 18px;
     font-weight: 600;
     padding: 10px 18px;
 }
-
 </style>
 """, unsafe_allow_html=True)
-
-/* aumenta altura das abas */
-button[data-baseweb="tab"] {
-    padding: 10px 18px;
-}
 
 /* ===== Título Principal ===== */
 h1 {
