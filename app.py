@@ -257,13 +257,14 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
-home = linha_exg["Home_Team"]
-away = linha_exg["Visitor_Team"]
+with tab1:
+    home = linha_exg["Home_Team"]
+    away = linha_exg["Visitor_Team"]
 
-esc_home = escudo_time_base64(home)
-esc_away = escudo_time_base64(away)
+    esc_home = escudo_time_base64(home)
+    esc_away = escudo_time_base64(away)
 
-liga = linha_exg.get("League", "")
+    liga = linha_exg.get("League", "")
 
 # ===== placar =====
 gh = linha_exg.get("Result Home")
