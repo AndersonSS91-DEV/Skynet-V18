@@ -1002,53 +1002,33 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
-    home = linha_exg["Home_Team"]
-    away = linha_exg["Visitor_Team"]
 
-    esc_home = escudo_time_base64(home)
-    esc_away = escudo_time_base64(away)
+    # TOPO
+    left, center, right = st.columns([2,1,2])
 
-    liga = linha_exg.get("League", "")
-    hora = linha_exg.get("Time", "")
+    with left:
+        st.image(esc_home, width=90)
+        st.markdown(f"**{home}**")
 
-    gh = linha_exg.get("Result Home")
-    ga = linha_exg.get("Result Visitor")
+    with center:
+        st.markdown(
+            f"<h1 style='text-align:center'>{placar}</h1>",
+            unsafe_allow_html=True
+        )
 
-    if pd.notna(gh) and pd.notna(ga):
-        placar = f"{int(gh)} x {int(ga)}"
-    else:
-        placar = "X"
+    with right:
+        st.image(esc_away, width=90)
+        st.markdown(f"**{away}**")
 
-    hora_html = f'<div style="opacity:0.6;">🕒 {hora}</div>' if hora else ""
+    st.markdown("---")
 
-    st.markdown(f"## 🏆 {liga}")
-
-if hora:
-    st.caption(f"🕒 {hora}")
-
-left, center, right = st.columns([2,1,2])
-
-with left:
-    st.image(esc_home, width=90)
-    st.markdown(f"**{home}**")
-
-with center:
-    st.markdown(
-        f"<h1 style='text-align:center;margin-top:20px'>{placar}</h1>",
-        unsafe_allow_html=True
-    )
-
-with right:
-    st.image(esc_away, width=90)
-    st.markdown(f"**{away}**")
-
-st.markdown("---")
-
-    # 👇 continua normal
+    # 👇 ESTA LINHA DEVE TER ESTE RECUO
     st.markdown("### 🎯 Odds")
 
-    o1, o2, o3 = st.columns(3)
+    sp1, main, sp2 = st.columns([1,6,1])
 
+    with main:
+        o1, o2, o3 = st.columns(3)
     with o1:
         ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
         st.metric("Odds Casa", linha_exg["Odds_Casa"])
