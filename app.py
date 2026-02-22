@@ -1130,31 +1130,33 @@ with tab1:
 
     st.subheader("⚡ Probabilidades HT")
 
-st.dataframe(
-    df_ht[[
-        "League",
-        "Home_Team",
-        "Visitor_Team",
-        "Prob_Gol_HT",
-        "Prob_0x0_HT",
-        "Gol_HT_Home_%",
-        "Gol_HT_Away_%",
-        "Selo_HT"
-    ]],
-    use_container_width=True
+    st.dataframe(
+        df_ht[[
+            "League",
+            "Home_Team",
+            "Visitor_Team",
+            "Prob_Gol_HT",
+            "Prob_0x0_HT",
+            "Gol_HT_Home_%",
+            "Gol_HT_Away_%",
+            "Selo_HT"
+        ]],
+        use_container_width=True
+    )
+
     st.markdown("### 🔥 Jogos com maior probabilidade de gol HT")
 
     top_ht = df_ht.sort_values("Prob_Gol_HT", ascending=False).head(5)
 
-for _, row in top_ht.iterrows():
-    st.markdown(f"""
-    ### ⚡ {row['Home_Team']} x {row['Visitor_Team']}
+    for _, row in top_ht.iterrows():
+        st.markdown(f"""
+### ⚡ {row['Home_Team']} x {row['Visitor_Team']}
 
-    🔥 Prob Gol HT: **{row['Prob_Gol_HT']}%**  
-    🏠 Home marca: **{row['Gol_HT_Home_%']}%**  
-    ✈️ Away marca: **{row['Gol_HT_Away_%']}%**  
-    {row['Selo_HT']}
-    """)
+🔥 Prob Gol HT: **{row['Prob_Gol_HT']}%**  
+🏠 Home marca: **{row['Gol_HT_Home_%']}%**  
+✈️ Away marca: **{row['Gol_HT_Away_%']}%**  
+{row['Selo_HT']}
+""")
     # =========================================
     # 🎯 RADAR CONSENSO
     # =========================================
