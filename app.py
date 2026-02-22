@@ -1,214 +1,234 @@
 # =========================================
-# STREAMLIT — POISSON SKYNET (HÍBRIDO)
+# ⚽🏆 POISSON SKYNET 🏆⚽
 # =========================================
 
 import streamlit as st
 import pandas as pd
 import numpy as np
 import os
-import re
-import glob
 from pathlib import Path
 from scipy.stats import poisson
 import matplotlib.pyplot as plt
 import seaborn as sns
-import plotly.graph_objects as go
-import random
 from streamlit_autorefresh import st_autorefresh
-from PIL import Image
 
 # =========================================
 # CONFIG
 # =========================================
-st.set_page_config(
-    page_title="⚽🏆Poisson Skynet🏆⚽",
-    layout="wide"
-)
-
+st.set_page_config(page_title="⚽🏆Poisson Skynet🏆⚽", layout="wide")
 st.title("⚽🏆 Poisson Skynet 🏆⚽")
 
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
-
-html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif;
-}
-
-h1 { font-size:46px !important; font-weight:900 !important; }
-h3 { font-size:28px !important; font-weight:800 !important; }
-
-div[data-testid="metric-container"] label {
-    font-size:13px !important;
-    text-transform:uppercase !important;
-    letter-spacing:1px !important;
-    opacity:0.6 !important;
-    font-weight:700 !important;
-}
-
-div[data-testid="metric-container"] > div {
-    font-size:48px !important;
-    font-weight:900 !important;
-}
-
-div[data-testid="stAlert"] {
-    font-size:20px !important;
-    font-weight:700 !important;
-    border-radius:12px !important;
-    padding:12px 16px !important;
-    color:white !important;
-}
-
-button[data-baseweb="tab"] {
-    font-size:18px !important;
-    font-weight:700 !important;
-}
-
-div[data-baseweb="select"] {
-    font-size:20px !important;
-    font-weight:700 !important;
-}
-
-div[data-testid="stDataFrame"] table { font-size:22px !important; }
-div[data-testid="stDataFrame"] th { font-size:20px !important; }
-</style>
-""", unsafe_allow_html=True)
-
 # =========================================
-# 🎬 BANNER CARROSSEL
+# 🎬 BANNER
 # =========================================
 ASSETS = Path("assets")
-BANNERS = sorted(str(p) for p in ASSETS.glob("banner*.*"))
+banners = sorted(str(p) for p in ASSETS.glob("banner*.*"))
 
-if not BANNERS:
-    st.warning("⚠️ Coloque imagens em /assets/banner1.png, banner2.png ...")
-else:
-    total = len(BANNERS)
-
-    refresh_count = st_autorefresh(interval=120000, key="banner_refresh")
-
+if banners:
+    refresh = st_autorefresh(interval=120000, key="banner")
     if "banner_idx" not in st.session_state:
         st.session_state.banner_idx = 0
+    if refresh:
+        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(banners)
 
-    if refresh_count:
-        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
-
-    c1, c2, c3 = st.columns([1,8,1])
-
+    c1,c2,c3 = st.columns([1,8,1])
     with c1:
-        if st.button("◀", use_container_width=True):
-            st.session_state.banner_idx = (st.session_state.banner_idx - 1) % total
-
+        if st.button("◀"):
+            st.session_state.banner_idx -= 1
     with c3:
-        if st.button("▶", use_container_width=True):
-            st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
-
+        if st.button("▶"):
+            st.session_state.banner_idx += 1
     with c2:
-        st.image(BANNERS[st.session_state.banner_idx], use_container_width=True)
+        st.image(banners[st.session_state.banner_idx % len(banners)], use_container_width=True)
 
 # =========================================
-# ARQUIVO PADRÃO + UPLOAD
+# 📂 CARREGAR DADOS
 # =========================================
 ARQUIVO_PADRAO = "data/POISSON_DUAS_MATRIZES.xlsx"
 
 with st.sidebar:
-    st.header("📂 Dados")
+    arquivo = st.file_uploader("Enviar Excel", type=["xlsx"])
 
-    arquivo_upload = st.file_uploader(
-        "Enviar outro Excel (opcional)",
-        type=["xlsx"]
-    )
-
-    if arquivo_upload:
-        xls = pd.ExcelFile(arquivo_upload)
-        st.success("📤 Utilizando arquivo enviado pelo usuário")
-
-    elif os.path.exists(ARQUIVO_PADRAO):
-        xls = pd.ExcelFile(ARQUIVO_PADRAO)
-        st.info("📊 Utilizando arquivo padrão")
-
-    else:
-        st.error("❌ Nenhum arquivo disponível")
-        st.stop()
+if arquivo:
+    xls = pd.ExcelFile(arquivo)
+elif os.path.exists(ARQUIVO_PADRAO):
+    xls = pd.ExcelFile(ARQUIVO_PADRAO)
+else:
+    st.error("Arquivo não encontrado")
+    st.stop()
 
 # =========================================
-# LEITURA DAS ABAS
+# 📊 LEITURA
 # =========================================
-df_mgf = pd.read_excel(xls, "Poisson_Media_Gols")
-df_exg = pd.read_excel(xls, "Poisson_Ataque_Defesa")
-df_vg  = pd.read_excel(xls, "Poisson_VG")
-df_ht  = pd.read_excel(xls, "Poisson_HT")
+df_mgf = pd.read_excel(xls,"Poisson_Media_Gols")
+df_exg = pd.read_excel(xls,"Poisson_Ataque_Defesa")
+df_vg  = pd.read_excel(xls,"Poisson_VG")
+df_ht  = pd.read_excel(xls,"Poisson_HT")
 
-for df in (df_mgf, df_exg, df_vg, df_ht):
+for df in (df_mgf,df_exg,df_vg,df_ht):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
 
 # =========================================
-# SCORE OFENSIVO
+# 🔧 NORMALIZAÇÕES
 # =========================================
-score_raw = []
+def norm_exg(x): return min(x*40,100)
+def norm_shots(x): return min((x/15)*100,100)
 
-for _, row in df_mgf.iterrows():
+# =========================================
+# 🔥 SCORE OFENSIVO CONSENSO
+# =========================================
+scores=[]
+radar_map={}
 
-    exg_row = df_exg[
-        (df_exg["Home_Team"] == row["Home_Team"]) &
-        (df_exg["Visitor_Team"] == row["Visitor_Team"])
-    ]
+for _,row in df_mgf.iterrows():
 
-    vg_row = df_vg[
-        (df_vg["Home_Team"] == row["Home_Team"]) &
-        (df_vg["Visitor_Team"] == row["Visitor_Team"])
-    ]
+    exg_row=df_exg[(df_exg.Home_Team==row.Home_Team)&(df_exg.Visitor_Team==row.Visitor_Team)]
+    vg_row=df_vg[(df_vg.Home_Team==row.Home_Team)&(df_vg.Visitor_Team==row.Visitor_Team)]
 
     if exg_row.empty or vg_row.empty:
-        score_raw.append(np.nan)
+        scores.append(np.nan)
         continue
 
-    exg_row = exg_row.iloc[0]
-    vg_row  = vg_row.iloc[0]
+    exg_row=exg_row.iloc[0]
+    vg_row=vg_row.iloc[0]
 
-    ief_home = (1 / row["CHM"]) * 100 if row["CHM"] > 0 else 0
-    ief_away = (1 / row["CAM"]) * 100 if row["CAM"] > 0 else 0
+    ief_home=(1/row.CHM)*100 if row.CHM>0 else 0
+    ief_away=(1/row.CAM)*100 if row.CAM>0 else 0
 
-    def norm_exg(x): return min(x * 40, 100)
-    def norm_shots(x): return min((x / 15) * 100, 100)
+    radar_home=np.mean([
+        [ief_home,norm_exg(row.ExG_Home_MGF),norm_shots(row.CHM),exg_row.Precisao_CG_H,row["BTTS_%"]],
+        [exg_row.FAH,norm_exg(exg_row.ExG_Home_ATKxDEF),norm_shots(row.CHM),exg_row.Precisao_CG_H,exg_row["BTTS_%"]],
+        [exg_row.FAH,norm_exg(vg_row.ExG_Home_VG),norm_shots(row.CHM),exg_row.Precisao_CG_H,vg_row["BTTS_%"]]
+    ],axis=0)
 
-    radar_home = np.mean([
-        [ief_home, norm_exg(row["ExG_Home_MGF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], row["BTTS_%"]],
-        [exg_row["FAH"], norm_exg(exg_row["ExG_Home_ATKxDEF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], exg_row["BTTS_%"]],
-        [exg_row["FAH"], norm_exg(vg_row["ExG_Home_VG"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], vg_row["BTTS_%"]]
-    ], axis=0)
+    radar_away=np.mean([
+        [ief_away,norm_exg(row.ExG_Away_MGF),norm_shots(row.CAM),exg_row.Precisao_CG_A,row["BTTS_%"]],
+        [exg_row.FAA,norm_exg(exg_row.ExG_Away_ATKxDEF),norm_shots(row.CAM),exg_row.Precisao_CG_A,exg_row["BTTS_%"]],
+        [exg_row.FAA,norm_exg(vg_row.ExG_Away_VG),norm_shots(row.CAM),exg_row.Precisao_CG_A,vg_row["BTTS_%"]]
+    ],axis=0)
 
-    radar_away = np.mean([
-        [ief_away, norm_exg(row["ExG_Away_MGF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], row["BTTS_%"]],
-        [exg_row["FAA"], norm_exg(exg_row["ExG_Away_ATKxDEF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], exg_row["BTTS_%"]],
-        [exg_row["FAA"], norm_exg(vg_row["ExG_Away_VG"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], vg_row["BTTS_%"]]
-    ], axis=0)
+    radar_map[row["JOGO"]] = (radar_home, radar_away, ief_home, ief_away)
+    scores.append(((sum(radar_home)/5 + sum(radar_away)/5)/2))
 
-    score = ((sum(radar_home)/5 + sum(radar_away)/5) / 2)
-    score_raw.append(score)
-
-df_mgf["Score_Ofensivo"] = score_raw
+df_mgf["Score_Ofensivo"]=scores
 
 # =========================================
-# SELECT JOGO
+# 🎯 ESCOLHER JOGO
 # =========================================
-jogos_lista = df_mgf["JOGO"].tolist()
+jogo = st.selectbox("⚽ Escolha o jogo", df_mgf["JOGO"])
 
-if "jogo" not in st.session_state:
-    st.session_state["jogo"] = jogos_lista[0]
+linha_mgf=df_mgf[df_mgf.JOGO==jogo].iloc[0]
+linha_exg=df_exg[df_exg.JOGO==jogo].iloc[0]
+linha_vg=df_vg[df_vg.JOGO==jogo].iloc[0]
 
-jogo = st.selectbox("⚽ Escolha o jogo", jogos_lista)
+radar_home, radar_away, ief_home, ief_away = radar_map[jogo]
 
-linha_mgf = df_mgf[df_mgf["JOGO"] == jogo].iloc[0]
-linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
-linha_vg  = df_vg[df_vg["JOGO"] == jogo].iloc[0]
+# =========================================
+# 📡 RADAR COMPARATIVO
+# =========================================
+def radar_plot(home,away):
+    labels=["Eficiência","ExG","Finalizações","Precisão","BTTS"]
+    ang=np.linspace(0,2*np.pi,len(labels),endpoint=False)
+    ang=np.concatenate((ang,[ang[0]]))
+    home=np.concatenate((home,[home[0]]))
+    away=np.concatenate((away,[away[0]]))
 
-st.session_state["jogo"] = jogo
+    fig=plt.figure(figsize=(4,4))
+    ax=fig.add_subplot(111,polar=True)
+    ax.plot(ang,home,linewidth=2)
+    ax.fill(ang,home,alpha=0.25)
+    ax.plot(ang,away,linewidth=2)
+    ax.fill(ang,away,alpha=0.15)
+    ax.set_xticks(ang[:-1])
+    ax.set_xticklabels(labels)
+    ax.set_ylim(0,100)
+    return fig
+
+st.pyplot(radar_plot(radar_home,radar_away))
+
+# =========================================
+# ⚔️ DOMÍNIO
+# =========================================
+def dominio(home,away):
+    if sum(home)>sum(away)*1.15: return "HOME ⚔️"
+    if sum(away)>sum(home)*1.15: return "AWAY ⚔️"
+    return "EQUILIBRADO ⚖️"
+
+st.subheader(dominio(radar_home,radar_away))
+
+# =========================================
+# 🔥 TENDÊNCIA GOLS
+# =========================================
+exg_total = linha_exg.ExG_Home_ATKxDEF + linha_exg.ExG_Away_ATKxDEF
+
+def tendencia(exg_total,ief_h,ief_a):
+    if exg_total>2.6 and ief_h+ief_a>70: return "🚨🔥 ALTÍSSIMA"
+    if exg_total>2.2: return "🔥 ALTA"
+    if exg_total>1.8: return "⚡ MODERADA"
+    return "❄️ BAIXA"
+
+st.info(tendencia(exg_total,ief_home,ief_away))
+
+# =========================================
+# 💀 TIME LETAL
+# =========================================
+if ief_home>45 and exg_total/2>1.2:
+    st.success("💀🔥⚽ HOME LETAL")
+if ief_away>45 and exg_total/2>1.2:
+    st.success("💀🔥⚽ AWAY LETAL")
+
+# =========================================
+# 🎯 MATRIZ POISSON + BTTS
+# =========================================
+def matriz_poisson(lh,la):
+    m=np.zeros((5,5))
+    for i in range(5):
+        for j in range(5):
+            m[i,j]=poisson.pmf(i,lh)*poisson.pmf(j,la)
+    return m
+
+matriz = matriz_poisson(linha_exg.ExG_Home_ATKxDEF, linha_exg.ExG_Away_ATKxDEF)
+
+btts = sum(matriz[i][j] for i in range(1,5) for j in range(1,5))*100
+st.metric("BTTS %", f"{btts:.1f}%")
+
+# =========================================
+# 🛡️ SCORE DEFENSIVO
+# =========================================
+def score_def(fd,cs,chs,mgc):
+    if pd.isna(fd): fd=50
+    if pd.isna(cs): cs=30
+    if pd.isna(chs) or chs==0: chs=10
+    if pd.isna(mgc) or mgc==0: mgc=1
+    res=min((chs/15)*100,100)
+    conc=max(0,100-(mgc*40))
+    return round(fd*0.35+cs*0.25+res*0.2+conc*0.2,1)
+
+st.metric("Score Defesa Home", score_def(linha_exg.FDH, linha_exg.CS_H, linha_mgf.CHM, linha_exg.MGC_H))
+st.metric("Score Defesa Away", score_def(linha_exg.FDA, linha_exg.CS_A, linha_mgf.CAM, linha_exg.MGC_A))
+
+# =========================================
+# 💣 INTENSIDADE DO JOGO
+# =========================================
+score_jogo = df_mgf[df_mgf.JOGO==jogo]["Score_Ofensivo"].values[0]
+
+def intensidade(s):
+    if s<35: return "❄️🧊 FRIO"
+    if s<60: return "⚡ EQUILIBRADO"
+    if s<80: return "🔥 PRESSÃO"
+    if s<85: return "💣 QUENTE"
+    return "💀 PIROTÉCNICO"
+
+st.header(intensidade(score_jogo))
 
 # =========================================
 # FUNÇÕES AUX
 # =========================================
 def get_val(linha, col, fmt=None, default="—"):
+    """
+    Retorna valor seguro da coluna.
+    Evita crash se coluna não existir ou for NaN.
+    """
     if col in linha.index and pd.notna(linha[col]):
         try:
             return fmt.format(linha[col]) if fmt else linha[col]
@@ -216,12 +236,21 @@ def get_val(linha, col, fmt=None, default="—"):
             return default
     return default
 
+
 def calc_ev(odd_real, odd_justa):
+    """
+    Calcula Valor Esperado (EV)
+    > 0  = valor positivo
+    < 0  = valor negativo
+    """
     try:
         return (odd_real / odd_justa) - 1
     except:
         return None
-
+        
+# =========================================
+# ESTATÍSTICAS DO SCORE (CONSENSO)
+# =========================================
 media_score = df_mgf["Score_Ofensivo"].mean()
 desvio_score = df_mgf["Score_Ofensivo"].std()
 
