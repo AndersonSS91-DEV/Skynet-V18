@@ -1005,11 +1005,12 @@ with tab1:
 
     # 🏆 Liga
     st.markdown(
-        f"<h3 style='text-align:center; opacity:0.8;'>🏆 {liga}</h3>",
+        f"<h3 style='text-align:center; opacity:0.85;'>🏆 {liga}</h3>",
         unsafe_allow_html=True
     )
 
-    esp1, col_home, col_score, col_away, esp2 = st.columns([1,3,2,3,1])
+    # GRID SIMÉTRICO PERFEITO
+    col_home, col_score, col_away = st.columns([4,2,4])
 
     # HOME
     with col_home:
