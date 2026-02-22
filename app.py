@@ -200,6 +200,7 @@ df_ht = pd.read_excel(xls,  "Poisson_HT")
 
 for df in (df_mgf, df_exg, df_vg, df_ht):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
+    df_ht["JOGO"] = df_ht["Home_Team"] + " x " + df_ht["Visitor_Team"]
 
 # =========================================
 # 🔥 SCORE OFENSIVO CONSENSO 0–100
@@ -1233,38 +1234,6 @@ if not jogo_ht.empty:
 
     st.pyplot(fig, use_container_width=False)
 
-    
-# =============================
-# ⚡ CARD HT
-# =============================
-
-jogo_ht = df_ht[
-    (df_ht["Home_Team"] == jogo_sel["Home_Team"]) &
-    (df_ht["Visitor_Team"] == jogo_sel["Visitor_Team"])
-]
-
-if not jogo_ht.empty:
-
-    ht = jogo_ht.iloc[0]
-
-    st.markdown(f"""
-    <div style="
-        background: linear-gradient(90deg,#0f2027,#203a43,#2c5364);
-        padding:14px;
-        border-radius:10px;
-        margin-top:10px;
-        margin-bottom:10px;
-        font-size:18px;
-    ">
-    ⚡ <b>Probabilidade de Gol no 1º Tempo</b><br>
-    🔥 Gol HT: <b>{ht['Prob_Gol_HT']}%</b> &nbsp;&nbsp;
-    ❄️ 0x0 HT: <b>{ht['Prob_0x0_HT']}%</b><br>
-    🏠 Home marca: <b>{ht['Gol_HT_Home_%']}%</b> &nbsp;&nbsp;
-    ✈️ Away marca: <b>{ht['Gol_HT_Away_%']}%</b><br>
-    <b>{ht['Selo_HT']}</b>
-    </div>
-    """, unsafe_allow_html=True)
-    
 
     cards_ofensivos(
     radar_home_consenso,
