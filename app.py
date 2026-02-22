@@ -2025,7 +2025,7 @@ col_away.markdown(f"<p style='text-align:center'><b>{away}</b></p>", unsafe_allo
 
 st.markdown("---")
 
-    st.markdown("### 🎯 Odds")
+st.markdown("### 🎯 Odds")
 
 o1, o2, o3 = st.columns(3)
 
