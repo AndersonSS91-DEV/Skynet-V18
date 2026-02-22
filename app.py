@@ -334,7 +334,8 @@ st.markdown("### ⚽ Escolha o jogo")
 jogo = st.selectbox(label="",options=jogos_lista)
 linha_mgf = df_mgf[df_mgf["JOGO"] == jogo].iloc[0]
 linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
-linha_vg  = df_vg[df_vg["JOGO"] == jogo].iloc[0]  # <<< FALTAVA ISSO
+linha_vg  = df_vg[df_vg["JOGO"] == jogo].iloc[0]
+linha_ht  = df_ht[df_ht["JOGO"] == jogo].iloc[0]  # ✅ ADICIONE ESTA
 
 st.session_state["jogo"] = jogo
 # =========================================
