@@ -36,16 +36,6 @@ html, body, [class*="css"]  {
     font-family: 'Inter', sans-serif;
 }
 
-st.markdown("""
-<style>
-button[data-baseweb="tab"] {
-    font-size: 18px;
-    font-weight: 600;
-    padding: 10px 18px;
-}
-</style>
-""", unsafe_allow_html=True)
-
 /* ===== Título Principal ===== */
 h1 {
     font-size: 46px !important;
@@ -129,6 +119,16 @@ div[data-testid="stDataFrame"] table {
 div[data-testid="stDataFrame"] th {
     font-size: 20px !important;
 }
+
+
+st.markdown("""
+<style>
+button[data-baseweb="tab"] {
+    font-size: 18px;
+    font-weight: 600;
+    padding: 10px 18px;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
