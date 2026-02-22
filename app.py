@@ -343,10 +343,25 @@ st.session_state["jogo"] = jogo
 # FUNÇÕES AUX
 # =========================================
 def escudo_time(nome):
-    caminho = f"assets/escudos/{nome.lower()}.png"
-    if os.path.exists(caminho):
-        return caminho
-    return "assets/escudos/default.png"
+    nome = str(nome).lower().strip()
+
+    # remove acentos
+    import unicodedata
+    nome = unicodedata.normalize('NFKD', nome).encode('ASCII', 'ignore').decode('ASCII')
+
+    # substituições comuns
+    nome = nome.replace(" ", "_")
+    nome = nome.replace("-", "_")
+    nome = nome.replace(".", "")
+    nome = nome.replace("fc", "").strip("_")
+
+    pasta = "assets/escudos"
+
+    for arquivo in os.listdir(pasta):
+        if nome in arquivo.lower():
+            return f"{pasta}/{arquivo}"
+
+    return f"{pasta}/default.png"
 
 
 def get_val(linha, col, fmt=None, default="—"):
