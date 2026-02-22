@@ -1194,7 +1194,7 @@ else:
     total = len(BANNERS)
 
     # autoplay (a cada 2 min)
-    refresh_count = st_autorefresh(interval=120000, key="banner_refresh")
+    refresh_count = st_autorefresh(interval=120000)
 
     # inicia estado
     if "banner_idx" not in st.session_state:
