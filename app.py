@@ -232,14 +232,25 @@ from pathlib import Path
 
 def escudo_time_base64(nome_time):
     """
-    Retorna imagem do escudo em base64.
+    Retorna o escudo do time.
     Se não existir, usa team_vazio.png
     """
 
     pasta = Path("assets/escudos")
 
     nome_arquivo = nome_time.lower().strip()
-    nome_arquivo = nome_arquivo.replace(" ", "_
+    nome_arquivo = nome_arquivo.replace(" ", "_")
+    nome_arquivo = nome_arquivo.replace(".", "")
+    nome_arquivo = nome_arquivo.replace("-", "_")
+
+    caminho = pasta / f"{nome_arquivo}.png"
+
+    # se não existir → usa escudo vazio
+    if not caminho.exists():
+        caminho = pasta / "team_vazio.png"
+
+    with open(caminho, "rb") as img:
+        return img.read()
 # =========================================
 # ABAS
 # =========================================
