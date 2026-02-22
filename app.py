@@ -888,7 +888,165 @@ def mostrar_card(df_base, jogo):
 
 media_score = df_mgf["Score_Ofensivo"].mean()
 desvio_score = df_mgf["Score_Ofensivo"].std()
+def calcular_modelo_ht(row):
 
+    # =========================
+    # FORÇA OFENSIVA HT
+    # =========================
+    forca_home = (
+        row["MCGS_HT_H"] * 0.35 +
+        row["Eficiência_HT_H"] * 0.25 +
+        (row["GF_0-15_Home"] +
+         row["GF_16-30_Home"] +
+         row["GF_31-45_Home"]) * 0.40
+    )
+
+    forca_away = (
+        row["MCGS_HT_A"] * 0.35 +
+        row["Eficiência_HT_A"] * 0.25 +
+        (row["GF_0-15_Away"] +
+         row["GF_16-30_Away"] +
+         row["GF_31-45_Away"]) * 0.40
+    )
+
+    # =========================
+    # FRAGILIDADE DEFENSIVA HT
+    # =========================
+    frag_home = (
+        row["MCGC_HT_H"] * 0.4 +
+        (row["GC_0-15_Home"] +
+         row["GC_16-30_Home"] +
+         row["GC_31-45_Home"]) * 0.4 +
+        row["CFHT_H"] * 0.2
+    )
+
+    frag_away = (
+        row["MCGC_HT_A"] * 0.4 +
+        (row["GC_0-15_Away"] +
+         row["GC_16-30_Away"] +
+         row["GC_31-45_Away"]) * 0.4 +
+        row["CFHT_A"] * 0.2
+    )
+
+    # =========================
+    # PRESSÃO INICIAL
+    # =========================
+    press_home = (
+        row["Posse_Bola_Home"] * 0.35 +
+        row["Pressão_Média_Home"] * 0.35 +
+        row["APPM_Home"] * 0.30
+    )
+
+    press_away = (
+        row["Posse_Bola_Away"] * 0.35 +
+        row["Pressão_Média_Away"] * 0.35 +
+        row["APPM_Away"] * 0.30
+    )
+
+    # =========================
+    # PROBABILIDADE HT
+    # =========================
+    prob_home = forca_home*0.4 + frag_away*0.4 + press_home*0.2
+    prob_away = forca_away*0.4 + frag_home*0.4 + press_away*0.2
+
+    prob_total = prob_home + prob_away
+
+    # normalização 0–100
+    prob_total = min(max(prob_total, 0), 100)
+
+    # =========================
+    # QUEM ABRE O PLACAR
+    # =========================
+    abrir_home = row["FS_HT_H"] - row["CFHT_H"] + prob_home
+    abrir_away = row["FS_HT_A"] - row["CFHT_A"] + prob_away
+
+    if abs(abrir_home - abrir_away) < 5:
+        primeiro = "Equilibrado"
+    elif abrir_home > abrir_away:
+        primeiro = "Home"
+    else:
+        primeiro = "Away"
+
+    # =========================
+    # GOL PRECOCE
+    # =========================
+    gol_precoce = (
+        row["GF_0-15_Home"] +
+        row["GF_0-15_Away"] +
+        row["GC_0-15_Home"] +
+        row["GC_0-15_Away"]
+    )
+
+    # =========================
+    # RISCO 0x0 HT
+    # =========================
+    risco_0x0 = max(0, 100 - prob_total)
+
+    return pd.Series({
+        "Prob_Gol_HT": round(prob_total,1),
+        "Primeiro_Gol_HT": primeiro,
+        "Gol_Precoce_Index": round(gol_precoce,1),
+        "Risco_0x0_HT": round(risco_0x0,1)
+    })
+    
+# =========================================
+# GERAR COLUNAS AUTOMÁTICAS
+# =========================================
+    df[[
+    "Prob_Gol_HT",
+    "Primeiro_Gol_HT",
+    "Gol_Precoce_Index",
+    "Risco_0x0_HT"
+]] = df.apply(calcular_modelo_ht, axis=1)
+
+# =========================================
+# CLASSIFICAÇÃO E SELO AUTOMÁTICOS
+# =========================================
+def classificar_ht(p):
+
+    if p >= 65:
+        return "🔥🔥🔥 ALTÍSSIMA"
+    elif p >= 50:
+        return "🔥 PROVÁVEL"
+    elif p >= 35:
+        return "⚖️ MODERADA"
+    else:
+        return "❄️ BAIXA"
+        
+    df["Selo_HT"] = df["Prob_Gol_HT"].apply(classificar_ht)
+
+# =========================================
+# ✅ VERSÃO POISSON HT
+# =========================================
+from scipy.stats import poisson
+
+def poisson_ht(lambda_home_ht, lambda_away_ht):
+
+    prob_0x0 = poisson.pmf(0, lambda_home_ht) * poisson.pmf(0, lambda_away_ht)
+
+    prob_gol = 1 - prob_0x0
+
+    return prob_gol * 100
+
+def card_ht(row):
+
+    st.markdown("### ⏱️ Probabilidade Gol HT")
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("Probabilidade", f"{row['Prob_Gol_HT']}%")
+    col2.metric("Primeiro Gol", row["Primeiro_Gol_HT"])
+    col3.metric("Risco 0x0", f"{row['Risco_0x0_HT']}%")
+
+    if row["Prob_Gol_HT"] >= 65:
+        st.error("🔥🔥🔥 GOL HT MUITO PROVÁVEL")
+
+    elif row["Prob_Gol_HT"] >= 50:
+        st.warning("🔥 GOL HT PROVÁVEL")
+
+    elif row["Prob_Gol_HT"] < 35:
+        st.info("❄️ Jogo tende a 0x0 HT")
+        
 # =========================================
 # ABAS
 # =========================================
@@ -1126,6 +1284,29 @@ with tab1:
         matriz_consenso,
         "Over/Under — Consenso"
     )
+    # =========================================
+    # 🎯 HT -DADOS / Probabilidade Gol HT
+    # =========================================
+    def card_ht(row):
+
+    st.markdown("### ⏱️ Probabilidade Gol HT")
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("Probabilidade", f"{row['Prob_Gol_HT']}%")
+    col2.metric("Primeiro Gol", row["Primeiro_Gol_HT"])
+    col3.metric("Risco 0x0", f"{row['Risco_0x0_HT']}%")
+
+    if row["Prob_Gol_HT"] >= 65:
+        st.error("🔥🔥🔥 GOL HT MUITO PROVÁVEL")
+
+    elif row["Prob_Gol_HT"] >= 50:
+        st.warning("🔥 GOL HT PROVÁVEL")
+
+    elif row["Prob_Gol_HT"] < 35:
+        st.info("❄️ Jogo tende a 0x0 HT")
+
+    card_ht(linha)
 
     # =========================================
     # 🎯 RADAR CONSENSO
