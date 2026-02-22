@@ -1026,7 +1026,7 @@ with col3:
     st.markdown(f"<b>{away}</b>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-st.markdown("---")
+    st.markdown("---")
 
     gh = linha_exg.get("Result Home")
     ga = linha_exg.get("Result Visitor")
