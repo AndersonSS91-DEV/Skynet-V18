@@ -42,7 +42,16 @@ st.markdown("""
 /* Aumenta fonte das abas */
 button[data-baseweb="tab"] {
     font-size: 18px;
-    font-weight: 600;}""")
+    font-weight: 600;
+}
+
+/* aumenta o espaçamento interno */
+button[data-baseweb="tab"] {
+    padding: 10px 18px;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 /* aumenta altura das abas */
 button[data-baseweb="tab"] {
