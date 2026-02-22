@@ -21,7 +21,7 @@ from PIL import Image
 # =========================================
 st.set_page_config(
     page_title="⚽🏆Poisson Skynet🏆⚽",
-    layout="wide"
+    layout="centered"
 )
 
 st.title("⚽🏆 Poisson Skynet 🏆⚽")
