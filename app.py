@@ -345,7 +345,7 @@ def mostrar_over_under(matriz, titulo):
     )
 
     tabela.auto_set_font_size(False)
-    tabela.set_fontsize(8)      # 👈 tamanho igual ao Poisson
+    tabela.set_fontsize(7)      # 👈 tamanho igual ao Poisson
     tabela.scale(1.1, 1.2)      # 👈 altura e largura das células
 
     for (row, col), cell in tabela.get_celld().items():
