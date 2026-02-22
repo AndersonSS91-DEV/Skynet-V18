@@ -217,8 +217,10 @@ else:
         if st.button("▶", use_container_width=True):
             st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
 
-    with c2:
-        st.image(BANNERS[st.session_state.banner_idx], width=500)
+    c1, c2, c3 = st.columns([1,2,1])
+
+with c2:
+    st.image(BANNERS[st.session_state.banner_idx], width=500)
 
 
 # =========================================
