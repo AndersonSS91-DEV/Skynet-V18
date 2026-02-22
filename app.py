@@ -345,25 +345,35 @@ st.session_state["jogo"] = jogo
 import base64
 
 def escudo_time_base64(nome):
-    import unicodedata
+    import base64, os, unicodedata
+
+    pasta = "assets/escudos"
+
+    # se a pasta não existir, não quebra o app
+    if not os.path.isdir(pasta):
+        return ""
+
     nome = str(nome).lower().strip()
     nome = unicodedata.normalize('NFKD', nome).encode('ASCII','ignore').decode('ASCII')
     nome = nome.replace(" ", "_")
 
-    pasta = "assets/escudos"
+    for arquivo in os.listdir(pasta):
+        if nome in arquivo.lower():
+            caminho = os.path.join(pasta, arquivo)
 
-    for arq in os.listdir(pasta):
-        if nome in arq.lower():
-            caminho = os.path.join(pasta, arq)
-            with open(caminho, "rb") as img:
-                encoded = base64.b64encode(img.read()).decode()
-                return f"data:image/png;base64,{encoded}"
+            if os.path.exists(caminho):
+                with open(caminho, "rb") as img:
+                    return "data:image/png;base64," + base64.b64encode(img.read()).decode()
 
-    # default
-    caminho = os.path.join(pasta, "default.png")
-    with open(caminho, "rb") as img:
-        encoded = base64.b64encode(img.read()).decode()
-        return f"data:image/png;base64,{encoded}"
+    # tenta default.png
+    default_img = os.path.join(pasta, "default.png")
+
+    if os.path.exists(default_img):
+        with open(default_img, "rb") as img:
+            return "data:image/png;base64," + base64.b64encode(img.read()).decode()
+
+    # se nada existir, não quebra o app
+    return ""
         
 def get_val(linha, col, fmt=None, default="—"):
     if col in linha.index and pd.notna(linha[col]):
