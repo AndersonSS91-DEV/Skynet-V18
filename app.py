@@ -993,42 +993,30 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
-home = linha_exg["Home_Team"]
-away = linha_exg["Visitor_Team"]
 
-esc_home = escudo_time_base64(home)
-esc_away = escudo_time_base64(away)
+    home = linha_exg["Home_Team"]
+    away = linha_exg["Visitor_Team"]
 
-liga = linha_exg.get("League", "")
-hora = linha_exg.get("Time", "")
+    esc_home = escudo_time_base64(home)
+    esc_away = escudo_time_base64(away)
 
-gh = linha_exg.get("Result Home")
-ga = linha_exg.get("Result Visitor")
-
-# placar
-if pd.notna(gh) and pd.notna(ga):
-    placar = f"{int(gh)} x {int(ga)}"
-else:
     placar = "X"
 
-st.markdown(f"### 🏆 {liga}")
+    col_esq, col_meio, col_dir = st.columns([3,2,3])
 
-# cria 3 colunas CENTRALIZADAS
-col_esq, col_meio, col_dir = st.columns([3,2,3])
+    with col_esq:
+        st.image(esc_home, width=90)
+        st.markdown(f"<div style='text-align:center'>{home}</div>", unsafe_allow_html=True)
 
-with col_esq:
-    st.image(esc_home, width=90)
-    st.markdown(f"<div style='text-align:center;font-weight:700'>{home}</div>", unsafe_allow_html=True)
+    with col_meio:
+        st.markdown(
+            f"<h1 style='text-align:center;margin-top:25px'>{placar}</h1>",
+            unsafe_allow_html=True
+        )
 
-with col_meio:
-    st.markdown(
-        f"<h1 style='text-align:center;margin-top:25px'>{placar}</h1>",
-        unsafe_allow_html=True
-    )
-
-with col_dir:
-    st.image(esc_away, width=90)
-    st.markdown(f"<div style='text-align:center;font-weight:700'>{away}</div>", unsafe_allow_html=True)
+    with col_dir:
+        st.image(esc_away, width=90)
+        st.markdown(f"<div style='text-align:center'>{away}</div>", unsafe_allow_html=True)
 
 st.markdown("---")
 
