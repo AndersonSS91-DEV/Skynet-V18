@@ -225,24 +225,6 @@ def calc_ev(odd_real, odd_justa):
 media_score = df_mgf["Score_Ofensivo"].mean()
 desvio_score = df_mgf["Score_Ofensivo"].std()
 
-
-
-def escudo_time_base64(nome_time):
-
-    pasta = Path("assets/escudos")
-
-    nome_arquivo = nome_time.lower().strip()
-    nome_arquivo = nome_arquivo.replace(" ", "_")
-    nome_arquivo = nome_arquivo.replace(".", "")
-    nome_arquivo = nome_arquivo.replace("-", "_")
-
-    caminho = pasta / f"{nome_arquivo}.png"
-
-    if not caminho.exists():
-        caminho = pasta / "team_vazio.png"
-
-    with open(caminho, "rb") as img:
-        return img.read()
 # =========================================
 # ABAS
 # =========================================
