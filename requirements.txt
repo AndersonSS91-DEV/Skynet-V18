@@ -8,3 +8,4 @@ plotly
 openpyxl
 xlsxwriter
 streamlit-autorefresh
+plotly

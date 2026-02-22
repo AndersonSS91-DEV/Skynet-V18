@@ -11,6 +11,8 @@ from pathlib import Path
 from scipy.stats import poisson
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.graph_objects as go
+import random
 from streamlit_autorefresh import st_autorefresh
 from PIL import Image
 
@@ -108,6 +110,15 @@ div[data-testid="stAlert"] p {
     color: white !important;
 }
 
+
+/* ===== TABELAS DATAFRAME ===== */
+
+div[data-testid="stDataFrame"] table {
+    font-size: 22px !important;
+}
+div[data-testid="stDataFrame"] th {
+    font-size: 20px !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -309,6 +320,7 @@ def calcular_over_under(matriz, max_gols=4):
     return resultados
 
 def mostrar_over_under(matriz, titulo):
+
     ou = calcular_over_under(matriz)
 
     st.markdown(f"### ⚽ {titulo}")
@@ -319,7 +331,29 @@ def mostrar_over_under(matriz, titulo):
         "Under %": [ou['Under 0.5'], ou['Under 1.5'], ou['Under 2.5'], ou['Under 3.5'], ou['Under 4.5']]
     }).round(2)
 
-    st.dataframe(df_ou, use_container_width=True)
+    fig = plt.figure(figsize=(2.4, 2.0), dpi=120)
+    ax = fig.add_axes([0.05, 0.05, 0.9, 0.9])
+    ax.axis('off')
+
+    tabela = ax.table(
+        cellText=df_ou.values,
+        colLabels=df_ou.columns,
+        cellLoc='center',
+        loc='center'
+    )
+
+    tabela.auto_set_font_size(False)
+    tabela.set_fontsize(8)      # 👈 tamanho igual ao Poisson
+    tabela.scale(1.1, 1.2)      # 👈 altura e largura das células
+
+    for (row, col), cell in tabela.get_celld().items():
+        cell.set_edgecolor("#DDDDDD")
+        if row == 0:
+            cell.set_facecolor("#F2F2F2")
+            cell.set_text_props(weight='bold')
+
+    st.pyplot(fig, use_container_width=False)
+    plt.close(fig)
     
 def exibir_matriz(matriz, home, away, titulo):
     df = pd.DataFrame(
@@ -925,9 +959,7 @@ with tab1:
             unsafe_allow_html=True
         )
 
-    else:
-        st.info("⏳ Jogo ainda não finalizado")
-
+    
     st.markdown("---")
 
 
@@ -1094,7 +1126,7 @@ with tab1:
         matriz_consenso,
         "Over/Under — Consenso"
     )
-
+  
     # =========================================
     # 🎯 RADAR CONSENSO
     # =========================================
