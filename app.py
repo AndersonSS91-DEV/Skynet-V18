@@ -1084,7 +1084,7 @@ with tab1:
         st.metric("MGF_A", get_val(linha_mgf, "MGF_A", "{:.2f}"))
         st.metric("CV_GF_A", get_val(linha_mgf, "CV_GF_A", "{:.2f}"))
         st.metric("MGF_HT_Away", get_val(linha_ht, "MGF_HT_Away", "{:.2f}"))
-        st.metric("CV_MGF_HT_Away", get_val(linha_ht, "CV_MGF_HT_Away", "{:.2f}")
+        st.metric("CV_MGF_HT_Away", get_val(linha_ht, "CV_MGF_HT_Away", "{:.2f}"))
                   
     with c5:
         st.metric("Força Defesa Home (%)", get_val(linha_exg, "FDH", "{:.2f}"))
@@ -1102,7 +1102,7 @@ with tab1:
         st.metric("MGC_A", get_val(linha_mgf, "MGC_A", "{:.2f}"))
         st.metric("CV_GC_A", get_val(linha_mgf, "CV_GC_A", "{:.2f}"))
         st.metric("MGC_HT_Away", get_val(linha_ht, "MGC_HT_Away", "{:.2f}"))
-        st.metric("CV_MGC_HT_Away", get_val(linha_ht, "CV_MGC_HT_Away", "{:.2f}")
+        st.metric("CV_MGC_HT_Away", get_val(linha_ht, "CV_MGC_HT_Away", "{:.2f}"))
         
     st.markdown("---")
 
