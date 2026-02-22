@@ -120,6 +120,7 @@ jogo = st.selectbox("⚽ Escolha o jogo", df_mgf["JOGO"])
 linha_mgf=df_mgf[df_mgf.JOGO==jogo].iloc[0]
 linha_exg=df_exg[df_exg.JOGO==jogo].iloc[0]
 linha_vg=df_vg[df_vg.JOGO==jogo].iloc[0]
+linha_ht = df_ht[df_ht["JOGO"] == jogo].iloc[0]
 
 radar_home, radar_away, ief_home, ief_away = radar_map[jogo]
 
