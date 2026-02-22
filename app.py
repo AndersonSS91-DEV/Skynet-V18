@@ -204,8 +204,17 @@ def score_def(fd,cs,chs,mgc):
     conc=max(0,100-(mgc*40))
     return round(fd*0.35+cs*0.25+res*0.2+conc*0.2,1)
 
-st.metric("Score Defesa Home", score_def(linha_exg.FDH, linha_exg.CS_H, linha_mgf.CHM, linha_exg.MGC_H))
-st.metric("Score Defesa Away", score_def(linha_exg.FDA, linha_exg.CS_A, linha_mgf.CAM, linha_exg.MGC_A))
+st.metric("Score Defesa Home",
+          score_def(linha_exg["FDH"],
+                    linha_exg["Clean_Games_H"],
+                    linha_mgf["CHM"],
+                    linha_exg["MGC_H"]))
+
+st.metric("Score Defesa Away",
+          score_def(linha_exg["FDA"],
+                    linha_exg["Clean_Games_A"],
+                    linha_mgf["CAM"],
+                    linha_exg["MGC_A"]))
 
 # =========================================
 # 💣 INTENSIDADE DO JOGO
