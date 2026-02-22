@@ -137,7 +137,7 @@ div[data-baseweb="select"] div {
 
 /* opções dentro da lista */
 ul[role="listbox"] li {
-    font-size: 22px !important;
+    font-size: 16px !important;
 }
 
 button[aria-selected="true"] {
