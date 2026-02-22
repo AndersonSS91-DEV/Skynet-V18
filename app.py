@@ -1010,31 +1010,25 @@ else:
     placar = "X"
 
 # ===== LIGA CENTRALIZADA =====
+# ===== LIGA =====
 st.markdown(
     f"<h4 style='text-align:center; opacity:0.85;'>🏆 {liga}</h4>",
     unsafe_allow_html=True
 )
 
-# ===== HEADER CENTRALIZADO =====
-sp1, col_home, col_score, col_away, sp2 = st.columns([2,2,2,2,2])
+# ===== HEADER TIMES =====
+col_home, col_score, col_away = st.columns([1,1,1])
 
-with col_home:
-    st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-    st.image(esc_home, width=90)
-    st.markdown(f"**{home}**")
-    st.markdown("</div>", unsafe_allow_html=True)
+col_home.image(esc_home, width=90)
+col_home.markdown(f"<p style='text-align:center'><b>{home}</b></p>", unsafe_allow_html=True)
 
-with col_score:
-    st.markdown(
-        f"<h1 style='text-align:center; margin-top:20px'>{placar}</h1>",
-        unsafe_allow_html=True
-    )
+col_score.markdown(
+    f"<h1 style='text-align:center; margin-top:20px'>{placar}</h1>",
+    unsafe_allow_html=True
+)
 
-with col_away:
-    st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-    st.image(esc_away, width=90)
-    st.markdown(f"**{away}**")
-    st.markdown("</div>", unsafe_allow_html=True)
+col_away.image(esc_away, width=90)
+col_away.markdown(f"<p style='text-align:center'><b>{away}</b></p>", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -1043,22 +1037,19 @@ st.markdown("### 🎯 Odds")
 o1, o2, o3 = st.columns(3)
 
 with o1:
-    ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
     st.metric("Odds Casa", linha_exg["Odds_Casa"])
-    st.metric("Odd_Over_1,5FT", linha_exg["Odd_Over_1,5FT"])
+    st.metric("Odd Over 1.5", linha_exg["Odd_Over_1,5FT"])
     st.metric("VR01", get_val(linha_exg, "VR01", "{:.2f}"))
 
 with o2:
-    ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
     st.metric("Odds Empate", linha_exg["Odds_Empate"])
-    st.metric("Odds_Over_2,5FT", linha_exg["Odds_Over_2,5FT"])
+    st.metric("Odd Over 2.5", linha_exg["Odds_Over_2,5FT"])
     st.metric("COEF_OVER1FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
 
 with o3:
-    ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
     st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
-    st.metric("Odds_Under_2,5FT", linha_exg["Odds_Under_2,5FT"])
-    st.metric("Odd_BTTS_YES", linha_exg["Odd_BTTS_YES"])
+    st.metric("Odd Under 2.5", linha_exg["Odds_Under_2,5FT"])
+    st.metric("BTTS Yes", linha_exg["Odd_BTTS_YES"])
 
 st.markdown("---")
 
