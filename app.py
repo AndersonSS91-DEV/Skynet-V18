@@ -994,45 +994,37 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 with tab1:
 
-    home = linha_exg["Home_Team"]
-    away = linha_exg["Visitor_Team"]
-    liga = linha_exg.get("League", "")
+    import base64
+import unicodedata
+import os
 
-    esc_home = escudo_time_base64(home)
-    esc_away = escudo_time_base64(away)
+def escudo_time_base64(nome):
 
-    placar = "X"
+    pasta = "assets/escudos"
 
-    # 🏆 Liga
-    st.markdown(
-        f"<h3 style='text-align:center; opacity:0.85;'>🏆 {liga}</h3>",
-        unsafe_allow_html=True
-    )
+    try:
+        # normaliza nome
+        nome = str(nome).lower().strip()
+        nome = unicodedata.normalize('NFKD', nome).encode('ASCII','ignore').decode('ASCII')
+        nome = nome.replace(" ", "_")
 
-    # GRID SIMÉTRICO PERFEITO
-    col_home, col_score, col_away = st.columns([4,2,4])
+        # procura escudo correspondente
+        for arq in os.listdir(pasta):
+            if nome in arq.lower():
+                caminho = os.path.join(pasta, arq)
+                with open(caminho, "rb") as img:
+                    encoded = base64.b64encode(img.read()).decode()
+                    return f"data:image/png;base64,{encoded}"
 
-    # HOME
-    with col_home:
-        st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
-        st.image(esc_home, width=85)
-        st.markdown(f"<div style='font-weight:700'>{home}</div>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        # 🔥 SE NÃO ENCONTRAR → team_vazio
+        caminho = os.path.join(pasta, "team_vazio.png")
 
-    # PLACAR
-    with col_score:
-        st.markdown(
-            f"<h1 style='text-align:center; margin-top:22px'>{placar}</h1>",
-            unsafe_allow_html=True
-        )
+        with open(caminho, "rb") as img:
+            encoded = base64.b64encode(img.read()).decode()
+            return f"data:image/png;base64,{encoded}"
 
-    # AWAY
-    with col_away:
-        st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
-        st.image(esc_away, width=85)
-        st.markdown(f"<div style='font-weight:700'>{away}</div>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
+    except Exception:
+        return ""
     st.markdown("---")
 
     # ODDS
