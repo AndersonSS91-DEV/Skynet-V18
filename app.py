@@ -1036,7 +1036,7 @@ with col3:
     st.markdown(f"**{away}**")
     st.markdown("</div>", unsafe_allow_html=True)
 
-st.markdown("---")
+    st.markdown("---")
 
     # ODDS
     st.markdown("### 🎯 Odds")
