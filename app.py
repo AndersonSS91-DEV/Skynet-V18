@@ -1301,26 +1301,29 @@ with tab1:
         lambda_home + lambda_away
     )
 
-    # =============================
-    # ⚡ CARD HT
-    # =============================
-    jogo_ht = df_ht[df_ht["JOGO"] == jogo]
+# =============================
+# ⚡ CARD HT
+# =============================
+jogo_ht = df_ht[df_ht["JOGO"] == jogo]
 
-    if not jogo_ht.empty:
+if not jogo_ht.empty:
 
-        ht = jogo_ht.iloc[0]
+    ht = jogo_ht.iloc[0]
 
-        st.info(
-            f"""⚡ Probabilidade de Gol no 1º Tempo
+    selo_ht = ht.get("Selo_HT", "")
+    if pd.isna(selo_ht):
+        selo_ht = ""
+
+    st.info(
+        f"""⚡ Probabilidade de Gol no 1º Tempo
 
 🔥 Gol HT: {ht['Prob_Gol_HT']}%   |   ❄️ 0x0 HT: {ht['Prob_0x0_HT']}%
 
 🏠 Home marca HT: {ht['Gol_HT_Home_%']}%   |   ✈️ Away marca HT: {ht['Gol_HT_Away_%']}%
 
-selo_ht = ht.get("Selo_HT", "")
-if pd.isna(selo_ht):
-    selo_ht = ""
-{selo_ht})
+{selo_ht}
+"""
+    )
     
     # =========================================
     # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
