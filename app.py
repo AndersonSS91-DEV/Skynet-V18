@@ -139,6 +139,11 @@ div[data-baseweb="select"] div {
 ul[role="listbox"] li {
     font-size: 18px !important;
 }
+
+button[aria-selected="true"] {
+    font-size: 22px !important;
+    color: #00E5FF !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
