@@ -1074,6 +1074,8 @@ with tab1:
         st.metric("Chutes H (Marcar)", get_val(linha_mgf, "CHM", "{:.2f}"))
         st.metric("MGF_H", get_val(linha_mgf, "MGF_H", "{:.2f}"))
         st.metric("CV_GF_H", get_val(linha_mgf, "CV_GF_H", "{:.2f}"))
+        st.metric("MGF_HT_Home", get_val(linha_ht, "MGF_HT_Home", "{:.2f}"))
+        st.metric("CV_MGF_HT_Home", get_val(linha_ht, "CV_MGF_HT_Home", "{:.2f}"))
 
     with c4:
         st.metric("Força Ataque Away (%)", get_val(linha_exg, "FAA", "{:.2f}"))
@@ -1081,6 +1083,8 @@ with tab1:
         st.metric("Chutes A (Marcar)", get_val(linha_mgf, "CAM", "{:.2f}"))
         st.metric("MGF_A", get_val(linha_mgf, "MGF_A", "{:.2f}"))
         st.metric("CV_GF_A", get_val(linha_mgf, "CV_GF_A", "{:.2f}"))
+        st.metric("MGF_HT_Away", get_val(linha_ht, "MGF_HT_Away", "{:.2f}"))
+        st.metric("CV_MGF_HT_Away", get_val(linha_ht, "CV_MGF_HT_Away", "{:.2f}")
 
     with c5:
         st.metric("Força Defesa Home (%)", get_val(linha_exg, "FDH", "{:.2f}"))
@@ -1088,14 +1092,18 @@ with tab1:
         st.metric("Chutes H (Sofrer)", get_val(linha_mgf, "CHS", "{:.2f}"))
         st.metric("MGC_H", get_val(linha_mgf, "MGC_H", "{:.2f}"))
         st.metric("CV_GC_H", get_val(linha_mgf, "CV_GC_H", "{:.2f}"))
-
+        st.metric("MGC_HT_Home", get_val(linha_ht, "MGC_HT_Home", "{:.2f}"))
+        st.metric("CV_MGC_HT_Home", get_val(linha_ht, "CV_MGC_HT_Home", "{:.2f}"))
+        
     with c6:
         st.metric("Força Defesa Away (%)", get_val(linha_exg, "FDA", "{:.2f}"))
         st.metric("Clean Games Away (%)", get_val(linha_exg, "Clean_Games_A"))
         st.metric("Chutes A (Sofrer)", get_val(linha_mgf, "CAS", "{:.2f}"))
         st.metric("MGC_A", get_val(linha_mgf, "MGC_A", "{:.2f}"))
         st.metric("CV_GC_A", get_val(linha_mgf, "CV_GC_A", "{:.2f}"))
-
+        st.metric("MGC_HT_Away", get_val(linha_ht, "MGC_HT_Away", "{:.2f}"))
+        st.metric("CV_MGC_HT_Away", get_val(linha_ht, "CV_MGC_HT_Away", "{:.2f}")
+        
     st.markdown("---")
 
     # -------- LINHA 3 — MGF
