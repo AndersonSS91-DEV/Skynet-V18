@@ -227,8 +227,6 @@ desvio_score = df_mgf["Score_Ofensivo"].std()
 
 
 
-import base64
-from pathlib import Path
 def escudo_time_base64(nome_time):
 
     pasta = Path("assets/escudos")
