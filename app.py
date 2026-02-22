@@ -342,28 +342,29 @@ st.session_state["jogo"] = jogo
 # =========================================
 # FUNÇÕES AUX
 # =========================================
-def escudo_time(nome):
-    nome = str(nome).lower().strip()
+import base64
 
-    # remove acentos
+def escudo_time_base64(nome):
     import unicodedata
-    nome = unicodedata.normalize('NFKD', nome).encode('ASCII', 'ignore').decode('ASCII')
-
-    # substituições comuns
+    nome = str(nome).lower().strip()
+    nome = unicodedata.normalize('NFKD', nome).encode('ASCII','ignore').decode('ASCII')
     nome = nome.replace(" ", "_")
-    nome = nome.replace("-", "_")
-    nome = nome.replace(".", "")
-    nome = nome.replace("fc", "").strip("_")
 
     pasta = "assets/escudos"
 
-    for arquivo in os.listdir(pasta):
-        if nome in arquivo.lower():
-            return f"{pasta}/{arquivo}"
+    for arq in os.listdir(pasta):
+        if nome in arq.lower():
+            caminho = os.path.join(pasta, arq)
+            with open(caminho, "rb") as img:
+                encoded = base64.b64encode(img.read()).decode()
+                return f"data:image/png;base64,{encoded}"
 
-    return f"{pasta}/default.png"
-
-
+    # default
+    caminho = os.path.join(pasta, "default.png")
+    with open(caminho, "rb") as img:
+        encoded = base64.b64encode(img.read()).decode()
+        return f"data:image/png;base64,{encoded}"
+        
 def get_val(linha, col, fmt=None, default="—"):
     if col in linha.index and pd.notna(linha[col]):
         try:
@@ -995,8 +996,8 @@ with tab1:
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
 
-    esc_home = escudo_time(home)
-    esc_away = escudo_time(away)
+    esc_home = escudo_time_base64(home)
+    esc_away = escudo_time_base64(away)
 
     liga = linha_exg.get("League", "")
     hora = linha_exg.get("Time", "")
