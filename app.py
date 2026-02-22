@@ -131,13 +131,13 @@ div[data-testid="stDataFrame"] th {
 
 /* TEXTO dentro do selectbox */
 div[data-baseweb="select"] span {
-    font-size: 22px !important;
+    font-size: 50px !important;
     font-weight: 700 !important;
 }
 
 /* label "Escolha o jogo" */
 label[data-testid="stWidgetLabel"] {
-    font-size: 20px !important;
+    font-size: 50px !important;
     font-weight: 700 !important;
 }
 
