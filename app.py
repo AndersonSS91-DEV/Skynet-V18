@@ -185,10 +185,6 @@ ul[role="listbox"] li {
 # =========================================
 # 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
 # =========================================
-import streamlit as st
-from pathlib import Path
-from streamlit_autorefresh import st_autorefresh
-
 ASSETS = Path("assets")
 
 BANNERS = sorted(str(p) for p in ASSETS.glob("banner*.*"))
@@ -988,193 +984,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "⚔️⚽ ATK x DEF",
 "💎⚽ VG"
 ])
-
-# =========================================
-# ABA 1 — RESUMO
-# =========================================
-# =========================================
-# STREAMLIT — POISSON SKYNET (HÍBRIDO)
-# =========================================
-import streamlit as st
-import pandas as pd
-import numpy as np
-import os
-import re
-import glob
-from pathlib import Path
-from scipy.stats import poisson
-import matplotlib.pyplot as plt
-import seaborn as sns
-import plotly.graph_objects as go
-import random
-from streamlit_autorefresh import st_autorefresh
-from PIL import Image
-
-# =========================================
-# CONFIG
-# =========================================
-st.set_page_config(
-    page_title="⚽🏆Poisson Skynet🏆⚽",
-    layout="wide"
-)
-st.markdown(
-    """
-    <h1 style="text-align:center;">⚽🏆 Poisson Skynet 🏆⚽</h1>
-    <hr style="width:560px; margin:auto; border:4px solid #FFD700;">
-    """,
-    unsafe_allow_html=True
-)
-st.markdown("""
-<style>
-
-/* ===== Fonte Global ===== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
-
-html, body, [class*="css"]  {
-    font-family: 'Inter', sans-serif;
-}
-
-/* ===== Título Principal ===== */
-h1 {
-    font-size: 46px !important;
-    font-weight: 900 !important;
-}
-
-/* ===== Subheader ===== */
-h3 {
-    font-size: 28px !important;
-    font-weight: 800 !important;
-}
-
-/* ===== MÉTRICAS ===== */
-div[data-testid="metric-container"] label {
-    font-size: 13px !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-    opacity: 0.6 !important;
-    font-weight: 700 !important;
-}
-
-div[data-testid="metric-container"] > div {
-    font-size: 48px !important;
-    font-weight: 900 !important;
-}
-
-/* ===== ALERT CARDS ===== */
-div[data-testid="stAlert"] {
-    font-size: 20px !important;
-    font-weight: 700 !important;
-    border-radius: 12px !important;
-    padding: 12px 16px !important;
-}
-
-/* mantém cores originais do Streamlit */
-div[data-testid="stAlert"] p {
-    font-size: 20px !important;
-}
-
-/* ===== TABS ===== */
-button[data-baseweb="tab"] {
-    font-size: 18px !important;
-    font-weight: 700 !important;
-}
-
-/* ===== SELECTBOX ===== */
-div[data-baseweb="select"] {
-    font-size: 20px !important;
-    font-weight: 700 !important;
-}
-
-/* ===== DATAFRAME ===== */
-div[data-testid="stDataFrame"] table {
-    font-size: 17px !important;
-}
-
-div[data-testid="stDataFrame"] th {
-    font-size: 17px !important;
-    font-weight: 700 !important;
-}
-
-div[data-testid="stDataFrame"] td {
-    font-size: 17px !important;
-}
-
-/* texto dos cards st.info */
-div[data-testid="stAlert"] {
-    color: white !important;
-}
-
-div[data-testid="stAlert"] p {
-    color: white !important;
-}
-
-
-/* ===== TABELAS DATAFRAME ===== */
-
-div[data-testid="stDataFrame"] table {
-    font-size: 22px !important;
-}
-div[data-testid="stDataFrame"] th {
-    font-size: 20px !important;
-}
-
-/* ===== TABELAS DATAFRAME ===== */
-
-div[data-testid="stDataFrame"] table {
-    font-size: 22px !important;
-}
-div[data-testid="stDataFrame"] th {
-    font-size: 20px !important;
-}
-
-/* texto do valor selecionado */
-div[data-baseweb="select"] div {
-    font-size: 22px !important;
-    font-weight: 700 !important;
-}
-
-/* opções dentro da lista */
-ul[role="listbox"] li {
-    font-size: 16px !important;
-}
-
-button[aria-selected="true"] {
-    font-size: 22px !important;
-    color: #00E5FF !important;
-}
-
-button[data-baseweb="tab"][aria-selected="true"] * {
-    font-size: 26px !important;
-    color: #00E5FF !important;
-}
-/* ===== SELECTBOX TAMANHO ===== */
-
-/* caixa externa */
-div[data-baseweb="select"] {
-    min-height: 55px !important;
-}
-
-/* área clicável */
-div[data-baseweb="select"] > div {
-    min-height: 55px !important;
-    display: flex;
-    align-items: center;
-}
-
-/* texto selecionado */
-div[data-baseweb="select"] span {
-    font-size: 22px !important;
-    font-weight: 700 !important;
-}
-
-/* itens do dropdown */
-ul[role="listbox"] li {
-    font-size: 18px !important;
-    padding: 10px !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
 
 # =========================================
 # 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
@@ -2004,7 +1813,7 @@ else:
     placar = "X"
 
 # ===== LIGA CENTRALIZADA =====
-    st.markdown(
+st.markdown(
     f"<h4 style='text-align:center; opacity:0.85;'>🏆 {liga}</h4>",
     unsafe_allow_html=True
 )
