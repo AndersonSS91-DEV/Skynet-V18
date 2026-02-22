@@ -1036,10 +1036,11 @@ with tab1:
     # ODDS
     st.markdown("### 🎯 Odds")
 
+sp1, main, sp2 = st.columns([1,6,1])
+
+with main:
     o1, o2, o3 = st.columns(3)
 
-    with o1:
-        o1, o2, o3 = st.columns(3)
     with o1:
         ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
         st.metric("Odds Casa", linha_exg["Odds_Casa"])
