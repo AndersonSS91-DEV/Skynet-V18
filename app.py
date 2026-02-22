@@ -1015,28 +1015,28 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ===== TIMES + PLACAR CENTRALIZADOS =====
-col1, col2, col3 = st.columns([1,1,1])
+# ===== HEADER CENTRALIZADO =====
+sp1, col_home, col_score, col_away, sp2 = st.columns([2,2,2,2,2])
 
-with col1:
+with col_home:
     st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
     st.image(esc_home, width=90)
     st.markdown(f"**{home}**")
     st.markdown("</div>", unsafe_allow_html=True)
 
-with col2:
+with col_score:
     st.markdown(
         f"<h1 style='text-align:center; margin-top:20px'>{placar}</h1>",
         unsafe_allow_html=True
     )
 
-with col3:
+with col_away:
     st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
     st.image(esc_away, width=90)
     st.markdown(f"**{away}**")
     st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("---")
+st.markdown("---")
 
     # ODDS
     st.markdown("### 🎯 Odds")
