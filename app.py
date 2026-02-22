@@ -1025,11 +1025,10 @@ st.markdown(
         <div style="font-size:14px; opacity:0.7;">
             HT: {gh_ht} x {ga_ht}
         </div>
-
-    </div>
-    """,
-    unsafe_allow_html=True
-)        
+        </div>
+        """,
+        unsafe_allow_html=True)    
+        
     st.markdown("---")
 
 
