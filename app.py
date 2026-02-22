@@ -1003,24 +1003,25 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 with tab1:
 
-    # TOPO
+    home = linha_exg["Home_Team"]
+away = linha_exg["Visitor_Team"]
+
+esc_home = escudo_time_base64(home)
+esc_away = escudo_time_base64(away)
+
+liga = linha_exg.get("League", "")
+hora = linha_exg.get("Time", "")
+
+gh = linha_exg.get("Result Home")
+ga = linha_exg.get("Result Visitor")
+
+# placar
+if pd.notna(gh) and pd.notna(ga):
+    placar = f"{int(gh)} x {int(ga)}"
+else:
+    placar = "X"
+
     left, center, right = st.columns([2,1,2])
-
-    with left:
-        st.image(esc_home, width=90)
-        st.markdown(f"**{home}**")
-
-    with center:
-        st.markdown(
-            f"<h1 style='text-align:center'>{placar}</h1>",
-            unsafe_allow_html=True
-        )
-
-    with right:
-        st.image(esc_away, width=90)
-        st.markdown(f"**{away}**")
-
-    st.markdown("---")
 
     # 👇 ESTA LINHA DEVE TER ESTE RECUO
     st.markdown("### 🎯 Odds")
