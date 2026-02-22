@@ -1041,8 +1041,6 @@ with col3:
         st.image(esc_away, width=70)
     st.markdown(f"**{away}**")
 
-st.markdown("---")
-
     # 👇 continua normal
     st.markdown("### 🎯 Odds")
 
