@@ -996,57 +996,74 @@ with tab1:
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
 
-    esc_home = escudo_time_base64(home)
-    esc_away = escudo_time_base64(away)
+esc_home = escudo_time_base64(home)
+esc_away = escudo_time_base64(away)
 
-    liga = linha_exg.get("League", "")
-    hora = linha_exg.get("Time", "")
+liga = linha_exg.get("League", "")
+hora = linha_exg.get("Time", "")
 
-    gh = linha_exg.get("Result Home", "")
-    ga = linha_exg.get("Result Visitor", "")
-    gh_ht = linha_exg.get("Result_Home_HT", "")
-    ga_ht = linha_exg.get("Result_Visitor_HT", "")
+gh = linha_exg.get("Result Home")
+ga = linha_exg.get("Result Visitor")
+gh_ht = linha_exg.get("Result_Home_HT")
+ga_ht = linha_exg.get("Result_Visitor_HT")
 
-    st.markdown(
-f"""
-<div style="text-align:center">
+# =========================
+# PLACAR PRINCIPAL
+# =========================
+if pd.notna(gh) and pd.notna(ga):
+    placar = f"{int(gh)} x {int(ga)}"
+else:
+    placar = "X"   # jogo não iniciado
 
-<div style="font-size:20px; opacity:0.8;">
-🏆 {liga}
-</div>
+# =========================
+# PLACAR HT
+# =========================
+if pd.notna(gh_ht) and pd.notna(ga_ht):
+    ht_html = f'<div style="font-size:14px; opacity:0.7;">HT: {int(gh_ht)} x {int(ga_ht)}</div>'
+else:
+    ht_html = ""
 
-<div style="font-size:18px; margin-bottom:8px;">
-{hora}
-</div>
+# =========================
+# HORÁRIO (mostra só se existir)
+# =========================
+hora_html = f'<div style="font-size:16px; opacity:0.6;">🕒 {hora}</div>' if hora else ""
 
-<div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:20px 0;">
+st.markdown(
+    f"""
+    <div style="text-align:center">
 
-<div>
-<img src="{esc_home}" width="70">
-<div style="font-size:18px; font-weight:700;">{home}</div>
-</div>
+        <div style="font-size:20px; opacity:0.85;">
+            🏆 {liga}
+        </div>
 
-<div style="font-size:26px; font-weight:900;">
-{gh} x {ga}
-</div>
+        {hora_html}
 
-<div>
-<img src="{esc_away}" width="70">
-<div style="font-size:18px; font-weight:700;">{away}</div>
-</div>
+        <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:25px 0;">
 
-</div>
+            <div>
+                <img src="{esc_home}" width="70">
+                <div style="font-size:18px; font-weight:700;">{home}</div>
+            </div>
 
-<div style="font-size:14px; opacity:0.7;">
-HT: {gh_ht} x {ga_ht}
-</div>
+            <div style="font-size:30px; font-weight:900;">
+                {placar}
+            </div>
 
-</div>
-""",
-unsafe_allow_html=True
+            <div>
+                <img src="{esc_away}" width="70">
+                <div style="font-size:18px; font-weight:700;">{away}</div>
+            </div>
+
+        </div>
+
+        {ht_html}
+
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
-    st.markdown("---")
+st.markdown("---")
 
     # 👇 continua normal
     st.markdown("### 🎯 Odds")
