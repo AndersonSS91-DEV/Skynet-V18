@@ -992,7 +992,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
-
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
 
@@ -1004,64 +1003,43 @@ with tab1:
 
     gh = linha_exg.get("Result Home")
     ga = linha_exg.get("Result Visitor")
-    gh_ht = linha_exg.get("Result_Home_HT")
-    ga_ht = linha_exg.get("Result_Visitor_HT")
 
-    # =========================
-    # PLACAR PRINCIPAL
-    # =========================
     if pd.notna(gh) and pd.notna(ga):
         placar = f"{int(gh)} x {int(ga)}"
     else:
-        placar = "X"   # jogo não iniciado
+        placar = "X"
 
-    # =========================
-    # PLACAR HT
-    # =========================
-    if pd.notna(gh_ht) and pd.notna(ga_ht):
-        ht_html = f'<div style="font-size:14px; opacity:0.7;">HT: {int(gh_ht)} x {int(ga_ht)}</div>'
-    else:
-        ht_html = ""
+    hora_html = f'<div style="opacity:0.6;">🕒 {hora}</div>' if hora else ""
 
-    # =========================
-    # HORÁRIO
-    # =========================
-    hora_html = f'<div style="font-size:16px; opacity:0.6;">🕒 {hora}</div>' if hora else ""
+    st.markdown(f"""
+    <div style="text-align:center">
 
-    st.markdown(
-        f"""
-        <div style="text-align:center">
+        <div style="font-size:20px; opacity:0.85;">
+            🏆 {liga}
+        </div>
 
-            <div style="font-size:20px; opacity:0.85;">
-                🏆 {liga}
+        {hora_html}
+
+        <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:25px 0;">
+
+            <div>
+                <img src="{esc_home}" width="70">
+                <div style="font-size:18px; font-weight:700;">{home}</div>
             </div>
 
-            {hora_html}
-
-            <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:25px 0;">
-
-                <div>
-                    <img src="{esc_home}" width="70">
-                    <div style="font-size:18px; font-weight:700;">{home}</div>
-                </div>
-
-                <div style="font-size:30px; font-weight:900;">
-                    {placar}
-                </div>
-
-                <div>
-                    <img src="{esc_away}" width="70">
-                    <div style="font-size:18px; font-weight:700;">{away}</div>
-                </div>
-
+            <div style="font-size:30px; font-weight:900;">
+                {placar}
             </div>
 
-            {ht_html}
+            <div>
+                <img src="{esc_away}" width="70">
+                <div style="font-size:18px; font-weight:700;">{away}</div>
+            </div>
 
         </div>
-        """,
-        unsafe_allow_html=True
-    )
+
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("---")
 
@@ -1339,9 +1317,10 @@ with tab1:
 
 🏠 Home marca HT: {ht['Gol_HT_Home_%']}%   |   ✈️ Away marca HT: {ht['Gol_HT_Away_%']}%
 
-{ht['Selo_HT']}
-"""
-        )
+selo_ht = ht.get("Selo_HT", "")
+if pd.isna(selo_ht):
+    selo_ht = ""
+{selo_ht})
     
     # =========================================
     # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
