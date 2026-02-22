@@ -1022,34 +1022,34 @@ with tab1:
     hora_html = f'<div style="opacity:0.6;">🕒 {hora}</div>' if hora else ""
 
     st.markdown(f"""
-    <div style="text-align:center">
+<div style="text-align:center">
 
-        <div style="font-size:20px; opacity:0.85;">
-            🏆 {liga}
+    <div style="font-size:20px; opacity:0.85;">
+        🏆 {liga}
+    </div>
+
+    {hora_html}
+
+    <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:25px 0;">
+
+        <div>
+            <img src="{esc_home}" width="70">
+            <div style="font-size:18px; font-weight:700;">{home}</div>
         </div>
 
-        {hora_html}
+        <div style="font-size:30px; font-weight:900;">
+            {placar}
+        </div>
 
-        <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:25px 0;">
-
-            <div>
-                <img src="{esc_home}" width="70">
-                <div style="font-size:18px; font-weight:700;">{home}</div>
-            </div>
-
-            <div style="font-size:30px; font-weight:900;">
-                {placar}
-            </div>
-
-            <div>
-                <img src="{esc_away}" width="70">
-                <div style="font-size:18px; font-weight:700;">{away}</div>
-            </div>
-
+        <div>
+            <img src="{esc_away}" width="70">
+            <div style="font-size:18px; font-weight:700;">{away}</div>
         </div>
 
     </div>
-    """, unsafe_allow_html=True)
+
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown("---")
 
