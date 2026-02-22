@@ -1375,10 +1375,8 @@ if not jogo_ht.empty:
 with tab2:
     for aba in xls.sheet_names:
         with st.expander(aba):
-            st.dataframe(
-                pd.read_excel(xls, aba),
-                use_container_width=True
-            )
+            df_temp = pd.read_excel(xls, aba)
+            st.dataframe(df_temp, use_container_width=True)
 
 
 # =========================================
