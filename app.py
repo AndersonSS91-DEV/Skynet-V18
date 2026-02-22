@@ -1014,7 +1014,7 @@ with tab1:
 
     # HOME
     with col_home:
-        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
         st.image(esc_home, width=85)
         st.markdown(f"<div style='font-weight:700'>{home}</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -1022,13 +1022,13 @@ with tab1:
     # PLACAR
     with col_score:
         st.markdown(
-            f"<h1 style='text-align:center; margin-top:20px'>{placar}</h1>",
+            f"<h1 style='text-align:center; margin-top:22px'>{placar}</h1>",
             unsafe_allow_html=True
         )
 
     # AWAY
     with col_away:
-        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
         st.image(esc_away, width=85)
         st.markdown(f"<div style='font-weight:700'>{away}</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
