@@ -270,9 +270,11 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
+with tab1:
+
     st.markdown("### 🎯 Odds")
 
-o1, o2, o3 = st.columns(3)
+    o1, o2, o3 = st.columns(3)
 
 with o1:
     st.metric("Odds Casa", linha_exg["Odds_Casa"])
