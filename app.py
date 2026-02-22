@@ -2023,7 +2023,7 @@ col_score.markdown(
 col_away.image(esc_away, width=90)
 col_away.markdown(f"<p style='text-align:center'><b>{away}</b></p>", unsafe_allow_html=True)
 
-    st.markdown("---")
+st.markdown("---")
 
     st.markdown("### 🎯 Odds")
 
