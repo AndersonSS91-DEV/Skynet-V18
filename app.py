@@ -290,10 +290,7 @@ if "jogo" not in st.session_state or st.session_state["jogo"] not in jogos_lista
     st.session_state["jogo"] = jogos_lista[0]
 
 st.markdown("### ⚽ Escolha o jogo")
-jogo = st.selectbox(
-    label="",
-    options=jogos_lista
-))
+jogo = st.selectbox(label="",options=jogos_lista)
 linha_mgf = df_mgf[df_mgf["JOGO"] == jogo].iloc[0]
 linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
 linha_vg  = df_vg[df_vg["JOGO"] == jogo].iloc[0]  # <<< FALTAVA ISSO
