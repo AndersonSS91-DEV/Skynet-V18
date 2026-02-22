@@ -993,23 +993,51 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
+    home = linha_exg["Home_Team"]
+    away = linha_exg["Visitor_Team"]
 
-    import base64, os
+    esc_home = escudo_time_base64(home)
+    esc_away = escudo_time_base64(away)
 
-def escudo_time_base64(nome):
-    pasta = "assets/escudos"
-    nome = str(nome).lower().replace(" ", "_")
+    liga = linha_exg.get("League", "")
 
-    for arq in os.listdir(pasta):
-        if nome in arq.lower():
-            caminho = os.path.join(pasta, arq)
-            with open(caminho, "rb") as f:
-                return f"data:image/png;base64,{base64.b64encode(f.read()).decode()}"
+    gh = linha_exg.get("Result Home")
+    ga = linha_exg.get("Result Visitor")
 
-    # fallback obrigatório
-    caminho = os.path.join(pasta, "team_vazio.png")
-    with open(caminho, "rb") as f:
-        return f"data:image/png;base64,{base64.b64encode(f.read()).decode()}"
+    # placar
+    if pd.notna(gh) and pd.notna(ga):
+        placar = f"{int(gh)} x {int(ga)}"
+    else:
+        placar = "X"
+
+    # ===== LIGA CENTRALIZADA =====
+    st.markdown(
+        f"<h3 style='text-align:center;'>🏆 {liga}</h3>",
+        unsafe_allow_html=True
+    )
+
+    # ===== TIMES CENTRALIZADOS =====
+    c1, c2, c3 = st.columns([3,2,3])
+
+    with c1:
+        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+        st.image(esc_home, width=80)
+        st.markdown(f"**{home}**")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with c2:
+        st.markdown(
+            f"<h1 style='text-align:center; margin-top:20px'>{placar}</h1>",
+            unsafe_allow_html=True
+        )
+
+    with c3:
+        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+        st.image(esc_away, width=80)
+        st.markdown(f"**{away}**")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("---")
     st.markdown("---")
 
     # ODDS
