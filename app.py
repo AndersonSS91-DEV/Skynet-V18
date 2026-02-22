@@ -26,7 +26,7 @@ st.set_page_config(
 st.markdown(
     """
     <h1 style="text-align:center;">⚽🏆 Poisson Skynet 🏆⚽</h1>
-    <hr style="width:280px; margin:auto; border:2px solid #00E5FF;">
+    <hr style="width:560px; margin:auto; border:4px solid #00E5FF;">
     """,
     unsafe_allow_html=True
 )
