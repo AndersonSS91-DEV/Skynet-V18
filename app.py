@@ -196,9 +196,11 @@ else:
 df_mgf = pd.read_excel(xls, "Poisson_Media_Gols")
 df_exg = pd.read_excel(xls, "Poisson_Ataque_Defesa")
 df_vg  = pd.read_excel(xls, "Poisson_VG")  # <<< FALTAVA ISSO
+df_ht = pd.read_excel(xls,  "Poisson_HT")
 
-for df in (df_mgf, df_exg, df_vg):
+for df in (df_mgf, df_exg, df_vg, df_ht):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
+    df_ht["JOGO"] = df_ht["Home_Team"] + " x " + df_ht["Visitor_Team"]
 
 # =========================================
 # 🔥 SCORE OFENSIVO CONSENSO 0–100
@@ -958,8 +960,7 @@ with tab1:
             """,
             unsafe_allow_html=True
         )
-
-    
+        
     st.markdown("---")
 
 
@@ -1126,7 +1127,7 @@ with tab1:
         matriz_consenso,
         "Over/Under — Consenso"
     )
-  
+
     # =========================================
     # 🎯 RADAR CONSENSO
     # =========================================
@@ -1204,6 +1205,7 @@ with tab1:
 
     st.pyplot(fig, use_container_width=False)
 
+
     cards_ofensivos(
     radar_home_consenso,
     radar_away_consenso,
@@ -1211,7 +1213,24 @@ with tab1:
     radar_away_consenso[0],   # eficiência away
     lambda_home + lambda_away
 )
+    # =============================
+# ⚡ CARD HT
+# =============================
+jogo_ht = df_ht[df_ht["JOGO"] == jogo]
+if not jogo_ht.empty:
+    ht = jogo_ht.iloc[0]
 
+    st.info(
+    f"""⚡ Probabilidade de Gol no 1º Tempo
+
+🔥 Gol HT: {ht['Prob_Gol_HT']}%   |   ❄️ 0x0 HT: {ht['Prob_0x0_HT']}%
+
+🏠 Home marca: {ht['Gol_HT_Home_%']}%   |   ✈️ Away marca: {ht['Gol_HT_Away_%']}%
+
+{ht['Selo_HT']}
+"""
+)
+    
     # =========================================
     # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
     # =========================================
