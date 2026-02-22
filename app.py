@@ -345,35 +345,25 @@ st.session_state["jogo"] = jogo
 import base64
 
 def escudo_time_base64(nome):
-    import base64, os, unicodedata
-
-    pasta = "assets/escudos"
-
-    # se a pasta não existir, não quebra o app
-    if not os.path.isdir(pasta):
-        return ""
-
+    import unicodedata
     nome = str(nome).lower().strip()
     nome = unicodedata.normalize('NFKD', nome).encode('ASCII','ignore').decode('ASCII')
     nome = nome.replace(" ", "_")
 
-    for arquivo in os.listdir(pasta):
-        if nome in arquivo.lower():
-            caminho = os.path.join(pasta, arquivo)
+    pasta = "assets/escudos"
 
-            if os.path.exists(caminho):
-                with open(caminho, "rb") as img:
-                    return "data:image/png;base64," + base64.b64encode(img.read()).decode()
+    for arq in os.listdir(pasta):
+        if nome in arq.lower():
+            caminho = os.path.join(pasta, arq)
+            with open(caminho, "rb") as img:
+                encoded = base64.b64encode(img.read()).decode()
+                return f"data:image/png;base64,{encoded}"
 
-    # tenta default.png
-    default_img = os.path.join(pasta, "default.png")
-
-    if os.path.exists(default_img):
-        with open(default_img, "rb") as img:
-            return "data:image/png;base64," + base64.b64encode(img.read()).decode()
-
-    # se nada existir, não quebra o app
-    return ""
+    # default
+    caminho = os.path.join(pasta, "default.png")
+    with open(caminho, "rb") as img:
+        encoded = base64.b64encode(img.read()).decode()
+        return f"data:image/png;base64,{encoded}"
         
 def get_val(linha, col, fmt=None, default="—"):
     if col in linha.index and pd.notna(linha[col]):
@@ -1014,14 +1004,66 @@ hora = linha_exg.get("Time", "")
 
 gh = linha_exg.get("Result Home")
 ga = linha_exg.get("Result Visitor")
+gh_ht = linha_exg.get("Result_Home_HT")
+ga_ht = linha_exg.get("Result_Visitor_HT")
 
-# placar
+# =========================
+# PLACAR PRINCIPAL
+# =========================
 if pd.notna(gh) and pd.notna(ga):
     placar = f"{int(gh)} x {int(ga)}"
 else:
-    placar = "X"
+    placar = "X"   # jogo não iniciado
 
-    left, center, right = st.columns([2,1,2])
+# =========================
+# PLACAR HT
+# =========================
+if pd.notna(gh_ht) and pd.notna(ga_ht):
+    ht_html = f'<div style="font-size:14px; opacity:0.7;">HT: {int(gh_ht)} x {int(ga_ht)}</div>'
+else:
+    ht_html = ""
+
+# =========================
+# HORÁRIO (mostra só se existir)
+# =========================
+hora_html = f'<div style="font-size:16px; opacity:0.6;">🕒 {hora}</div>' if hora else ""
+
+st.markdown(
+    f"""
+    <div style="text-align:center">
+
+        <div style="font-size:20px; opacity:0.85;">
+            🏆 {liga}
+        </div>
+
+        {hora_html}
+
+        <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:25px 0;">
+
+            <div>
+                <img src="{esc_home}" width="70">
+                <div style="font-size:18px; font-weight:700;">{home}</div>
+            </div>
+
+            <div style="font-size:30px; font-weight:900;">
+                {placar}
+            </div>
+
+            <div>
+                <img src="{esc_away}" width="70">
+                <div style="font-size:18px; font-weight:700;">{away}</div>
+            </div>
+
+        </div>
+
+        {ht_html}
+
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown("---")
 
     # 👇 ESTA LINHA DEVE TER ESTE RECUO
     st.markdown("### 🎯 Odds")
