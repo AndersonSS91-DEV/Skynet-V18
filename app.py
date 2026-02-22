@@ -1018,7 +1018,7 @@ with tab1:
         st.image(esc_away, width=90)
         st.markdown(f"<div style='text-align:center'>{away}</div>", unsafe_allow_html=True)
 
-st.markdown("---")
+    st.markdown("---")
 
     # ODDS
     st.markdown("### 🎯 Odds")
