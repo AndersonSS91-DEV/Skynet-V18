@@ -220,7 +220,7 @@ else:
     c1, c2, c3 = st.columns([1,2,1])
 
 with c2:
-    st.image(BANNERS[st.session_state.banner_idx], width=500)
+    st.image(BANNERS[st.session_state.banner_idx], width=600)
 
 
 # =========================================
