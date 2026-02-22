@@ -433,7 +433,7 @@ with o3:
 
     st.markdown("### 🔢⚽ Poisson Consenso")
 
-    matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
+    matriz_consenso = matriz_poisson(lambda_home, lambda_away)
 
     exibir_matriz(
         matriz_consenso,
