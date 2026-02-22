@@ -1000,6 +1000,33 @@ with tab1:
     esc_away = escudo_time_base64(away)
 
     liga = linha_exg.get("League", "")
+    
+    st.markdown(
+    f"<h4 style='text-align:center; opacity:0.8;'>🏆 {liga}</h4>",
+    unsafe_allow_html=True
+)
+
+col1, col2, col3 = st.columns([1,1,1])
+
+with col1:
+    st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+    st.image(esc_home, width=90)
+    st.markdown(f"<b>{home}</b>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+with col2:
+    st.markdown(
+        f"<h1 style='text-align:center; margin-top:20px'>{placar}</h1>",
+        unsafe_allow_html=True
+    )
+
+with col3:
+    st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+    st.image(esc_away, width=90)
+    st.markdown(f"<b>{away}</b>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+st.markdown("---")
 
     gh = linha_exg.get("Result Home")
     ga = linha_exg.get("Result Visitor")
@@ -1037,7 +1064,6 @@ with tab1:
         st.markdown(f"**{away}**")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("---")
     st.markdown("---")
 
     # ODDS
