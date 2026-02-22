@@ -1225,7 +1225,7 @@ if not jogo_ht.empty:
 
 🔥 Gol HT: {ht['Prob_Gol_HT']}%   |   ❄️ 0x0 HT: {ht['Prob_0x0_HT']}%
 
-🏠 Home marca: {ht['Gol_HT_Home_%']}%   |   ✈️ Away marca: {ht['Gol_HT_Away_%']}%
+🏠 Home marca HT: {ht['Gol_HT_Home_%']}%   |   ✈️ Away marca HT: {ht['Gol_HT_Away_%']}%
 
 {ht['Selo_HT']}
 """
