@@ -149,6 +149,31 @@ button[data-baseweb="tab"][aria-selected="true"] * {
     font-size: 26px !important;
     color: #00E5FF !important;
 }
+/* ===== SELECTBOX TAMANHO ===== */
+
+/* caixa externa */
+div[data-baseweb="select"] {
+    min-height: 55px !important;
+}
+
+/* área clicável */
+div[data-baseweb="select"] > div {
+    min-height: 55px !important;
+    display: flex;
+    align-items: center;
+}
+
+/* texto selecionado */
+div[data-baseweb="select"] span {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+}
+
+/* itens do dropdown */
+ul[role="listbox"] li {
+    font-size: 18px !important;
+    padding: 10px !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
