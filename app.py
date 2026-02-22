@@ -348,13 +348,8 @@ def escudo_time(nome):
         return caminho
     return "assets/escudos/default.png"
 
-def get_val(linha, col, fmt=None, default="—"):def get_val(linha, col, fmt=None, default="—"):
-    if col in linha.index and pd.notna(linha[col]):
-        try:
-            return fmt.format(linha[col]) if fmt else linha[col]
-        except Exception:
-            return default
-    return default
+def get_val(linha, col, fmt=None, default="—"):
+
 
 
 def calc_ev(odd_real, odd_justa):
