@@ -1021,25 +1021,28 @@ with tab1:
 
     hora_html = f'<div style="opacity:0.6;">🕒 {hora}</div>' if hora else ""
 
-    st.markdown(f"### 🏆 {liga}")
+    st.markdown(f"## 🏆 {liga}")
 
 if hora:
     st.caption(f"🕒 {hora}")
 
-col1, col2, col3 = st.columns([1,1,1])
+left, center, right = st.columns([2,1,2])
 
-with col1:
-    if esc_home:
-        st.image(esc_home, width=70)
+with left:
+    st.image(esc_home, width=90)
     st.markdown(f"**{home}**")
 
-with col2:
-    st.markdown(f"<h2 style='text-align:center'>{placar}</h2>", unsafe_allow_html=True)
+with center:
+    st.markdown(
+        f"<h1 style='text-align:center;margin-top:20px'>{placar}</h1>",
+        unsafe_allow_html=True
+    )
 
-with col3:
-    if esc_away:
-        st.image(esc_away, width=70)
+with right:
+    st.image(esc_away, width=90)
     st.markdown(f"**{away}**")
+
+st.markdown("---")
 
     # 👇 continua normal
     st.markdown("### 🎯 Odds")
