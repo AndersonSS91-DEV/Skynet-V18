@@ -129,8 +129,6 @@ div[data-testid="stDataFrame"] th {
     font-size: 20px !important;
 }
 
-</style>
-""", unsafe_allow_html=True)
 /* TEXTO dentro do selectbox */
 div[data-baseweb="select"] span {
     font-size: 22px !important;
@@ -142,6 +140,10 @@ label[data-testid="stWidgetLabel"] {
     font-size: 20px !important;
     font-weight: 700 !important;
 }
+
+</style>
+""", unsafe_allow_html=True)
+
 # =========================================
 # 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
 # =========================================
