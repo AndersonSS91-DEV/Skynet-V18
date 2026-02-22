@@ -1224,24 +1224,30 @@ if not jogo_ht.empty:
     ht = jogo_ht.iloc[0]
 
     st.markdown(f"""
-    <div style="
-        background: linear-gradient(90deg,#0f2027,#203a43,#2c5364);
-        padding:16px;
-        border-radius:12px;
-        margin-top:12px;
-        margin-bottom:12px;
-        font-size:20px;
-    ">
-    ⚡ <b>Probabilidade de Gol no 1º Tempo</b><br>
-    🔥 Gol HT: <b>{ht['Prob_Gol_HT']}%</b> &nbsp;&nbsp;
-    ❄️ 0x0 HT: <b>{ht['Prob_0x0_HT']}%</b><br>
-    🏠 Home marca: <b>{ht['Gol_HT_Home_%']}%</b> &nbsp;&nbsp;
-    ✈️ Away marca: <b>{ht['Gol_HT_Away_%']}%</b><br>
-    <b>{ht['Selo_HT']}</b>
-    </div>
-    """, unsafe_allow_html=True)
+<div style="
+    background: linear-gradient(90deg,#0f2027,#203a43,#2c5364);
+    padding:18px 22px;
+    border-radius:12px;
+    margin-top:14px;
+    margin-bottom:14px;
+    font-size:20px;
+    font-weight:700;
+    line-height:1.6;
+    box-shadow:0 4px 12px rgba(0,0,0,0.35);
+    width:100%;
+">
+⚡ Probabilidade de Gol no 1º Tempo<br>
 
+🔥 Gol HT: <b>{ht['Prob_Gol_HT']}%</b> &nbsp;&nbsp;
+❄️ 0x0 HT: <b>{ht['Prob_0x0_HT']}%</b><br>
 
+🏠 Home marca: <b>{ht['Gol_HT_Home_%']}%</b> &nbsp;&nbsp;
+✈️ Away marca: <b>{ht['Gol_HT_Away_%']}%</b><br>
+
+<b>{ht['Selo_HT']}</b>
+</div>
+""", unsafe_allow_html=True)
+    
     # =========================================
     # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
     # =========================================
