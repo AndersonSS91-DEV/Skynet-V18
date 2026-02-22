@@ -137,7 +137,7 @@ div[data-baseweb="select"] div {
 
 /* opções dentro da lista */
 ul[role="listbox"] li {
-    font-size: 18px !important;
+    font-size: 22px !important;
 }
 
 button[aria-selected="true"] {
@@ -146,7 +146,7 @@ button[aria-selected="true"] {
 }
 
 button[data-baseweb="tab"][aria-selected="true"] * {
-    font-size: 22px !important;
+    font-size: 26px !important;
     color: #00E5FF !important;
 }
 </style>
