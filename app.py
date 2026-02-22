@@ -129,18 +129,16 @@ div[data-testid="stDataFrame"] th {
     font-size: 20px !important;
 }
 
-/* TEXTO dentro do selectbox */
-div[data-baseweb="select"] span {
-    font-size: 50px !important;
+/* texto do valor selecionado */
+div[data-baseweb="select"] div {
+    font-size: 22px !important;
     font-weight: 700 !important;
 }
 
-/* label "Escolha o jogo" */
-label[data-testid="stWidgetLabel"] {
-    font-size: 50px !important;
-    font-weight: 700 !important;
+/* opções dentro da lista */
+ul[role="listbox"] li {
+    font-size: 18px !important;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -291,7 +289,11 @@ jogos_lista = df_mgf["JOGO"].tolist()
 if "jogo" not in st.session_state or st.session_state["jogo"] not in jogos_lista:
     st.session_state["jogo"] = jogos_lista[0]
 
-jogo = st.selectbox("⚽ Escolha o jogo", jogos_lista)
+st.markdown("### ⚽ Escolha o jogo")
+jogo = st.selectbox(
+    label="",
+    options=jogos_lista
+))
 linha_mgf = df_mgf[df_mgf["JOGO"] == jogo].iloc[0]
 linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
 linha_vg  = df_vg[df_vg["JOGO"] == jogo].iloc[0]  # <<< FALTAVA ISSO
