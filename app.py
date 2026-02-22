@@ -1279,8 +1279,8 @@ with tab1:
 # =============================
 # ⚡ CARD HT
 # =============================
-jogo_ht = df_ht[df_ht["JOGO"] == jogo]
-if not jogo_ht.empty:
+    jogo_ht = df_ht[df_ht["JOGO"] == jogo]
+    if not jogo_ht.empty:
     ht = jogo_ht.iloc[0]
 
     st.info(
