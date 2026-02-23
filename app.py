@@ -25,20 +25,26 @@ import base64
 PASTA_ESCUDOS = Path(__file__).parent / "assets" / "escudos"
 
 def escudo_time_base64(nome_time):
+
     if not nome_time:
         return ""
 
     nome_arquivo = str(nome_time).strip().replace(" ", "_")
     caminho = PASTA_ESCUDOS / f"{nome_arquivo}.png"
 
-    if caminho.exists():
-        with open(caminho, "rb") as f:
-            return "data:image/png;base64," + base64.b64encode(f.read()).decode()
+    try:
+        if caminho.is_file():
+            with open(caminho, "rb") as img:
+                return "data:image/png;base64," + base64.b64encode(img.read()).decode()
 
-    caminho_padrao = PASTA_ESCUDOS / "team_vazio.png"
-    if caminho_padrao.exists():
-        with open(caminho_padrao, "rb") as f:
-            return "data:image/png;base64," + base64.b64encode(f.read()).decode()
+        # fallback padrão
+        caminho_padrao = PASTA_ESCUDOS / "team_vazio.png"
+        if caminho_padrao.is_file():
+            with open(caminho_padrao, "rb") as img:
+                return "data:image/png;base64," + base64.b64encode(img.read()).decode()
+
+    except Exception as e:
+        print(f"Erro carregando escudo: {e}")
 
     return ""
 
