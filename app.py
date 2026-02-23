@@ -22,7 +22,7 @@ from PIL import Image
 from pathlib import Path
 import base64
 
-PASTA_ESCUDOS = Path("assets/escudos")
+PASTA_ESCUDOS = Path(__file__).parent / "assets" / "escudos"
 
 def escudo_time_base64(nome_time):
     if not nome_time:
@@ -31,12 +31,10 @@ def escudo_time_base64(nome_time):
     nome_arquivo = str(nome_time).strip().replace(" ", "_")
     caminho = PASTA_ESCUDOS / f"{nome_arquivo}.png"
 
-    # ✅ escudo do time
     if caminho.exists():
         with open(caminho, "rb") as f:
             return "data:image/png;base64," + base64.b64encode(f.read()).decode()
 
-    # ✅ fallback padrão
     caminho_padrao = PASTA_ESCUDOS / "team_vazio.png"
     if caminho_padrao.exists():
         with open(caminho_padrao, "rb") as f:
