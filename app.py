@@ -246,6 +246,119 @@ def intensidade(s):
 
 st.header(intensidade(score_jogo))
 
+# =========================================================
+# 🔢 POISSON + MATRIZES
+# =========================================================
+def calcular_matriz_poisson(lh, la, max_gols=5):
+    matriz = np.zeros((max_gols, max_gols))
+    for i in range(max_gols):
+        for j in range(max_gols):
+            matriz[i, j] = poisson.pmf(i, lh) * poisson.pmf(j, la)
+    return matriz
+
+
+def exibir_matriz(matriz, home, away, titulo):
+    st.markdown(f"### {titulo}")
+    df = pd.DataFrame(
+        matriz,
+        index=[f"{home} {i}" for i in range(len(matriz))],
+        columns=[f"{away} {i}" for i in range(len(matriz))]
+    )
+    st.dataframe((df * 100).round(2), use_container_width=True)
+
+
+def mostrar_over_under(matriz, titulo):
+    total = {}
+
+    for i in range(len(matriz)):
+        for j in range(len(matriz)):
+            gols = i + j
+            total[gols] = total.get(gols, 0) + matriz[i, j]
+
+    over25 = sum(v for k, v in total.items() if k >= 3) * 100
+    under25 = 100 - over25
+
+    st.markdown(f"### {titulo}")
+    c1, c2 = st.columns(2)
+    c1.metric("Over 2.5", f"{over25:.1f}%")
+    c2.metric("Under 2.5", f"{under25:.1f}%")
+
+# =========================================================
+# 🎯 EFICIÊNCIA DE FINALIZAÇÃO
+# =========================================================
+def eficiencia_finalizacao(chutes):
+    if chutes <= 0:
+        return 0
+    return min((1 / chutes) * 100, 100)
+
+# =========================================================
+# 📡 RADAR COMPARATIVO
+# =========================================================
+def radar_comparativo(home, away, nome_home, nome_away):
+    labels = ["Eficiência", "ExG", "Finalizações", "Precisão", "BTTS"]
+
+    ang = np.linspace(0, 2*np.pi, len(labels), endpoint=False)
+    ang = np.concatenate((ang, [ang[0]]))
+
+    home = np.concatenate((home, [home[0]]))
+    away = np.concatenate((away, [away[0]]))
+
+    fig = plt.figure(figsize=(4,4))
+    ax = fig.add_subplot(111, polar=True)
+
+    ax.plot(ang, home)
+    ax.fill(ang, home, alpha=0.2)
+
+    ax.plot(ang, away)
+    ax.fill(ang, away, alpha=0.2)
+
+    ax.set_xticks(ang[:-1])
+    ax.set_xticklabels(labels)
+    ax.set_ylim(0, 100)
+    ax.set_title(f"{nome_home} vs {nome_away}")
+
+    return fig
+# =========================================================
+# 🧱 SCORE DEFENSIVO
+# =========================================================
+def score_defensivo(fd, cs, chs, mgc):
+    if pd.isna(fd): fd = 50
+    if pd.isna(cs): cs = 30
+    if pd.isna(chs) or chs == 0: chs = 10
+    if pd.isna(mgc) or mgc == 0: mgc = 1
+
+    resistencia = min((chs/15) * 100, 100)
+    protecao = max(0, 100 - (mgc * 40))
+
+    return round(fd*0.4 + cs*0.2 + resistencia*0.2 + protecao*0.2, 1)
+# =========================================================
+# 🛡️ CLASSIFICAÇÃO DEFENSIVA
+# =========================================================
+def classificar_defesa(valor):
+    if valor >= 75: return "🧱 MURALHA"
+    if valor >= 60: return "🛡️ FORTE"
+    if valor >= 45: return "⚖️ MÉDIA"
+    return "⚠️ FRÁGIL"
+
+# =========================================================
+# 🧠 LEITURA OFENSIVA
+# =========================================================
+def leitura_ofensiva(time, ef, exg, fin, prec, btts):
+    return f"{time}: eficiência {ef:.1f} | criação {exg:.1f} | BTTS {btts:.0f}%"
+
+# =========================================================
+# 🧠 LEITURA CONSENSO
+# =========================================================
+def leitura_consenso(time, radar):
+    media = np.mean(radar)
+    return f"{time} apresenta índice ofensivo médio de {media:.1f}"
+    
+# =========================================================
+# 🎴 CARD DO JOGO
+# =========================================================
+def mostrar_card(df, jogo):
+    linha = df[df["JOGO"] == jogo].iloc[0]
+    st.subheader(f"{linha['Home_Team']} x {linha['Visitor_Team']}")
 # =========================================
 # FUNÇÕES AUX
 # =========================================
