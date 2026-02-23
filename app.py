@@ -15,12 +15,13 @@ import plotly.graph_objects as go
 import random
 from streamlit_autorefresh import st_autorefresh
 from PIL import Image
-from pathlib import Path
-import base64
 
 # =========================================
 # ESCUDOS
 # =========================================
+from pathlib import Path
+import base64
+
 PASTA_ESCUDOS = Path("assets/escudos")
 
 def escudo_time_base64(nome_time):
