@@ -1002,11 +1002,26 @@ with tab1:
     liga = linha_exg.get("League", "")
     hora = linha_exg.get("Time", "")
 
-    gh = linha_exg.get("Result Home", "")
-    ga = linha_exg.get("Result Visitor", "")
-    gh_ht = linha_exg.get("Result_Home_HT", "")
-    ga_ht = linha_exg.get("Result_Visitor_HT", "")
+    gh = linha_exg.get("Result Home")
+    ga = linha_exg.get("Result Visitor")
+    gh_ht = linha_exg.get("Result_Home_HT")
+    ga_ht = linha_exg.get("Result_Visitor_HT")
 
+# verifica se jogo terminou
+jogo_finalizado = pd.notna(gh) and pd.notna(ga)
+
+# verifica se HT existe
+ht_disponivel = pd.notna(gh_ht) and pd.notna(ga_ht)
+
+if jogo_finalizado:
+    placar_ft = f"{int(gh)} x {int(ga)}"
+else:
+    placar_ft = "vs"
+
+if ht_disponivel:
+    placar_ht = f"HT: {int(gh_ht)} x {int(ga_ht)}"
+else:
+    placar_ht = ""
     st.markdown(
 f"""
 <div style="text-align:center">
@@ -1027,7 +1042,7 @@ f"""
 </div>
 
 <div style="font-size:26px; font-weight:900;">
-{gh} x {ga}
+{placar_ft}
 </div>
 
 <div>
@@ -1038,7 +1053,7 @@ f"""
 </div>
 
 <div style="font-size:14px; opacity:0.7;">
-HT: {gh_ht} x {ga_ht}
+HT: {placar_ht}
 </div>
 
 </div>
