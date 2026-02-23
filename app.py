@@ -394,11 +394,68 @@ def leitura_ofensiva(time, ef, exg, fin, prec, btts):
     return f"{time}: eficiência {ef:.1f} | criação {exg:.1f} | BTTS {btts:.0f}%"
 
 # =========================================================
-# 🧠 LEITURA CONSENSO
+# 🧠 LEITURA OFENSIVA CONSENSO (COMPLETA)
 # =========================================================
 def leitura_consenso(time, radar):
+
+    eficiencia, exg, finalizacoes, precisao, btts = radar
     media = np.mean(radar)
-    return f"{time} apresenta índice ofensivo médio de {media:.1f}"
+
+    texto = f"**{time}** → "
+
+    # Eficiência
+    if eficiencia > 60:
+        texto += "finaliza com ALTÍSSIMA eficiência. "
+    elif eficiencia > 45:
+        texto += "possui boa eficiência nas finalizações. "
+    else:
+        texto += "tem baixa eficiência na conclusão. "
+
+    # Criação ofensiva (ExG)
+    if exg > 70:
+        texto += "Cria chances perigosas com frequência. "
+    elif exg > 50:
+        texto += "gera volume ofensivo consistente. "
+    else:
+        texto += "cria poucas chances claras. "
+
+    # Volume de finalizações
+    if finalizacoes > 70:
+        texto += "pressiona constantemente o adversário. "
+    elif finalizacoes > 50:
+        texto += "mantém presença ofensiva regular. "
+    else:
+        texto += "apresenta baixo volume ofensivo. "
+
+    # Precisão
+    if precisao > 60:
+        texto += "Apresenta alta precisão nas finalizações. "
+    elif precisao > 45:
+        texto += "tem precisão aceitável. "
+    else:
+        texto += "finaliza com pouca precisão. "
+
+    # Tendência BTTS
+    if btts > 65:
+        texto += "Jogo com forte tendência de ambos marcarem. "
+    elif btts > 50:
+        texto += "BTTS moderadamente provável. "
+    else:
+        texto += "baixa probabilidade de ambos marcarem. "
+
+    # Índice ofensivo geral
+    texto += f"\n\n🎯 Índice ofensivo geral: **{media:.1f}**"
+
+    if media > 75:
+        texto += " → 💀 ataque extremamente perigoso."
+    elif media > 60:
+        texto += " → 🔥 ataque forte."
+    elif media > 45:
+        texto += " → ⚡ ataque competitivo."
+    else:
+        texto += " → ❄️ ataque limitado."
+
+    return texto
     
 # =========================================================
 # 🎴 CARD DO JOGO
