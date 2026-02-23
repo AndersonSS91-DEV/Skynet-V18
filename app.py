@@ -15,36 +15,33 @@ import plotly.graph_objects as go
 import random
 from streamlit_autorefresh import st_autorefresh
 from PIL import Image
+import base64
+from pathlib import Path
 
 # =========================================
 # ESCUDOS
 # =========================================
-from pathlib import Path
-import base64
-
-PASTA_ESCUDOS = Path(__file__).parent / "assets" / "escudos"
+PASTA_ESCUDOS = Path("assets/escudos")
 
 def escudo_time_base64(nome_time):
 
     if not nome_time:
         return ""
 
-    nome_arquivo = str(nome_time).strip().replace(" ", "_")
-    caminho = PASTA_ESCUDOS / f"{nome_arquivo}.png"
+    nome_arquivo = str(nome_time).strip().replace(" ", "_") + ".png"
+    caminho = PASTA_ESCUDOS / nome_arquivo
 
-    try:
-        if caminho.is_file():
-            with open(caminho, "rb") as img:
-                return "data:image/png;base64," + base64.b64encode(img.read()).decode()
+    # ✅ se existir escudo do time
+    if caminho.exists():
+        with open(caminho, "rb") as img:
+            return "data:image/png;base64," + base64.b64encode(img.read()).decode()
 
-        # fallback padrão
-        caminho_padrao = PASTA_ESCUDOS / "team_vazio.png"
-        if caminho_padrao.is_file():
-            with open(caminho_padrao, "rb") as img:
-                return "data:image/png;base64," + base64.b64encode(img.read()).decode()
+    # ✅ fallback
+    caminho_fallback = PASTA_ESCUDOS / "team_vazio.png"
 
-    except Exception as e:
-        print(f"Erro carregando escudo: {e}")
+    if caminho_fallback.exists():
+        with open(caminho_fallback, "rb") as img:
+            return "data:image/png;base64," + base64.b64encode(img.read()).decode()
 
     return ""
 
