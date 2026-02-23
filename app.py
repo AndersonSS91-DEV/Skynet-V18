@@ -270,7 +270,29 @@ def cards_ofensivos(home, away, ef_home, ef_away, exg_total):
         st.info("⚡ Produção moderada")
     else:
         st.success("🔥 Forte tendência ofensiva")
+        
+# =========================================================
+# 🔥 CLASSIFICAÇÃO DA INTENSIDADE OFENSIVA
+# =========================================================
+def classificar_intensidade(score):
 
+    if score < 35:
+        return "❄️ Jogo muito frio"
+
+    elif score < 55:
+        return "🧊 Baixa intensidade ofensiva"
+
+    elif score < 70:
+        return "⚡ Intensidade moderada"
+
+    elif score < 82:
+        return "🔥 Jogo quente"
+
+    elif score < 90:
+        return "💣 Altíssima pressão ofensiva"
+
+    else:
+        return "💀🔥 Jogo extremamente ofensivo"
 # =========================================================
 # 🔢 POISSON + MATRIZES
 # =========================================================
