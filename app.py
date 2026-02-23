@@ -247,6 +247,31 @@ def intensidade(s):
 st.header(intensidade(score_jogo))
 
 # =========================================================
+# 🎴 CARDS OFENSIVOS
+# =========================================================
+def cards_ofensivos(home, away, ef_home, ef_away, exg_total):
+    
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Eficiência Home", f"{ef_home:.1f}")
+
+    with col2:
+        st.metric("Eficiência Away", f"{ef_away:.1f}")
+
+    with col3:
+        st.metric("ExG Total", f"{exg_total:.2f}")
+
+    intensidade = exg_total
+
+    if intensidade < 2:
+        st.info("❄️ Baixa produção ofensiva")
+    elif intensidade < 2.8:
+        st.info("⚡ Produção moderada")
+    else:
+        st.success("🔥 Forte tendência ofensiva")
+
+# =========================================================
 # 🔢 POISSON + MATRIZES
 # =========================================================
 def calcular_matriz_poisson(lh, la, max_gols=5):
