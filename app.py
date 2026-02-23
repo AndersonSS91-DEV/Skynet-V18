@@ -130,7 +130,12 @@ jogo = st.selectbox("⚽ Escolha o jogo", df_mgf["JOGO"])
 linha_mgf=df_mgf[df_mgf.JOGO==jogo].iloc[0]
 linha_exg=df_exg[df_exg.JOGO==jogo].iloc[0]
 linha_vg=df_vg[df_vg.JOGO==jogo].iloc[0]
-linha_ht=df_ht[df_ht.JOGO==jogo].iloc[0]
+linha_ht = df_ht[df_ht["JOGO"] == jogo]
+
+if not linha_ht.empty:
+    linha_ht = linha_ht.iloc[0]
+else:
+    linha_ht = None
 
 radar_home, radar_away, ief_home, ief_away = radar_map[jogo]
 
@@ -257,6 +262,13 @@ def calc_ev(odd_real, odd_justa):
         return (odd_real / odd_justa) - 1
     except:
         return None
+
+def calcular_matriz_poisson(lh, la, max_gols=5):
+    matriz = np.zeros((max_gols, max_gols))
+    for i in range(max_gols):
+        for j in range(max_gols):
+            matriz[i,j] = poisson.pmf(i, lh) * poisson.pmf(j, la)
+    return matriz
 
 # =========================================
 # ESTATÍSTICAS DO SCORE
@@ -433,7 +445,7 @@ with o3:
 
     st.markdown("### 🔢⚽ Poisson Consenso")
 
-    matriz_consenso = matriz_poisson(lambda_home, lambda_away)
+    matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
 
     exibir_matriz(
         matriz_consenso,
