@@ -345,7 +345,7 @@ st.session_state["jogo"] = jogo
 # FUNÇÕES AUX
 # =========================================
 # =========================================
-# 🔰 MATCH PROFISSIONAL DE ESCUDOS (v2)
+# 🔰 MATCH PROFISSIONAL DE ESCUDOS (FIX FINAL)
 # =========================================
 def escudo_path(nome_time):
     import unicodedata, os, re
@@ -363,34 +363,35 @@ def escudo_path(nome_time):
     # 🧠 APELIDOS MANUAIS
     # ===============================
     APELIDOS = {
+        "inter milan": "inter",
         "inter": "inter",
-        "psg": "paris saint germain",
-        "man utd": "manchester united",
-        "man city": "manchester city",
-        "atletico": "atletico madrid",
-        "bayern": "bayern munich",
-        "juve": "juventus",
+        "bodø glimt": "bodo glimt",
+        "bodo/glimt": "bodo glimt",
+        "bodo glimt": "bodo glimt",
         "estrela": "estrela amadora",
-        "bodø glimt": "Bodø / Glimt",
     }
 
     # ===============================
-    # LIMPEZA DO TEXTO
+    # LIMPAR TEXTO
     # ===============================
     def limpar(txt):
         txt = str(txt).lower().strip()
 
-        txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
+        # remove acentos (ø → o)
+        txt = unicodedata.normalize('NFKD', txt)\
+            .encode('ASCII','ignore').decode('ASCII')
 
         # remove categorias base
         txt = re.sub(r'\b(u17|u19|u20|u21|u23|sub17|sub20|sub23)\b', '', txt)
 
-        # remove B team / II / reservas
-        txt = re.sub(r'\b(ii| b |reserves|reserve)\b', '', txt)
+        # remove reservas / II / B
+        txt = re.sub(r'\b(ii|reserves|reserve)\b', '', txt)
 
-        txt = txt.replace("-", " ").replace("_", " ")
+        txt = txt.replace("/", " ")
+        txt = txt.replace("-", " ")
+        txt = txt.replace("_", " ")
+
         txt = re.sub(r'\s+', ' ', txt).strip()
-
         return txt
 
     alvo = limpar(nome_time)
@@ -400,48 +401,47 @@ def escudo_path(nome_time):
 
     arquivos = [a for a in os.listdir(pasta) if a.endswith(".png")]
 
-    # ===============================
-    # 1️⃣ MATCH EXATO DO NOME COMPLETO
-    # ===============================
+    # =================================
+    # 1️⃣ MATCH EXATO
+    # =================================
     for arq in arquivos:
         nome_arq = limpar(arq.replace(".png", ""))
         if alvo == nome_arq:
             return os.path.join(pasta, arq)
 
-    # ===============================
-    # 2️⃣ MATCH EXATO IGNORANDO ESPAÇOS
-    # ===============================
-    alvo_compacto = alvo.replace(" ", "")
+    # =================================
+    # 2️⃣ MATCH COMPACTO (sem espaços)
+    # =================================
+    alvo_comp = alvo.replace(" ", "")
     for arq in arquivos:
         nome_arq = limpar(arq.replace(".png", "")).replace(" ", "")
-        if alvo_compacto == nome_arq:
+        if alvo_comp == nome_arq:
             return os.path.join(pasta, arq)
 
-    # ===============================
-    # 3️⃣ MATCH POR INÍCIO DO NOME
+    # =================================
+    # 3️⃣ MATCH POR INÍCIO (seguro)
     # evita Inter → Winterthur
-    # ===============================
+    # =================================
     for arq in arquivos:
         nome_arq = limpar(arq.replace(".png", ""))
-        if nome_arq.startswith(alvo):
+        if nome_arq.startswith(alvo) and len(alvo) > 3:
             return os.path.join(pasta, arq)
 
-    # ===============================
-    # 4️⃣ MATCH POR TOKENS (SEGURO)
-    # ===============================
-    alvo_tokens = alvo.split()
+    # =================================
+    # 4️⃣ MATCH POR TOKENS
+    # =================================
+    alvo_tokens = set(alvo.split())
 
     melhor = None
     melhor_score = 0
 
     for arq in arquivos:
         nome_arq = limpar(arq.replace(".png", ""))
-        tokens_arq = nome_arq.split()
+        tokens = set(nome_arq.split())
 
-        intersec = len(set(alvo_tokens) & set(tokens_arq))
+        intersec = len(alvo_tokens & tokens)
         score = intersec / max(len(alvo_tokens), 1)
 
-        # exige match forte para evitar erros
         if score > melhor_score and score >= 0.7:
             melhor = arq
             melhor_score = score
@@ -1104,9 +1104,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
-# =========================================
-# ABA 1 — RESUMO
-# =========================================
 with tab1:
 
     home = linha_exg["Home_Team"]
@@ -1115,22 +1112,27 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    st.markdown("### ⚽ Confronto")
+    col1, col2, col3 = st.columns([2,1,2])
 
-    colA, colB, colC = st.columns([2,1,2])
+    with col1:
+        st.image(esc_home, width=90)
+        st.markdown(
+            f"<center><b>{home}</b></center>",
+            unsafe_allow_html=True
+        )
 
-    with colA:
-        if esc_home:
-            st.image(esc_home, width=90)
-        st.markdown(f"<div style='text-align:center;font-size:20px;font-weight:800'>{home}</div>", unsafe_allow_html=True)
+    with col2:
+        st.markdown(
+            "<h2 style='text-align:center'>VS</h2>",
+            unsafe_allow_html=True
+        )
 
-    with colB:
-        st.markdown("<h1 style='text-align:center'>VS</h1>", unsafe_allow_html=True)
-
-    with colC:
-        if esc_away:
-            st.image(esc_away, width=90)
-        st.markdown(f"<div style='text-align:center;font-size:20px;font-weight:800'>{away}</div>", unsafe_allow_html=True)
+    with col3:
+        st.image(esc_away, width=90)
+        st.markdown(
+            f"<center><b>{away}</b></center>",
+            unsafe_allow_html=True
+        )
 
     st.markdown("---")
 
