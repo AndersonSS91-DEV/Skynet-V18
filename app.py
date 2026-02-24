@@ -344,29 +344,28 @@ st.session_state["jogo"] = jogo
 # =========================================
 # FUNÇÕES AUX
 # =========================================
-def escudo_time_base64(nome_time):
-    import base64
-    from pathlib import Path
+def escudo_path(nome_time):
+    import unicodedata, os
+
+    pasta = "escudos"
 
     if not nome_time:
-        return ""
+        return None
 
-    nome_arquivo = (
-        str(nome_time)
-        .lower()
-        .strip()
-        .replace(" ", "_")
-        .replace("-", "_")
-        .replace(".", "")
-    )
+    def normalizar(txt):
+        txt = str(txt).lower().strip()
+        txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
+        return txt.replace(" ", "").replace("_", "").replace("-", "")
 
-    caminho = Path("escudos") / f"{nome_arquivo}.png"
+    alvo = normalizar(nome_time)
 
-    if caminho.exists():
-        with open(caminho, "rb") as img:
-            return "data:image/png;base64," + base64.b64encode(img.read()).decode()
+    for arq in os.listdir(pasta):
+        nome_arq = normalizar(arq.replace(".png",""))
 
-    return ""
+        if alvo in nome_arq or nome_arq in alvo:
+            return os.path.join(pasta, arq)
+
+    return None
     # (FIM DO BLOCO)
         
 def get_val(linha, col, fmt=None, default="—"):
@@ -500,9 +499,6 @@ def normalizar(txt):
     txt = str(txt).lower().strip()
     txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
     return txt.replace(" ", "").replace("_", "").replace("-", "")
-
-def escudo_time(nome_time):
-    pasta = "escudos"
 
     if not nome_time:
         return None
@@ -1023,31 +1019,33 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
+# =========================================
+# ABA 1 — RESUMO
+# =========================================
 with tab1:
 
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
 
-    esc_home = escudo_time_base64(home)
-    esc_away = escudo_time_base64(away)
+    esc_home = escudo_path(home)
+    esc_away = escudo_path(away)
 
-    st.markdown(f"""
-    <div style="display:flex; justify-content:center; gap:60px; align-items:center;">
+    st.markdown("### ⚽ Confronto")
 
-        <div style="text-align:center">
-            <img src="{esc_home}" width="70">
-            <div>{home}</div>
-        </div>
+    colA, colB, colC = st.columns([2,1,2])
 
-        <div style="font-size:28px; font-weight:900;">VS</div>
+    with colA:
+        if esc_home:
+            st.image(esc_home, width=90)
+        st.markdown(f"<div style='text-align:center;font-size:20px;font-weight:800'>{home}</div>", unsafe_allow_html=True)
 
-        <div style="text-align:center">
-            <img src="{esc_away}" width="70">
-            <div>{away}</div>
-        </div>
+    with colB:
+        st.markdown("<h1 style='text-align:center'>VS</h1>", unsafe_allow_html=True)
 
-    </div>
-    """, unsafe_allow_html=True)
+    with colC:
+        if esc_away:
+            st.image(esc_away, width=90)
+        st.markdown(f"<div style='text-align:center;font-size:20px;font-weight:800'>{away}</div>", unsafe_allow_html=True)
 
     st.markdown("---")
 
