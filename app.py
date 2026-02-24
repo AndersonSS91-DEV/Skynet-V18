@@ -344,28 +344,92 @@ st.session_state["jogo"] = jogo
 # =========================================
 # FUNÇÕES AUX
 # =========================================
+# =========================================
+# 🔰 BUSCA INTELIGENTE + PLACEHOLDER
+# =========================================
 def escudo_path(nome_time):
-    import unicodedata, os
+    import unicodedata, os, re
 
     pasta = "escudos"
+    placeholder = os.path.join(pasta, "time_vazio.png")
+
+    if not os.path.exists(pasta):
+        return placeholder
 
     if not nome_time:
-        return None
+        return placeholder
 
-    def normalizar(txt):
+    # ===============================
+    # 🧠 DICIONÁRIO MANUAL
+    # ===============================
+    APELIDOS = {
+        "inter": "internazionale",
+        "psg": "paris saint germain",
+        "man utd": "manchester united",
+        "man city": "manchester city",
+        "atletico": "atletico madrid",
+        "bayern": "bayern munich",
+        "juve": "juventus",
+        "estrela": "estrela amadora",
+        "bodo glimt": "bodo glimt",
+    }
+
+    # ===============================
+    # LIMPEZA DO TEXTO
+    # ===============================
+    def limpar(txt):
         txt = str(txt).lower().strip()
-        txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
-        return txt.replace(" ", "").replace("_", "").replace("-", "")
 
-    alvo = normalizar(nome_time)
+        txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
+
+        # remove categorias base
+        txt = re.sub(r'\b(u17|u19|u20|u21|u23|sub17|sub20|sub23)\b', '', txt)
+
+        # remove B team / II / reservas
+        txt = re.sub(r'\b(ii| b |reserves|reserve)\b', '', txt)
+
+        txt = txt.replace("-", " ").replace("_", " ")
+        txt = re.sub(r'\s+', ' ', txt).strip()
+
+        return txt
+
+    alvo = limpar(nome_time)
+
+    if alvo in APELIDOS:
+        alvo = APELIDOS[alvo]
+
+    alvo_tokens = alvo.split()
+
+    melhor_match = None
+    melhor_score = 0
 
     for arq in os.listdir(pasta):
-        nome_arq = normalizar(arq.replace(".png",""))
 
-        if alvo in nome_arq or nome_arq in alvo:
+        if not arq.lower().endswith(".png"):
+            continue
+
+        nome_limpo = limpar(arq.replace(".png",""))
+        tokens_arq = nome_limpo.split()
+
+        # MATCH EXATO
+        if alvo == nome_limpo:
             return os.path.join(pasta, arq)
 
-    return None
+        # MATCH POR PALAVRAS
+        intersec = len(set(alvo_tokens) & set(tokens_arq))
+        score = intersec / max(len(alvo_tokens), 1)
+
+        # evita falsos positivos
+        if score > melhor_score and score >= 0.6:
+            melhor_match = arq
+            melhor_score = score
+
+    if melhor_match:
+        return os.path.join(pasta, melhor_match)
+
+    # 🔥 fallback final
+    return placeholder
+    
     # (FIM DO BLOCO)
         
 def get_val(linha, col, fmt=None, default="—"):
