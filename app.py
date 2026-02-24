@@ -363,7 +363,7 @@ def escudo_path(nome_time):
     # 🧠 APELIDOS MANUAIS
     # ===============================
     APELIDOS = {
-        "inter": "internazionale",
+        "inter": "inter",
         "psg": "paris saint germain",
         "man utd": "manchester united",
         "man city": "manchester city",
