@@ -377,28 +377,26 @@ def escudo_path(nome_time):
     # ===============================
     # LIMPEZA DO TEXTO
     # ===============================
-    def limpar(txt):
-        txt = str(txt).lower().strip()
+def limpar(txt):
+    txt = str(txt).lower().strip()
 
-        txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
+    # remove acentos (ø -> o)
+    txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
 
-        # remove categorias base
-        txt = re.sub(r'\b(u17|u19|u20|u21|u23|sub17|sub20|sub23)\b', '', txt)
+    # troca separadores estranhos
+    txt = txt.replace("/", " ")
+    txt = txt.replace("-", " ")
+    txt = txt.replace("_", " ")
 
-        # remove B team / II / reservas
-        txt = re.sub(r'\b(ii| b |reserves|reserve)\b', '', txt)
+    # remove categorias base
+    txt = re.sub(r'\b(u17|u19|u20|u21|u23|sub17|sub20|sub23)\b', '', txt)
 
-        txt = txt.replace("-", " ").replace("_", " ")
-        txt = re.sub(r'\s+', ' ', txt).strip()
+    # remove B team / II
+    txt = re.sub(r'\b(ii| b |reserves|reserve)\b', '', txt)
 
-        return txt
+    txt = re.sub(r'\s+', ' ', txt).strip()
 
-    alvo = limpar(nome_time)
-
-    if alvo in APELIDOS:
-        alvo = APELIDOS[alvo]
-
-    arquivos = [a for a in os.listdir(pasta) if a.endswith(".png")]
+    return txt
 
     # ===============================
     # 1️⃣ MATCH EXATO DO NOME COMPLETO
