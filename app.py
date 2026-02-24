@@ -345,7 +345,7 @@ st.session_state["jogo"] = jogo
 # FUNÇÕES AUX
 # =========================================
 # =========================================
-# 🔰 BUSCA INTELIGENTE + PLACEHOLDER
+# 🔰 MATCH PROFISSIONAL DE ESCUDOS (v2)
 # =========================================
 def escudo_path(nome_time):
     import unicodedata, os, re
@@ -360,7 +360,7 @@ def escudo_path(nome_time):
         return placeholder
 
     # ===============================
-    # 🧠 DICIONÁRIO MANUAL
+    # 🧠 APELIDOS MANUAIS
     # ===============================
     APELIDOS = {
         "inter": "internazionale",
@@ -398,36 +398,57 @@ def escudo_path(nome_time):
     if alvo in APELIDOS:
         alvo = APELIDOS[alvo]
 
-    alvo_tokens = alvo.split()
+    arquivos = [a for a in os.listdir(pasta) if a.endswith(".png")]
 
-    melhor_match = None
-    melhor_score = 0
-
-    for arq in os.listdir(pasta):
-
-        if not arq.lower().endswith(".png"):
-            continue
-
-        nome_limpo = limpar(arq.replace(".png",""))
-        tokens_arq = nome_limpo.split()
-
-        # MATCH EXATO
-        if alvo == nome_limpo:
+    # ===============================
+    # 1️⃣ MATCH EXATO DO NOME COMPLETO
+    # ===============================
+    for arq in arquivos:
+        nome_arq = limpar(arq.replace(".png", ""))
+        if alvo == nome_arq:
             return os.path.join(pasta, arq)
 
-        # MATCH POR PALAVRAS
+    # ===============================
+    # 2️⃣ MATCH EXATO IGNORANDO ESPAÇOS
+    # ===============================
+    alvo_compacto = alvo.replace(" ", "")
+    for arq in arquivos:
+        nome_arq = limpar(arq.replace(".png", "")).replace(" ", "")
+        if alvo_compacto == nome_arq:
+            return os.path.join(pasta, arq)
+
+    # ===============================
+    # 3️⃣ MATCH POR INÍCIO DO NOME
+    # evita Inter → Winterthur
+    # ===============================
+    for arq in arquivos:
+        nome_arq = limpar(arq.replace(".png", ""))
+        if nome_arq.startswith(alvo):
+            return os.path.join(pasta, arq)
+
+    # ===============================
+    # 4️⃣ MATCH POR TOKENS (SEGURO)
+    # ===============================
+    alvo_tokens = alvo.split()
+
+    melhor = None
+    melhor_score = 0
+
+    for arq in arquivos:
+        nome_arq = limpar(arq.replace(".png", ""))
+        tokens_arq = nome_arq.split()
+
         intersec = len(set(alvo_tokens) & set(tokens_arq))
         score = intersec / max(len(alvo_tokens), 1)
 
-        # evita falsos positivos
-        if score > melhor_score and score >= 0.6:
-            melhor_match = arq
+        # exige match forte para evitar erros
+        if score > melhor_score and score >= 0.7:
+            melhor = arq
             melhor_score = score
 
-    if melhor_match:
-        return os.path.join(pasta, melhor_match)
+    if melhor:
+        return os.path.join(pasta, melhor)
 
-    # 🔥 fallback final
     return placeholder
     
     # (FIM DO BLOCO)
