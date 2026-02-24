@@ -1024,33 +1024,35 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
+
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
 
-esc_home = escudo_time_base64(home)
-esc_away = escudo_time_base64(away)
+    esc_home = escudo_time_base64(home)
+    esc_away = escudo_time_base64(away)
 
-st.markdown(f"""
-<div style="display:flex; justify-content:center; gap:60px; align-items:center;">
+    st.markdown(f"""
+    <div style="display:flex; justify-content:center; gap:60px; align-items:center;">
 
-<div style="text-align:center">
-<img src="{esc_home}" width="70">
-<div>{home}</div>
-</div>
+        <div style="text-align:center">
+            <img src="{esc_home}" width="70">
+            <div>{home}</div>
+        </div>
 
-<div style="font-size:28px; font-weight:900;">VS</div>
+        <div style="font-size:28px; font-weight:900;">VS</div>
 
-<div style="text-align:center">
-<img src="{esc_away}" width="70">
-<div>{away}</div>
-</div>
+        <div style="text-align:center">
+            <img src="{esc_away}" width="70">
+            <div>{away}</div>
+        </div>
 
-</div>
-""", unsafe_allow_html=True)
-    
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
     # ===== ODDS =====
     st.markdown("### 🎯 Odds")
-
     o1, o2, o3 = st.columns(3)
 
     with o1:
