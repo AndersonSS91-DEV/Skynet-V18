@@ -19,33 +19,6 @@ import base64
 from pathlib import Path
 
 # =========================================
-# ESCUDOS
-# =========================================
-PASTA_ESCUDOS = Path("assets/escudos")
-
-def escudo_time_base64(nome_time):
-
-    if not nome_time:
-        return ""
-
-    nome_arquivo = str(nome_time).strip().replace(" ", "_") + ".png"
-    caminho = PASTA_ESCUDOS / nome_arquivo
-
-    # ✅ se existir escudo do time
-    if caminho.exists():
-        with open(caminho, "rb") as img:
-            return "data:image/png;base64," + base64.b64encode(img.read()).decode()
-
-    # ✅ fallback
-    caminho_fallback = PASTA_ESCUDOS / "team_vazio.png"
-
-    if caminho_fallback.exists():
-        with open(caminho_fallback, "rb") as img:
-            return "data:image/png;base64," + base64.b64encode(img.read()).decode()
-
-    return ""
-
-# =========================================
 # CONFIG
 # =========================================
 st.set_page_config(
@@ -518,6 +491,31 @@ def top_placares(matriz, n=6):
 
     m["Probabilidade%"] = m["Probabilidade%"].map(lambda x: f"{x:.2f}%")
     return m
+# =========================================
+# ESCUDOS PROFISSIONAL (COM ACENTOS)
+# =========================================
+import unicodedata
+
+def normalizar_nome(nome):
+    nome = str(nome).lower().strip()
+    nome = unicodedata.normalize('NFKD', nome).encode('ASCII','ignore').decode('ASCII')
+    return nome.replace(" ", "_")
+
+def escudo_time(nome_time):
+    pasta = "escudos"
+
+    if not nome_time:
+        return None
+
+    nome_norm = normalizar_nome(nome_time)
+
+    for arquivo in os.listdir(pasta):
+        if normalizar_nome(arquivo).replace(".png","") == nome_norm:
+            return os.path.join(pasta, arquivo)
+
+    return os.path.join(pasta, "default.png")
+
+
 # =========================================
 # ⚽ MÉTRICAS OFENSIVAS SKYNET
 # =========================================
@@ -1022,6 +1020,18 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 with tab1:
 
+    col1, col2, col3 = st.columns([1,3,1])
+
+with col1:
+    st.image(escudo_time(linha_exg["Home_Team"]), width=70)
+
+with col2:
+    st.markdown(f"## {linha_exg['Home_Team']}  x  {linha_exg['Visitor_Team']}")
+
+with col3:
+    st.image(escudo_time(linha_exg["Visitor_Team"]), width=70)
+    
+    
     # 👇 continua normal
     st.markdown("### 🎯 Odds")
 
