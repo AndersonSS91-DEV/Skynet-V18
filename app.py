@@ -494,8 +494,6 @@ def top_placares(matriz, n=6):
 # =========================================
 # ESCUDOS PROFISSIONAL (COM ACENTOS)
 # =========================================
-import unicodedata
-
 def normalizar_nome(nome):
     nome = str(nome).lower().strip()
     nome = unicodedata.normalize('NFKD', nome).encode('ASCII','ignore').decode('ASCII')
@@ -509,11 +507,18 @@ def escudo_time(nome_time):
 
     nome_norm = normalizar_nome(nome_time)
 
+    # procura arquivo correspondente
     for arquivo in os.listdir(pasta):
-        if normalizar_nome(arquivo).replace(".png","") == nome_norm:
+        nome_arquivo = normalizar_nome(arquivo).replace(".png","")
+        if nome_arquivo == nome_norm:
             return os.path.join(pasta, arquivo)
 
-    return os.path.join(pasta, "default.png")
+    # fallback seguro
+    fallback = os.path.join(pasta, "default.png")
+    if os.path.exists(fallback):
+        return fallback
+
+    return None
 
 
 # =========================================
