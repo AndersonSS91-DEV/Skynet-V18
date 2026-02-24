@@ -1093,7 +1093,7 @@ HT: {placar_ht}
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("---")
+    st.markdown("---")
     
     
     # 👇 continua normal
