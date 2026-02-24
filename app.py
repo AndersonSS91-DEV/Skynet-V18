@@ -17,7 +17,7 @@ from streamlit_autorefresh import st_autorefresh
 from PIL import Image
 import base64
 from pathlib import Path
-
+import unicodedata
 # =========================================
 # CONFIG
 # =========================================
