@@ -344,28 +344,35 @@ st.session_state["jogo"] = jogo
 # =========================================
 # FUNÇÕES AUX
 # =========================================
+import streamlit as st
+import pandas as pd
 import base64
+from pathlib import Path
 
-def escudo_time_base64(nome):
-    import unicodedata
-    nome = str(nome).lower().strip()
-    nome = unicodedata.normalize('NFKD', nome).encode('ASCII','ignore').decode('ASCII')
-    nome = nome.replace(" ", "_")
+# ==============================
+# FUNÇÃO ESCUDO (DEFINITIVA)
+# ==============================
+def escudo_time_base64(nome_time):
+    if not nome_time:
+        return ""
 
-    pasta = "assets/escudos"
+    nome_arquivo = (
+        str(nome_time)
+        .lower()
+        .strip()
+        .replace(" ", "_")
+        .replace("-", "_")
+        .replace(".", "")
+    )
 
-    for arq in os.listdir(pasta):
-        if nome in arq.lower():
-            caminho = os.path.join(pasta, arq)
-            with open(caminho, "rb") as img:
-                encoded = base64.b64encode(img.read()).decode()
-                return f"data:image/png;base64,{encoded}"
+    caminho = Path("ESCUDOS_FINAL") / f"{nome_arquivo}.png"
 
-    # default
-    caminho = os.path.join(pasta, "default.png")
-    with open(caminho, "rb") as img:
-        encoded = base64.b64encode(img.read()).decode()
-        return f"data:image/png;base64,{encoded}"
+    if caminho.exists():
+        with open(caminho, "rb") as img:
+            return "data:image/png;base64," + base64.b64encode(img.read()).decode()
+
+    return ""  # se não encontrar
+    # (FIM DO BLOCO)
         
 def get_val(linha, col, fmt=None, default="—"):
     if col in linha.index and pd.notna(linha[col]):
@@ -1022,6 +1029,72 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
+    # ==============================
+# LAYOUT DOS JOGOS
+# ==============================
+for _, linha_exg in df.iterrows():
+
+    home = linha_exg["Home_Team"]
+    away = linha_exg["Visitor_Team"]
+
+    esc_home = escudo_time_base64(home)
+    esc_away = escudo_time_base64(away)
+
+    liga = linha_exg.get("League", "")
+    hora = linha_exg.get("Time", "")
+
+    gh = linha_exg.get("Result Home")
+    ga = linha_exg.get("Result Visitor")
+    gh_ht = linha_exg.get("Result_Home_HT")
+    ga_ht = linha_exg.get("Result_Visitor_HT")
+
+    jogo_finalizado = pd.notna(gh) and pd.notna(ga)
+    ht_disponivel = pd.notna(gh_ht) and pd.notna(ga_ht)
+
+    placar_ft = f"{int(gh)} x {int(ga)}" if jogo_finalizado else "vs"
+    placar_ht = f"{int(gh_ht)} x {int(ga_ht)}" if ht_disponivel else ""
+
+    st.markdown(
+        f"""
+        <div style="text-align:center">
+
+        <div style="font-size:20px; opacity:0.8;">
+        🏆 {liga}
+        </div>
+
+        <div style="font-size:16px; margin-bottom:8px; opacity:0.7;">
+        {hora}
+        </div>
+
+        <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:20px 0;">
+
+            <div>
+                <img src="{esc_home}" width="70">
+                <div style="font-size:18px; font-weight:700;">{home}</div>
+            </div>
+
+            <div style="font-size:28px; font-weight:900;">
+                {placar_ft}
+            </div>
+
+            <div>
+                <img src="{esc_away}" width="70">
+                <div style="font-size:18px; font-weight:700;">{away}</div>
+            </div>
+
+        </div>
+
+        <div style="font-size:14px; opacity:0.7;">
+        {placar_ht}
+        </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown("---")
+    
     # ===== ODDS =====
     st.markdown("### 🎯 Odds")
 
