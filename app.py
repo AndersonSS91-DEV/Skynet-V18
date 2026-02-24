@@ -1102,9 +1102,9 @@ st.markdown("---")
     
     
     # 👇 continua normal
-st.markdown("### 🎯 Odds")
+    st.markdown("### 🎯 Odds")
 
-    o1, o2, o3 = st.columns(3)
+o1, o2, o3 = st.columns(3)
 
     with o1:
         ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
