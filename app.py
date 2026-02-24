@@ -1026,22 +1026,27 @@ with tab1:
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
 
-esc_home = escudo_time_base64(home)
-esc_away = escudo_time_base64(away)
+    esc_home = escudo_time_base64(home)
+    esc_away = escudo_time_base64(away)
 
-liga = linha_exg.get("League", "")
-hora = linha_exg.get("Time", "")
+    liga = linha_exg.get("League", "")
+    hora = linha_exg.get("Time", "")
 
-gh = linha_exg.get("Result Home")
-ga = linha_exg.get("Result Visitor")
-gh_ht = linha_exg.get("Result_Home_HT")
-ga_ht = linha_exg.get("Result_Visitor_HT")
+    gh = linha_exg.get("Result Home")
+    ga = linha_exg.get("Result Visitor")
 
-jogo_finalizado = pd.notna(gh) and pd.notna(ga)
-ht_disponivel = pd.notna(gh_ht) and pd.notna(ga_ht)
+    st.markdown("### 🎯 Odds")
 
-placar_ft = f"{int(gh)} x {int(ga)}" if jogo_finalizado else "VS"
-placar_ht = f"{int(gh_ht)} x {int(ga_ht)}" if ht_disponivel else ""
+    o1, o2, o3 = st.columns(3)
+
+    with o1:
+        st.metric("Odds Casa", linha_exg["Odds_Casa"])
+
+    with o2:
+        st.metric("Odds Empate", linha_exg["Odds_Empate"])
+
+    with o3:
+        st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
 
 st.markdown(f"""
 <div style="text-align:center; margin-top:10px;">
