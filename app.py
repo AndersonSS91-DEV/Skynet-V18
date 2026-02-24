@@ -17,34 +17,7 @@ from streamlit_autorefresh import st_autorefresh
 from PIL import Image
 import base64
 from pathlib import Path
-
-# =========================================
-# ESCUDOS
-# =========================================
-PASTA_ESCUDOS = Path("assets/escudos")
-
-def escudo_time_base64(nome_time):
-
-    if not nome_time:
-        return ""
-
-    nome_arquivo = str(nome_time).strip().replace(" ", "_") + ".png"
-    caminho = PASTA_ESCUDOS / nome_arquivo
-
-    # ✅ se existir escudo do time
-    if caminho.exists():
-        with open(caminho, "rb") as img:
-            return "data:image/png;base64," + base64.b64encode(img.read()).decode()
-
-    # ✅ fallback
-    caminho_fallback = PASTA_ESCUDOS / "team_vazio.png"
-
-    if caminho_fallback.exists():
-        with open(caminho_fallback, "rb") as img:
-            return "data:image/png;base64," + base64.b64encode(img.read()).decode()
-
-    return ""
-
+import unicodedata
 # =========================================
 # CONFIG
 # =========================================
@@ -518,6 +491,34 @@ def top_placares(matriz, n=6):
 
     m["Probabilidade%"] = m["Probabilidade%"].map(lambda x: f"{x:.2f}%")
     return m
+# =========================================
+# ESCUDOS PROFISSIONAL (COM ACENTOS)
+# =========================================
+def normalizar(txt):
+    txt = str(txt).lower().strip()
+    txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
+    return txt.replace(" ", "").replace("_", "").replace("-", "")
+
+def escudo_time(nome_time):
+    pasta = "escudos"
+
+    if not nome_time:
+        return None
+
+    alvo = normalizar(nome_time)
+
+    for arquivo in os.listdir(pasta):
+        nome_arq = normalizar(arquivo.replace(".png",""))
+
+        if alvo in nome_arq or nome_arq in alvo:
+            return os.path.join(pasta, arquivo)
+
+    fallback = os.path.join(pasta, "default.png")
+    if os.path.exists(fallback):
+        return fallback
+
+    return None
+
 # =========================================
 # ⚽ MÉTRICAS OFENSIVAS SKYNET
 # =========================================
@@ -1022,29 +1023,100 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 with tab1:
 
-    # 👇 continua normal
+    home = linha_exg["Home_Team"]
+    away = linha_exg["Visitor_Team"]
+
+    esc_home = escudo_time_base64(home)
+    esc_away = escudo_time_base64(away)
+
+    liga = linha_exg.get("League", "")
+    hora = linha_exg.get("Time", "")
+
+    gh = linha_exg.get("Result Home")
+    ga = linha_exg.get("Result Visitor")
+    gh_ht = linha_exg.get("Result_Home_HT")
+    ga_ht = linha_exg.get("Result_Visitor_HT")
+
+    # placar FT
+    if pd.notna(gh) and pd.notna(ga):
+        placar_ft = f"{int(gh)} x {int(ga)}"
+    else:
+        placar_ft = "vs"
+
+    # placar HT
+    if pd.notna(gh_ht) and pd.notna(ga_ht):
+        placar_ht = f"{int(gh_ht)} x {int(ga_ht)}"
+    else:
+        placar_ht = ""
+
+    # ===== HEADER CENTRAL =====
+    st.markdown(f"""
+    <div style="text-align:center; margin-top:10px;">
+
+    <div style="font-size:20px; opacity:0.85;">
+    🏆 {liga}
+    </div>
+
+    <div style="font-size:16px; margin-bottom:6px; opacity:0.7;">
+    {hora}
+    </div>
+
+    <div style="
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:50px;
+    margin:18px 0;
+    ">
+
+    <div style="width:140px;">
+        <img src="{esc_home}" style="height:70px;">
+        <div style="font-size:18px; font-weight:700; margin-top:6px;">
+            {home}
+        </div>
+    </div>
+
+    <div style="font-size:30px; font-weight:900; min-width:90px;">
+    {placar_ft}
+    </div>
+
+    <div style="width:140px;">
+        <img src="{esc_away}" style="height:70px;">
+        <div style="font-size:18px; font-weight:700; margin-top:6px;">
+            {away}
+        </div>
+    </div>
+
+    </div>
+
+    <div style="font-size:13px; opacity:0.65;">
+    HT: {placar_ht}
+    </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # ===== ODDS =====
     st.markdown("### 🎯 Odds")
 
     o1, o2, o3 = st.columns(3)
 
     with o1:
-        ev = calc_ev(linha_exg["Odds_Casa"], linha_exg["Odd_Justa_Home"])
         st.metric("Odds Casa", linha_exg["Odds_Casa"])
-
-        st.metric("Odd_Over_1,5FT", linha_exg["Odd_Over_1,5FT"])
+        st.metric("Odd Over 1.5", linha_exg["Odd_Over_1,5FT"])
         st.metric("VR01", get_val(linha_exg, "VR01", "{:.2f}"))
 
     with o2:
-        ev = calc_ev(linha_exg["Odds_Empate"], linha_exg["Odd_Justa_Draw"])
         st.metric("Odds Empate", linha_exg["Odds_Empate"])
-        st.metric("Odds_Over_2,5FT", linha_exg["Odds_Over_2,5FT"])
-        st.metric("COEF_OVER1FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
+        st.metric("Odds Over 2.5", linha_exg["Odds_Over_2,5FT"])
+        st.metric("Coef Over1FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
 
     with o3:
-        ev = calc_ev(linha_exg["Odds_Visitante"], linha_exg["Odd_Justa_Away"])
         st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
-        st.metric("Odds_Under_2,5FT", linha_exg["Odds_Under_2,5FT"])
-        st.metric("Odd_BTTS_YES", linha_exg["Odd_BTTS_YES"])
+        st.metric("Odds Under 2.5", linha_exg["Odds_Under_2,5FT"])
+        st.metric("BTTS YES", linha_exg["Odd_BTTS_YES"])
 
     st.markdown("---")
 
