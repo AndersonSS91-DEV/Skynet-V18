@@ -344,110 +344,55 @@ st.session_state["jogo"] = jogo
 # =========================================
 # FUNÇÕES AUX
 # =========================================
-# =========================================
-# 🔰 MATCH PROFISSIONAL DE ESCUDOS (v2)
-# =========================================
-def escudo_path(nome_time):
-    import unicodedata, os, re
+from pathlib import Path
 
-    pasta = "escudos"
-    placeholder = os.path.join(pasta, "time_vazio.png")
+PASTA_ESCUDOS = Path("escudos")
+ESCUDO_PADRAO = PASTA_ESCUDOS / "time_vazio.png"
 
-    if not os.path.exists(pasta):
-        return placeholder
+# aliases manuais
+APELIDOS = {
+    "inter kashi": "inter kashi",
+    "inter miami": "inter miami",
+    "inter": "inter",
+    "bodo glimt": "bodo glimt",
+}
+
+def escudo_time_base64(nome_time):
+    import base64
 
     if not nome_time:
-        return placeholder
+        return ""
 
-    # ===============================
-    # 🧠 APELIDOS MANUAIS
-    # ===============================
-    APELIDOS = {
-        "inter": "inter",
-        "psg": "paris saint germain",
-        "man utd": "manchester united",
-        "man city": "manchester city",
-        "atletico": "atletico madrid",
-        "bayern": "bayern munich",
-        "juve": "juventus",
-        "estrela": "estrela amadora",
-        "Bodø / Glimt": "bodo glimt",
-    }
+    nome_limpo = limpar(nome_time)
 
-    # ===============================
-    # LIMPEZA DO TEXTO
-    # ===============================
-def limpar(txt):
-    txt = str(txt).lower().strip()
+    # aplica apelidos
+    if nome_limpo in APELIDOS:
+        nome_limpo = APELIDOS[nome_limpo]
 
-    # remove acentos (ø -> o)
-    txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
+    # 🔥 PASSO 1 — MATCH EXATO
+    for arq in PASTA_ESCUDOS.glob("*.png"):
+        if limpar(arq.stem) == nome_limpo:
+            with open(arq, "rb") as f:
+                return "data:image/png;base64," + base64.b64encode(f.read()).decode()
 
-    # troca separadores estranhos
-    txt = txt.replace("/", " ")
-    txt = txt.replace("-", " ")
-    txt = txt.replace("_", " ")
+    # 🔥 PASSO 2 — MATCH PARCIAL (seguro)
+    for arq in PASTA_ESCUDOS.glob("*.png"):
+        nome_arq = limpar(arq.stem)
 
-    # remove categorias base
-    txt = re.sub(r'\b(u17|u19|u20|u21|u23|sub17|sub20|sub23)\b', '', txt)
+        if nome_limpo in nome_arq or nome_arq in nome_limpo:
+            # evita erro tipo Inter → Winterthur
+            if len(nome_limpo) < 5:
+                continue
 
-    # remove B team / II
-    txt = re.sub(r'\b(ii| b |reserves|reserve)\b', '', txt)
+            with open(arq, "rb") as f:
+                return "data:image/png;base64," + base64.b64encode(f.read()).decode()
 
-    txt = re.sub(r'\s+', ' ', txt).strip()
+    # 🔥 PASSO 3 — fallback
+    if ESCUDO_PADRAO.exists():
+        with open(ESCUDO_PADRAO, "rb") as f:
+            return "data:image/png;base64," + base64.b64encode(f.read()).decode()
 
-    return txt
-
-    # ===============================
-    # 1️⃣ MATCH EXATO DO NOME COMPLETO
-    # ===============================
-    for arq in arquivos:
-        nome_arq = limpar(arq.replace(".png", ""))
-        if alvo == nome_arq:
-            return os.path.join(pasta, arq)
-
-    # ===============================
-    # 2️⃣ MATCH EXATO IGNORANDO ESPAÇOS
-    # ===============================
-    alvo_compacto = alvo.replace(" ", "")
-    for arq in arquivos:
-        nome_arq = limpar(arq.replace(".png", "")).replace(" ", "")
-        if alvo_compacto == nome_arq:
-            return os.path.join(pasta, arq)
-
-    # ===============================
-    # 3️⃣ MATCH POR INÍCIO DO NOME
-    # evita Inter → Winterthur
-    # ===============================
-    for arq in arquivos:
-        nome_arq = limpar(arq.replace(".png", ""))
-        if nome_arq.startswith(alvo):
-            return os.path.join(pasta, arq)
-
-    # ===============================
-    # 4️⃣ MATCH POR TOKENS (SEGURO)
-    # ===============================
-    alvo_tokens = alvo.split()
-
-    melhor = None
-    melhor_score = 0
-
-    for arq in arquivos:
-        nome_arq = limpar(arq.replace(".png", ""))
-        tokens_arq = nome_arq.split()
-
-        intersec = len(set(alvo_tokens) & set(tokens_arq))
-        score = intersec / max(len(alvo_tokens), 1)
-
-        # exige match forte para evitar erros
-        if score > melhor_score and score >= 0.7:
-            melhor = arq
-            melhor_score = score
-
-    if melhor:
-        return os.path.join(pasta, melhor)
-
-    return placeholder
+    return ""
     
     # (FIM DO BLOCO)
         
