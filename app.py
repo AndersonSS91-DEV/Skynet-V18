@@ -371,7 +371,7 @@ def escudo_path(nome_time):
         "bayern": "bayern munich",
         "juve": "juventus",
         "estrela": "estrela amadora",
-        "bodo glimt": "bodo glimt",
+        "Bodø / Glimt": "bodo_glimt",
     }
 
     # ===============================
