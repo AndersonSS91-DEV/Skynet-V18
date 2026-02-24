@@ -344,15 +344,10 @@ st.session_state["jogo"] = jogo
 # =========================================
 # FUNÇÕES AUX
 # =========================================
-import streamlit as st
-import pandas as pd
-import base64
-from pathlib import Path
-
-# ==============================
-# FUNÇÃO ESCUDO (DEFINITIVA)
-# ==============================
 def escudo_time_base64(nome_time):
+    import base64
+    from pathlib import Path
+
     if not nome_time:
         return ""
 
@@ -365,13 +360,13 @@ def escudo_time_base64(nome_time):
         .replace(".", "")
     )
 
-    caminho = Path("ESCUDOS_FINAL") / f"{nome_arquivo}.png"
+    caminho = Path("escudos") / f"{nome_arquivo}.png"
 
     if caminho.exists():
         with open(caminho, "rb") as img:
             return "data:image/png;base64," + base64.b64encode(img.read()).decode()
 
-    return ""  # se não encontrar
+    return ""
     # (FIM DO BLOCO)
         
 def get_val(linha, col, fmt=None, default="—"):
@@ -1029,71 +1024,29 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
-    # ==============================
-# LAYOUT DOS JOGOS
-# ==============================
-for _, linha_exg in df.iterrows():
-
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
 
-    esc_home = escudo_time_base64(home)
-    esc_away = escudo_time_base64(away)
+esc_home = escudo_time_base64(home)
+esc_away = escudo_time_base64(away)
 
-    liga = linha_exg.get("League", "")
-    hora = linha_exg.get("Time", "")
+st.markdown(f"""
+<div style="display:flex; justify-content:center; gap:60px; align-items:center;">
 
-    gh = linha_exg.get("Result Home")
-    ga = linha_exg.get("Result Visitor")
-    gh_ht = linha_exg.get("Result_Home_HT")
-    ga_ht = linha_exg.get("Result_Visitor_HT")
+<div style="text-align:center">
+<img src="{esc_home}" width="70">
+<div>{home}</div>
+</div>
 
-    jogo_finalizado = pd.notna(gh) and pd.notna(ga)
-    ht_disponivel = pd.notna(gh_ht) and pd.notna(ga_ht)
+<div style="font-size:28px; font-weight:900;">VS</div>
 
-    placar_ft = f"{int(gh)} x {int(ga)}" if jogo_finalizado else "vs"
-    placar_ht = f"{int(gh_ht)} x {int(ga_ht)}" if ht_disponivel else ""
+<div style="text-align:center">
+<img src="{esc_away}" width="70">
+<div>{away}</div>
+</div>
 
-    st.markdown(
-        f"""
-        <div style="text-align:center">
-
-        <div style="font-size:20px; opacity:0.8;">
-        🏆 {liga}
-        </div>
-
-        <div style="font-size:16px; margin-bottom:8px; opacity:0.7;">
-        {hora}
-        </div>
-
-        <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:20px 0;">
-
-            <div>
-                <img src="{esc_home}" width="70">
-                <div style="font-size:18px; font-weight:700;">{home}</div>
-            </div>
-
-            <div style="font-size:28px; font-weight:900;">
-                {placar_ft}
-            </div>
-
-            <div>
-                <img src="{esc_away}" width="70">
-                <div style="font-size:18px; font-weight:700;">{away}</div>
-            </div>
-
-        </div>
-
-        <div style="font-size:14px; opacity:0.7;">
-        {placar_ht}
-        </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.markdown("---")
+</div>
+""", unsafe_allow_html=True)
     
     # ===== ODDS =====
     st.markdown("### 🎯 Odds")
