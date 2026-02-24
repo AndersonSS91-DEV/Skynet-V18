@@ -494,10 +494,10 @@ def top_placares(matriz, n=6):
 # =========================================
 # ESCUDOS PROFISSIONAL (COM ACENTOS)
 # =========================================
-def normalizar_nome(nome):
-    nome = str(nome).lower().strip()
-    nome = unicodedata.normalize('NFKD', nome).encode('ASCII','ignore').decode('ASCII')
-    return nome.replace(" ", "_")
+def normalizar(txt):
+    txt = str(txt).lower().strip()
+    txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
+    return txt.replace(" ", "").replace("_", "").replace("-", "")
 
 def escudo_time(nome_time):
     pasta = "escudos"
@@ -505,21 +505,19 @@ def escudo_time(nome_time):
     if not nome_time:
         return None
 
-    nome_norm = normalizar_nome(nome_time)
+    alvo = normalizar(nome_time)
 
-    # procura arquivo correspondente
     for arquivo in os.listdir(pasta):
-        nome_arquivo = normalizar_nome(arquivo).replace(".png","")
-        if nome_arquivo == nome_norm:
+        nome_arq = normalizar(arquivo.replace(".png",""))
+
+        if alvo in nome_arq or nome_arq in alvo:
             return os.path.join(pasta, arquivo)
 
-    # fallback seguro
     fallback = os.path.join(pasta, "default.png")
     if os.path.exists(fallback):
         return fallback
 
     return None
-
 
 # =========================================
 # ⚽ MÉTRICAS OFENSIVAS SKYNET
@@ -1025,16 +1023,77 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 with tab1:
 
-    col1, col2, col3 = st.columns([1,3,1])
+home = linha_exg["Home_Team"]
+away = linha_exg["Visitor_Team"]
 
-with col1:
-    st.image(escudo_time(linha_exg["Home_Team"]), width=70)
+esc_home = escudo_time_base64(home)
+esc_away = escudo_time_base64(away)
 
-with col2:
-    st.markdown(f"## {linha_exg['Home_Team']}  x  {linha_exg['Visitor_Team']}")
+liga = linha_exg.get("League", "")
+hora = linha_exg.get("Time", "")
 
-with col3:
-    st.image(escudo_time(linha_exg["Visitor_Team"]), width=70)
+gh = linha_exg.get("Result Home")
+ga = linha_exg.get("Result Visitor")
+gh_ht = linha_exg.get("Result_Home_HT")
+ga_ht = linha_exg.get("Result_Visitor_HT")
+
+jogo_finalizado = pd.notna(gh) and pd.notna(ga)
+ht_disponivel = pd.notna(gh_ht) and pd.notna(ga_ht)
+
+placar_ft = f"{int(gh)} x {int(ga)}" if jogo_finalizado else "VS"
+placar_ht = f"{int(gh_ht)} x {int(ga_ht)}" if ht_disponivel else ""
+
+st.markdown(f"""
+<div style="text-align:center; margin-top:10px;">
+
+<div style="font-size:20px; opacity:0.85;">
+🏆 {liga}
+</div>
+
+<div style="font-size:16px; margin-bottom:6px; opacity:0.7;">
+{hora}
+</div>
+
+<div style="
+display:flex;
+justify-content:center;
+align-items:center;
+gap:50px;
+margin:18px 0;
+">
+
+<div style="width:140px;">
+    <img src="{esc_home}" style="height:70px;">
+    <div style="font-size:18px; font-weight:700; margin-top:6px;">
+        {home}
+    </div>
+</div>
+
+<div style="
+font-size:30px;
+font-weight:900;
+min-width:90px;
+">
+{placar_ft}
+</div>
+
+<div style="width:140px;">
+    <img src="{esc_away}" style="height:70px;">
+    <div style="font-size:18px; font-weight:700; margin-top:6px;">
+        {away}
+    </div>
+</div>
+
+</div>
+
+<div style="font-size:13px; opacity:0.65;">
+HT: {placar_ht}
+</div>
+
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("---")
     
     
     # 👇 continua normal
