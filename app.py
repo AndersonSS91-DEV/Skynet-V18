@@ -357,7 +357,7 @@ def escudo_path(nome_time):
     "bodo glimt": "bodo",
     "bodo / glimt": "bodo",
     "fk bodo glimt": "bodo",
-        
+    "brøndby if": "brondby if",  
     "olympiacos": "olympiakos",
     "olympiacos f.c.": "olympiakos",
     "estrela": "estrela amadora",
