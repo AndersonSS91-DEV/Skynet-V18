@@ -378,7 +378,7 @@ def escudo_path(nome_time):
               .encode('ASCII','ignore').decode('ASCII')
 
         # troca separadores
-        txt = txt.replace("/", " ")
+        txt = re.sub(r'\s*/\s*', ' ', txt)
         txt = txt.replace("-", " ")
         txt = txt.replace("_", " ")
 
