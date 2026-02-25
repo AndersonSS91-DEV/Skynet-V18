@@ -348,17 +348,13 @@ def escudo_path(nome_time):
 
     # 🔥 apelidos manuais
     APELIDOS = {
-        "inter milan": "inter",
-        "inter": "inter",
-        "bodo glimt": "bodo glimt",
-        "bodo / glimt": "bodo glimt",
-        "bodø glimt": "bodo glimt",
-        "bodø / glimt": "bodo glimt",
-        "bodo glimt fk": "bodo glimt",
-        "fk bodo glimt": "bodo glimt",
-        "olympiacos f.c.": "olympiakos",
-        "estrela": "estrela amadora",
-    }
+    "inter milan": "inter",
+    "inter": "inter",
+    "bodo glimt": "bodo glimt",
+    "olympiacos": "olympiakos",
+    "olympiacos fc": "olympiakos",
+    "estrela": "estrela amadora",
+}
     def limpar(txt):
         txt = str(txt).lower().strip()
 
@@ -372,7 +368,7 @@ def escudo_path(nome_time):
         txt = re.sub(r'[\-_]+', ' ', txt)
 
         # remove espaços duplicados infinitos
-        txt = re.sub(r'\s+', ' ', txt).strip()
+        txt = txt.replace("/", " ")
 
         # remove termos inúteis
         txt = re.sub(r'\b(fc|f\.c\.|club|sc)\b', '', txt)
