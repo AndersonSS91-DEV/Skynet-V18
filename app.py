@@ -372,15 +372,22 @@ def escudo_path(nome_time):
     def limpar(txt):
         txt = str(txt).lower().strip()
 
+        # remove acentos
         txt = unicodedata.normalize('NFKD', txt)\
               .encode('ASCII','ignore').decode('ASCII')
 
-        txt = re.sub(r'\b(fc|f\.c\.|football club|sc|club|ac)\b', '', txt)
+        # troca separadores
+        txt = txt.replace("/", " ")
+        txt = txt.replace("-", " ")
+        txt = txt.replace("_", " ")
+
+        # remove termos inúteis
+        txt = re.sub(r'\b(fc|f\.c\.|club|sc)\b', '', txt)
+
+        # remove categorias base
         txt = re.sub(r'\b(u17|u19|u20|u21|u23)\b', '', txt)
 
-        txt = txt.replace("-", " ").replace("_", " ")
         txt = re.sub(r'\s+', ' ', txt).strip()
-
         return txt
 
     alvo = limpar(nome_time)
