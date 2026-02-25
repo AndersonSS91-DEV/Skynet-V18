@@ -347,22 +347,8 @@ st.session_state["jogo"] = jogo
 # =========================================
 # 🔰 MATCH PROFISSIONAL DE ESCUDOS (FIX FINAL)
 # =========================================
-def limpar(txt):
-    txt = str(txt).lower().strip()
-
-    txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
-
-    txt = re.sub(r'\b(fc|f\.c\.|football club|sc|club|ac)\b', '', txt)
-    txt = re.sub(r'\b(u17|u19|u20|u21|u23|sub17|sub20|sub23)\b', '', txt)
-    txt = re.sub(r'\b(ii| b |reserves|reserve)\b', '', txt)
-
-    txt = txt.replace("-", " ").replace("_", " ").replace("/", " ")
-    txt = re.sub(r'\s+', ' ', txt).strip()
-
-    return txt
-
-
 def escudo_path(nome_time):
+    import os, re, unicodedata
 
     pasta = "escudos"
     placeholder = os.path.join(pasta, "time_vazio.png")
@@ -373,20 +359,45 @@ def escudo_path(nome_time):
     if not nome_time:
         return placeholder
 
-    apelidos = {
+    # 🔥 apelidos manuais
+    APELIDOS = {
         "inter milan": "inter",
         "inter": "inter",
         "bodo glimt": "bodo glimt",
-        "bodo/glimt": "bodo glimt",
+        "bodo / glimt": "bodo glimt",
         "bodø glimt": "bodo glimt",
-        "olympiacos": "olympiakos",
+        "bodø / glimt": "bodo glimt",
+        "olympiacos f.c.": "olympiakos",
         "estrela": "estrela amadora",
     }
+    def limpar(txt):
+        txt = str(txt).lower().strip()
+
+        # remove acentos
+        txt = unicodedata.normalize('NFKD', txt)\
+              .encode('ASCII','ignore').decode('ASCII')
+
+        # troca separadores
+        txt = txt.replace("/", " ")
+        txt = txt.replace("-", " ")
+        txt = txt.replace("_", " ")
+
+        # remove espaços duplicados infinitos
+        txt = re.sub(r'\s+', ' ', txt).strip()
+
+        # remove termos inúteis
+        txt = re.sub(r'\b(fc|f\.c\.|club|sc)\b', '', txt)
+
+        # remove categorias base
+        txt = re.sub(r'\b(u17|u19|u20|u21|u23)\b', '', txt)
+
+        txt = re.sub(r'\s+', ' ', txt).strip()
+        return txt
 
     alvo = limpar(nome_time)
 
-    if alvo in apelidos:
-        alvo = apelidos[alvo]
+    if alvo in APELIDOS:
+        alvo = APELIDOS[alvo]
 
     arquivos = [a for a in os.listdir(pasta) if a.endswith(".png")]
 
@@ -395,35 +406,21 @@ def escudo_path(nome_time):
         if limpar(arq.replace(".png","")) == alvo:
             return os.path.join(pasta, arq)
 
-    # 2️⃣ match sem espaços
-    alvo_comp = alvo.replace(" ", "")
+    # 2️⃣ match compacto
+    alvo2 = alvo.replace(" ", "")
     for arq in arquivos:
-        nome = limpar(arq.replace(".png","")).replace(" ","")
-        if nome == alvo_comp:
+        if limpar(arq.replace(".png","")).replace(" ","") == alvo2:
             return os.path.join(pasta, arq)
 
-    # 3️⃣ match por tokens (seguro)
+    # 3️⃣ tokens
     alvo_tokens = set(alvo.split())
-
-    melhor = None
-    melhor_score = 0
 
     for arq in arquivos:
         nome_arq = limpar(arq.replace(".png",""))
-        tokens = set(nome_arq.split())
-
-        intersec = len(alvo_tokens & tokens)
-        score = intersec / max(len(alvo_tokens),1)
-
-        if score > melhor_score and score >= 0.6:
-            melhor = arq
-            melhor_score = score
-
-    if melhor:
-        return os.path.join(pasta, melhor)
+        if alvo_tokens.issubset(set(nome_arq.split())):
+            return os.path.join(pasta, arq)
 
     return placeholder
-    
     # (FIM DO BLOCO)
         
 def get_val(linha, col, fmt=None, default="—"):
