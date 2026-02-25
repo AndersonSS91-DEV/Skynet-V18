@@ -347,8 +347,22 @@ st.session_state["jogo"] = jogo
 # =========================================
 # 🔰 MATCH PROFISSIONAL DE ESCUDOS (FIX FINAL)
 # =========================================
+def limpar(txt):
+    txt = str(txt).lower().strip()
+
+    txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
+
+    txt = re.sub(r'\b(fc|f\.c\.|football club|sc|club|ac)\b', '', txt)
+    txt = re.sub(r'\b(u17|u19|u20|u21|u23|sub17|sub20|sub23)\b', '', txt)
+    txt = re.sub(r'\b(ii| b |reserves|reserve)\b', '', txt)
+
+    txt = txt.replace("-", " ").replace("_", " ").replace("/", " ")
+    txt = re.sub(r'\s+', ' ', txt).strip()
+
+    return txt
+
+
 def escudo_path(nome_time):
-    import unicodedata, os, re
 
     pasta = "escudos"
     placeholder = os.path.join(pasta, "time_vazio.png")
@@ -359,87 +373,49 @@ def escudo_path(nome_time):
     if not nome_time:
         return placeholder
 
-    # ===============================
-    # 🧠 APELIDOS MANUAIS
-    # ===============================
-    APELIDOS = {
+    apelidos = {
         "inter milan": "inter",
         "inter": "inter",
-        "bodø glimt": "bodo glimt",
-        "bodo/glimt": "bodo glimt",
         "bodo glimt": "bodo glimt",
-        "estrela": "estrela amadora",
+        "bodo/glimt": "bodo glimt",
+        "bodø glimt": "bodo glimt",
         "olympiacos": "olympiakos",
-}
+        "estrela": "estrela amadora",
+    }
 
-    # ===============================
-    # LIMPAR TEXTO
-    # ===============================
-def limpar(txt):
-    txt = str(txt).lower().strip()
+    alvo = limpar(nome_time)
 
-    # remove acentos
-    txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
+    if alvo in apelidos:
+        alvo = apelidos[alvo]
 
-    # remove termos institucionais
-    txt = re.sub(r'\b(fc|f\.c\.|football club|sc|club|ac)\b', '', txt)
+    arquivos = [a for a in os.listdir(pasta) if a.endswith(".png")]
 
-    # remove categorias base
-    txt = re.sub(r'\b(u17|u19|u20|u21|u23|sub17|sub20|sub23)\b', '', txt)
-
-    # remove reservas / B team
-    txt = re.sub(r'\b(ii| b |reserves|reserve)\b', '', txt)
-
-    # normaliza separadores
-    txt = txt.replace("-", " ").replace("_", " ")
-
-    # remove espaços duplicados
-    txt = re.sub(r'\s+', ' ', txt).strip()
-
-    return txt
-
-    # =================================
-    # 1️⃣ MATCH EXATO
-    # =================================
+    # 1️⃣ match exato
     for arq in arquivos:
-        nome_arq = limpar(arq.replace(".png", ""))
-        if alvo == nome_arq:
+        if limpar(arq.replace(".png","")) == alvo:
             return os.path.join(pasta, arq)
 
-    # =================================
-    # 2️⃣ MATCH COMPACTO (sem espaços)
-    # =================================
+    # 2️⃣ match sem espaços
     alvo_comp = alvo.replace(" ", "")
     for arq in arquivos:
-        nome_arq = limpar(arq.replace(".png", "")).replace(" ", "")
-        if alvo_comp == nome_arq:
+        nome = limpar(arq.replace(".png","")).replace(" ","")
+        if nome == alvo_comp:
             return os.path.join(pasta, arq)
 
-    # =================================
-    # 3️⃣ MATCH POR INÍCIO (seguro)
-    # evita Inter → Winterthur
-    # =================================
-    for arq in arquivos:
-        nome_arq = limpar(arq.replace(".png", ""))
-        if nome_arq.startswith(alvo) and len(alvo) > 3:
-            return os.path.join(pasta, arq)
-
-    # =================================
-    # 4️⃣ MATCH POR TOKENS
-    # =================================
+    # 3️⃣ match por tokens (seguro)
     alvo_tokens = set(alvo.split())
 
     melhor = None
     melhor_score = 0
 
     for arq in arquivos:
-        nome_arq = limpar(arq.replace(".png", ""))
+        nome_arq = limpar(arq.replace(".png",""))
         tokens = set(nome_arq.split())
 
         intersec = len(alvo_tokens & tokens)
-        score = intersec / max(len(alvo_tokens), 1)
+        score = intersec / max(len(alvo_tokens),1)
 
-        if score > melhor_score and score >= 0.7:
+        if score > melhor_score and score >= 0.6:
             melhor = arq
             melhor_score = score
 
@@ -1113,23 +1089,14 @@ with tab1:
 
     with col1:
         st.image(esc_home, width=90)
-        st.markdown(
-            f"<center><b>{home}</b></center>",
-            unsafe_allow_html=True
-        )
+        st.markdown(f"<center><b>{home}</b></center>", unsafe_allow_html=True)
 
     with col2:
-        st.markdown(
-            "<h2 style='text-align:center'>VS</h2>",
-            unsafe_allow_html=True
-        )
+        st.markdown("<h2 style='text-align:center'>VS</h2>", unsafe_allow_html=True)
 
     with col3:
         st.image(esc_away, width=90)
-        st.markdown(
-            f"<center><b>{away}</b></center>",
-            unsafe_allow_html=True
-        )
+        st.markdown(f"<center><b>{away}</b></center>", unsafe_allow_html=True)
 
     st.markdown("---")
 
