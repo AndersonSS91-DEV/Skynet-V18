@@ -183,33 +183,40 @@ ul[role="listbox"] li {
 </style>
 """, unsafe_allow_html=True)
 
-
 # =========================================
-# 🎬 BANNER CARROSSEL (SAFE MODE)
+# 🎬 BANNER CARROSSEL (OFICIAL SKYNET)
 # =========================================
 from pathlib import Path
-from PIL import Image
+from streamlit_autorefresh import st_autorefresh
 
 ASSETS = Path("assets")
+BANNERS = sorted(ASSETS.glob("banner*"))
 
-if ASSETS.exists():
-    BANNERS = list(ASSETS.glob("banner*"))
+if BANNERS:
 
-    if BANNERS:
-        if "banner_idx" not in st.session_state:
-            st.session_state.banner_idx = 0
+    refresh = st_autorefresh(interval=120000, key="banner")
 
-        idx = st.session_state.banner_idx % len(BANNERS)
+    if "banner_idx" not in st.session_state:
+        st.session_state.banner_idx = 0
 
-        try:
-            img = Image.open(BANNERS[idx])
-            st.image(img, width=800)
-        except:
-            st.warning("⚠️ erro ao carregar banner")
-    else:
-        st.warning("⚠️ nenhum banner encontrado em /assets")
-else:
-    st.warning("⚠️ pasta /assets não encontrada")
+    if refresh:
+        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % len(BANNERS)
+
+    colL, colC, colR = st.columns([1,6,1])
+
+    with colL:
+        if st.button("◀", use_container_width=True):
+            st.session_state.banner_idx -= 1
+
+    with colR:
+        if st.button("▶", use_container_width=True):
+            st.session_state.banner_idx += 1
+
+    st.session_state.banner_idx %= len(BANNERS)
+
+    with colC:
+        st.image(str(BANNERS[st.session_state.banner_idx]), use_container_width=True)
+        
 # =========================================
 # HÍBRIDO — ARQUIVO PADRÃO + UPLOAD OPCIONAL
 # =========================================
@@ -359,8 +366,8 @@ def escudo_path(nome_time):
 
         # troca separadores
         txt = re.sub(r'\s*/\s*', ' ', txt)
-        txt = txt.replace("-", " ")
-        txt = txt.replace("_", " ")
+        # normaliza qualquer separador múltiplo
+        txt = re.sub(r'[\-_]+', ' ', txt)
 
         # remove espaços duplicados infinitos
         txt = re.sub(r'\s+', ' ', txt).strip()
