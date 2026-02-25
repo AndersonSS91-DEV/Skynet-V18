@@ -351,7 +351,13 @@ def escudo_path(nome_time):
     APELIDOS = {
     "inter milan": "inter",
     "inter": "inter",
-    "bodo glimt": "bodo glimt",
+        
+    # BODO GLIMT → arquivo bodo.png
+    "bodø glimt": "bodo",
+    "bodo glimt": "bodo",
+    "bodo / glimt": "bodo",
+    "fk bodo glimt": "bodo",
+        
     "olympiacos": "olympiakos",
     "olympiacos f.c.": "olympiakos",
     "estrela": "estrela amadora",
@@ -363,13 +369,8 @@ def escudo_path(nome_time):
         txt = unicodedata.normalize('NFKD', txt)\
               .encode('ASCII','ignore').decode('ASCII')
 
-        # troca separadores
-        txt = re.sub(r'\s*/\s*', ' ', txt)
-        # normaliza qualquer separador múltiplo
-        txt = re.sub(r'[\-_]+', ' ', txt)
-
-        # remove espaços duplicados infinitos
-        txt = txt.replace("/", " ")
+        # transforma separadores em espaço
+        txt = re.sub(r'[\/\-_]+', ' ', txt)
 
         # remove termos inúteis
         txt = re.sub(r'\b(fc|f\.c\.|club|sc)\b', '', txt)
@@ -377,7 +378,9 @@ def escudo_path(nome_time):
         # remove categorias base
         txt = re.sub(r'\b(u17|u19|u20|u21|u23)\b', '', txt)
 
+        # remove espaços duplicados
         txt = re.sub(r'\s+', ' ', txt).strip()
+
         return txt
 
     alvo = limpar(nome_time)
@@ -386,6 +389,15 @@ def escudo_path(nome_time):
         alvo = APELIDOS[alvo]
 
     arquivos = [a for a in os.listdir(pasta) if a.endswith(".png")]
+
+    for arq in arquivos:
+        nome_arq = limpar(arq.replace(".png",""))
+
+        if nome_arq == alvo:
+            return os.path.join(pasta, arq)
+
+        if nome_arq.replace(" ","") == alvo.replace(" ",""):
+            return os.path.join(pasta, arq)
 
     # 1️⃣ match exato
     for arq in arquivos:
