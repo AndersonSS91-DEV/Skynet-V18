@@ -414,12 +414,6 @@ def limpar(txt):
         nome_arq = limpar(arq.replace(".png",""))
         if alvo_tokens.issubset(set(nome_arq.split())):
             return os.path.join(pasta, arq)
-            
-    # 4️⃣ match por palavra principal (ULTRA IMPORTANTE)
-    for arq in arquivos:
-        nome_arq = limpar(arq.replace(".png",""))
-        if nome_arq in alvo:
-            return os.path.join(pasta, arq)
 
     return placeholder
     
