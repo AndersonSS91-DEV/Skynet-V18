@@ -548,31 +548,6 @@ def top_placares(matriz, n=6):
     m["Probabilidade%"] = m["Probabilidade%"].map(lambda x: f"{x:.2f}%")
     return m
 # =========================================
-# ESCUDOS PROFISSIONAL (COM ACENTOS)
-# =========================================
-def normalizar(txt):
-    txt = str(txt).lower().strip()
-    txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
-    return txt.replace(" ", "").replace("_", "").replace("-", "")
-
-    if not nome_time:
-        return None
-
-    alvo = normalizar(nome_time)
-
-    for arquivo in os.listdir(pasta):
-        nome_arq = normalizar(arquivo.replace(".png",""))
-
-        if alvo in nome_arq or nome_arq in alvo:
-            return os.path.join(pasta, arquivo)
-
-    fallback = os.path.join(pasta, "default.png")
-    if os.path.exists(fallback):
-        return fallback
-
-    return None
-
-# =========================================
 # ⚽ MÉTRICAS OFENSIVAS SKYNET
 # =========================================
 
