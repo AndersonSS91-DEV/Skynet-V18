@@ -335,33 +335,43 @@ st.session_state["jogo"] = jogo
 # 🔰 MATCH PROFISSIONAL DE ESCUDOS (FIX FINAL)
 # =========================================
 def escudo_path(nome_time):
-    import os, unicodedata, re
+    import os, re, unicodedata
 
     pasta = "escudos"
     placeholder = os.path.join(pasta, "time_vazio.png")
 
-    if not os.path.exists(pasta) or not nome_time:
+    if not os.path.exists(pasta):
         return placeholder
 
+    if not nome_time:
+        return placeholder
+
+    # 🔥 apelidos manuais
+    APELIDOS = {
+    "inter milan": "inter",
+    "inter": "inter",
+    "bodo glimt": "bodo glimt",
+    "olympiacos": "olympiakos",
+    "olympiacos fc": "olympiakos",
+    "estrela": "estrela amadora",
+}
     def limpar(txt):
-        txt = str(txt)
-
-        # remove caracteres invisíveis
-        txt = txt.replace('\xa0',' ').replace('\u200b','')
-
-        txt = txt.lower().strip()
+        txt = str(txt).lower().strip()
 
         # remove acentos
         txt = unicodedata.normalize('NFKD', txt)\
               .encode('ASCII','ignore').decode('ASCII')
 
-        # normaliza separadores
+        # troca separadores
+        txt = re.sub(r'\s*/\s*', ' ', txt)
+        # normaliza qualquer separador múltiplo
+        txt = re.sub(r'[\-_]+', ' ', txt)
+
+        # remove espaços duplicados infinitos
         txt = txt.replace("/", " ")
-        txt = txt.replace("-", " ")
-        txt = txt.replace("_", " ")
 
         # remove termos inúteis
-        txt = re.sub(r'\b(fc|club|sc)\b', '', txt)
+        txt = re.sub(r'\b(fc|f\.c\.|club|sc)\b', '', txt)
 
         # remove categorias base
         txt = re.sub(r'\b(u17|u19|u20|u21|u23)\b', '', txt)
@@ -371,13 +381,28 @@ def escudo_path(nome_time):
 
     alvo = limpar(nome_time)
 
-    for arq in os.listdir(pasta):
-        if not arq.lower().endswith(".png"):
-            continue
+    if alvo in APELIDOS:
+        alvo = APELIDOS[alvo]
 
-        nome_limpo = limpar(arq.replace(".png",""))
+    arquivos = [a for a in os.listdir(pasta) if a.endswith(".png")]
 
-        if nome_limpo == alvo:
+    # 1️⃣ match exato
+    for arq in arquivos:
+        if limpar(arq.replace(".png","")) == alvo:
+            return os.path.join(pasta, arq)
+
+    # 2️⃣ match compacto
+    alvo2 = alvo.replace(" ", "")
+    for arq in arquivos:
+        if limpar(arq.replace(".png","")).replace(" ","") == alvo2:
+            return os.path.join(pasta, arq)
+
+    # 3️⃣ tokens
+    alvo_tokens = set(alvo.split())
+
+    for arq in arquivos:
+        nome_arq = limpar(arq.replace(".png",""))
+        if alvo_tokens.issubset(set(nome_arq.split())):
             return os.path.join(pasta, arq)
 
     return placeholder
