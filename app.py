@@ -1036,13 +1036,8 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # ABA 1 — RESUMO
 # =========================================
 with tab1:
-
-    # DEBUG — ver nome real vindo do Excel
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
-
-    st.write("HOME:", home)
-    st.write("AWAY:", away)
 
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
