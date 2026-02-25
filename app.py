@@ -185,51 +185,31 @@ ul[role="listbox"] li {
 
 
 # =========================================
-# 🎬 BANNER CARROSSEL — FIX DEFINITIVO REAL
+# 🎬 BANNER CARROSSEL (SAFE MODE)
 # =========================================
-import streamlit as st
 from pathlib import Path
-from streamlit_autorefresh import st_autorefresh
+from PIL import Image
 
 ASSETS = Path("assets")
 
-BANNERS = sorted(str(p) for p in ASSETS.glob("banner*.*"))
+if ASSETS.exists():
+    BANNERS = list(ASSETS.glob("banner*"))
 
-if not BANNERS:
-    st.warning("⚠️ Coloque imagens em /assets/banner1.png, banner2.png ...")
+    if BANNERS:
+        if "banner_idx" not in st.session_state:
+            st.session_state.banner_idx = 0
 
+        idx = st.session_state.banner_idx % len(BANNERS)
+
+        try:
+            img = Image.open(BANNERS[idx])
+            st.image(img, width=800)
+        except:
+            st.warning("⚠️ erro ao carregar banner")
+    else:
+        st.warning("⚠️ nenhum banner encontrado em /assets")
 else:
-    total = len(BANNERS)
-
-    # autoplay (a cada 2 min)
-    refresh_count = st_autorefresh(interval=120000, key="banner_refresh")
-
-    # inicia estado
-    if "banner_idx" not in st.session_state:
-        st.session_state.banner_idx = 0
-
-    # autoplay só incrementa (não sobrescreve)
-    if refresh_count:
-        st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
-
-    c1, c2, c3 = st.columns([1, 8, 1])
-
-    # ◀
-    with c1:
-        if st.button("◀", use_container_width=True):
-            st.session_state.banner_idx = (st.session_state.banner_idx - 1) % total
-
-    # ▶
-    with c3:
-        if st.button("▶", use_container_width=True):
-            st.session_state.banner_idx = (st.session_state.banner_idx + 1) % total
-
-    c1, c2, c3 = st.columns([1,2,1])
-
-with c2:
-    st.image(BANNERS[st.session_state.banner_idx], width=800)
-
-
+    st.warning("⚠️ pasta /assets não encontrada")
 # =========================================
 # HÍBRIDO — ARQUIVO PADRÃO + UPLOAD OPCIONAL
 # =========================================
