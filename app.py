@@ -360,7 +360,7 @@ def escudo_path(nome_time):
         return placeholder
 
     # 🔥 apelidos manuais
-      apelidos = {
+     APELIDOS = {
         "inter milan": "inter",
         "inter": "inter",
         "bodo glimt": "bodo glimt",
