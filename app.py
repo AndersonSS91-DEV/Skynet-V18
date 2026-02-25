@@ -370,37 +370,33 @@ def escudo_path(nome_time):
         "bodo glimt": "bodo glimt",
         "estrela": "estrela amadora",
         "olympiacos": "olympiakos",
-    }
+}
 
     # ===============================
     # LIMPAR TEXTO
     # ===============================
-    def limpar(txt):
-        txt = str(txt).lower().strip()
+def limpar(txt):
+    txt = str(txt).lower().strip()
 
-        # remove acentos (ø → o)
-        txt = unicodedata.normalize('NFKD', txt)\
-            .encode('ASCII','ignore').decode('ASCII')
+    # remove acentos
+    txt = unicodedata.normalize('NFKD', txt).encode('ASCII','ignore').decode('ASCII')
 
-        # remove categorias base
-        txt = re.sub(r'\b(u17|u19|u20|u21|u23|sub17|sub20|sub23)\b', '', txt)
+    # remove termos institucionais
+    txt = re.sub(r'\b(fc|f\.c\.|football club|sc|club|ac)\b', '', txt)
 
-        # remove reservas / II / B
-        txt = re.sub(r'\b(ii|reserves|reserve)\b', '', txt)
+    # remove categorias base
+    txt = re.sub(r'\b(u17|u19|u20|u21|u23|sub17|sub20|sub23)\b', '', txt)
 
-        txt = txt.replace("/", " ")
-        txt = txt.replace("-", " ")
-        txt = txt.replace("_", " ")
+    # remove reservas / B team
+    txt = re.sub(r'\b(ii| b |reserves|reserve)\b', '', txt)
 
-        txt = re.sub(r'\s+', ' ', txt).strip()
-        return txt
+    # normaliza separadores
+    txt = txt.replace("-", " ").replace("_", " ")
 
-    alvo = limpar(nome_time)
+    # remove espaços duplicados
+    txt = re.sub(r'\s+', ' ', txt).strip()
 
-    if alvo in APELIDOS:
-        alvo = APELIDOS[alvo]
-
-    arquivos = [a for a in os.listdir(pasta) if a.endswith(".png")]
+    return txt
 
     # =================================
     # 1️⃣ MATCH EXATO
