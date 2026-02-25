@@ -352,7 +352,7 @@ def escudo_path(nome_time):
     "inter": "inter",
     "bodo glimt": "bodo glimt",
     "olympiacos": "olympiakos",
-    "olympiacos fc": "olympiakos",
+    "olympiacos f.c.": "olympiakos",
     "estrela": "estrela amadora",
 }
     def limpar(txt):
