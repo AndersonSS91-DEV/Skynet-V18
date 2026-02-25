@@ -354,6 +354,8 @@ def escudo_path(nome_time):
         "bodo / glimt": "bodo glimt",
         "bodø glimt": "bodo glimt",
         "bodø / glimt": "bodo glimt",
+        "bodo glimt fk": "bodo glimt",
+        "fk bodo glimt": "bodo glimt",
         "olympiacos f.c.": "olympiakos",
         "estrela": "estrela amadora",
     }
@@ -1040,6 +1042,10 @@ with tab1:
 
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
+    
+    # DEBUG — ver nome real vindo do Excel
+    st.write(home, "->", limpar(home))
+    st.write(away, "->", limpar(away))
 
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
