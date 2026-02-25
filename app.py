@@ -351,7 +351,13 @@ def escudo_path(nome_time):
     APELIDOS = {
     "inter milan": "inter",
     "inter": "inter",
-    "bodo glimt": "bodo glimt",
+        
+    # BODO GLIMT → arquivo bodo.png
+    "bodø glimt": "bodo",
+    "bodo glimt": "bodo",
+    "bodo / glimt": "bodo",
+    "fk bodo glimt": "bodo",
+        
     "olympiacos": "olympiakos",
     "olympiacos f.c.": "olympiakos",
     "estrela": "estrela amadora",
