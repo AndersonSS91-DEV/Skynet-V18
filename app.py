@@ -382,6 +382,9 @@ def escudo_path(nome_time):
         txt = txt.replace("-", " ")
         txt = txt.replace("_", " ")
 
+        # remove espaços duplicados infinitos
+        txt = re.sub(r'\s+', ' ', txt).strip()
+
         # remove termos inúteis
         txt = re.sub(r'\b(fc|f\.c\.|club|sc)\b', '', txt)
 
