@@ -362,32 +362,26 @@ def escudo_path(nome_time):
     "olympiacos f.c.": "olympiakos",
     "estrela": "estrela amadora",
 }
-def limpar(txt):
-    import unicodedata, re
+    def limpar(txt):
+        txt = str(txt).lower().strip()
 
-    txt = str(txt)
+        # remove acentos
+        txt = unicodedata.normalize('NFKD', txt)\
+              .encode('ASCII','ignore').decode('ASCII')
 
-    # remove caracteres invisíveis / quebrados
-    txt = txt.encode("utf-8", "ignore").decode("utf-8")
+        # transforma separadores em espaço
+        txt = re.sub(r'[\/\-_]+', ' ', txt)
 
-    txt = txt.lower().strip()
+        # remove termos inúteis
+        txt = re.sub(r'\b(fc|f\.c\.|club|sc)\b', '', txt)
 
-    # normaliza acentos (ø → o)
-    txt = unicodedata.normalize('NFKD', txt)\
-          .encode('ASCII','ignore').decode('ASCII')
+        # remove categorias base
+        txt = re.sub(r'\b(u17|u19|u20|u21|u23)\b', '', txt)
 
-    # troca separadores
-    txt = re.sub(r'[/\\\-]+', ' ', txt)
+        # remove espaços duplicados
+        txt = re.sub(r'\s+', ' ', txt).strip()
 
-    # remove termos inúteis
-    txt = re.sub(r'\b(fc|f\.c\.|club|sc)\b', '', txt)
-
-    # remove categorias base
-    txt = re.sub(r'\b(u17|u19|u20|u21|u23)\b', '', txt)
-
-    txt = re.sub(r'\s+', ' ', txt).strip()
-
-    return txt
+        return txt
 
     alvo = limpar(nome_time)
 
@@ -395,6 +389,15 @@ def limpar(txt):
         alvo = APELIDOS[alvo]
 
     arquivos = [a for a in os.listdir(pasta) if a.endswith(".png")]
+
+    for arq in arquivos:
+        nome_arq = limpar(arq.replace(".png",""))
+
+        if nome_arq == alvo:
+            return os.path.join(pasta, arq)
+
+        if nome_arq.replace(" ","") == alvo.replace(" ",""):
+            return os.path.join(pasta, arq)
 
     # 1️⃣ match exato
     for arq in arquivos:
