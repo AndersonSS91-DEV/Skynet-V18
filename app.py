@@ -362,29 +362,32 @@ def escudo_path(nome_time):
     "olympiacos f.c.": "olympiakos",
     "estrela": "estrela amadora",
 }
-    def limpar(txt):
-        txt = str(txt).lower().strip()
+def limpar(txt):
+    import unicodedata, re
 
-        # remove acentos
-        txt = unicodedata.normalize('NFKD', txt)\
-              .encode('ASCII','ignore').decode('ASCII')
+    txt = str(txt)
 
-        # troca separadores
-        txt = re.sub(r'\s*/\s*', ' ', txt)
-        # normaliza qualquer separador múltiplo
-        txt = re.sub(r'[\-_]+', ' ', txt)
+    # remove caracteres invisíveis / quebrados
+    txt = txt.encode("utf-8", "ignore").decode("utf-8")
 
-        # remove espaços duplicados infinitos
-        txt = txt.replace("/", " ")
+    txt = txt.lower().strip()
 
-        # remove termos inúteis
-        txt = re.sub(r'\b(fc|f\.c\.|club|sc)\b', '', txt)
+    # normaliza acentos (ø → o)
+    txt = unicodedata.normalize('NFKD', txt)\
+          .encode('ASCII','ignore').decode('ASCII')
 
-        # remove categorias base
-        txt = re.sub(r'\b(u17|u19|u20|u21|u23)\b', '', txt)
+    # troca separadores
+    txt = re.sub(r'[/\\\-]+', ' ', txt)
 
-        txt = re.sub(r'\s+', ' ', txt).strip()
-        return txt
+    # remove termos inúteis
+    txt = re.sub(r'\b(fc|f\.c\.|club|sc)\b', '', txt)
+
+    # remove categorias base
+    txt = re.sub(r'\b(u17|u19|u20|u21|u23)\b', '', txt)
+
+    txt = re.sub(r'\s+', ' ', txt).strip()
+
+    return txt
 
     alvo = limpar(nome_time)
 
@@ -410,6 +413,12 @@ def escudo_path(nome_time):
     for arq in arquivos:
         nome_arq = limpar(arq.replace(".png",""))
         if alvo_tokens.issubset(set(nome_arq.split())):
+            return os.path.join(pasta, arq)
+            
+    # 4️⃣ match por palavra principal (ULTRA IMPORTANTE)
+    for arq in arquivos:
+        nome_arq = limpar(arq.replace(".png",""))
+        if nome_arq in alvo:
             return os.path.join(pasta, arq)
 
     return placeholder
