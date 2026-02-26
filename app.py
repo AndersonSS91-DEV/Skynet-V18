@@ -1055,32 +1055,33 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    col1, col2, col3 = st.columns([1,1,1])
+    col1, col2, col3 = st.columns([2,1,2])
 
 with col1:
-    st.markdown("<div style='height:25px'></div>", unsafe_allow_html=True)
-    st.image(esc_home, width=110)
+    st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+    st.image(esc_home, width=120)
     st.markdown(
-        f"<div style='text-align:center;font-size:22px;font-weight:800;margin-top:6px'>{home.upper()}</div>",
+        f"<div style='font-size:22px;font-weight:800;margin-top:8px'>{home.upper()}</div>",
         unsafe_allow_html=True
     )
+    st.markdown("</div>", unsafe_allow_html=True)
 
 with col2:
     st.markdown(
-        "<div style='text-align:center;font-size:30px;font-weight:900;margin-top:55px'>VS</div>",
+        "<div style='text-align:center;font-size:30px;font-weight:900;margin-top:45px'>VS</div>",
         unsafe_allow_html=True
     )
 
 with col3:
-    st.markdown("<div style='height:25px'></div>", unsafe_allow_html=True)
-    st.image(esc_away, width=110)
+    st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+    st.image(esc_away, width=120)
     st.markdown(
-        f"<div style='text-align:center;font-size:22px;font-weight:800;margin-top:6px'>{away.upper()}</div>",
+        f"<div style='font-size:22px;font-weight:800;margin-top:8px'>{away.upper()}</div>",
         unsafe_allow_html=True
     )
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("---")
-
+  
     # ===== ODDS =====
     st.markdown("### 🎯 Odds")
     o1, o2, o3 = st.columns(3)
