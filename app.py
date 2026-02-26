@@ -1068,7 +1068,7 @@ with tab1:
         )
 
     with col2:
-    st.markdown(
+        st.markdown(
         """
         <div style="
             display:flex;
