@@ -1046,7 +1046,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💎⚽ VG"
 ])
 # =========================================
-# ABA 1 — RESUMO >>> ALINHAMENTO SIMPLIFICADO (ESTILO ODDS)
+# ABA 1 — RESUMO >>> ALINHAMENTO IGUAL ÀS ODDS
 # =========================================
 with tab1:
     home = linha_exg["Home_Team"]
@@ -1057,22 +1057,24 @@ with tab1:
     c1, c2, c3 = st.columns([3, 1, 3])
 
     with c1:
-        # Centralização padrão do Streamlit
+        # Alinhamento nativo: Imagem em cima, nome embaixo
         st.image(esc_home, width=105)
-        st.subheader(home.upper())
+        st.markdown(f"<p style='text-align:center; font-weight:bold;'>{home.upper()}</p>", unsafe_allow_html=True)
 
     with c2:
-        # O PULO DO GATO: 
-        # Criamos um espaço vazio para empurrar o VS para a linha do escudo
+        # PULA LINHA PARA ALINHAR O VS COM O CENTRO DO ESCUDO
         st.write("") 
-        st.write("") 
-        st.markdown("<h2 style='text-align: center;'>VS</h2>", unsafe_allow_html=True)
+        st.write("")
+        st.write("")
+        st.markdown("<h2 style='text-align:center;'>VS</h2>", unsafe_allow_html=True)
 
     with c3:
         st.image(esc_away, width=105)
-        st.subheader(away.upper())
+        st.markdown(f"<p style='text-align:center; font-weight:bold;'>{away.upper()}</p>", unsafe_allow_html=True)
 
     st.markdown("---")
+    
+    # Suas Odds continuam aqui sem nenhuma alteração de CSS global
   
     # ===== ODDS =====
     st.markdown("### 🎯 Odds")
