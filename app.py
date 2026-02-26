@@ -1045,9 +1045,8 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "⚔️⚽ ATK x DEF",
 "💎⚽ VG"
 ])
-
 # =========================================
-# ABA 1 — RESUMO >>>>>>. ESCUDOS QUASE PERFEITOS >>>>> SALVAR ESSE CÓDIGO
+# ABA 1 — RESUMO
 # =========================================
 with tab1:
 
@@ -1057,7 +1056,7 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-        header = st.container()
+    header = st.container()
 
     with header:
 
