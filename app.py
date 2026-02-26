@@ -1046,7 +1046,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💎⚽ VG"
 ])
 # =========================================
-# ABA 1 — RESUMO >>> ALINHAMENTO IGUAL ÀS ODDS
+# ABA 1 — RESUMO >>> ALINHAMENTO POR TABELA (BLINDADO)
 # =========================================
 with tab1:
     home = linha_exg["Home_Team"]
@@ -1054,25 +1054,29 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    c1, c2, c3 = st.columns([3, 1, 3])
-
-    with c1:
-        # Alinhamento nativo: Imagem em cima, nome embaixo
-        st.image(esc_home, width=105)
-        st.markdown(f"<p style='text-align:center; font-weight:bold;'>{home.upper()}</p>", unsafe_allow_html=True)
-
-    with c2:
-        # PULA LINHA PARA ALINHAR O VS COM O CENTRO DO ESCUDO
-        st.write("") 
-        st.write("")
-        st.write("")
-        st.markdown("<h2 style='text-align:center;'>VS</h2>", unsafe_allow_html=True)
-
-    with c3:
-        st.image(esc_away, width=105)
-        st.markdown(f"<p style='text-align:center; font-weight:bold;'>{away.upper()}</p>", unsafe_allow_html=True)
+    # Criamos uma tabela HTML onde a célula do meio (VS) 
+    # se alinha automaticamente ao centro das células laterais
+    st.write(f"""
+        <table style="width:100%; border:none; border-collapse:collapse;">
+            <tr style="border:none;">
+                <td style="width:45%; text-align:center; border:none; vertical-align:middle;">
+                    <img src="{esc_home}" width="105">
+                    <div style="font-size:20px; font-weight:700; margin-top:10px;">{home.upper()}</div>
+                </td>
+                <td style="width:10%; text-align:center; border:none; vertical-align:middle;">
+                    <h1 style="margin:0; padding:0; font-size:32px;">VS</h1>
+                </td>
+                <td style="width:45%; text-align:center; border:none; vertical-align:middle;">
+                    <img src="{esc_away}" width="105">
+                    <div style="font-size:20px; font-weight:700; margin-top:10px;">{away.upper()}</div>
+                </td>
+            </tr>
+        </table>
+    """, unsafe_allow_html=True)
 
     st.markdown("---")
+    
+    # Suas Odds abaixo não serão afetadas porque não usamos <style> global
     
     # Suas Odds continuam aqui sem nenhuma alteração de CSS global
   
