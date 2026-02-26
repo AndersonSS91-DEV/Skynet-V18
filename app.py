@@ -1057,7 +1057,7 @@ with tab1:
     esc_away = escudo_path(away)
 
         # ===== HEADER AJUSTADO (POSIÇÃO FINA) =====
-        col1, col2, col3 = st.columns(3)
+            col1, col2, col3 = st.columns(3)
 
     with col1:
         st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
