@@ -1045,29 +1045,46 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "⚔️⚽ ATK x DEF",
 "💎⚽ VG"
 ])
+import base64
+from pathlib import Path
+
+# 1. Função para converter a imagem local em Base64
+def get_base64_image(image_path):
+    try:
+        img_file = Path(image_path)
+        if img_file.exists():
+            with open(img_file, "rb") as f:
+                data = base64.b64encode(f.read()).decode()
+            return f"data:image/png;base64,{data}"
+        return "" 
+    except:
+        return ""
+
 # =========================================
-# ABA 1 — RESUMO >>> ALINHAMENTO PERFEITO SEM QUEBRAR IMAGENS
+# ABA 1 — RESUMO >>> SOLUÇÃO FINAL (BASE64 + FLEXBOX)
 # =========================================
 with tab1:
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
-    esc_home = escudo_path(home)
-    esc_away = escudo_path(away)
+    
+    # Converte os caminhos para Base64
+    esc_home_b64 = get_base64_image(escudo_path(home))
+    esc_away_b64 = get_base64_image(escudo_path(away))
 
-    # Usamos HTML com Flexbox em uma única linha de markdown para garantir o alinhamento
+    # HTML com alinhamento perfeito e imagens embutidas
     st.markdown(f"""
-        <div style="display: flex; align-items: center; justify-content: space-around; text-align: center; width: 100%;">
+        <div style="display: flex; align-items: center; justify-content: center; text-align: center; gap: 20px; width: 100%;">
             <div style="flex: 1;">
-                <img src="{esc_home}" width="105">
+                <img src="{esc_home_b64}" width="105" style="display: block; margin: 0 auto;">
                 <div style="font-size:20px; font-weight:700; margin-top:6px;">{home.upper()}</div>
             </div>
             
-            <div style="flex: 0.5; font-size:28px; font-weight:900; line-height: 1;">
+            <div style="flex: 0.3; font-size:28px; font-weight:900; white-space: nowrap;">
                 VS
             </div>
             
             <div style="flex: 1;">
-                <img src="{esc_away}" width="105">
+                <img src="{esc_away_b64}" width="105" style="display: block; margin: 0 auto;">
                 <div style="font-size:20px; font-weight:700; margin-top:6px;">{away.upper()}</div>
             </div>
         </div>
