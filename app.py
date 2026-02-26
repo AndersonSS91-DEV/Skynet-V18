@@ -1056,32 +1056,30 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-        # ===== HEADER ALINHADO COM AS ODDS =====
-            # ===== HEADER COM MESMA LARGURA DAS ODDS =====
-    spacer_left, header, spacer_right = st.columns([1,6,1])
+        # ===== HEADER AJUSTADO (POSIÇÃO FINA) =====
+    col1, col2, col3 = st.columns([1.2,1,1.2])
 
-    with header:
-        col1, col2, col3 = st.columns([1,1,1])
+    with col1:
+        st.markdown("<div style='text-align:center;margin-left:18px'>", unsafe_allow_html=True)
+        st.image(esc_home, width=105)
+        st.markdown(
+            f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>",
+            unsafe_allow_html=True
+        )
 
-        with col1:
-            st.image(esc_home, width=105)
-            st.markdown(
-                f"<div style='text-align:center;font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div>",
-                unsafe_allow_html=True
-            )
+    with col2:
+        st.markdown(
+            "<div style='text-align:center;font-size:30px;font-weight:900;margin-top:38px'>VS</div>",
+            unsafe_allow_html=True
+        )
 
-        with col2:
-            st.markdown(
-                "<div style='text-align:center;font-size:30px;font-weight:900;margin-top:38px'>VS</div>",
-                unsafe_allow_html=True
-            )
-
-        with col3:
-            st.image(esc_away, width=105)
-            st.markdown(
-                f"<div style='text-align:center;font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div>",
-                unsafe_allow_html=True
-            )
+    with col3:
+        st.markdown("<div style='text-align:center;margin-right:18px'>", unsafe_allow_html=True)
+        st.image(esc_away, width=105)
+        st.markdown(
+            f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>",
+            unsafe_allow_html=True
+        )
 
     st.markdown("---")
 
