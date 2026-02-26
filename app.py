@@ -1046,7 +1046,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💎⚽ VG"
 ])
 # =========================================
-# ABA 1 — RESUMO >>> ALINHAMENTO TÉCNICO
+# ABA 1 — RESUMO >>> ALINHAMENTO NO EIXO (SEM MARGEM SOBRANDO)
 # =========================================
 with tab1:
     home = linha_exg["Home_Team"]
@@ -1054,61 +1054,39 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    # Injeta o CSS que força o alinhamento vertical no meio para esta linha de colunas
+    # CSS agressivo para alinhar o VS exatamente no meio do bloco horizontal
     st.markdown("""
         <style>
-        /* Alinha verticalmente o conteúdo de todas as colunas desta linha */
-        [data-testid="column"] {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+        /* Força a linha das colunas a alinhar tudo pelo meio */
+        div[data-testid="stHorizontalBlock"] {
+            align-items: center !important;
         }
-        /* Garante que o texto dentro da coluna também centralize */
-        [data-testid="column"] .stMarkdown {
-            text-align: center;
-            width: 100%;
+        /* Remove a margem chata que o Streamlit coloca embaixo de toda imagem */
+        div[data-testid="stImage"] > img {
+            margin-bottom: -20px; 
         }
         </style>
         """, unsafe_allow_html=True)
 
-    # Mantemos a proporção original das suas colunas
     c1, c2, c3 = st.columns([3, 1, 3])
 
     with c1:
+        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
         st.image(esc_home, width=105)
-        st.markdown(f"**{home.upper()}**")
+        st.markdown(f"<div style='font-size:20px;font-weight:700;margin-top:0px'>{home.upper()}</div></div>", unsafe_allow_html=True)
 
     with c2:
-        # Sem margens manuais. O CSS acima cuida de centralizar o VS no eixo do escudo.
-        st.markdown("## VS")
+        # VS puro, sem div, sem nada, deixando o CSS lá de cima centralizar
+        st.markdown("<h2 style='text-align:center; margin:0;'>VS</h2>", unsafe_allow_html=True)
 
     with c3:
+        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
         st.image(esc_away, width=105)
-        st.markdown(f"**{away.upper()}**")
+        st.markdown(f"<div style='font-size:20px;font-weight:700;margin-top:0px'>{away.upper()}</div></div>", unsafe_allow_html=True)
 
     st.markdown("---")
     
-    # ===== ODDS (RESTAURADAS) =====
-    st.markdown("### 🎯 Odds")
-    o1, o2, o3 = st.columns(3)
-
-    with o1:
-        st.metric("Odds Casa", linha_exg["Odds_Casa"])
-        st.metric("Odd Over 1.5", linha_exg["Odd_Over_1,5FT"])
-        st.metric("VR01", get_val(linha_exg, "VR01", "{:.2f}"))
-
-    with o2:
-        st.metric("Odds Empate", linha_exg["Odds_Empate"])
-        st.metric("Odds Over 2.5", linha_exg["Odds_Over_2,5FT"])
-        st.metric("Coef Over1FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
-
-    with o3:
-        st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
-        st.metric("Odds Under 2.5", linha_exg["Odds_Under_2,5FT"])
-        st.metric("BTTS YES", linha_exg["Odd_BTTS_YES"])
-
-    st.markdown("---")
+    # Suas ODDS aqui (não serão afetadas pelo align-items: center porque são textos uniformes)
 
     # -------- LINHA 2 — Métricas
     st.markdown("### 📊📈Métricas")
