@@ -1055,67 +1055,36 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    # ===== CSS DO CONFRONTO =====
-    st.markdown("""
-    <style>
-    .match-row {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 70px;
-        margin-top: 10px;
-        margin-bottom: 15px;
-    }
-    .team-box { text-align: center; }
-    .team-logo {
-        width: 100px;
-        height: 100px;
-        object-fit: contain;
-    }
-    .team-name {
-        font-size: 24px;
-        font-weight: 900;
-        margin-top: 6px;
-        letter-spacing: 1px;
-    }
-    .vs-text {
-        font-size: 34px;
-        font-weight: 900;
-        opacity: 0.85;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    # converte escudos para base64
+import base64
 
-    # ===== CONFRONTO VISUAL =====
-    import base64
+def img_to_base64(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
 
-    def img_to_base64(path):
-        try:
-            with open(path, "rb") as f:
-                return base64.b64encode(f.read()).decode()
-        except:
-            return ""
+esc_home64 = img_to_base64(esc_home)
+esc_away64 = img_to_base64(esc_away)
 
-    esc_home64 = img_to_base64(esc_home)
-    esc_away64 = img_to_base64(esc_away)
+# confronto centralizado
+html_confronto = f"""
+<div style="display:flex;justify-content:center;align-items:center;gap:60px;margin-top:10px;margin-bottom:15px;">
 
-    st.markdown(f"""
-    <div class="match-row">
-
-        <div class="team-box">
-            <img class="team-logo" src="data:image/png;base64,{esc_home64}">
-            <div class="team-name">{home.upper()}</div>
-        </div>
-
-        <div class="vs-text">VS</div>
-
-        <div class="team-box">
-            <img class="team-logo" src="data:image/png;base64,{esc_away64}">
-            <div class="team-name">{away.upper()}</div>
-        </div>
-
+    <div style="text-align:center;">
+        <img src="data:image/png;base64,{esc_home64}" width="95">
+        <div style="font-size:22px;font-weight:800;margin-top:6px;">{home.upper()}</div>
     </div>
-    """, unsafe_allow_html=True)
+
+    <div style="font-size:30px;font-weight:900;">VS</div>
+
+    <div style="text-align:center;">
+        <img src="data:image/png;base64,{esc_away64}" width="95">
+        <div style="font-size:22px;font-weight:800;margin-top:6px;">{away.upper()}</div>
+    </div>
+
+</div>
+"""
+
+st.markdown(html_confronto, unsafe_allow_html=True)
 
     st.markdown("---")
 
