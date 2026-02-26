@@ -1068,10 +1068,10 @@ with tab1:
         )
 
     with col2:
-        st.markdown(
-            "<div style='text-align:center;font-size:30px;font-weight:800;margin-top:38px'>VS</div>",
-            unsafe_allow_html=True
-        )
+    st.markdown(
+        "<div style='text-align:center;font-size:30px;font-weight:900;margin-top:38px; transform: translateX(-18px);'>VS</div>",
+        unsafe_allow_html=True
+    )
 
     with col3:
         st.markdown("<div style='text-align:center;margin-right:18px'>", unsafe_allow_html=True)
