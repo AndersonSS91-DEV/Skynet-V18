@@ -1056,73 +1056,66 @@ with tab1:
     esc_away = escudo_path(away)
 
     # ===== CSS DO CONFRONTO =====
-st.markdown("""
-<style>
-.match-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 70px;
-    margin-top: 10px;
-    margin-bottom: 15px;
-}
+    st.markdown("""
+    <style>
+    .match-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 70px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+    .team-box { text-align: center; }
+    .team-logo {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+    }
+    .team-name {
+        font-size: 24px;
+        font-weight: 900;
+        margin-top: 6px;
+        letter-spacing: 1px;
+    }
+    .vs-text {
+        font-size: 34px;
+        font-weight: 900;
+        opacity: 0.85;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-.team-box {
-    text-align: center;
-}
+    # ===== CONFRONTO VISUAL =====
+    import base64
 
-.team-logo {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-}
+    def img_to_base64(path):
+        try:
+            with open(path, "rb") as f:
+                return base64.b64encode(f.read()).decode()
+        except:
+            return ""
 
-.team-name {
-    font-size: 24px;
-    font-weight: 900;
-    margin-top: 6px;
-    letter-spacing: 1px;
-}
+    esc_home64 = img_to_base64(esc_home)
+    esc_away64 = img_to_base64(esc_away)
 
-.vs-text {
-    font-size: 34px;
-    font-weight: 900;
-    opacity: 0.85;
-}
-</style>
-""", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="match-row">
 
+        <div class="team-box">
+            <img class="team-logo" src="data:image/png;base64,{esc_home64}">
+            <div class="team-name">{home.upper()}</div>
+        </div>
 
-# ===== CONFRONTO VISUAL =====
-import base64
+        <div class="vs-text">VS</div>
 
-def img_to_base64(path):
-    try:
-        with open(path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
-    except:
-        return ""
+        <div class="team-box">
+            <img class="team-logo" src="data:image/png;base64,{esc_away64}">
+            <div class="team-name">{away.upper()}</div>
+        </div>
 
-esc_home64 = img_to_base64(esc_home)
-esc_away64 = img_to_base64(esc_away)
-
-st.markdown(f"""
-<div class="match-row">
-
-    <div class="team-box">
-        <img class="team-logo" src="data:image/png;base64,{esc_home64}">
-        <div class="team-name">{home.upper()}</div>
     </div>
-
-    <div class="vs-text">VS</div>
-
-    <div class="team-box">
-        <img class="team-logo" src="data:image/png;base64,{esc_away64}">
-        <div class="team-name">{away.upper()}</div>
-    </div>
-
-</div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
     st.markdown("---")
 
