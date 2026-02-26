@@ -1056,29 +1056,30 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
+        # ===== HEADER ALINHADO COM AS ODDS =====
     od1, od2, od3 = st.columns(3)
 
-with od1:
-    st.image(esc_home, width=105)
-    st.markdown(
-        f"<div style='text-align:center;font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div>",
-        unsafe_allow_html=True
-    )
+    with od1:
+        st.image(esc_home, width=105)
+        st.markdown(
+            f"<div style='text-align:center;font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div>",
+            unsafe_allow_html=True
+        )
 
-with od2:
-    st.markdown(
-        "<div style='text-align:center;font-size:30px;font-weight:900;margin-top:38px'>VS</div>",
-        unsafe_allow_html=True
-    )
+    with od2:
+        st.markdown(
+            "<div style='text-align:center;font-size:30px;font-weight:900;margin-top:38px'>VS</div>",
+            unsafe_allow_html=True
+        )
 
-with od3:
-    st.image(esc_away, width=105)
-    st.markdown(
-        f"<div style='text-align:center;font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div>",
-        unsafe_allow_html=True
-    )
+    with od3:
+        st.image(esc_away, width=105)
+        st.markdown(
+            f"<div style='text-align:center;font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div>",
+            unsafe_allow_html=True
+        )
 
-st.markdown("---")
+    st.markdown("---")
 
   
     # ===== ODDS =====
