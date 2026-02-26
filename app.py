@@ -1071,6 +1071,19 @@ with tab1:
                 unsafe_allow_html=True
             )
 
+        with c1:
+    st.markdown(
+        f"""
+        <div style="text-align:center;">
+            <img src="data:image/png;base64,{img_to_base64(esc_home)}" width="105">
+            <div style="font-size:20px;font-weight:700;margin-top:6px">
+                {home.upper()}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
         with c2:
             st.markdown("<div style='text-align:center; font-size:28px; font-weight:900; margin-top:55px;'>VS</div>",
         unsafe_allow_html=True
