@@ -1071,7 +1071,7 @@ with tab1:
 
         with c2:
     # Aumente o valor de 'margin-right' para empurrar mais para a esquerda
-    st.markdown(
+            st.markdown(
         """
         <div style='
             text-align: center; 
