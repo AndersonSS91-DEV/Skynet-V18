@@ -1071,9 +1071,8 @@ with tab1:
             )
 
         with c2:
-            st.markdown(
-                "<div style='text-align:center;font-size:30px;font-weight:900;margin-top:38px'>VS</div>",
-                unsafe_allow_html=True
+            st.markdown("<div style='text-align:center; font-size:28px; font-weight:900; margin-top:55px;'>VS</div>",
+        unsafe_allow_html=True
             )
 
         with c3:
