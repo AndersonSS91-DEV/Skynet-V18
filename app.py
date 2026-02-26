@@ -1048,34 +1048,32 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
-with tab1:
-    home = linha_exg["Home_Team"]
-    away = linha_exg["Visitor_Team"]
+# HEADER CENTRALIZADO (ISOLADO DO LAYOUT)
+header = st.container()
 
-    esc_home = escudo_path(home)
-    esc_away = escudo_path(away)
+with header:
+    c1, c2, c3 = st.columns([1,1,1])
 
-    sp1, col1, col2, col3, sp2 = st.columns([2,3,1,3,2])
+    with c1:
+        st.image(esc_home, width=120)
+        st.markdown(
+            f"<div style='text-align:center;font-weight:800'>{home.upper()}</div>",
+            unsafe_allow_html=True
+        )
 
-with col1:
-    st.image(esc_home, width=110)
-    st.markdown(
-        f"<div style='text-align:center;font-size:20px;font-weight:700'>{home.upper()}</div>",
-        unsafe_allow_html=True
-    )
+    with c2:
+        st.markdown(
+            "<div style='text-align:center;font-size:28px;font-weight:900;margin-top:35px'>VS</div>",
+            unsafe_allow_html=True
+        )
 
-with col2:
-    st.markdown(
-        "<div style='text-align:center;font-size:28px;font-weight:900;margin-top:32px'>VS</div>",
-        unsafe_allow_html=True
-    )
+    with c3:
+        st.image(esc_away, width=120)
+        st.markdown(
+            f"<div style='text-align:center;font-weight:800'>{away.upper()}</div>",
+            unsafe_allow_html=True
+        )
 
-with col3:
-    st.image(esc_away, width=110)
-    st.markdown(
-        f"<div style='text-align:center;font-size:20px;font-weight:700'>{away.upper()}</div>",
-        unsafe_allow_html=True
-    )
     st.markdown("---")
 
   
