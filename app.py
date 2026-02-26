@@ -1055,7 +1055,7 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-        col1, col2, col3 = st.columns([3,1,3])
+    col1, col2, col3 = st.columns([3,1,3])
 
     with col1:
         st.image(esc_home, width=110)
