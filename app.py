@@ -1066,7 +1066,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
         # ===== PLACAR + VS =====
         with col3:
             st.markdown(
-                """
+                f"""
                 <div style='text-align:center; line-height:1.1'>
                     <div style='font-size:34px; font-weight:900;'>0 x 0</div>
                     <div style='font-size:16px; opacity:0.7;'>VS</div>
