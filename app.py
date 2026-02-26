@@ -363,10 +363,10 @@ def escudo_path(nome_time):
         "estrela": "estrela amadora",
         
         # RACING
-        "racing club": "racing_club",
-        "racing avellaneda": "racing_club",
-        "racing santander": "racing_santander",
-        "racing cordoba": "racing_cordoba"
+        "racing club": "racing club",
+        "racing": "racing",
+        "racing santander": "racing santander",
+        "racing cordoba": "racing cordoba"
     }
 
     # 🔧 normalização segura
