@@ -1045,50 +1045,43 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "⚔️⚽ ATK x DEF",
 "💎⚽ VG"
 ])
-import base64
-from pathlib import Path
-
-# 1. Função para converter a imagem local em Base64
-def get_base64_image(image_path):
-    try:
-        img_file = Path(image_path)
-        if img_file.exists():
-            with open(img_file, "rb") as f:
-                data = base64.b64encode(f.read()).decode()
-            return f"data:image/png;base64,{data}"
-        return "" 
-    except:
-        return ""
-
 # =========================================
-# ABA 1 — RESUMO >>> SOLUÇÃO FINAL (BASE64 + FLEXBOX)
+# ABA 1 — RESUMO >>> VOLTANDO AO QUE FUNCIONA + ALINHAMENTO
 # =========================================
 with tab1:
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
-    
-    # Converte os caminhos para Base64
-    esc_home_b64 = get_base64_image(escudo_path(home))
-    esc_away_b64 = get_base64_image(escudo_path(away))
 
-    # HTML com alinhamento perfeito e imagens embutidas
-    st.markdown(f"""
-        <div style="display: flex; align-items: center; justify-content: center; text-align: center; gap: 20px; width: 100%;">
-            <div style="flex: 1;">
-                <img src="{esc_home_b64}" width="105" style="display: block; margin: 0 auto;">
-                <div style="font-size:20px; font-weight:700; margin-top:6px;">{home.upper()}</div>
-            </div>
-            
-            <div style="flex: 0.3; font-size:28px; font-weight:900; white-space: nowrap;">
-                VS
-            </div>
-            
-            <div style="flex: 1;">
-                <img src="{esc_away_b64}" width="105" style="display: block; margin: 0 auto;">
-                <div style="font-size:20px; font-weight:700; margin-top:6px;">{away.upper()}</div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
+    esc_home = escudo_path(home)
+    esc_away = escudo_path(away)
+
+    # Este bloco de CSS vai centralizar verticalmente o conteúdo de TODAS as colunas
+    st.markdown("""
+        <style>
+        /* Alinha o conteúdo das colunas pelo centro vertical */
+        div[data-testid="column"] {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+    c1, c2, c3 = st.columns([3, 1, 3])
+
+    with c1:
+        # Removi o div de alinhamento manual para não conflitar com o CSS acima
+        st.image(esc_home, width=105)
+        st.markdown(f"<div style='font-size:20px; font-weight:700; margin-top:6px; text-align:center;'>{home.upper()}</div>", unsafe_allow_html=True)
+
+    with c2:
+        # Sem margin-top fixo agora, o CSS lá de cima cuida do meio
+        st.markdown("<div style='font-size:28px; font-weight:900;'>VS</div>", unsafe_allow_html=True)
+
+    with c3:
+        st.image(esc_away, width=105)
+        st.markdown(f"<div style='font-size:20px; font-weight:700; margin-top:6px; text-align:center;'>{away.upper()}</div>", unsafe_allow_html=True)
 
     st.markdown("---")
   
