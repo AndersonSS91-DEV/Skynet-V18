@@ -1069,18 +1069,7 @@ with tab1:
 
     with col2:
         st.markdown(
-        """
-        <div style="
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            transform: translateX(-32px);
-            font-size:30px;
-            font-weight:900;
-        ">
-            VS
-        </div>
-        """,
+        "<div style='text-align:center; margin-top:18px; margin-left:-32px; font-size:30px; font-weight:900;'>VS</div>",
         unsafe_allow_html=True
     )
 
