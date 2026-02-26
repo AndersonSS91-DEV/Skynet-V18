@@ -1046,52 +1046,32 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💎⚽ VG"
 ])
 # =========================================
-# ABA 1 — RESUMO >>> AJUSTADO PARA CENTRALIZAR VS
+# ABA 1 — RESUMO >>> ALINHAMENTO PERFEITO SEM QUEBRAR IMAGENS
 # =========================================
 with tab1:
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
-
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    # CSS para centralizar verticalmente as colunas
-    st.markdown("""
-        <style>
-        [data-testid="column"] {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
-    c1, c2, c3 = st.columns([3, 1, 3])
-
-    with c1:
-        st.markdown(f"""
-            <div style='text-align:center'>
-                <img src='{esc_home}' width='105'>
-                <div style='font-size:20px; font-weight:700; margin-top:6px'>{home.upper()}</div>
+    # Usamos HTML com Flexbox em uma única linha de markdown para garantir o alinhamento
+    st.markdown(f"""
+        <div style="display: flex; align-items: center; justify-content: space-around; text-align: center; width: 100%;">
+            <div style="flex: 1;">
+                <img src="{esc_home}" width="105">
+                <div style="font-size:20px; font-weight:700; margin-top:6px;">{home.upper()}</div>
             </div>
-            """, unsafe_allow_html=True)
-
-    with c2:
-        # Removido o margin-top fixo e usado flexbox para centralizar
-        st.markdown("""
-            <div style='font-size:28px; font-weight:900; line-height:1;'>
+            
+            <div style="flex: 0.5; font-size:28px; font-weight:900; line-height: 1;">
                 VS
             </div>
-            """, unsafe_allow_html=True)
-
-    with c3:
-        st.markdown(f"""
-            <div style='text-align:center'>
-                <img src='{esc_away}' width='105'>
-                <div style='font-size:20px; font-weight:700; margin-top:6px'>{away.upper()}</div>
+            
+            <div style="flex: 1;">
+                <img src="{esc_away}" width="105">
+                <div style="font-size:20px; font-weight:700; margin-top:6px;">{away.upper()}</div>
             </div>
-            """, unsafe_allow_html=True)
+        </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("---")
   
