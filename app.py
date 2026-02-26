@@ -1064,14 +1064,6 @@ with tab1:
         c1, c2, c3 = st.columns(3)
 
         with c1:
-            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-            st.image(esc_home, width=105)
-            st.markdown(
-                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>",
-                unsafe_allow_html=True
-            )
-
-        with c1:
     st.markdown(
         f"""
         <div style="text-align:center;">
