@@ -1060,37 +1060,42 @@ with tab1:
 
     header = st.container()
 
-    with header:
-        c1, c2, c3 = st.columns(3)
+   with header:
+    c1, c2, c3 = st.columns(3)
 
-        with c1:
-    st.markdown(
-        f"""
-        <div style="text-align:center;">
-            <img src="data:image/png;base64,{img_to_base64(esc_home)}" width="105">
-            <div style="font-size:20px;font-weight:700;margin-top:6px">
-                {home.upper()}
+    with c1:
+        st.markdown(
+            f"""
+            <div style="text-align:center;">
+                <img src="data:image/png;base64,{img_to_base64(esc_home)}" width="105">
+                <div style="font-size:20px;font-weight:700;margin-top:6px">
+                    {home.upper()}
+                </div>
             </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+            """,
+            unsafe_allow_html=True
+        )
 
-        with c2:
-            st.markdown("<div style='text-align:center; font-size:28px; font-weight:900; margin-top:55px;'>VS</div>",
-        unsafe_allow_html=True
-            )
+    with c2:
+        st.markdown(
+            "<div style='text-align:center; font-size:28px; font-weight:900; margin-top:55px;'>VS</div>",
+            unsafe_allow_html=True
+        )
 
-        with c3:
-            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-            st.image(esc_away, width=105)
-            st.markdown(
-                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>",
-                unsafe_allow_html=True
-            )
+    with c3:
+        st.markdown(
+            f"""
+            <div style="text-align:center;">
+                <img src="data:image/png;base64,{img_to_base64(esc_away)}" width="105">
+                <div style="font-size:20px;font-weight:700;margin-top:6px">
+                    {away.upper()}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-  
-    st.markdown("---")
+st.markdown("---")
   
     # ===== ODDS =====
     st.markdown("### 🎯 Odds")
