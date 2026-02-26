@@ -1059,7 +1059,7 @@ with tab1:
     header = st.container()
 
     with header:
-        c1, c2, c3 = st.columns([3.2,2,3])
+        c1, c2, c3 = st.columns([3,1,3])
 
         with c1:
             st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
