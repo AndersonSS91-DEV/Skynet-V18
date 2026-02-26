@@ -1055,18 +1055,18 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    # converte escudos para base64
-import base64
+        # converter escudos para base64
+    import base64
 
-def img_to_base64(path):
-    with open(path, "rb") as f:
-        return base64.b64encode(f.read()).decode()
+    def img_to_base64(path):
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
 
-esc_home64 = img_to_base64(esc_home)
-esc_away64 = img_to_base64(esc_away)
+    esc_home64 = img_to_base64(esc_home)
+    esc_away64 = img_to_base64(esc_away)
 
-# confronto centralizado
-html_confronto = f"""
+    # confronto centralizado
+    html_confronto = f"""
 <div style="display:flex;justify-content:center;align-items:center;gap:60px;margin-top:10px;margin-bottom:15px;">
 
     <div style="text-align:center;">
@@ -1084,7 +1084,7 @@ html_confronto = f"""
 </div>
 """
 
-st.markdown(html_confronto, unsafe_allow_html=True)
+    st.markdown(html_confronto, unsafe_allow_html=True)
 
     st.markdown("---")
 
