@@ -1046,7 +1046,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💎⚽ VG"
 ])
 # =========================================
-# ABA 1 — RESUMO >>> ALINHAMENTO FORÇADO
+# ABA 1 — RESUMO >>> ALINHAMENTO SIMPLIFICADO (ESTILO ODDS)
 # =========================================
 with tab1:
     home = linha_exg["Home_Team"]
@@ -1054,30 +1054,23 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    # Esse CSS ataca diretamente a linha das colunas para alinhar TUDO pelo centro
-    st.markdown("""
-        <style>
-        div[data-testid="stHorizontalBlock"] {
-            align-items: center !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
     c1, c2, c3 = st.columns([3, 1, 3])
 
     with c1:
-        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+        # Centralização padrão do Streamlit
         st.image(esc_home, width=105)
-        st.markdown(f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>", unsafe_allow_html=True)
+        st.subheader(home.upper())
 
     with c2:
-        # Aqui está o pulo do gato: o margin-bottom compensa a altura do nome do time abaixo do escudo
-        st.markdown("<div style='text-align:center; font-size:28px; font-weight:900; margin-bottom:35px;'>VS</div>", unsafe_allow_html=True)
+        # O PULO DO GATO: 
+        # Criamos um espaço vazio para empurrar o VS para a linha do escudo
+        st.write("") 
+        st.write("") 
+        st.markdown("<h2 style='text-align: center;'>VS</h2>", unsafe_allow_html=True)
 
     with c3:
-        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
         st.image(esc_away, width=105)
-        st.markdown(f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>", unsafe_allow_html=True)
+        st.subheader(away.upper())
 
     st.markdown("---")
   
