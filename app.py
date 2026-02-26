@@ -1078,7 +1078,7 @@ with tab1:
             font-size: 28px; 
             font-weight: 900; 
             margin-top: 55px; 
-            margin-right: 30px;
+            margin-right: 100px;
         '>
             VS
         </div>
