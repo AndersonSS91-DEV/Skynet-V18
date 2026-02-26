@@ -1046,23 +1046,32 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💎⚽ VG"
 ])
 # =========================================
-# ABA 1 — RESUMO >>> ALINHAMENTO POR EIXO CENTRAL
+# ABA 1 — RESUMO >>> ALINHAMENTO VERTICAL TOTAL
 # =========================================
 with tab1:
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
-
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    # CSS para garantir que as colunas centralizem TUDO
+    # CSS Robusto: Força o centro em todas as camadas da coluna
     st.markdown("""
         <style>
-        div[data-testid="column"] {
+        [data-testid="stHorizontalBlock"] {
+            align-items: center;
+        }
+        [data-testid="column"] {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            text-align: center;
+        }
+        /* Garante que a imagem dentro da div não flutue */
+        [data-testid="stImage"] {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 0px;
         }
         </style>
         """, unsafe_allow_html=True)
@@ -1070,19 +1079,16 @@ with tab1:
     c1, c2, c3 = st.columns([3, 1, 3])
 
     with c1:
-        # Usamos um container para garantir que a imagem e o texto sigam o mesmo eixo
-        with st.container():
-            st.image(esc_home, width=105)
-            st.markdown(f"<div style='font-size:20px; font-weight:700; text-align:center; width:100%;'>{home.upper()}</div>", unsafe_allow_html=True)
+        st.image(esc_home, width=105)
+        st.markdown(f"**{home.upper()}**")
 
     with c2:
-        # VS centralizado verticalmente em relação ao conjunto escudo+nome
-        st.markdown("<div style='font-size:28px; font-weight:900; margin-bottom:30px;'>VS</div>", unsafe_allow_html=True)
+        # Usando um heading para garantir que o VS não herde margens de texto comum
+        st.markdown("<h2 style='margin:0; padding:0; text-align:center;'>VS</h2>", unsafe_allow_html=True)
 
     with c3:
-        with st.container():
-            st.image(esc_away, width=105)
-            st.markdown(f"<div style='font-size:20px; font-weight:700; text-align:center; width:100%;'>{away.upper()}</div>", unsafe_allow_html=True)
+        st.image(esc_away, width=105)
+        st.markdown(f"**{away.upper()}**")
 
     st.markdown("---")
   
