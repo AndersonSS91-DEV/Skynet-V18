@@ -1055,36 +1055,27 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-        # converter escudos para base64
-    import base64
+        col1, col2, col3 = st.columns([3,1,3])
 
-    def img_to_base64(path):
-        with open(path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
+    with col1:
+        st.image(esc_home, width=110)
+        st.markdown(
+            f"<div style='text-align:center;font-size:22px;font-weight:800;margin-top:5px'>{home.upper()}</div>",
+            unsafe_allow_html=True
+        )
 
-    esc_home64 = img_to_base64(esc_home)
-    esc_away64 = img_to_base64(esc_away)
+    with col2:
+        st.markdown(
+            "<div style='text-align:center;font-size:28px;font-weight:900;margin-top:35px'>VS</div>",
+            unsafe_allow_html=True
+        )
 
-    # confronto centralizado
-    html_confronto = f"""
-<div style="display:flex;justify-content:center;align-items:center;gap:60px;margin-top:10px;margin-bottom:15px;">
-
-    <div style="text-align:center;">
-        <img src="data:image/png;base64,{esc_home64}" width="95">
-        <div style="font-size:22px;font-weight:800;margin-top:6px;">{home.upper()}</div>
-    </div>
-
-    <div style="font-size:30px;font-weight:900;">VS</div>
-
-    <div style="text-align:center;">
-        <img src="data:image/png;base64,{esc_away64}" width="95">
-        <div style="font-size:22px;font-weight:800;margin-top:6px;">{away.upper()}</div>
-    </div>
-
-</div>
-"""
-
-    st.markdown(html_confronto, unsafe_allow_html=True)
+    with col3:
+        st.image(esc_away, width=110)
+        st.markdown(
+            f"<div style='text-align:center;font-size:22px;font-weight:800;margin-top:5px'>{away.upper()}</div>",
+            unsafe_allow_html=True
+        )
 
     st.markdown("---")
 
