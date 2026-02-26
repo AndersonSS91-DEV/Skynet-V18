@@ -332,9 +332,8 @@ st.session_state["jogo"] = jogo
 # FUNÇÕES AUX
 # =========================================
 # =========================================
-# 🔰 MATCH PROFISSIONAL DE ESCUDOS (FIX FINAL)
+# 🔰 MATCH PROFISSIONAL DE ESCUDOS (FIX DEFINITIVO)
 # =========================================
-
 def escudo_path(nome_time):
     import os, re, unicodedata
 
@@ -347,36 +346,37 @@ def escudo_path(nome_time):
     if not nome_time:
         return placeholder
 
-    # 🔥 apelidos manuais
+    # 🔥 APELIDOS MANUAIS (apenas exceções reais)
     APELIDOS = {
-    "inter milan": "inter",
-    "inter": "inter",
-        
-    # BODO GLIMT → arquivo bodo.png
-    "bodø glimt": "bodo",
-    "bodo glimt": "bodo",
-    "bodo / glimt": "bodo",
-    "fk bodo glimt": "bodo",
-    "brondby if": "brondby if",  
-    "olympiacos": "olympiakos",
-    "olympiacos f.c.": "olympiakos",
-    "estrela": "estrela amadora",
-    "nacional asuncion": "nacional asuncion",
-    "nacional-pt": "nacional-pt",
-    "nacional": "nacional", 
-    "nacional potosi": "nacional potosi",
-    "manchester city": "manchester city",
-    "manchester united": "manchester united", 
-    "racing club": "racing club",
-}
-    def limpar(txt):
-        txt = str(txt).lower().strip()
+        "inter milan": "inter",
+        "inter": "inter",
 
-        # remove acentos
+        # Bodø/Glimt → usar arquivo bodo.png
+        "bodø glimt": "bodo",
+        "bodo glimt": "bodo",
+        "bodo / glimt": "bodo",
+        "fk bodo glimt": "bodo",
+
+        "olympiacos": "olympiakos",
+        "olympiacos f.c.": "olympiakos",
+
+        "estrela": "estrela amadora",
+    }
+
+    # 🔧 normalização segura
+    def limpar(txt):
+        txt = str(txt)
+
+        # remove caracteres quebrados
+        txt = txt.encode("utf-8", "ignore").decode("utf-8")
+
+        txt = txt.lower().strip()
+
+        # remove acentos (ø → o)
         txt = unicodedata.normalize('NFKD', txt)\
               .encode('ASCII','ignore').decode('ASCII')
 
-        # transforma separadores em espaço
+        # separadores viram espaço
         txt = re.sub(r'[\/\-_]+', ' ', txt)
 
         # remove termos inúteis
@@ -385,44 +385,40 @@ def escudo_path(nome_time):
         # remove categorias base
         txt = re.sub(r'\b(u17|u19|u20|u21|u23)\b', '', txt)
 
-        # remove espaços duplicados
         txt = re.sub(r'\s+', ' ', txt).strip()
-
         return txt
 
     alvo = limpar(nome_time)
 
+    # aplica apelido
     if alvo in APELIDOS:
         alvo = APELIDOS[alvo]
 
-    arquivos = [a for a in os.listdir(pasta) if a.endswith(".png")]
+    arquivos = [a for a in os.listdir(pasta) if a.lower().endswith(".png")]
 
-    for arq in arquivos:
-        nome_arq = limpar(arq.replace(".png",""))
-
-        if nome_arq == alvo:
-            return os.path.join(pasta, arq)
-
-        if nome_arq.replace(" ","") == alvo.replace(" ",""):
-            return os.path.join(pasta, arq)
+    # 🔧 normaliza nome do arquivo
+    def limpar_arquivo(nome):
+        nome = nome.replace(".png", "")
+        nome = nome.replace("_", " ")
+        nome = nome.replace("-", " ")
+        return limpar(nome)
 
     # 1️⃣ match exato
     for arq in arquivos:
-        if limpar(arq.replace(".png","")) == alvo:
+        if limpar_arquivo(arq) == alvo:
             return os.path.join(pasta, arq)
 
-    # 2️⃣ match compacto
-    alvo2 = alvo.replace(" ", "")
+    # 2️⃣ match compacto (remove espaços)
+    alvo_compacto = alvo.replace(" ", "")
     for arq in arquivos:
-        if limpar(arq.replace(".png","")).replace(" ","") == alvo2:
+        if limpar_arquivo(arq).replace(" ", "") == alvo_compacto:
             return os.path.join(pasta, arq)
 
-    # 3️⃣ tokens
+    # 3️⃣ match por tokens
     alvo_tokens = set(alvo.split())
-
     for arq in arquivos:
-        nome_arq = limpar(arq.replace(".png",""))
-        if alvo_tokens.issubset(set(nome_arq.split())):
+        nome_tokens = set(limpar_arquivo(arq).split())
+        if alvo_tokens.issubset(nome_tokens):
             return os.path.join(pasta, arq)
 
     return placeholder
