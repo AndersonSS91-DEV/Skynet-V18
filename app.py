@@ -1073,7 +1073,7 @@ with tab1:
 
         with c2:
             st.markdown(
-                "<div style='text-align:center;font-size:32px;font-weight:900;margin-top:40px'>VS</div>",
+                "<div style='text-align:center;font-size:32px;font-weight:900;margin-top:40px; transform: translateX(8px);'>VS</div>",
                 unsafe_allow_html=True
             )
 
