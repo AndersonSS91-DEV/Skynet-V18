@@ -1058,31 +1058,22 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    header = st.container()
+        header = st.container()
 
     with header:
 
-        c1, c2, c3 = st.columns([2,1,2])
+        col1, col2, col3 = st.columns([3,1,3])
 
-        with c1:
+        with col1:
             st.image(esc_home, width=110)
-            st.markdown(
-                f"<div style='text-align:center;font-size:20px;font-weight:700'>{home.upper()}</div>",
-                unsafe_allow_html=True
-            )
+            st.write(f"<p style='text-align:center;font-weight:700'>{home.upper()}</p>", unsafe_allow_html=True)
 
-        with c2:
-            st.markdown(
-                "<div style='text-align:center;font-size:32px;font-weight:900;margin-top:40px; transform: translateX(8px);'>VS</div>",
-                unsafe_allow_html=True
-            )
+        with col2:
+            st.markdown("<h2 style='text-align:center;margin-top:35px;'>VS</h2>", unsafe_allow_html=True)
 
-        with c3:
+        with col3:
             st.image(esc_away, width=110)
-            st.markdown(
-                f"<div style='text-align:center;font-size:20px;font-weight:700'>{away.upper()}</div>",
-                unsafe_allow_html=True
-            )
+            st.write(f"<p style='text-align:center;font-weight:700'>{away.upper()}</p>", unsafe_allow_html=True)
 
     st.markdown("---")
   
