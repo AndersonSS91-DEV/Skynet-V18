@@ -1070,9 +1070,21 @@ with tab1:
             )
 
         with c2:
-            st.markdown("<div style='text-align:center; font-size:28px; font-weight:900; margin-top:55px;'>VS</div>",
+    # Aumente o valor de 'margin-right' para empurrar mais para a esquerda
+    st.markdown(
+        """
+        <div style='
+            text-align: center; 
+            font-size: 28px; 
+            font-weight: 900; 
+            margin-top: 55px; 
+            margin-right: 30px;
+        '>
+            VS
+        </div>
+        """,
         unsafe_allow_html=True
-            )
+    )
 
         with c3:
             st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
