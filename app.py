@@ -1046,6 +1046,17 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💎⚽ VG"
 ])
 
+# =========================================
+# ABA 1 — RESUMO >>>>>>. ESCUDOS QUASE PERFEITOS >>>>> SALVAR ESSE CÓDIGO
+# =========================================
+with tab1:
+
+    home = linha_exg["Home_Team"]
+    away = linha_exg["Visitor_Team"]
+
+    esc_home = escudo_path(home)
+    esc_away = escudo_path(away)
+
     header = st.container()
 
     with header:
