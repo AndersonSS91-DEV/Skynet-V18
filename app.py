@@ -1046,31 +1046,59 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💎⚽ VG"
 ])
 # =========================================
-# ABA 1 — RESUMO
+# ABA 1 — RESUMO >>>>>>. ESCUDOS QUASE PERFEITOS >>>>> SALVAR ESSE CÓDIGO
 # =========================================
 with tab1:
+
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
 
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    col1, col2, col3 = st.columns([2,1,2])
+    header = st.container()
 
-    with col1:
-        st.image(esc_home, width=90)
-        st.markdown(f"<center><b>{home}</b></center>", unsafe_allow_html=True)
+    with header:
+        c1, c2, c3 = st.columns(3)
 
-    with col2:
-        st.markdown("<h2 style='text-align:center'>VS</h2>", unsafe_allow_html=True)
+        with c1:
+            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+            st.image(esc_home, width=105)
+            st.markdown(
+                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>",
+                unsafe_allow_html=True
+            )
 
-    with col3:
-        st.image(esc_away, width=90)
-        st.markdown(f"<center><b>{away}</b></center>", unsafe_allow_html=True)
+        with c2:
+    # Aumente o valor de 'margin-right' para empurrar mais para a esquerda
+            st.markdown(
+        """
+        <div style='
+            text-align: center; 
+            font-size: 28px; 
+            font-weight: 900; 
+            margin-top: 55px; 
+            margin-right: 240px;
+        '>
+            VS
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
+        with c3:
+            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+            st.image(esc_away, width=105)
+            st.markdown(
+                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>",
+                unsafe_allow_html=True
+            )
+
+  
     st.markdown("---")
 
-    # ===== ODDS =====
+    
+# ===== ODDS (RESTAURADAS) =====
     st.markdown("### 🎯 Odds")
     o1, o2, o3 = st.columns(3)
 
@@ -1090,7 +1118,6 @@ with tab1:
         st.metric("BTTS YES", linha_exg["Odd_BTTS_YES"])
 
     st.markdown("---")
-
     # -------- LINHA 2 — Métricas
     st.markdown("### 📊📈Métricas")
     c1, c2, c3, c4, c5, c6 = st.columns(6)
