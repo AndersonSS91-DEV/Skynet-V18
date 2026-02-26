@@ -1068,8 +1068,20 @@ with tab1:
         )
 
     with col2:
-        st.markdown(
-        "<div style='text-align:center; margin-top:32px; margin-left:-32px; font-size:30px; font-weight:900;'>VS</div>",
+    st.markdown(
+        """
+        <div style="
+            height:120px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            margin-left:-32px;
+            font-size:30px;
+            font-weight:900;
+        ">
+            VS
+        </div>
+        """,
         unsafe_allow_html=True
     )
         
