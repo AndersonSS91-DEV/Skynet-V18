@@ -1045,8 +1045,10 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "⚔️⚽ ATK x DEF",
 "💎⚽ VG"
 ])
+
+
 # =========================================
-# ABA 1 — RESUMO
+# ABA 1 — RESUMO >>>>>>. ESCUDOS QUASE PERFEITOS >>>>> SALVAR ESSE CÓDIGO
 # =========================================
 with tab1:
 
@@ -1059,38 +1061,30 @@ with tab1:
     header = st.container()
 
     with header:
+        c1, c2, c3 = st.columns(3)
 
-        _, col1, col2, col3, col4, col5, _ = st.columns([1,2,2,1.4,2,2,1])
-
-        with col1:
-            st.image(esc_home, width=90)
-
-        with col2:
+        with c1:
+            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+            st.image(esc_home, width=105)
             st.markdown(
-                f"<div style='text-align:left; font-size:20px; font-weight:700; margin-top:28px'>{home.upper()}</div>",
+                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>",
                 unsafe_allow_html=True
             )
 
-        with col3:
+        with c2:
+            st.markdown("<div style='text-align:center; font-size:28px; font-weight:900; margin-top:55px;'>VS</div>",
+        unsafe_allow_html=True
+            )
+
+        with c3:
+            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+            st.image(esc_away, width=105)
             st.markdown(
-                """
-                <div style='text-align:center; line-height:1.05'>
-                    <div style='font-size:34px; font-weight:900;'>0 x 0</div>
-                    <div style='font-size:15px; opacity:0.7;'>VS</div>
-                </div>
-                """,
+                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>",
                 unsafe_allow_html=True
             )
 
-        with col4:
-            st.markdown(
-                f"<div style='text-align:right; font-size:20px; font-weight:700; margin-top:28px'>{away.upper()}</div>",
-                unsafe_allow_html=True
-            )
-
-        with col5:
-            st.image(esc_away, width=90)
-
+  
     st.markdown("---")
   
     # ===== ODDS =====
