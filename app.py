@@ -361,8 +361,8 @@ def escudo_path(nome_time):
         "olympiacos f.c.": "olympiakos",
 
         "estrela": "estrela amadora",   
-        "racing club": "racing_club",
-        "racing": "racing_uru",
+        "racing club": "racing",
+        "racing": "racinguru",
     }
 
     # 🔧 normalização segura
