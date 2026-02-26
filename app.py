@@ -1046,25 +1046,13 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💎⚽ VG"
 ])
 # =========================================
-# ABA 1 — RESUMO >>> ALINHAMENTO PERFEITO + ODDS
+# ABA 1 — RESUMO >>> SOLUÇÃO FINAL SEM ERRO
 # =========================================
 with tab1:
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
-
-    # Este bloco CSS alinha verticalmente o conteúdo das colunas APENAS nesta linha
-    st.markdown("""
-        <style>
-        .v-align {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 150px; /* Altura aproximada do escudo + nome */
-        }
-        </style>
-    """, unsafe_allow_html=True)
 
     c1, c2, c3 = st.columns([3, 1, 3])
 
@@ -1074,9 +1062,11 @@ with tab1:
         st.markdown(f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>", unsafe_allow_html=True)
 
     with c2:
-        # Alinhamento vertical puro: o VS agora "boia" no meio da altura das colunas
-        st.markdown(f"""
-            <div class='v-align' style='font-size:32px; font-weight:900; margin-bottom:30px;'>
+        # O VS agora tem um transform para subir exatamente para o meio dos escudos
+        # Sem depender de colunas ou alinhamentos globais
+        st.markdown("""
+            <div style='text-align:center; font-size:28px; font-weight:900; 
+                        position: relative; top: 50px;'>
                 VS
             </div>
             """, unsafe_allow_html=True)
