@@ -1055,18 +1055,74 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    col1, col2, col3 = st.columns([2,1,2])
+    # ===== CSS DO CONFRONTO =====
+st.markdown("""
+<style>
+.match-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 70px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
 
-    with col1:
-        st.image(esc_home, width=90)
-        st.markdown(f"<center><b>{home}</b></center>", unsafe_allow_html=True)
+.team-box {
+    text-align: center;
+}
 
-    with col2:
-        st.markdown("<h2 style='text-align:center'>VS</h2>", unsafe_allow_html=True)
+.team-logo {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+}
 
-    with col3:
-        st.image(esc_away, width=90)
-        st.markdown(f"<center><b>{away}</b></center>", unsafe_allow_html=True)
+.team-name {
+    font-size: 24px;
+    font-weight: 900;
+    margin-top: 6px;
+    letter-spacing: 1px;
+}
+
+.vs-text {
+    font-size: 34px;
+    font-weight: 900;
+    opacity: 0.85;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+# ===== CONFRONTO VISUAL =====
+import base64
+
+def img_to_base64(path):
+    try:
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    except:
+        return ""
+
+esc_home64 = img_to_base64(esc_home)
+esc_away64 = img_to_base64(esc_away)
+
+st.markdown(f"""
+<div class="match-row">
+
+    <div class="team-box">
+        <img class="team-logo" src="data:image/png;base64,{esc_home64}">
+        <div class="team-name">{home.upper()}</div>
+    </div>
+
+    <div class="vs-text">VS</div>
+
+    <div class="team-box">
+        <img class="team-logo" src="data:image/png;base64,{esc_away64}">
+        <div class="team-name">{away.upper()}</div>
+    </div>
+
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown("---")
 
