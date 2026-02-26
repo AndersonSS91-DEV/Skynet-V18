@@ -1046,42 +1046,53 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💎⚽ VG"
 ])
 # =========================================
-# ABA 1 — RESUMO >>>>>>. ESCUDOS QUASE PERFEITOS >>>>> SALVAR ESSE CÓDIGO
+# ABA 1 — RESUMO >>> AJUSTADO PARA CENTRALIZAR VS
 # =========================================
 with tab1:
-
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
 
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    header = st.container()
+    # CSS para centralizar verticalmente as colunas
+    st.markdown("""
+        <style>
+        [data-testid="column"] {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        </style>
+        """, unsafe_allow_html=True)
 
-    with header:
-        c1, c2, c3 = st.columns([3,1,3])
+    c1, c2, c3 = st.columns([3, 1, 3])
 
-        with c1:
-            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-            st.image(esc_home, width=105)
-            st.markdown(
-                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>",
-                unsafe_allow_html=True
-            )
+    with c1:
+        st.markdown(f"""
+            <div style='text-align:center'>
+                <img src='{esc_home}' width='105'>
+                <div style='font-size:20px; font-weight:700; margin-top:6px'>{home.upper()}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-        with c2:
-            st.markdown("<div style='text-align:center; font-size:28px; font-weight:900; margin-top:55px;'>VS</div>",
-        unsafe_allow_html=True
-            )
+    with c2:
+        # Removido o margin-top fixo e usado flexbox para centralizar
+        st.markdown("""
+            <div style='font-size:28px; font-weight:900; line-height:1;'>
+                VS
+            </div>
+            """, unsafe_allow_html=True)
 
-        with c3:
-            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-            st.image(esc_away, width=105)
-            st.markdown(
-                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>",
-                unsafe_allow_html=True
-            )
-  
+    with c3:
+        st.markdown(f"""
+            <div style='text-align:center'>
+                <img src='{esc_away}' width='105'>
+                <div style='font-size:20px; font-weight:700; margin-top:6px'>{away.upper()}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
     st.markdown("---")
   
     # ===== ODDS =====
