@@ -1088,6 +1088,27 @@ with tab1:
     
     # Suas ODDS aqui (não serão afetadas pelo align-items: center porque são textos uniformes)
 
+    
+# ===== ODDS (RESTAURADAS) =====
+    st.markdown("### 🎯 Odds")
+    o1, o2, o3 = st.columns(3)
+
+    with o1:
+        st.metric("Odds Casa", linha_exg["Odds_Casa"])
+        st.metric("Odd Over 1.5", linha_exg["Odd_Over_1,5FT"])
+        st.metric("VR01", get_val(linha_exg, "VR01", "{:.2f}"))
+
+    with o2:
+        st.metric("Odds Empate", linha_exg["Odds_Empate"])
+        st.metric("Odds Over 2.5", linha_exg["Odds_Over_2,5FT"])
+        st.metric("Coef Over1FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
+
+    with o3:
+        st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
+        st.metric("Odds Under 2.5", linha_exg["Odds_Under_2,5FT"])
+        st.metric("BTTS YES", linha_exg["Odd_BTTS_YES"])
+
+    st.markdown("---")
     # -------- LINHA 2 — Métricas
     st.markdown("### 📊📈Métricas")
     c1, c2, c3, c4, c5, c6 = st.columns(6)
