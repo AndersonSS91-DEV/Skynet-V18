@@ -367,7 +367,6 @@ def escudo_path(nome_time):
     "nacional potosi": "nacional potosi",
     "manchester city": "manchester city",
     "manchester united": "manchester united", 
-    "racing": "racing",
     "racing club": "racing club",
 }
     def limpar(txt):
