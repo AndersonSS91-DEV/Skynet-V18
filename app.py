@@ -1057,43 +1057,42 @@ with tab1:
     esc_away = escudo_path(away)
 
         # ===== HEADER AJUSTADO (POSIÇÃO FINA) =====
-    col1, col2, col3 = st.columns([1.2,1,1.2])
+        col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.markdown("<div style='text-align:center;margin-left:18px'>", unsafe_allow_html=True)
-        st.image(esc_home, width=105)
+        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+        st.image(esc_home, width=120)
         st.markdown(
-            f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>",
+            f"<div style='font-weight:800;font-size:18px;margin-top:6px'>{home.upper()}</div>",
             unsafe_allow_html=True
         )
+        st.markdown("</div>", unsafe_allow_html=True)
 
     with col2:
         st.markdown(
-        """
-        <div style="
-            height:120px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            margin-left:-32px;
-            font-size:30px;
-            font-weight:900;
-        ">
-            VS
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-        
-    with col3:
-        st.markdown("<div style='text-align:center;margin-right:18px'>", unsafe_allow_html=True)
-        st.image(esc_away, width=105)
-        st.markdown(
-            f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>",
+            """
+            <div style="
+                height:140px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-size:32px;
+                font-weight:900;
+            ">
+                VS
+            </div>
+            """,
             unsafe_allow_html=True
         )
 
-    st.markdown("---")
+    with col3:
+        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+        st.image(esc_away, width=120)
+        st.markdown(
+            f"<div style='font-weight:800;font-size:18px;margin-top:6px'>{away.upper()}</div>",
+            unsafe_allow_html=True
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
 
   
     # ===== ODDS =====
