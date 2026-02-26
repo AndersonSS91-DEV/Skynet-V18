@@ -1055,31 +1055,26 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    col1, col2, col3 = st.columns([2,1,2])
+    col1, col2, col3 = st.columns([1,1,1])
 
 with col1:
-    st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-    st.image(esc_home, width=120)
+    st.image(esc_home, width=115)
     st.markdown(
-        f"<div style='font-size:22px;font-weight:800;margin-top:8px'>{home.upper()}</div>",
+        f"<p style='text-align:center;font-size:20px;font-weight:700;margin:6px 0 0 0'>{home.upper()}</p>",
         unsafe_allow_html=True
     )
-    st.markdown("</div>", unsafe_allow_html=True)
 
 with col2:
+    st.markdown("<h2 style='text-align:center;margin-top:38px'>VS</h2>", unsafe_allow_html=True)
+
+with col3:
+    st.image(esc_away, width=115)
     st.markdown(
-        "<div style='text-align:center;font-size:30px;font-weight:900;margin-top:45px'>VS</div>",
+        f"<p style='text-align:center;font-size:20px;font-weight:700;margin:6px 0 0 0'>{away.upper()}</p>",
         unsafe_allow_html=True
     )
 
-with col3:
-    st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-    st.image(esc_away, width=120)
-    st.markdown(
-        f"<div style='font-size:22px;font-weight:800;margin-top:8px'>{away.upper()}</div>",
-        unsafe_allow_html=True
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("---")
 
   
     # ===== ODDS =====
