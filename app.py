@@ -1060,42 +1060,31 @@ with tab1:
 
     header = st.container()
 
-with header:
-    c1, c2, c3 = st.columns(3)
+    with header:
 
-    with c1:
-        st.markdown(
-            f"""
-            <div style="text-align:center;">
-                <img src="data:image/png;base64,{img_to_base64(esc_home)}" width="105">
-                <div style="font-size:20px;font-weight:700;margin-top:6px">
-                    {home.upper()}
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        c1, c2, c3 = st.columns([2,1,2])
 
-    with c2:
-        st.markdown(
-            "<div style='text-align:center; font-size:28px; font-weight:900; margin-top:55px;'>VS</div>",
-            unsafe_allow_html=True
-        )
+        with c1:
+            st.image(esc_home, width=110)
+            st.markdown(
+                f"<div style='text-align:center;font-size:20px;font-weight:700'>{home.upper()}</div>",
+                unsafe_allow_html=True
+            )
 
-    with c3:
-        st.markdown(
-            f"""
-            <div style="text-align:center;">
-                <img src="data:image/png;base64,{img_to_base64(esc_away)}" width="105">
-                <div style="font-size:20px;font-weight:700;margin-top:6px">
-                    {away.upper()}
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        with c2:
+            st.markdown(
+                "<div style='text-align:center;font-size:32px;font-weight:900;margin-top:40px'>VS</div>",
+                unsafe_allow_html=True
+            )
 
-st.markdown("---")
+        with c3:
+            st.image(esc_away, width=110)
+            st.markdown(
+                f"<div style='text-align:center;font-size:20px;font-weight:700'>{away.upper()}</div>",
+                unsafe_allow_html=True
+            )
+
+    st.markdown("---")
   
     # ===== ODDS =====
     st.markdown("### 🎯 Odds")
