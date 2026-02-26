@@ -1046,47 +1046,44 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💎⚽ VG"
 ])
 # =========================================
-# ABA 1 — RESUMO >>> ALINHAMENTO NO EIXO (SEM MARGEM SOBRANDO)
+# ABA 1 — RESUMO >>>>>>. ESCUDOS QUASE PERFEITOS >>>>> SALVAR ESSE CÓDIGO
 # =========================================
 with tab1:
+
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
+
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    # CSS agressivo para alinhar o VS exatamente no meio do bloco horizontal
-    st.markdown("""
-        <style>
-        /* Força a linha das colunas a alinhar tudo pelo meio */
-        div[data-testid="stHorizontalBlock"] {
-            align-items: center !important;
-        }
-        /* Remove a margem chata que o Streamlit coloca embaixo de toda imagem */
-        div[data-testid="stImage"] > img {
-            margin-bottom: -20px; 
-        }
-        </style>
-        """, unsafe_allow_html=True)
+    header = st.container()
 
-    c1, c2, c3 = st.columns([3, 1, 3])
+    with header:
+        c1, c2, c3 = st.columns(3)
 
-    with c1:
-        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-        st.image(esc_home, width=105)
-        st.markdown(f"<div style='font-size:20px;font-weight:700;margin-top:0px'>{home.upper()}</div></div>", unsafe_allow_html=True)
+        with c1:
+            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+            st.image(esc_home, width=105)
+            st.markdown(
+                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>",
+                unsafe_allow_html=True
+            )
 
-    with c2:
-        # VS puro, sem div, sem nada, deixando o CSS lá de cima centralizar
-        st.markdown("<h2 style='text-align:center; margin:0;'>VS</h2>", unsafe_allow_html=True)
+        with c2:
+            st.markdown("<div style='text-align:center; font-size:28px; font-weight:900; margin-top:55px;'>VS</div>",
+        unsafe_allow_html=True
+            )
 
-    with c3:
-        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-        st.image(esc_away, width=105)
-        st.markdown(f"<div style='font-size:20px;font-weight:700;margin-top:0px'>{away.upper()}</div></div>", unsafe_allow_html=True)
+        with c3:
+            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+            st.image(esc_away, width=105)
+            st.markdown(
+                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>",
+                unsafe_allow_html=True
+            )
 
+  
     st.markdown("---")
-    
-    # Suas ODDS aqui (não serão afetadas pelo align-items: center porque são textos uniformes)
 
     
 # ===== ODDS (RESTAURADAS) =====
