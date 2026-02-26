@@ -1046,7 +1046,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "💎⚽ VG"
 ])
 # =========================================
-# ABA 1 — RESUMO >>> ALINHAMENTO POR EIXO DE CENTRO
+# ABA 1 — RESUMO >>> ALINHAMENTO PERFEITO + ODDS
 # =========================================
 with tab1:
     home = linha_exg["Home_Team"]
@@ -1054,38 +1054,58 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    # 1. LINHA DOS ESCUDOS + VS
-    # Usamos o CSS apenas para garantir que o VS fique no meio da altura do escudo
+    # Este bloco CSS alinha verticalmente o conteúdo das colunas APENAS nesta linha
     st.markdown("""
         <style>
-        div[data-testid="stHorizontalBlock"] {
-            align-items: center !important;
+        .v-align {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 150px; /* Altura aproximada do escudo + nome */
         }
         </style>
-        """, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
     c1, c2, c3 = st.columns([3, 1, 3])
 
     with c1:
-        st.markdown(f"<div style='text-align:center'><img src='{esc_home}' width='105'></div>", unsafe_allow_html=True)
-    
-    with c2:
-        st.markdown("<h2 style='text-align:center; margin:0;'>VS</h2>", unsafe_allow_html=True)
-    
-    with c3:
-        st.markdown(f"<div style='text-align:center'><img src='{esc_away}' width='105'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+        st.image(esc_home, width=105)
+        st.markdown(f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>", unsafe_allow_html=True)
 
-    # 2. LINHA DOS NOMES (Garante que fiquem no mesmo eixo horizontal abaixo dos escudos)
-    n1, n2, n3 = st.columns([3, 1, 3])
+    with c2:
+        # Alinhamento vertical puro: o VS agora "boia" no meio da altura das colunas
+        st.markdown(f"""
+            <div class='v-align' style='font-size:32px; font-weight:900; margin-bottom:30px;'>
+                VS
+            </div>
+            """, unsafe_allow_html=True)
+
+    with c3:
+        st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+        st.image(esc_away, width=105)
+        st.markdown(f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>", unsafe_allow_html=True)
+
+    st.markdown("---")
     
-    with n1:
-        st.markdown(f"<div style='text-align:center; font-size:20px; font-weight:700;'>{home.upper()}</div>", unsafe_allow_html=True)
-    
-    with n2:
-        st.write("") # Espaço vazio central
-        
-    with n3:
-        st.markdown(f"<div style='text-align:center; font-size:20px; font-weight:700;'>{away.upper()}</div>", unsafe_allow_html=True)
+    # ===== ODDS (RESTAURADAS) =====
+    st.markdown("### 🎯 Odds")
+    o1, o2, o3 = st.columns(3)
+
+    with o1:
+        st.metric("Odds Casa", linha_exg["Odds_Casa"])
+        st.metric("Odd Over 1.5", linha_exg["Odd_Over_1,5FT"])
+        st.metric("VR01", get_val(linha_exg, "VR01", "{:.2f}"))
+
+    with o2:
+        st.metric("Odds Empate", linha_exg["Odds_Empate"])
+        st.metric("Odds Over 2.5", linha_exg["Odds_Over_2,5FT"])
+        st.metric("Coef Over1FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
+
+    with o3:
+        st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
+        st.metric("Odds Under 2.5", linha_exg["Odds_Under_2,5FT"])
+        st.metric("BTTS YES", linha_exg["Odd_BTTS_YES"])
 
     st.markdown("---")
 
