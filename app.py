@@ -1069,10 +1069,10 @@ with tab1:
 
     with col2:
         st.markdown(
-        "<div style='text-align:center; margin-top:18px; margin-left:-32px; font-size:30px; font-weight:900;'>VS</div>",
+        "<div style='text-align:center; margin-top:32px; margin-left:-32px; font-size:30px; font-weight:900;'>VS</div>",
         unsafe_allow_html=True
     )
-
+        
     with col3:
         st.markdown("<div style='text-align:center;margin-right:18px'>", unsafe_allow_html=True)
         st.image(esc_away, width=105)
