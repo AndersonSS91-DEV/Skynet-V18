@@ -1057,45 +1057,40 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    header = st.container()
+        header = st.container()
 
     with header:
 
-        col1, col2, col3, col4, col5 = st.columns([2,2,1.4,2,2])
+        _, col1, col2, col3, col4, col5, _ = st.columns([1,2,2,1.4,2,2,1])
 
-        # ===== ESCUDO HOME =====
         with col1:
-            st.image(esc_home, width=95)
+            st.image(esc_home, width=90)
 
-        # ===== NOME HOME =====
         with col2:
             st.markdown(
-                f"<div style='text-align:left; font-size:20px; font-weight:700; margin-top:30px'>{home.upper()}</div>",
+                f"<div style='text-align:left; font-size:20px; font-weight:700; margin-top:28px'>{home.upper()}</div>",
                 unsafe_allow_html=True
             )
 
-        # ===== PLACAR + VS =====
         with col3:
             st.markdown(
-                f"""
-                <div style='text-align:center; line-height:1.1'>
+                """
+                <div style='text-align:center; line-height:1.05'>
                     <div style='font-size:34px; font-weight:900;'>0 x 0</div>
-                    <div style='font-size:16px; opacity:0.7;'>VS</div>
+                    <div style='font-size:15px; opacity:0.7;'>VS</div>
                 </div>
                 """,
                 unsafe_allow_html=True
             )
 
-        # ===== NOME AWAY =====
         with col4:
             st.markdown(
-                f"<div style='text-align:right; font-size:20px; font-weight:700; margin-top:30px'>{away.upper()}</div>",
+                f"<div style='text-align:right; font-size:20px; font-weight:700; margin-top:28px'>{away.upper()}</div>",
                 unsafe_allow_html=True
             )
 
-        # ===== ESCUDO AWAY =====
         with col5:
-            st.image(esc_away, width=95)
+            st.image(esc_away, width=90)
 
     st.markdown("---")
   
