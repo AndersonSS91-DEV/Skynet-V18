@@ -1057,22 +1057,23 @@ with tab1:
     esc_away = escudo_path(away)
 
         # ===== HEADER ALINHADO COM AS ODDS =====
-    od1, od2, od3 = st.columns(3)
+        # ===== HEADER ALINHADO COM AS ODDS =====
+    col1, col2, col3 = st.columns([2,1,2])
 
-    with od1:
+    with col1:
         st.image(esc_home, width=105)
         st.markdown(
             f"<div style='text-align:center;font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div>",
             unsafe_allow_html=True
         )
 
-    with od2:
+    with col2:
         st.markdown(
             "<div style='text-align:center;font-size:30px;font-weight:900;margin-top:38px'>VS</div>",
             unsafe_allow_html=True
         )
 
-    with od3:
+    with col3:
         st.image(esc_away, width=105)
         st.markdown(
             f"<div style='text-align:center;font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div>",
