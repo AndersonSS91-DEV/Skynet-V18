@@ -360,9 +360,13 @@ def escudo_path(nome_time):
         "olympiacos": "olympiakos",
         "olympiacos f.c.": "olympiakos",
 
-        "estrela": "estrela amadora",   
+        "estrela": "estrela amadora",        
+        # RACING ARGENTINA
         "racing club": "racing",
-        "racing": "racinguru",
+        "racing club avellaneda": "racing",
+        # RACING URUGUAY
+        "racing montevideo": "racinguru",
+        "racing club montevideo": "racinguru",
     }
 
     # 🔧 normalização segura
