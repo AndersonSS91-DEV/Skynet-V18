@@ -668,6 +668,7 @@ def consenso_poisson(s1, s2, s3):
 # =========================================
 def poisson_score(matriz):
 
+    # converter de % para probabilidade
     matriz = matriz / 100
 
     probs = []
@@ -681,7 +682,7 @@ def poisson_score(matriz):
     top3 = sum(probs[:3])
     top5 = sum(probs[:5])
 
-    score = (top3 * 60) + (top5 * 40)
+    score = (top3 * 0.6) + (top5 * 0.4)
 
     return round(score * 100, 1)
     
