@@ -557,9 +557,9 @@ def top_placares(matriz, n=6):
     return m
 
 # =========================================
-# 💀 INDICADOR POISSON SKYNET
+# 💀 POISSON KILL SIGNAL
 # =========================================
-def indicador_poisson_sinais(matriz):
+def poisson_kill_signal(matriz):
 
     placares = []
 
@@ -572,32 +572,64 @@ def indicador_poisson_sinais(matriz):
             })
 
     df = pd.DataFrame(placares)
+
     top5 = df.sort_values("prob", ascending=False).head(5)
-    top4 = df.sort_values("prob", ascending=False).head(4)
+    top6 = df.sort_values("prob", ascending=False).head(6)
 
     sinais = []
 
-    # Lay Away
+    # LAY AWAY
     if not any(top5["away"] > top5["home"]):
         sinais.append("💀 Lay Away")
 
-    # Lay Home
+    # LAY HOME
     if not any(top5["home"] > top5["away"]):
         sinais.append("💀 Lay Home")
 
-    # Lay 0x0
-    if all((top4["home"] >= 1) & (top4["away"] >= 1)):
+    # LAY 0x0
+    if all((top5["home"] >= 1) & (top5["away"] >= 1)):
         sinais.append("💀 Lay 0x0")
 
-    # Lay 1x0
-    if all(top4["away"] >= 1):
+    # LAY 1x0
+    if all(top5["away"] >= 1):
         sinais.append("💀 Lay 1x0")
 
-    # Lay 0x1
-    if all(top4["home"] >= 1):
+    # LAY 0x1
+    if all(top5["home"] >= 1):
         sinais.append("💀 Lay 0x1")
 
+    # OVER PRESSÃO
+    if (top6["home"] + top6["away"]).mean() >= 3:
+        sinais.append("🔥 Over pressão")
+
+    # UNDER TENDENCIOSO
+    if (top6["home"] + top6["away"]).mean() <= 1.6:
+        sinais.append("❄️ Under tendencioso")
+
     return sinais
+
+# =========================================
+# 🧠 CONSENSO ENTRE MÉTODOS POISSON
+# =========================================
+def consenso_poisson(s1, s2, s3):
+
+    todos = s1 + s2 + s3
+    contagem = {}
+
+    for s in todos:
+        contagem[s] = contagem.get(s, 0) + 1
+
+    fortes = []
+
+    for sinal, qtd in contagem.items():
+
+        if qtd >= 3:
+            fortes.append(f"💀💀💀 CONSENSO TOTAL: {sinal}")
+
+        elif qtd == 2:
+            fortes.append(f"💀💀 CONSENSO FORTE: {sinal}")
+
+    return fortes
     
 # =========================================
 # ⚽ MÉTRICAS OFENSIVAS SKYNET
@@ -1394,6 +1426,8 @@ with tab1:
 
     st.pyplot(fig, use_container_width=False)
 
+    
+
 
     cards_ofensivos(
         radar_home_consenso,
@@ -1423,7 +1457,7 @@ with tab1:
 """
         )
 
-        # =========================================
+    # =========================================
     # 💀 INDICADOR POISSON — CONSENSO
     # =========================================
 
@@ -1623,6 +1657,20 @@ with tab3:
     ief_away,
     linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
 )
+
+        # =========================================
+    # 💀 INDICADOR POISSON — MGF
+    # =========================================
+
+    st.markdown("### 💀 Indicador Poisson (MGF)")
+
+    sinais_mgf = poisson_kill_signal(matriz)
+
+    if sinais_mgf:
+        st.success(" | ".join(sinais_mgf))
+    else:
+        st.info("Sem sinal forte")
+        
 
     st.markdown("### 🧱 Defesa — Histórico (MGF)")
 
