@@ -557,9 +557,11 @@ def top_placares(matriz, n=6):
     return m
 
 # =========================================
-# 💀 POISSON KILL SIGNAL
+# 🧠💀 POISSON INTELLIGENCE
 # =========================================
-def poisson_kill_signal(matriz):
+def poisson_intelligence(matriz):
+
+    matriz_prob = matriz / 100
 
     placares = []
 
@@ -578,35 +580,65 @@ def poisson_kill_signal(matriz):
 
     sinais = []
 
-    # LAY AWAY
+    # ======================
+    # INDICADOR POISSON
+    # ======================
+
     if not any(top5["away"] > top5["home"]):
         sinais.append("💀 Lay Away")
 
-    # LAY HOME
     if not any(top5["home"] > top5["away"]):
         sinais.append("💀 Lay Home")
 
-    # LAY 0x0
     if all((top5["home"] >= 1) & (top5["away"] >= 1)):
         sinais.append("💀 Lay 0x0")
 
-    # LAY 1x0
     if all(top5["away"] >= 1):
         sinais.append("💀 Lay 1x0")
 
-    # LAY 0x1
     if all(top5["home"] >= 1):
         sinais.append("💀 Lay 0x1")
 
-    # OVER PRESSÃO
-    if (top6["home"] + top6["away"]).mean() >= 3:
-        sinais.append("🔥 Over pressão")
+    # ======================
+    # CHAOS INDEX
+    # ======================
 
-    # UNDER TENDENCIOSO
-    if (top6["home"] + top6["away"]).mean() <= 1.6:
-        sinais.append("❄️ Under tendencioso")
+    home_win = 0
+    draw = 0
+    away_win = 0
+    over25 = 0
+    under25 = 0
 
-    return sinais
+    for i in range(matriz_prob.shape[0]):
+        for j in range(matriz_prob.shape[1]):
+
+            p = matriz_prob[i][j]
+
+            if i > j:
+                home_win += p
+            elif i == j:
+                draw += p
+            else:
+                away_win += p
+
+            if i + j > 2:
+                over25 += p
+            else:
+                under25 += p
+
+    if abs(home_win - away_win) < 0.12 and draw < 0.30:
+        sinais.append("⚔️ Jogo Caótico")
+
+    if over25 > 0.65:
+        sinais.append("🔥 Over 2.5 Explosivo")
+
+    if under25 > 0.60:
+        sinais.append("❄️ Under 2.5 Tendencioso")
+
+    if draw > 0.33:
+        sinais.append("💀 Falso Favorito")
+
+    return list(set(sinais))
 
 # =========================================
 # 🧠 CONSENSO ENTRE MÉTODOS POISSON
@@ -1532,17 +1564,41 @@ with tab1:
         )
         
     # =========================================
-    # 💀 INDICADOR POISSON — CONSENSO
+    # 🧠💀 CONSENSO POISSON
     # =========================================
 
-    st.markdown("### 💀🔥 Indicador Poisson (Consenso)")
+    st.markdown("### 🧠💀 Consenso Poisson")
 
-    sinais = poisson_kill_signal(matriz_consenso)
+    try:
 
-    if sinais:
-        st.success(" | ".join(sinais))
-    else:
-        st.info("Sem sinal forte do Poisson")
+        matriz_mgf = calcular_matriz_poisson(
+            linha_mgf["ExG_Home_MGF"],
+            linha_mgf["ExG_Away_MGF"]
+        )
+
+        matriz_exg = calcular_matriz_poisson(
+            linha_exg["ExG_Home_ATKxDEF"],
+            linha_exg["ExG_Away_ATKxDEF"]
+        )
+
+        matriz_vg = calcular_matriz_poisson(
+            linha_vg["ExG_Home_VG"],
+            linha_vg["ExG_Away_VG"]
+        )
+
+        s1 = poisson_intelligence(matriz_mgf)
+        s2 = poisson_intelligence(matriz_exg)
+        s3 = poisson_intelligence(matriz_vg)
+
+        consenso = consenso_poisson(s1, s2, s3)
+
+        if consenso:
+            st.error(" | ".join(consenso))
+        else:
+            st.info("Sem consenso forte")
+
+    except:
+        pass
         
 # =========================================
 # ABA 2 — DADOS COMPLETOS
@@ -1698,18 +1754,18 @@ with tab3:
             *radar_away_mgf
         ))
         
-        # =========================================
-    # 💀 INDICADOR POISSON — MGF
+    # =========================================
+    # 🧠💀 POISSON INTELLIGENCE
     # =========================================
 
-    st.markdown("### 💀🔥 Indicador Poisson (MGF)")
+    st.markdown("### 🧠💀 Poisson Intelligence")
 
-    sinais_mgf = poisson_kill_signal(matriz)
+    sinais = poisson_intelligence(matriz)
 
-    if sinais_mgf:
-        st.success(" | ".join(sinais_mgf))
+    if sinais:
+        st.error(" | ".join(sinais))
     else:
-        st.info("Sem sinal forte")
+        st.info("Sem sinal estrutural forte")
 
 # =========================================
     # ===== RADAR ATK x DEF =====
@@ -1842,17 +1898,17 @@ with tab4:
         ))
 
     # =========================================
-    # 💀 INDICADOR POISSON — ATK x DEF
+    # 🧠💀 POISSON INTELLIGENCE
     # =========================================
 
-    st.markdown("### 💀🔥 Indicador Poisson (ATK x DEF)")
+    st.markdown("### 🧠💀 Poisson Intelligence")
 
-    sinais_exg = poisson_kill_signal(matriz)
+    sinais = poisson_intelligence(matriz)
 
-    if sinais_exg:
-        st.success(" | ".join(sinais_exg))
+    if sinais:
+        st.error(" | ".join(sinais))
     else:
-        st.info("Sem sinal forte")
+        st.info("Sem sinal estrutural forte")
        
 # =========================================
 # ABA 5 — VG
@@ -1986,14 +2042,14 @@ with tab5:
         ))
         
     # =========================================
-    # 💀 INDICADOR POISSON — VG
+    # 🧠💀 POISSON INTELLIGENCE
     # =========================================
 
-    st.markdown("### 💀🔥 Indicador Poisson (VG)")
+    st.markdown("### 🧠💀 Poisson Intelligence")
 
-    sinais_vg = poisson_kill_signal(matriz)
+    sinais = poisson_intelligence(matriz)
 
-    if sinais_vg:
-        st.success(" | ".join(sinais_vg))
+    if sinais:
+        st.error(" | ".join(sinais))
     else:
-        st.info("Sem sinal forte")
+        st.info("Sem sinal estrutural forte")
