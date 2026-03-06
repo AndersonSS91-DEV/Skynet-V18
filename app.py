@@ -1586,7 +1586,7 @@ with tab1:
         )
         
     # =========================================
-    # 🧠💀 CONSENSO POISSON
+    # 🧠💀 POISSON INTELLIGENCE CENTER
     # =========================================
 
     st.markdown("### 🧠💀 Consenso Poisson")
@@ -1608,16 +1608,46 @@ with tab1:
             linha_vg["ExG_Away_VG"]
         )
 
-        s1 = poisson_intelligence(matriz_mgf)
-        s2 = poisson_intelligence(matriz_exg)
-        s3 = poisson_intelligence(matriz_vg)
+        sinais_mgf = poisson_intelligence(matriz_mgf)
+        sinais_exg = poisson_intelligence(matriz_exg)
+        sinais_vg = poisson_intelligence(matriz_vg)
 
-        consenso = consenso_poisson(s1, s2, s3)
+        consenso = consenso_poisson(
+            sinais_mgf,
+            sinais_exg,
+            sinais_vg
+        )
+
+        sinais_total = list(set(
+            sinais_mgf +
+            sinais_exg +
+            sinais_vg
+        ))
+
+        # =============================
+        # SCORE POISSON
+        # =============================
+
+        score = poisson_score(matriz_consenso)
+
+        if score > 75:
+            leitura_score = "🔥 Alta previsibilidade"
+        elif score > 55:
+            leitura_score = "⚖️ Jogo equilibrado"
+        else:
+            leitura_score = "⚔️ Jogo imprevisível"
+
+        linhas = []
+
+        linhas.append(f"🎯 Score Poisson: {score} — {leitura_score}")
+
+        if sinais_total:
+            linhas.append(" | ".join(sinais_total))
 
         if consenso:
-            st.error(" | ".join(consenso))
-        else:
-            st.info("Sem consenso forte")
+            linhas.append(" | ".join(consenso))
+
+        st.error("\n\n".join(linhas))
 
     except:
         pass
