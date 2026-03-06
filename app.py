@@ -584,19 +584,19 @@ def poisson_intelligence(matriz):
     # ======================
 
     if not any(top5["away"] > top5["home"]):
-        sinais.append("💀 Lay Away")
+        sinais.append("Lay Away")
 
     if not any(top5["home"] > top5["away"]):
-        sinais.append("💀 Lay Home")
+        sinais.append("Lay Home")
 
     if all((top5["home"] >= 1) & (top5["away"] >= 1)):
-        sinais.append("💀 Lay 0x0")
+        sinais.append("Lay 0x0")
 
     if all(top5["away"] >= 1):
-        sinais.append("💀 Lay 1x0")
+        sinais.append("Lay 1x0")
 
     if all(top5["home"] >= 1):
-        sinais.append("💀 Lay 0x1")
+        sinais.append("Lay 0x1")
 
     # ======================
     # CHAOS INDEX
