@@ -1535,7 +1535,7 @@ with tab1:
     # 💀 INDICADOR POISSON — CONSENSO
     # =========================================
 
-    st.markdown("### 💀 Indicador Poisson (Consenso)")
+    st.markdown("### 💀🔥 Indicador Poisson (Consenso)")
 
     sinais = poisson_kill_signal(matriz_consenso)
 
@@ -1702,7 +1702,7 @@ with tab3:
     # 💀 INDICADOR POISSON — MGF
     # =========================================
 
-    st.markdown("### 💀 Indicador Poisson (MGF)")
+    st.markdown("### 💀🔥 Indicador Poisson (MGF)")
 
     sinais_mgf = poisson_kill_signal(matriz)
 
@@ -1845,7 +1845,7 @@ with tab4:
     # 💀 INDICADOR POISSON — ATK x DEF
     # =========================================
 
-    st.markdown("### 💀 Indicador Poisson (ATK x DEF)")
+    st.markdown("### 💀🔥 Indicador Poisson (ATK x DEF)")
 
     sinais_exg = poisson_kill_signal(matriz)
 
@@ -1989,7 +1989,7 @@ with tab5:
     # 💀 INDICADOR POISSON — VG
     # =========================================
 
-    st.markdown("### 💀 Indicador Poisson (VG)")
+    st.markdown("### 💀🔥 Indicador Poisson (VG)")
 
     sinais_vg = poisson_kill_signal(matriz)
 
