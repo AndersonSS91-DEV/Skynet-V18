@@ -555,6 +555,50 @@ def top_placares(matriz, n=6):
 
     m["Probabilidade%"] = m["Probabilidade%"].map(lambda x: f"{x:.2f}%")
     return m
+
+# =========================================
+# 💀 INDICADOR POISSON SKYNET
+# =========================================
+def indicador_poisson_sinais(matriz):
+
+    placares = []
+
+    for i in range(matriz.shape[0]):
+        for j in range(matriz.shape[1]):
+            placares.append({
+                "home": i,
+                "away": j,
+                "prob": matriz[i][j]
+            })
+
+    df = pd.DataFrame(placares)
+    top5 = df.sort_values("prob", ascending=False).head(5)
+    top4 = df.sort_values("prob", ascending=False).head(4)
+
+    sinais = []
+
+    # Lay Away
+    if not any(top5["away"] > top5["home"]):
+        sinais.append("💀 Lay Away")
+
+    # Lay Home
+    if not any(top5["home"] > top5["away"]):
+        sinais.append("💀 Lay Home")
+
+    # Lay 0x0
+    if all((top4["home"] >= 1) & (top4["away"] >= 1)):
+        sinais.append("💀 Lay 0x0")
+
+    # Lay 1x0
+    if all(top4["away"] >= 1):
+        sinais.append("💀 Lay 1x0")
+
+    # Lay 0x1
+    if all(top4["home"] >= 1):
+        sinais.append("💀 Lay 0x1")
+
+    return sinais
+    
 # =========================================
 # ⚽ MÉTRICAS OFENSIVAS SKYNET
 # =========================================
@@ -1378,7 +1422,20 @@ with tab1:
 {ht['Selo_HT']}
 """
         )
-    
+
+        # =========================================
+    # 💀 INDICADOR POISSON — CONSENSO
+    # =========================================
+
+    st.markdown("### 💀 Indicador Poisson (Consenso)")
+
+    sinais = indicador_poisson_sinais(matriz_consenso)
+
+    if sinais:
+        st.success(" | ".join(sinais))
+    else:
+        st.info("Sem sinal forte do Poisson")
+        
     # =========================================
     # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
     # =========================================
