@@ -1458,19 +1458,6 @@ with tab1:
         )
 
     # =========================================
-    # 💀 INDICADOR POISSON — CONSENSO
-    # =========================================
-
-    st.markdown("### 💀 Indicador Poisson (Consenso)")
-
-    sinais = poisson_kill_signal(matriz_consenso)
-
-    if sinais:
-        st.success(" | ".join(sinais))
-    else:
-        st.info("Sem sinal forte do Poisson")
-        
-    # =========================================
     # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
     # =========================================
     score_bruto = ((sum(radar_home_consenso)/5 + sum(radar_away_consenso)/5)/2)
@@ -1543,10 +1530,20 @@ with tab1:
                 radar_away_consenso
             )
         )
+        
+    # =========================================
+    # 💀 INDICADOR POISSON — CONSENSO
+    # =========================================
 
+    st.markdown("### 💀 Indicador Poisson (Consenso)")
 
+    sinais = poisson_kill_signal(matriz_consenso)
 
-
+    if sinais:
+        st.success(" | ".join(sinais))
+    else:
+        st.info("Sem sinal forte do Poisson")
+        
 # =========================================
 # ABA 2 — DADOS COMPLETOS
 # =========================================
@@ -1657,20 +1654,7 @@ with tab3:
     ief_away,
     linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
 )
-
-        # =========================================
-    # 💀 INDICADOR POISSON — MGF
-    # =========================================
-
-    st.markdown("### 💀 Indicador Poisson (MGF)")
-
-    sinais_mgf = poisson_kill_signal(matriz)
-
-    if sinais_mgf:
-        st.success(" | ".join(sinais_mgf))
-    else:
-        st.info("Sem sinal forte")
-        
+       
 
     st.markdown("### 🧱 Defesa — Histórico (MGF)")
 
@@ -1713,6 +1697,19 @@ with tab3:
             linha_mgf["Visitor_Team"],
             *radar_away_mgf
         ))
+        
+        # =========================================
+    # 💀 INDICADOR POISSON — MGF
+    # =========================================
+
+    st.markdown("### 💀 Indicador Poisson (MGF)")
+
+    sinais_mgf = poisson_kill_signal(matriz)
+
+    if sinais_mgf:
+        st.success(" | ".join(sinais_mgf))
+    else:
+        st.info("Sem sinal forte")
 
 # =========================================
     # ===== RADAR ATK x DEF =====
@@ -1843,6 +1840,19 @@ with tab4:
             linha_exg["Visitor_Team"],
             *radar_away_exg
         ))
+
+    # =========================================
+    # 💀 INDICADOR POISSON — ATK x DEF
+    # =========================================
+
+    st.markdown("### 💀 Indicador Poisson (ATK x DEF)")
+
+    sinais_exg = poisson_kill_signal(matriz)
+
+    if sinais_exg:
+        st.success(" | ".join(sinais_exg))
+    else:
+        st.info("Sem sinal forte")
        
 # =========================================
 # ABA 5 — VG
@@ -1974,3 +1984,16 @@ with tab5:
             linha_vg["Visitor_Team"],
             *radar_away_vg
         ))
+        
+    # =========================================
+    # 💀 INDICADOR POISSON — VG
+    # =========================================
+
+    st.markdown("### 💀 Indicador Poisson (VG)")
+
+    sinais_vg = poisson_kill_signal(matriz)
+
+    if sinais_vg:
+        st.success(" | ".join(sinais_vg))
+    else:
+        st.info("Sem sinal forte")
