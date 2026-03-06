@@ -580,6 +580,21 @@ def poisson_intelligence(matriz):
 
     sinais = []
 
+        # ----- seus cálculos de sinais -----
+    # Lay Away, Lay Home, Over pressão etc
+    # (mantém tudo igual)
+
+    # ======================
+    # SCORE POISSON
+    # ======================
+    score = poisson_score(matriz)
+
+    # ⚠️ FILTRO DE IMPREVISIBILIDADE
+    if score < 45:
+        sinais = []
+
+    return list(set(sinais))
+
     # ======================
     # INDICADOR POISSON
     # ======================
