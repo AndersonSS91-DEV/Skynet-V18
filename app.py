@@ -1463,7 +1463,7 @@ with tab1:
 
     st.markdown("### 💀 Indicador Poisson (Consenso)")
 
-    sinais = indicador_poisson_sinais(matriz_consenso)
+    sinais = poisson_kill_signal(matriz_consenso)
 
     if sinais:
         st.success(" | ".join(sinais))
