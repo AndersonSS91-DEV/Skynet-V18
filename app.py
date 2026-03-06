@@ -584,16 +584,15 @@ def poisson_intelligence(matriz):
     # Lay Away, Lay Home, Over pressão etc
     # (mantém tudo igual)
 
-    # ======================
-    # SCORE POISSON
-    # ======================
-    score = poisson_score(matriz)
+if "💀 Lay Home" in sinais and "💀 Lay Away" in sinais:
+    sinais.remove("💀 Lay Home")
+    sinais.remove("💀 Lay Away")
 
-    # ⚠️ FILTRO DE IMPREVISIBILIDADE
-    if score < 45:
-        sinais = []
+if "💀 Lay 1x0" in sinais and "💀 Lay 0x1" in sinais:
+    sinais.remove("💀 Lay 1x0")
+    sinais.remove("💀 Lay 0x1")
 
-    return list(set(sinais))
+return list(set(sinais))
 
     # ======================
     # INDICADOR POISSON
@@ -1823,17 +1822,59 @@ with tab3:
         ))
         
     # =========================================
-    # 🧠💀 POISSON INTELLIGENCE
+    # 🧠💀 CONSENSO POISSON
     # =========================================
 
-    st.markdown("### 🧠💀 Poisson Intelligence")
+    st.markdown("### 🧠💀 Consenso Poisson")
 
-    sinais = poisson_intelligence(matriz)
+    try:
 
-    if sinais:
-        st.error(" | ".join(sinais))
-    else:
-        st.info("Sem sinal estrutural forte")
+        matriz_mgf = calcular_matriz_poisson(
+            linha_mgf["ExG_Home_MGF"],
+            linha_mgf["ExG_Away_MGF"]
+        )
+
+        matriz_exg = calcular_matriz_poisson(
+            linha_exg["ExG_Home_ATKxDEF"],
+            linha_exg["ExG_Away_ATKxDEF"]
+        )
+
+        matriz_vg = calcular_matriz_poisson(
+            linha_vg["ExG_Home_VG"],
+            linha_vg["ExG_Away_VG"]
+        )
+
+        sinais_mgf = poisson_intelligence(matriz_mgf)
+        sinais_exg = poisson_intelligence(matriz_exg)
+        sinais_vg = poisson_intelligence(matriz_vg)
+
+        consenso = consenso_poisson(
+            sinais_mgf,
+            sinais_exg,
+            sinais_vg
+        )
+
+        sinais_total = list(set(
+            sinais_mgf +
+            sinais_exg +
+            sinais_vg
+        ))
+
+        linhas = []
+
+        if sinais_total:
+            linhas.append(" | ".join(sinais_total))
+
+        if consenso:
+            linhas.append(" | ".join(consenso))
+
+        if linhas:
+            st.error("\n\n".join(linhas))
+        else:
+            st.info("Sem consenso forte")
+
+    except:
+        pass
 
 # =========================================
     # ===== RADAR ATK x DEF =====
