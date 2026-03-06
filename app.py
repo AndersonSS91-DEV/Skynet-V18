@@ -555,7 +555,6 @@ def top_placares(matriz, n=6):
 
     m["Probabilidade%"] = m["Probabilidade%"].map(lambda x: f"{x:.2f}%")
     return m
-
 # =========================================
 # 🧠💀 POISSON INTELLIGENCE
 # =========================================
@@ -580,38 +579,24 @@ def poisson_intelligence(matriz):
 
     sinais = []
 
-        # ----- seus cálculos de sinais -----
-    # Lay Away, Lay Home, Over pressão etc
-    # (mantém tudo igual)
-
-if "💀 Lay Home" in sinais and "💀 Lay Away" in sinais:
-    sinais.remove("💀 Lay Home")
-    sinais.remove("💀 Lay Away")
-
-if "💀 Lay 1x0" in sinais and "💀 Lay 0x1" in sinais:
-    sinais.remove("💀 Lay 1x0")
-    sinais.remove("💀 Lay 0x1")
-
-return list(set(sinais))
-
     # ======================
     # INDICADOR POISSON
     # ======================
 
     if not any(top5["away"] > top5["home"]):
-        sinais.append("Lay Away")
+        sinais.append("💀 Lay Away")
 
     if not any(top5["home"] > top5["away"]):
-        sinais.append("Lay Home")
+        sinais.append("💀 Lay Home")
 
     if all((top5["home"] >= 1) & (top5["away"] >= 1)):
-        sinais.append("Lay 0x0")
+        sinais.append("💀 Lay 0x0")
 
     if all(top5["away"] >= 1):
-        sinais.append("Lay 1x0")
+        sinais.append("💀 Lay 1x0")
 
     if all(top5["home"] >= 1):
-        sinais.append("Lay 0x1")
+        sinais.append("💀 Lay 0x1")
 
     # ======================
     # CHAOS INDEX
@@ -652,8 +637,20 @@ return list(set(sinais))
     if draw > 0.33:
         sinais.append("💀 Falso Favorito")
 
-    return list(set(sinais))
+    # ======================
+    # LIMPAR CONFLITOS
+    # ======================
 
+    if "💀 Lay Home" in sinais and "💀 Lay Away" in sinais:
+        sinais.remove("💀 Lay Home")
+        sinais.remove("💀 Lay Away")
+
+    if "💀 Lay 1x0" in sinais and "💀 Lay 0x1" in sinais:
+        sinais.remove("💀 Lay 1x0")
+        sinais.remove("💀 Lay 0x1")
+
+    return list(set(sinais))
+    
 # =========================================
 # 🧠 CONSENSO ENTRE MÉTODOS POISSON
 # =========================================
@@ -676,13 +673,12 @@ def consenso_poisson(s1, s2, s3):
             fortes.append(f"💀💀 CONSENSO FORTE: {sinal}")
 
     return fortes
-
+    
 # =========================================
 # 🧠 POISSON CONFIDENCE SCORE
 # =========================================
 def poisson_score(matriz):
 
-    # converter de % para probabilidade
     matriz = matriz / 100
 
     probs = []
