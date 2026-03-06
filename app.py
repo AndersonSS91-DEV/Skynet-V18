@@ -585,19 +585,19 @@ def poisson_intelligence(matriz):
     # ======================
 
     if not any(top5["away"] > top5["home"]):
-        sinais.append("💀 Lay Away")
+        sinais.append("Lay Away")
 
     if not any(top5["home"] > top5["away"]):
-        sinais.append("💀 Lay Home")
+        sinais.append("Lay Home")
 
     if all((top5["home"] >= 1) & (top5["away"] >= 1)):
-        sinais.append("💀 Lay 0x0")
+        sinais.append("Lay 0x0")
 
     if all(top5["away"] >= 1):
-        sinais.append("💀 Lay 1x0")
+        sinais.append("Lay 1x0")
 
     if all(top5["home"] >= 1):
-        sinais.append("💀 Lay 0x1")
+        sinais.append("Lay 0x1")
 
     # ======================
     # CHAOS INDEX
@@ -662,6 +662,28 @@ def consenso_poisson(s1, s2, s3):
             fortes.append(f"💀💀 CONSENSO FORTE: {sinal}")
 
     return fortes
+
+# =========================================
+# 🧠 POISSON CONFIDENCE SCORE
+# =========================================
+def poisson_score(matriz):
+
+    matriz = matriz / 100
+
+    probs = []
+
+    for i in range(matriz.shape[0]):
+        for j in range(matriz.shape[1]):
+            probs.append(matriz[i][j])
+
+    probs = sorted(probs, reverse=True)
+
+    top3 = sum(probs[:3])
+    top5 = sum(probs[:5])
+
+    score = (top3 * 60) + (top5 * 40)
+
+    return round(score * 100, 1)
     
 # =========================================
 # ⚽ MÉTRICAS OFENSIVAS SKYNET
