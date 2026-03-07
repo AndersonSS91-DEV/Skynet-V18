@@ -1648,7 +1648,7 @@ with tab1:
             linhas.append("🧠 Consenso\n" + " | ".join(consenso))
 
         if linhas:
-    st.error("\n\n".join(linhas))
+            st.error("\n\n".join(linhas))
 
     except:
         pass
