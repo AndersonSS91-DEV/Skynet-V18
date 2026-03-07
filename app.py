@@ -1639,7 +1639,7 @@ with tab1:
         else:
             leitura_score = "⚔️ Jogo imprevisível"
 
-        linhas = []
+         linhas = []
 
         linhas.append(f"🎯 Score Poisson: {score} — {leitura_score}")
 
@@ -1654,6 +1654,11 @@ with tab1:
 
         if consenso:
             linhas.append("🧠 Consenso\n" + " | ".join(consenso))
+
+        st.error("\n\n".join(linhas))
+
+    except:
+        pass
         
 # =========================================
 # ABA 2 — DADOS COMPLETOS
