@@ -1615,12 +1615,13 @@ with tab1:
         estrutura = []
         mercado = []
         direcao = []
-        
+
         for s in [sinais_mgf, sinais_exg, sinais_vg]:
-        estrutura += s[0]
-        mercado += s[1]
-        direcao += s[2]
-        
+
+            estrutura += s[0]
+            mercado += s[1]
+            direcao += s[2]
+
         estrutura = list(set(estrutura))
         mercado = list(set(mercado))
         direcao = list(set(direcao))
