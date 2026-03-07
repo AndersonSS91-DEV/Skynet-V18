@@ -2143,7 +2143,9 @@ with tab5:
 
     st.markdown("### 🧠💀 Poisson Intelligence")
 
-    sinais = poisson_intelligence(matriz)
+    estrutura, mercado, direcao = poisson_intelligence(matriz)
+
+    sinais = estrutura + mercado + direcao
 
     if sinais:
         st.error(" | ".join(sinais))
