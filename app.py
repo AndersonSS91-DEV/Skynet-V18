@@ -251,7 +251,6 @@ df_ht = pd.read_excel(xls,  "Poisson_HT")
 
 for df in (df_mgf, df_exg, df_vg, df_ht):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
-    df_ht["JOGO"] = df_ht["Home_Team"] + " x " + df_ht["Visitor_Team"]
 
 # =========================================
 # 🔥 SCORE OFENSIVO CONSENSO 0–100
@@ -300,18 +299,6 @@ for _, row in df_mgf.iterrows():
     score_raw.append(score)
 
 df_mgf["Score_Ofensivo"] = score_raw
-
-# 🔥 recalibra para 0–100
-# df_mgf["Score_Ofensivo_100"] = recalibrar_0_100(df_mgf["Score_Ofensivo"])
-
-def recalibrar_0_100(serie):
-    minimo = serie.min()
-    maximo = serie.max()
-
-    if maximo == minimo:
-        return serie * 0
-
-    return ((serie - minimo) / (maximo - minimo)) * 100
 
 # =========================================    
 # 🔥 DEFINA AQUI (ANTES DAS TABS)
@@ -639,7 +626,12 @@ def poisson_intelligence(matriz):
 # =========================================
 def consenso_poisson(s1, s2, s3):
 
-    todos = s1 + s2 + s3
+    todos = (
+        s1[0] + s1[1] + s1[2] +
+        s2[0] + s2[1] + s2[2] +
+        s3[0] + s3[1] + s3[2]
+    )
+
     contagem = {}
 
     for s in todos:
@@ -1639,7 +1631,7 @@ with tab1:
         else:
             leitura_score = "⚔️ Jogo imprevisível"
 
-         linhas = []
+        linhas = []
 
         linhas.append(f"🎯 Score Poisson: {score} — {leitura_score}")
 
@@ -1655,7 +1647,8 @@ with tab1:
         if consenso:
             linhas.append("🧠 Consenso\n" + " | ".join(consenso))
 
-        st.error("\n\n".join(linhas))
+        if linhas:
+    st.error("\n\n".join(linhas))
 
     except:
         pass
@@ -2002,10 +1995,11 @@ with tab4:
     # =========================================
     # 🧠💀 POISSON INTELLIGENCE
     # =========================================
-
     st.markdown("### 🧠💀 Poisson Intelligence")
 
-    sinais = poisson_intelligence(matriz)
+    estrutura, mercado, direcao = poisson_intelligence(matriz)
+
+    sinais = estrutura + mercado + direcao
 
     if sinais:
         st.error(" | ".join(sinais))
