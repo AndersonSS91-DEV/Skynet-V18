@@ -556,7 +556,7 @@ def top_placares(matriz, n=6):
     m["Probabilidade%"] = m["Probabilidade%"].map(lambda x: f"{x:.2f}%")
     return m
 # =========================================
-# 🧠💀 POISSON INTELLIGENCE
+# 🧠💀 POISSON INTELLIGENCE (NOVA)
 # =========================================
 def poisson_intelligence(matriz):
 
@@ -575,36 +575,44 @@ def poisson_intelligence(matriz):
     df = pd.DataFrame(placares)
 
     top5 = df.sort_values("prob", ascending=False).head(5)
-    top6 = df.sort_values("prob", ascending=False).head(6)
 
-    sinais = []
+    estrutura = []
+    mercado = []
+    direcao = []
 
     # ======================
-    # INDICADOR POISSON
+    # DIREÇÃO
     # ======================
 
     if not any(top5["away"] > top5["home"]):
-        sinais.append("Lay Away")
+        direcao.append("💀 Lay Away")
 
     if not any(top5["home"] > top5["away"]):
-        sinais.append("Lay Home")
-
-    if all((top5["home"] >= 1) & (top5["away"] >= 1)):
-        sinais.append("Lay 0x0")
-
-    if all(top5["away"] >= 1):
-        sinais.append("Lay 1x0")
-
-    if all(top5["home"] >= 1):
-        sinais.append("Lay 0x1")
+        direcao.append("💀 Lay Home")
 
     # ======================
-    # CHAOS INDEX
+    # ESTRUTURA DE GOLS
     # ======================
 
-    home_win = 0
-    draw = 0
-    away_win = 0
+    home_goal = all(top5["home"] >= 1)
+    away_goal = all(top5["away"] >= 1)
+
+    if home_goal and away_goal:
+        estrutura.append("⚽ BTTS Tendência")
+
+    elif home_goal:
+        estrutura.append("💀 Lay 0x1")
+
+    elif away_goal:
+        estrutura.append("💀 Lay 1x0")
+
+    if all((top5["home"] + top5["away"]) >= 1):
+        estrutura.append("⚽ Gol provável (Lay 0x0)")
+
+    # ======================
+    # MERCADO
+    # ======================
+
     over25 = 0
     under25 = 0
 
@@ -613,43 +621,18 @@ def poisson_intelligence(matriz):
 
             p = matriz_prob[i][j]
 
-            if i > j:
-                home_win += p
-            elif i == j:
-                draw += p
-            else:
-                away_win += p
-
             if i + j > 2:
                 over25 += p
             else:
                 under25 += p
 
-    if abs(home_win - away_win) < 0.12 and draw < 0.30:
-        sinais.append("⚔️ Jogo Caótico")
-
     if over25 > 0.65:
-        sinais.append("🔥 Over 2.5 Explosivo")
+        mercado.append("🔥 Over 2.5 Explosivo")
 
     if under25 > 0.60:
-        sinais.append("❄️ Under 2.5 Tendencioso")
+        mercado.append("❄️ Under 2.5 Tendencioso")
 
-    if draw > 0.33:
-        sinais.append("💀 Falso Favorito")
-
-    # ======================
-    # LIMPAR CONFLITOS
-    # ======================
-
-    if "💀 Lay Home" in sinais and "💀 Lay Away" in sinais:
-        sinais.remove("💀 Lay Home")
-        sinais.remove("💀 Lay Away")
-
-    if "💀 Lay 1x0" in sinais and "💀 Lay 0x1" in sinais:
-        sinais.remove("💀 Lay 1x0")
-        sinais.remove("💀 Lay 0x1")
-
-    return list(set(sinais))
+    return estrutura, mercado, direcao
     
 # =========================================
 # 🧠 CONSENSO ENTRE MÉTODOS POISSON
@@ -1629,11 +1612,18 @@ with tab1:
             sinais_vg
         )
 
-        sinais_total = list(set(
-            sinais_mgf +
-            sinais_exg +
-            sinais_vg
-        ))
+        estrutura = []
+        mercado = []
+        direcao = []
+        
+        for s in [sinais_mgf, sinais_exg, sinais_vg]:
+        estrutura += s[0]
+        mercado += s[1]
+        direcao += s[2]
+        
+        estrutura = list(set(estrutura))
+        mercado = list(set(mercado))
+        direcao = list(set(direcao))
 
         # =============================
         # SCORE POISSON
@@ -1652,16 +1642,17 @@ with tab1:
 
         linhas.append(f"🎯 Score Poisson: {score} — {leitura_score}")
 
-        if sinais_total:
-            linhas.append(" | ".join(sinais_total))
+        if estrutura:
+            linhas.append("⚽ Estrutura de gols\n" + " | ".join(estrutura))
+
+        if mercado:
+            linhas.append("📈 Mercado\n" + " | ".join(mercado))
+
+        if direcao:
+            linhas.append("🎯 Direção\n" + " | ".join(direcao))
 
         if consenso:
-            linhas.append(" | ".join(consenso))
-
-        st.error("\n\n".join(linhas))
-
-    except:
-        pass
+            linhas.append("🧠 Consenso\n" + " | ".join(consenso))
         
 # =========================================
 # ABA 2 — DADOS COMPLETOS
