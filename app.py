@@ -251,7 +251,6 @@ df_ht = pd.read_excel(xls,  "Poisson_HT")
 
 for df in (df_mgf, df_exg, df_vg, df_ht):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
-    df_ht["JOGO"] = df_ht["Home_Team"] + " x " + df_ht["Visitor_Team"]
 
 # =========================================
 # 🔥 SCORE OFENSIVO CONSENSO 0–100
@@ -300,18 +299,6 @@ for _, row in df_mgf.iterrows():
     score_raw.append(score)
 
 df_mgf["Score_Ofensivo"] = score_raw
-
-# 🔥 recalibra para 0–100
-# df_mgf["Score_Ofensivo_100"] = recalibrar_0_100(df_mgf["Score_Ofensivo"])
-
-def recalibrar_0_100(serie):
-    minimo = serie.min()
-    maximo = serie.max()
-
-    if maximo == minimo:
-        return serie * 0
-
-    return ((serie - minimo) / (maximo - minimo)) * 100
 
 # =========================================    
 # 🔥 DEFINA AQUI (ANTES DAS TABS)
@@ -555,6 +542,135 @@ def top_placares(matriz, n=6):
 
     m["Probabilidade%"] = m["Probabilidade%"].map(lambda x: f"{x:.2f}%")
     return m
+# =========================================
+# 🧠💀 POISSON INTELLIGENCE (NOVA)
+# =========================================
+def poisson_intelligence(matriz):
+
+    matriz_prob = matriz / 100
+
+    placares = []
+
+    for i in range(matriz.shape[0]):
+        for j in range(matriz.shape[1]):
+            placares.append({
+                "home": i,
+                "away": j,
+                "prob": matriz[i][j]
+            })
+
+    df = pd.DataFrame(placares)
+
+    top5 = df.sort_values("prob", ascending=False).head(5)
+
+    estrutura = []
+    mercado = []
+    direcao = []
+
+    # ======================
+    # DIREÇÃO
+    # ======================
+
+    if not any(top5["away"] > top5["home"]):
+        direcao.append("💀 Lay Away")
+
+    if not any(top5["home"] > top5["away"]):
+        direcao.append("💀 Lay Home")
+
+    # ======================
+    # ESTRUTURA DE GOLS
+    # ======================
+
+    home_goal = all(top5["home"] >= 1)
+    away_goal = all(top5["away"] >= 1)
+
+    if home_goal and away_goal:
+        estrutura.append("⚽ BTTS Tendência")
+
+    elif home_goal:
+        estrutura.append("💀 Lay 0x1")
+
+    elif away_goal:
+        estrutura.append("💀 Lay 1x0")
+
+    if all((top5["home"] + top5["away"]) >= 1):
+        estrutura.append("⚽ Gol provável (Lay 0x0)")
+
+    # ======================
+    # MERCADO
+    # ======================
+
+    over25 = 0
+    under25 = 0
+
+    for i in range(matriz_prob.shape[0]):
+        for j in range(matriz_prob.shape[1]):
+
+            p = matriz_prob[i][j]
+
+            if i + j > 2:
+                over25 += p
+            else:
+                under25 += p
+
+    if over25 > 0.65:
+        mercado.append("🔥 Over 2.5 Explosivo")
+
+    if under25 > 0.60:
+        mercado.append("❄️ Under 2.5 Tendencioso")
+
+    return estrutura, mercado, direcao
+    
+# =========================================
+# 🧠 CONSENSO ENTRE MÉTODOS POISSON
+# =========================================
+def consenso_poisson(s1, s2, s3):
+
+    todos = (
+        s1[0] + s1[1] + s1[2] +
+        s2[0] + s2[1] + s2[2] +
+        s3[0] + s3[1] + s3[2]
+    )
+
+    contagem = {}
+
+    for s in todos:
+        contagem[s] = contagem.get(s, 0) + 1
+
+    fortes = []
+
+    for sinal, qtd in contagem.items():
+
+        if qtd >= 3:
+            fortes.append(f"💀💀💀 CONSENSO TOTAL: {sinal}")
+
+        elif qtd == 2:
+            fortes.append(f"💀💀 CONSENSO FORTE: {sinal}")
+
+    return fortes
+    
+# =========================================
+# 🧠 POISSON CONFIDENCE SCORE
+# =========================================
+def poisson_score(matriz):
+
+    matriz = matriz / 100
+
+    probs = []
+
+    for i in range(matriz.shape[0]):
+        for j in range(matriz.shape[1]):
+            probs.append(matriz[i][j])
+
+    probs = sorted(probs, reverse=True)
+
+    top3 = sum(probs[:3])
+    top5 = sum(probs[:5])
+
+    score = (top3 * 0.6) + (top5 * 0.4)
+
+    return round(score * 100, 1)
+    
 # =========================================
 # ⚽ MÉTRICAS OFENSIVAS SKYNET
 # =========================================
@@ -1350,6 +1466,8 @@ with tab1:
 
     st.pyplot(fig, use_container_width=False)
 
+    
+
 
     cards_ofensivos(
         radar_home_consenso,
@@ -1378,7 +1496,7 @@ with tab1:
 {ht['Selo_HT']}
 """
         )
-    
+
     # =========================================
     # 🔥 SCORE OFENSIVO NORMALIZADO (0–100 REAL)
     # =========================================
@@ -1452,10 +1570,89 @@ with tab1:
                 radar_away_consenso
             )
         )
+        
+    # =========================================
+    # 🧠💀 POISSON INTELLIGENCE CENTER
+    # =========================================
 
+    st.markdown("### 🧠💀 Consenso Poisson")
 
+    try:
 
+        matriz_mgf = calcular_matriz_poisson(
+            linha_mgf["ExG_Home_MGF"],
+            linha_mgf["ExG_Away_MGF"]
+        )
 
+        matriz_exg = calcular_matriz_poisson(
+            linha_exg["ExG_Home_ATKxDEF"],
+            linha_exg["ExG_Away_ATKxDEF"]
+        )
+
+        matriz_vg = calcular_matriz_poisson(
+            linha_vg["ExG_Home_VG"],
+            linha_vg["ExG_Away_VG"]
+        )
+
+        sinais_mgf = poisson_intelligence(matriz_mgf)
+        sinais_exg = poisson_intelligence(matriz_exg)
+        sinais_vg = poisson_intelligence(matriz_vg)
+
+        consenso = consenso_poisson(
+            sinais_mgf,
+            sinais_exg,
+            sinais_vg
+        )
+
+        estrutura = []
+        mercado = []
+        direcao = []
+
+        for s in [sinais_mgf, sinais_exg, sinais_vg]:
+
+            estrutura += s[0]
+            mercado += s[1]
+            direcao += s[2]
+
+        estrutura = list(set(estrutura))
+        mercado = list(set(mercado))
+        direcao = list(set(direcao))
+
+        # =============================
+        # SCORE POISSON
+        # =============================
+
+        score = poisson_score(matriz_consenso)
+
+        if score > 75:
+            leitura_score = "🔥 Alta previsibilidade"
+        elif score > 55:
+            leitura_score = "⚖️ Jogo equilibrado"
+        else:
+            leitura_score = "⚔️ Jogo imprevisível"
+
+        linhas = []
+
+        linhas.append(f"🎯 Score Poisson: {score} — {leitura_score}")
+
+        if estrutura:
+            linhas.append("⚽ Estrutura de gols\n" + " | ".join(estrutura))
+
+        if mercado:
+            linhas.append("📈 Mercado\n" + " | ".join(mercado))
+
+        if direcao:
+            linhas.append("🎯 Direção\n" + " | ".join(direcao))
+
+        if consenso:
+            linhas.append("🧠 Consenso\n" + " | ".join(consenso))
+
+        if linhas:
+            st.error("\n\n".join(linhas))
+
+    except:
+        pass
+        
 # =========================================
 # ABA 2 — DADOS COMPLETOS
 # =========================================
@@ -1566,6 +1763,7 @@ with tab3:
     ief_away,
     linha_mgf["ExG_Home_MGF"] + linha_mgf["ExG_Away_MGF"]
 )
+       
 
     st.markdown("### 🧱 Defesa — Histórico (MGF)")
 
@@ -1608,6 +1806,61 @@ with tab3:
             linha_mgf["Visitor_Team"],
             *radar_away_mgf
         ))
+        
+    # =========================================
+    # 🧠💀 CONSENSO POISSON
+    # =========================================
+
+    st.markdown("### 🧠💀 Consenso Poisson")
+
+    try:
+
+        matriz_mgf = calcular_matriz_poisson(
+            linha_mgf["ExG_Home_MGF"],
+            linha_mgf["ExG_Away_MGF"]
+        )
+
+        matriz_exg = calcular_matriz_poisson(
+            linha_exg["ExG_Home_ATKxDEF"],
+            linha_exg["ExG_Away_ATKxDEF"]
+        )
+
+        matriz_vg = calcular_matriz_poisson(
+            linha_vg["ExG_Home_VG"],
+            linha_vg["ExG_Away_VG"]
+        )
+
+        sinais_mgf = poisson_intelligence(matriz_mgf)
+        sinais_exg = poisson_intelligence(matriz_exg)
+        sinais_vg = poisson_intelligence(matriz_vg)
+
+        consenso = consenso_poisson(
+            sinais_mgf,
+            sinais_exg,
+            sinais_vg
+        )
+
+        sinais_total = list(set(
+            sinais_mgf +
+            sinais_exg +
+            sinais_vg
+        ))
+
+        linhas = []
+
+        if sinais_total:
+            linhas.append(" | ".join(sinais_total))
+
+        if consenso:
+            linhas.append(" | ".join(consenso))
+
+        if linhas:
+            st.error("\n\n".join(linhas))
+        else:
+            st.info("Sem consenso forte")
+
+    except:
+        pass
 
 # =========================================
     # ===== RADAR ATK x DEF =====
@@ -1738,6 +1991,20 @@ with tab4:
             linha_exg["Visitor_Team"],
             *radar_away_exg
         ))
+
+    # =========================================
+    # 🧠💀 POISSON INTELLIGENCE
+    # =========================================
+    st.markdown("### 🧠💀 Poisson Intelligence")
+
+    estrutura, mercado, direcao = poisson_intelligence(matriz)
+
+    sinais = estrutura + mercado + direcao
+
+    if sinais:
+        st.error(" | ".join(sinais))
+    else:
+        st.info("Sem sinal estrutural forte")
        
 # =========================================
 # ABA 5 — VG
@@ -1869,3 +2136,18 @@ with tab5:
             linha_vg["Visitor_Team"],
             *radar_away_vg
         ))
+        
+    # =========================================
+    # 🧠💀 POISSON INTELLIGENCE
+    # =========================================
+
+    st.markdown("### 🧠💀 Poisson Intelligence")
+
+    estrutura, mercado, direcao = poisson_intelligence(matriz)
+
+    sinais = estrutura + mercado + direcao
+
+    if sinais:
+        st.error(" | ".join(sinais))
+    else:
+        st.info("Sem sinal estrutural forte")
