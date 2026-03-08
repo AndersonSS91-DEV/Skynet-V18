@@ -187,7 +187,7 @@ ul[role="listbox"] li {
 
 /* largura da barra */
 ::-webkit-scrollbar {
-    width: 16px;
+    width: 24px;
 }
 
 /* fundo da barra */
@@ -198,7 +198,7 @@ ul[role="listbox"] li {
 /* parte que move */
 ::-webkit-scrollbar-thumb {
     background: #444;
-    border-radius: 10px;
+    border-radius: 18px;
 }
 
 /* hover */
@@ -208,7 +208,7 @@ ul[role="listbox"] li {
 
 ::-webkit-scrollbar-thumb {
     background: linear-gradient(180deg,#3b82f6,#2563eb);
-    border-radius: 10px;
+    border-radius: 18px;
 }
 
 </style>
