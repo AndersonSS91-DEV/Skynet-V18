@@ -180,9 +180,39 @@ ul[role="listbox"] li {
     font-size: 18px !important;
     padding: 10px !important;
 }
+
+===========================================
+# BARRA DE ROLAGEM
+===========================================
+
+/* largura da barra */
+::-webkit-scrollbar {
+    width: 30px;
+}
+
+/* fundo da barra */
+::-webkit-scrollbar-track {
+    background: #0e1117;
+}
+
+/* parte que move */
+::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 18px;
+}
+
+/* hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg,#3b82f6,#2563eb);
+    border-radius: 18px;
+}
+
 </style>
 """, unsafe_allow_html=True)
-
 # =========================================
 # 🎬 BANNER CARROSSEL (OFICIAL SKYNET)
 # =========================================
@@ -1252,13 +1282,17 @@ with tab1:
         st.metric("PPJH", get_val(linha_exg, "PPJH", "{:.2f}"))
         st.metric("Media_CG_H_01", get_val(linha_mgf, "Media_CG_H_01", "{:.2f}"))
         st.metric("CV_CG_H_01", get_val(linha_mgf, "CV_CG_H_01", "{:.2f}"))
-
+        st.metric("Media_CG_H_02", get_val(linha_mgf, "Media_CG_H_02", "{:.2f}"))
+        st.metric("CV_CG_H_02", get_val(linha_mgf, "CV_CG_H_02", "{:.2f}"))
+        
     with c2:
         st.metric("Posse Away (%)", get_val(linha_exg, "Posse_Bola_Away", "{:.2f}"))
         st.metric("PPJA", get_val(linha_exg, "PPJA", "{:.2f}"))
         st.metric("Media_CG_A_01", get_val(linha_mgf, "Media_CG_A_01", "{:.2f}"))
         st.metric("CV_CG_A_01", get_val(linha_mgf, "CV_CG_A_01", "{:.2f}"))
-
+        st.metric("Media_CG_A_02", get_val(linha_mgf, "Media_CG_A_02", "{:.2f}"))
+        st.metric("CV_CG_A_02", get_val(linha_mgf, "CV_CG_A_02", "{:.2f}"))
+        
     with c3:
         st.metric("Força Ataque Home (%)", get_val(linha_exg, "FAH", "{:.2f}"))
         st.metric("Precisão Chutes H (%)", get_val(linha_exg, "Precisao_CG_H", "{:.2f}"))
