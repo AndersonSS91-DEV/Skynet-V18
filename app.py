@@ -182,7 +182,40 @@ ul[role="listbox"] li {
 }
 </style>
 """, unsafe_allow_html=True)
+===========================================
+# BARRA DE ROLAGEM
+===========================================
+st.markdown("""
+<style>
 
+/* largura da barra */
+::-webkit-scrollbar {
+    width: 16px;
+}
+
+/* fundo da barra */
+::-webkit-scrollbar-track {
+    background: #0e1117;
+}
+
+/* parte que move */
+::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 10px;
+}
+
+/* hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg,#3b82f6,#2563eb);
+    border-radius: 10px;
+}
+
+</style>
+""", unsafe_allow_html=True)
 # =========================================
 # 🎬 BANNER CARROSSEL (OFICIAL SKYNET)
 # =========================================
