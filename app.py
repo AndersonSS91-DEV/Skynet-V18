@@ -180,13 +180,10 @@ ul[role="listbox"] li {
     font-size: 18px !important;
     padding: 10px !important;
 }
-</style>
-""", unsafe_allow_html=True)
+
 ===========================================
 # BARRA DE ROLAGEM
 ===========================================
-st.markdown("""
-<style>
 
 /* largura da barra */
 ::-webkit-scrollbar {
