@@ -187,7 +187,7 @@ ul[role="listbox"] li {
 
 /* largura da barra */
 ::-webkit-scrollbar {
-    width: 24px;
+    width: 30px;
 }
 
 /* fundo da barra */
