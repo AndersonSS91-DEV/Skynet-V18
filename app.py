@@ -652,9 +652,7 @@ elif under25 > 0.60 and under25 > over25:
 
 else:
     mercado.append("⚖️ Mercado equilibrado")
-
-    return estrutura, mercado, direcao
-    
+  
 # =========================================
 # 🧠 CONSENSO ENTRE MÉTODOS POISSON
 # =========================================
