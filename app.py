@@ -626,28 +626,32 @@ def poisson_intelligence(matriz):
     if all((top5["home"] + top5["away"]) >= 1):
         estrutura.append("⚽ Gol provável (Lay 0x0)")
 
-    # ======================
-    # MERCADO
-    # ======================
+# ======================
+# MERCADO
+# ======================
 
-    over25 = 0
-    under25 = 0
+over25 = 0
+under25 = 0
 
-    for i in range(matriz_prob.shape[0]):
-        for j in range(matriz_prob.shape[1]):
+for i in range(matriz_prob.shape[0]):
+    for j in range(matriz_prob.shape[1]):
 
-            p = matriz_prob[i][j]
+        p = matriz_prob[i][j]
 
-            if i + j > 2:
-                over25 += p
-            else:
-                under25 += p
+        if i + j > 2:
+            over25 += p
+        else:
+            under25 += p
 
-    if over25 > 0.65:
-        mercado.append("🔥 Over 2.5 Explosivo")
+# 🔥 CORREÇÃO: impedir conflito
+if over25 > 0.65 and over25 > under25:
+    mercado.append("🔥 Over 2.5 Explosivo")
 
-    if under25 > 0.60:
-        mercado.append("❄️ Under 2.5 Tendencioso")
+elif under25 > 0.60 and under25 > over25:
+    mercado.append("❄️ Under 2.5 Tendencioso")
+
+else:
+    mercado.append("⚖️ Mercado equilibrado")
 
     return estrutura, mercado, direcao
     
