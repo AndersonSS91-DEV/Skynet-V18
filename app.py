@@ -572,9 +572,6 @@ def top_placares(matriz, n=6):
 
     m["Probabilidade%"] = m["Probabilidade%"].map(lambda x: f"{x:.2f}%")
     return m
-# =========================================
-# 🧠💀 POISSON INTELLIGENCE (NOVA)
-# =========================================
 def poisson_intelligence(matriz):
 
     matriz_prob = matriz / 100
@@ -643,14 +640,17 @@ def poisson_intelligence(matriz):
             else:
                 under25 += p
 
-    if over25 > 0.65:
+    if over25 > 0.65 and over25 > under25:
         mercado.append("🔥 Over 2.5 Explosivo")
 
-    if under25 > 0.60:
+    elif under25 > 0.60 and under25 > over25:
         mercado.append("❄️ Under 2.5 Tendencioso")
 
+    else:
+        mercado.append("⚖️ Mercado equilibrado")
+
     return estrutura, mercado, direcao
-    
+  
 # =========================================
 # 🧠 CONSENSO ENTRE MÉTODOS POISSON
 # =========================================
@@ -1875,10 +1875,9 @@ with tab3:
         )
 
         sinais_total = list(set(
-            sinais_mgf +
-            sinais_exg +
-            sinais_vg
-        ))
+        sinais_mgf[0] + sinais_mgf[1] + sinais_mgf[2] +
+        sinais_exg[0] + sinais_exg[1] + sinais_exg[2] +
+        sinais_vg[0] + sinais_vg[1] + sinais_vg[2]))
 
         linhas = []
 
