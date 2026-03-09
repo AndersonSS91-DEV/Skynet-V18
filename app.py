@@ -1875,10 +1875,9 @@ with tab3:
         )
 
         sinais_total = list(set(
-            sinais_mgf +
-            sinais_exg +
-            sinais_vg
-        ))
+        sinais_mgf[0] + sinais_mgf[1] + sinais_mgf[2] +
+        sinais_exg[0] + sinais_exg[1] + sinais_exg[2] +
+        sinais_vg[0] + sinais_vg[1] + sinais_vg[2]))
 
         linhas = []
 
