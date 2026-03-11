@@ -2198,35 +2198,41 @@ with tab6:
     st.warning("🚧 Aba em desenvolvimento")
 
     st.markdown("""
-    Em breve esta aba incluirá:
+### 📊 Roadmap da Aba de Escanteios
 
-Fase 1 (rápida)
-Mostrar dados base:
+---
 
-Escanteios feitos
+### ⚡ Fase 1 — Dados Base
+Serão exibidas as principais métricas de escanteios:
 
-Escanteios concedidos
+• Escanteios feitos  
+• Escanteios concedidos  
+• Média de escanteios (últimos 5 jogos)  
+• Posse de bola  
+• Ataques perigosos  
 
-média últimos 5
+---
 
-posse
+### 🧠 Fase 2 — Modelo Estatístico
 
-ataques perigosos
+Cálculo dos escanteios esperados:
 
-Fase 2 (modelo)
+• **ExC_H** — Escanteios esperados do mandante  
+• **ExC_A** — Escanteios esperados do visitante  
+• **ExC_Total** — Total esperado de escanteios  
 
-ExC_H
+---
 
-ExC_A
+### 🎯 Fase 3 — Tomada de Decisão
 
-ExC_Total
+Indicadores para análise de mercado:
 
-Fase 3 (decisão)
+• **Probabilidade Over 8.5**  
+• **Probabilidade Over 9.5**  
+• **Corner Dominance** (dominância de escanteios)  
+• **Value Bet em escanteios**  
 
-Prob Over 8.5
+---
 
-Prob Over 9.5
-
-Corner Dominance
-
-Value Bet
+🚀 Esta aba fará parte do modelo avançado de análise do **Skynet** para mercados de escanteios.
+""")
