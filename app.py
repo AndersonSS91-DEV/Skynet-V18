@@ -2200,10 +2200,33 @@ with tab6:
     st.markdown("""
     Em breve esta aba incluirá:
 
-    • Escanteios esperados (ExC)  
-    • Índice de pressão ofensiva  
-    • Dominância de escanteios  
-    • Race to corners  
-    • Probabilidades Over/Under  
-    • Value bets em escanteios
-    """)
+Fase 1 (rápida)
+Mostrar dados base:
+
+Escanteios feitos
+
+Escanteios concedidos
+
+média últimos 5
+
+posse
+
+ataques perigosos
+
+Fase 2 (modelo)
+
+ExC_H
+
+ExC_A
+
+ExC_Total
+
+Fase 3 (decisão)
+
+Prob Over 8.5
+
+Prob Over 9.5
+
+Corner Dominance
+
+Value Bet
