@@ -1199,7 +1199,9 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 "📊⚽ MGF",
 "⚔️⚽ ATK x DEF",
 "💎⚽ VG"
+"🚩 Escanteios"
 ])
+
 # =========================================
 # ABA 1 — RESUMO >>>>>>. ESCUDOS QUASE PERFEITOS >>>>> SALVAR ESSE CÓDIGO
 # =========================================
@@ -2184,3 +2186,24 @@ with tab5:
         st.error(" | ".join(sinais))
     else:
         st.info("Sem sinal estrutural forte")
+
+
+# =========================================
+# ABA 6 — ESCANTEIOS
+# =========================================
+with tab6:
+
+    st.header("🚩 Análise de Escanteios")
+
+    st.warning("🚧 Aba em desenvolvimento")
+
+    st.markdown("""
+    Em breve esta aba incluirá:
+
+    • Escanteios esperados (ExC)  
+    • Índice de pressão ofensiva  
+    • Dominância de escanteios  
+    • Race to corners  
+    • Probabilidades Over/Under  
+    • Value bets em escanteios
+    """)
