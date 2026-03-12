@@ -1193,13 +1193,15 @@ desvio_score = df_mgf["Score_Ofensivo"].std()
 # =========================================
 # ABAS
 # =========================================
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 "📊🧠 Resumo",
 "📁🧠 Dados",
 "📊⚽ MGF",
 "⚔️⚽ ATK x DEF",
-"💎⚽ VG"
+"💎⚽ VG",
+"🚩 Escanteios"
 ])
+
 # =========================================
 # ABA 1 — RESUMO >>>>>>. ESCUDOS QUASE PERFEITOS >>>>> SALVAR ESSE CÓDIGO
 # =========================================
@@ -2184,3 +2186,53 @@ with tab5:
         st.error(" | ".join(sinais))
     else:
         st.info("Sem sinal estrutural forte")
+
+
+# =========================================
+# ABA 6 — ESCANTEIOS
+# =========================================
+with tab6:
+
+    st.header("🚩 Análise de Escanteios")
+
+    st.warning("🚧 Aba em desenvolvimento")
+
+    st.markdown("""
+### 📊 Roadmap da Aba de Escanteios
+
+---
+
+### ⚡ Fase 1 — Dados Base
+Serão exibidas as principais métricas de escanteios:
+
+• Escanteios feitos  
+• Escanteios concedidos  
+• Média de escanteios (últimos 5 jogos)  
+• Posse de bola  
+• Ataques perigosos  
+
+---
+
+### 🧠 Fase 2 — Modelo Estatístico
+
+Cálculo dos escanteios esperados:
+
+• **ExC_H** — Escanteios esperados do mandante  
+• **ExC_A** — Escanteios esperados do visitante  
+• **ExC_Total** — Total esperado de escanteios  
+
+---
+
+### 🎯 Fase 3 — Tomada de Decisão
+
+Indicadores para análise de mercado:
+
+• **Probabilidade Over 8.5**  
+• **Probabilidade Over 9.5**  
+• **Corner Dominance** (dominância de escanteios)  
+• **Value Bet em escanteios**  
+
+---
+
+🚀 Esta aba fará parte do modelo avançado de análise do **Skynet** para mercados de escanteios.
+""")
