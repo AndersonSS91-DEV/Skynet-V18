@@ -278,8 +278,9 @@ df_mgf = pd.read_excel(xls, "Poisson_Media_Gols")
 df_exg = pd.read_excel(xls, "Poisson_Ataque_Defesa")
 df_vg  = pd.read_excel(xls, "Poisson_VG")  # <<< FALTAVA ISSO
 df_ht = pd.read_excel(xls,  "Poisson_HT")
+df_cantos = pd.read_excel(xls, "Escanteios") 
 
-for df in (df_mgf, df_exg, df_vg, df_ht):
+for df in (df_mgf, df_exg, df_vg, df_ht, df_cantos):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
 
 # =========================================
@@ -342,7 +343,8 @@ jogo = st.selectbox(label="",options=jogos_lista)
 linha_mgf = df_mgf[df_mgf["JOGO"] == jogo].iloc[0]
 linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
 linha_vg  = df_vg[df_vg["JOGO"] == jogo].iloc[0]
-linha_ht  = df_ht[df_ht["JOGO"] == jogo].iloc[0]  # ✅ ADICIONE ESTA
+linha_ht  = df_ht[df_ht["JOGO"] == jogo].iloc[0]  
+linha_cantos = df_cantos[df_cantos["JOGO"] == jogo].iloc[0] # ✅ ADICIONE ESTA
 
 st.session_state["jogo"] = jogo
 # =========================================
