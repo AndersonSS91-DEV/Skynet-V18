@@ -2203,51 +2203,49 @@ with c1:
     st.metric("PPJH", get_val(linha_cantos, "PPJH", "{:.2f}"))
     st.metric("Pressão_Média_Home (%)", get_val(linha_cantos, "Pressão_Média_Home", "{:.2f}"))
     st.metric("APPM_Home", get_val(linha_cantos, "APPM_Home", "{:.2f}"))
-    
+
 with c2:
     st.metric("Posse Away (%)", get_val(linha_cantos, "Posse_Bola_Away", "{:.2f}"))
     st.metric("PPJA", get_val(linha_cantos, "PPJA", "{:.2f}"))
     st.metric("Pressão_Média_Away (%)", get_val(linha_cantos, "Pressão_Média_Away", "{:.2f}"))
     st.metric("APPM_Away", get_val(linha_cantos, "APPM_Away", "{:.2f}"))
-    
+
 with c3:
     st.metric("Força Ataque Home (%)", get_val(linha_cantos, "FAH", "{:.2f}"))
     st.metric("Precisão Chutes H (%)", get_val(linha_cantos, "Precisao_CG_H", "{:.2f}"))
-    
 
 with c4:
     st.metric("Força Ataque Away (%)", get_val(linha_cantos, "FAA", "{:.2f}"))
     st.metric("Precisão Chutes A (%)", get_val(linha_cantos, "Precisao_CG_A", "{:.2f}"))
-              
+
 with c5:
     st.metric("Força Defesa Home (%)", get_val(linha_cantos, "FDH", "{:.2f}"))
     st.metric("Clean Games Home (%)", get_val(linha_cantos, "Clean_Games_H"))
-    
+
 with c6:
     st.metric("Força Defesa Away (%)", get_val(linha_cantos, "FDA", "{:.2f}"))
     st.metric("Clean Games Away (%)", get_val(linha_cantos, "Clean_Games_A"))
 
-    
-        # =========================
-    # EXPECTATIVA
-    # =========================
-    st.metric("Expectativa_Cantos", get_val(linha_cantos, "Expectativa_Cantos", "{:.2f}"))
+# =========================
+# EXPECTATIVA
+# =========================
+st.metric("Expectativa_Cantos", get_val(linha_cantos, "Expectativa_Cantos", "{:.2f}"))
 
-    # =========================
-    # HT
-    # =========================
-    st.metric("MF_Cantos_HT_Home", get_val(linha_cantos, "MF_Cantos_HT_Home", "{:.2f}"))
-    st.metric("MF_Cantos_HT_Away", get_val(linha_cantos, "MF_Cantos_HT_Away", "{:.2f}"))
-    st.metric("MC_Cantos_HT_Home", get_val(linha_cantos, "MC_Cantos_HT_Home", "{:.2f}"))
-    st.metric("MC_Cantos_HT_Away", get_val(linha_cantos, "MC_Cantos_HT_Away", "{:.2f}"))
+# =========================
+# HT
+# =========================
+st.metric("MF_Cantos_HT_Home", get_val(linha_cantos, "MF_Cantos_HT_Home", "{:.2f}"))
+st.metric("MF_Cantos_HT_Away", get_val(linha_cantos, "MF_Cantos_HT_Away", "{:.2f}"))
+st.metric("MC_Cantos_HT_Home", get_val(linha_cantos, "MC_Cantos_HT_Home", "{:.2f}"))
+st.metric("MC_Cantos_HT_Away", get_val(linha_cantos, "MC_Cantos_HT_Away", "{:.2f}"))
 
-    # =========================
-    # FT
-    # =========================
-    st.metric("MF_Cantos_FT_Home", get_val(linha_cantos, "MF_Cantos_FT_Home", "{:.2f}"))
-    st.metric("MF_Cantos_FT_Away", get_val(linha_cantos, "MF_Cantos_FT_Away", "{:.2f}"))
-    st.metric("MC_Cantos_FT_Home", get_val(linha_cantos, "MC_Cantos_FT_Home", "{:.2f}"))
-    st.metric("MC_Cantos_FT_Away", get_val(linha_cantos, "MC_Cantos_FT_Away", "{:.2f}"))
+# =========================
+# FT
+# =========================
+st.metric("MF_Cantos_FT_Home", get_val(linha_cantos, "MF_Cantos_FT_Home", "{:.2f}"))
+st.metric("MF_Cantos_FT_Away", get_val(linha_cantos, "MF_Cantos_FT_Away", "{:.2f}"))
+st.metric("MC_Cantos_FT_Home", get_val(linha_cantos, "MC_Cantos_FT_Home", "{:.2f}"))
+st.metric("MC_Cantos_FT_Away", get_val(linha_cantos, "MC_Cantos_FT_Away", "{:.2f}"))
 
     # =========================
     # CV
