@@ -2267,3 +2267,76 @@ Indicadores para análise de mercado:
 
 🚀 Esta aba fará parte do modelo avançado de análise do **Skynet** para mercados de escanteios.
 """)
+
+
+
+
+
+# Expectativa_Cantos
+# MF_Cantos_HT_Home
+# MF_Cantos_HT_Away
+# MC_Cantos_HT_Home
+# MC_Cantos_HT_Away
+# MF_Cantos_FT_Home
+# MF_Cantos_FT_Away
+# MC_Cantos_FT_Home
+# MC_Cantos_FT_Away
+# Mais_Cantos_Home
+# Mais_Cantos_Away
+# CV_Cantos_HT_Home
+# CV_Cantos_HT_Away
+# CV_Cantos_FT_Home
+# CV_Cantos_FT_Away
+# MF_Cantos_37HT_Home
+# MF_Cantos_37HT_Away
+# MC_Cantos_37HT_Home
+# MC_Cantos_37HT_Away
+# MF_Cantos_80FT_Home
+# MF_Cantos_80FT_Away
+# MC_Cantos_80FT_Home
+# MC_Cantos_80FT_Away
+# MF_Cantos_87FT_Home
+# MF_Cantos_87FT_Away
+# MC_Cantos_87FT_Home
+# MC_Cantos_87FT_Away
+# R3_Home
+# R3_Away
+# R5_Home
+# R5_Away
+# R7_Home
+# R7_Away
+# R9_Home
+# R9_Away
+# M4_Cantos_HT
+# M5_Cantos_HT
+# M4_Cantos_2NDT
+# M5_Cantos_2NDT
+# M7,5_Cantos_FT
+# M8,5_Cantos_FT
+# M9,5_Cantos_FT
+# Dominio_Ofensivo
+# Dominio_Ofensivo_Num
+# Score_Cantos_Home
+# Score_Cantos_Away
+# Dominio_Cantos
+# CPI_Home
+# CPI_Away
+# CPI_Total
+# CPG
+# Value_Signal
+# Race_Dom_Home
+# Race_Dom_Away
+# Race_Total
+# Corner_Pace_Factor
+# Corner_Explosion_Index
+# CMI
+# Trap_Signal
+# Lambda_Cantos_Home
+# Lambda_Cantos_Away
+# Placar_Cantos_Mais_Provavel
+# Prob_Over8_5_Cantos
+# Prob_Over9_5_Cantos
+# Prob_Over10_5_Cantos
+# Odd_Justa_Over8_5_Cantos
+# Odd_Justa_Over9_5_Cantos
+# Odd_Justa_Over10_5_Cantos
