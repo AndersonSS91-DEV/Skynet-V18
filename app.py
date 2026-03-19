@@ -2226,9 +2226,6 @@ with c6:
     st.metric("Força Defesa Away (%)", get_val(linha_cantos, "FDA", "{:.2f}"))
     st.metric("Clean Games Away (%)", get_val(linha_cantos, "Clean_Games_A"))
 
-
-
-
 st.markdown("""
 ### 📊 Roadmap da Aba de Escanteios
 
