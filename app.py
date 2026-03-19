@@ -2267,11 +2267,6 @@ Indicadores para análise de mercado:
 🚀 Esta aba fará parte do modelo avançado de análise do **Skynet** para mercados de escanteios.
 """)
 
-    st.metric("Posse Home (%)", get_val(linha_cantos, "Posse_Bola_Home", "{:.2f}"))
-    st.metric("PPJH", get_val(linha_cantos, "PPJH", "{:.2f}"))
-    st.metric("Pressão_Média_Home (%)", get_val(linha_cantos, "Pressão_Média_Home", "{:.2f}"))
-    st.metric("APPM_Home", get_val(linha_cantos, "APPM_Home", "{:.2f}"))
-
 
 # =========================================
 # EXPECTATIVA
