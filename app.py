@@ -2227,47 +2227,8 @@ with c6:
     st.metric("Clean Games Away (%)", get_val(linha_cantos, "Clean_Games_A"))
 
 st.markdown("""
-### 📊 Roadmap da Aba de Escanteios
-
----
+### 📊 Roadmap da Aba de Escanteios---
 """)
-
-### ⚡ Fase 1 — Dados Base
-Serão exibidas as principais métricas de escanteios:
-
-• Escanteios feitos  
-• Escanteios concedidos  
-• Média de escanteios (últimos 5 jogos)  
-• Posse de bola  
-• Ataques perigosos  
-
----
-
-### 🧠 Fase 2 — Modelo Estatístico
-
-Cálculo dos escanteios esperados:
-
-• **ExC_H** — Escanteios esperados do mandante  
-• **ExC_A** — Escanteios esperados do visitante  
-• **ExC_Total** — Total esperado de escanteios  
-
----
-
-### 🎯 Fase 3 — Tomada de Decisão
-
-Indicadores para análise de mercado:
-
-• **Probabilidade Over 8.5**  
-• **Probabilidade Over 9.5**  
-• **Corner Dominance**  
-• **Value Bet em escanteios**  
-
----
-
-🚀 Esta aba fará parte do modelo avançado de análise do **Skynet** para mercados de escanteios.
-""")
-
-
 # =========================================
 # EXPECTATIVA
 # =========================================
