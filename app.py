@@ -2201,14 +2201,19 @@ c1, c2, c3, c4, c5, c6 = st.columns(6)
 with c1:
     st.metric("Posse Home (%)", get_val(linha_cantos, "Posse_Bola_Home", "{:.2f}"))
     st.metric("PPJH", get_val(linha_cantos, "PPJH", "{:.2f}"))
+    st.metric("Pressão_Média_Home (%)", get_val(linha_cantos, "Pressão_Média_Home", "{:.2f}"))
+    st.metric("APPM_Home", get_val(linha_cantos, "APPM_Home", "{:.2f}"))
     
 with c2:
     st.metric("Posse Away (%)", get_val(linha_cantos, "Posse_Bola_Away", "{:.2f}"))
     st.metric("PPJA", get_val(linha_cantos, "PPJA", "{:.2f}"))
+    st.metric("Pressão_Média_Away (%)", get_val(linha_cantos, "Pressão_Média_Away", "{:.2f}"))
+    st.metric("APPM_Away", get_val(linha_cantos, "APPM_Away", "{:.2f}"))
     
 with c3:
     st.metric("Força Ataque Home (%)", get_val(linha_cantos, "FAH", "{:.2f}"))
     st.metric("Precisão Chutes H (%)", get_val(linha_cantos, "Precisao_CG_H", "{:.2f}"))
+    
 
 with c4:
     st.metric("Força Ataque Away (%)", get_val(linha_cantos, "FAA", "{:.2f}"))
