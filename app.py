@@ -2226,100 +2226,7 @@ with c6:
     st.metric("Força Defesa Away (%)", get_val(linha_cantos, "FDA", "{:.2f}"))
     st.metric("Clean Games Away (%)", get_val(linha_cantos, "Clean_Games_A"))
 
-# =========================
-# EXPECTATIVA
-# =========================
-st.metric("Expectativa_Cantos", get_val(linha_cantos, "Expectativa_Cantos", "{:.2f}"))
 
-# =========================
-# HT
-# =========================
-st.metric("MF_Cantos_HT_Home", get_val(linha_cantos, "MF_Cantos_HT_Home", "{:.2f}"))
-st.metric("MF_Cantos_HT_Away", get_val(linha_cantos, "MF_Cantos_HT_Away", "{:.2f}"))
-st.metric("MC_Cantos_HT_Home", get_val(linha_cantos, "MC_Cantos_HT_Home", "{:.2f}"))
-st.metric("MC_Cantos_HT_Away", get_val(linha_cantos, "MC_Cantos_HT_Away", "{:.2f}"))
-
-# =========================
-# FT
-# =========================
-st.metric("MF_Cantos_FT_Home", get_val(linha_cantos, "MF_Cantos_FT_Home", "{:.2f}"))
-st.metric("MF_Cantos_FT_Away", get_val(linha_cantos, "MF_Cantos_FT_Away", "{:.2f}"))
-st.metric("MC_Cantos_FT_Home", get_val(linha_cantos, "MC_Cantos_FT_Home", "{:.2f}"))
-st.metric("MC_Cantos_FT_Away", get_val(linha_cantos, "MC_Cantos_FT_Away", "{:.2f}"))
-
-# =========================
-# CV
-# =========================
-st.metric("CV_Cantos_HT_Home", get_val(linha_cantos, "CV_Cantos_HT_Home", "{:.2f}"))
-st.metric("CV_Cantos_HT_Away", get_val(linha_cantos, "CV_Cantos_HT_Away", "{:.2f}"))
-st.metric("CV_Cantos_FT_Home", get_val(linha_cantos, "CV_Cantos_FT_Home", "{:.2f}"))
-st.metric("CV_Cantos_FT_Away", get_val(linha_cantos, "CV_Cantos_FT_Away", "{:.2f}"))
-
-# =========================
-# OUTROS
-# =========================
-st.metric("Mais_Cantos_Home", get_val(linha_cantos, "Mais_Cantos_Home"))
-st.metric("Mais_Cantos_Away", get_val(linha_cantos, "Mais_Cantos_Away"))
-
-# =========================
-# JANELAS
-# =========================
-st.metric("MF_Cantos_37HT_Home", get_val(linha_cantos, "MF_Cantos_37HT_Home", "{:.2f}"))
-st.metric("MF_Cantos_37HT_Away", get_val(linha_cantos, "MF_Cantos_37HT_Away", "{:.2f}"))
-st.metric("MC_Cantos_37HT_Home", get_val(linha_cantos, "MC_Cantos_37HT_Home", "{:.2f}"))
-st.metric("MC_Cantos_37HT_Away", get_val(linha_cantos, "MC_Cantos_37HT_Away", "{:.2f}"))
-
-st.metric("MF_Cantos_80FT_Home", get_val(linha_cantos, "MF_Cantos_80FT_Home", "{:.2f}"))
-st.metric("MF_Cantos_80FT_Away", get_val(linha_cantos, "MF_Cantos_80FT_Away", "{:.2f}"))
-st.metric("MC_Cantos_80FT_Home", get_val(linha_cantos, "MC_Cantos_80FT_Home", "{:.2f}"))
-st.metric("MC_Cantos_80FT_Away", get_val(linha_cantos, "MC_Cantos_80FT_Away", "{:.2f}"))
-
-st.metric("MF_Cantos_87FT_Home", get_val(linha_cantos, "MF_Cantos_87FT_Home", "{:.2f}"))
-st.metric("MF_Cantos_87FT_Away", get_val(linha_cantos, "MF_Cantos_87FT_Away", "{:.2f}"))
-st.metric("MC_Cantos_87FT_Home", get_val(linha_cantos, "MC_Cantos_87FT_Home", "{:.2f}"))
-st.metric("MC_Cantos_87FT_Away", get_val(linha_cantos, "MC_Cantos_87FT_Away", "{:.2f}"))
-
-# =========================
-# DISTRIBUIÇÃO
-# =========================
-st.metric("R3_Home", get_val(linha_cantos, "R3_Home", "{:.2f}"))
-st.metric("R3_Away", get_val(linha_cantos, "R3_Away", "{:.2f}"))
-st.metric("R5_Home", get_val(linha_cantos, "R5_Home", "{:.2f}"))
-st.metric("R5_Away", get_val(linha_cantos, "R5_Away", "{:.2f}"))
-st.metric("R7_Home", get_val(linha_cantos, "R7_Home", "{:.2f}"))
-st.metric("R7_Away", get_val(linha_cantos, "R7_Away", "{:.2f}"))
-st.metric("R9_Home", get_val(linha_cantos, "R9_Home", "{:.2f}"))
-st.metric("R9_Away", get_val(linha_cantos, "R9_Away", "{:.2f}"))
-
-# =========================
-# MERCADOS
-# =========================
-st.metric("M4_Cantos_HT", get_val(linha_cantos, "M4_Cantos_HT", "{:.2f}"))
-st.metric("M5_Cantos_HT", get_val(linha_cantos, "M5_Cantos_HT", "{:.2f}"))
-st.metric("M4_Cantos_2NDT", get_val(linha_cantos, "M4_Cantos_2NDT", "{:.2f}"))
-st.metric("M5_Cantos_2NDT", get_val(linha_cantos, "M5_Cantos_2NDT", "{:.2f}"))
-
-st.metric("M7,5_Cantos_FT", get_val(linha_cantos, "M7,5_Cantos_FT", "{:.2f}"))
-st.metric("M8,5_Cantos_FT", get_val(linha_cantos, "M8,5_Cantos_FT", "{:.2f}"))
-st.metric("M9,5_Cantos_FT", get_val(linha_cantos, "M9,5_Cantos_FT", "{:.2f}"))
-
-# =========================
-# MODELO
-# =========================
-st.metric("Dominio_Ofensivo", get_val(linha_cantos, "Dominio_Ofensivo"))
-st.metric("Dominio_Ofensivo_Num", get_val(linha_cantos, "Dominio_Ofensivo_Num", "{:.2f}"))
-
-st.metric("Score_Cantos_Home", get_val(linha_cantos, "Score_Cantos_Home", "{:.2f}"))
-st.metric("Score_Cantos_Away", get_val(linha_cantos, "Score_Cantos_Away", "{:.2f}"))
-
-st.metric("Dominio_Cantos", get_val(linha_cantos, "Dominio_Cantos"))
-
-st.metric("CPI_Home", get_val(linha_cantos, "CPI_Home", "{:.2f}"))
-st.metric("CPI_Away", get_val(linha_cantos, "CPI_Away", "{:.2f}"))
-st.metric("CPI_Total", get_val(linha_cantos, "CPI_Total", "{:.2f}"))
-
-st.metric("CPG", get_val(linha_cantos, "CPG", "{:.2f}"))
-st.metric("Value_Signal", get_val(linha_cantos, "Value_Signal"))
 
 
 st.markdown("""
@@ -2366,5 +2273,125 @@ Indicadores para análise de mercado:
     st.metric("PPJH", get_val(linha_cantos, "PPJH", "{:.2f}"))
     st.metric("Pressão_Média_Home (%)", get_val(linha_cantos, "Pressão_Média_Home", "{:.2f}"))
     st.metric("APPM_Home", get_val(linha_cantos, "APPM_Home", "{:.2f}"))
+
+
+# =========================================
+# EXPECTATIVA
+# =========================================
+# Expectativa_Cantos
+
+# =========================================
+# HT (1º TEMPO)
+# =========================================
+# MF_Cantos_HT_Home
+# MF_Cantos_HT_Away
+# MC_Cantos_HT_Home
+# MC_Cantos_HT_Away
+
+# CV_Cantos_HT_Home
+# CV_Cantos_HT_Away
+
+# M4_Cantos_HT
+# M5_Cantos_HT
+
+# =========================================
+# FT (JOGO COMPLETO)
+# =========================================
+# MF_Cantos_FT_Home
+# MF_Cantos_FT_Away
+# MC_Cantos_FT_Home
+# MC_Cantos_FT_Away
+
+# CV_Cantos_FT_Home
+# CV_Cantos_FT_Away
+
+# M7,5_Cantos_FT
+# M8,5_Cantos_FT
+# M9,5_Cantos_FT
+
+# =========================================
+# JANELAS (TIMING DO JOGO)
+# =========================================
+# MF_Cantos_37HT_Home
+# MF_Cantos_37HT_Away
+# MC_Cantos_37HT_Home
+# MC_Cantos_37HT_Away
+
+# MF_Cantos_80FT_Home
+# MF_Cantos_80FT_Away
+# MC_Cantos_80FT_Home
+# MC_Cantos_80FT_Away
+
+# MF_Cantos_87FT_Home
+# MF_Cantos_87FT_Away
+# MC_Cantos_87FT_Home
+# MC_Cantos_87FT_Away
+
+# =========================================
+# DISTRIBUIÇÃO (RANGES)
+# =========================================
+# R3_Home
+# R3_Away
+# R5_Home
+# R5_Away
+# R7_Home
+# R7_Away
+# R9_Home
+# R9_Away
+
+# =========================================
+# RESULTADO / DOMÍNIO
+# =========================================
+# Mais_Cantos_Home
+# Mais_Cantos_Away
+
+# Dominio_Ofensivo
+# Dominio_Ofensivo_Num
+# Dominio_Cantos
+
+# =========================================
+# SCORE / PRESSÃO
+# =========================================
+# Score_Cantos_Home
+# Score_Cantos_Away
+
+# CPI_Home
+# CPI_Away
+# CPI_Total
+
+# CPG
+# Value_Signal
+
+# =========================================
+# RITMO DO JOGO
+# =========================================
+# Race_Dom_Home
+# Race_Dom_Away
+# Race_Total
+
+# Corner_Pace_Factor
+# Corner_Explosion_Index
+# CMI
+
+# =========================================
+# ALERTAS
+# =========================================
+# Trap_Signal
+
+# =========================================
+# POISSON (CANTOS)
+# =========================================
+# Lambda_Cantos_Home
+# Lambda_Cantos_Away
+
+# Placar_Cantos_Mais_Provavel
+
+# Prob_Over8_5_Cantos
+# Prob_Over9_5_Cantos
+# Prob_Over10_5_Cantos
+
+# Odd_Justa_Over8_5_Cantos
+# Odd_Justa_Over9_5_Cantos
+# Odd_Justa_Over10_5_Cantos
 
 
