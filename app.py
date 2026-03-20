@@ -1066,9 +1066,9 @@ def cards_ofensivos(radar_home, radar_away, ief_home, ief_away, exg_total):
     tendencia = tendencia_gols(ief_home, ief_away, exg_total)
 
     if tendencia == "ALTÍSSIMA":
-        st.error("🚨🔥⚽🚨🔥⚽ Altíssima tendência de gols")
+        st.error("🚨🔥⚽🚨🔥⚽ Altíssima Tendência de Gols")
     elif tendencia == "ALTA":
-        st.warning("🔥⚽🔥⚽ Tendência alta de gols")
+        st.warning("🔥⚽🔥⚽ Tendência Pelo Menos Um Gol")
     else:
         st.info(f"Tendência: {tendencia}")
 
@@ -1098,16 +1098,16 @@ def score_defensivo(fd, clean_sheet, chs, mgc):
 def classificar_defesa(score):
 
     if score >= 60:
-        return "⛰️🚫⚽ Defesa MUITO sólida"
+        return "⛰️🚫⚽ Defesa MUITO Sólida"
 
     elif score >= 55:
-        return "🛡️🚫⚽ Defesa confiável"
+        return "🛡️🚫⚽ Defesa Confiável"
 
     elif score >= 45:
-        return "⚠️🚫⚽ Defesa instável"
+        return "⚠️🚫⚽ Defesa Instável"
 
     else:
-        return "🔥🔥🔥⚽⚽⚽Defesa vulnerável"
+        return "🔥⚽🔥⚽ Defesa Vulnerável"
 
 # 🎨 BTTS (NOVO)
 def calcular_btts_e_odd(matriz):
@@ -2193,77 +2193,158 @@ with tab5:
 # =========================================
 # ABA 6 — ESCANTEIOS
 # =========================================
+with tab6:
 
-st.markdown("### 📊📈 Dados Gerais")
+    st.markdown("### 📊📈 Dados Gerais")
 
-c1, c2, c3, c4, c5, c6 = st.columns(6)
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
 
-with c1:
-    st.metric("Posse Home (%)", get_val(linha_cantos, "Posse_Bola_Home", "{:.2f}"))
-    st.metric("PPJH", get_val(linha_cantos, "PPJH", "{:.2f}"))
-    st.metric("Pressão_Média_Home (%)", get_val(linha_cantos, "Pressão_Média_Home", "{:.2f}"))
-    st.metric("APPM_Home", get_val(linha_cantos, "APPM_Home", "{:.2f}"))
-    
-with c2:
-    st.metric("Posse Away (%)", get_val(linha_cantos, "Posse_Bola_Away", "{:.2f}"))
-    st.metric("PPJA", get_val(linha_cantos, "PPJA", "{:.2f}"))
-    st.metric("Pressão_Média_Away (%)", get_val(linha_cantos, "Pressão_Média_Away", "{:.2f}"))
-    st.metric("APPM_Away", get_val(linha_cantos, "APPM_Away", "{:.2f}"))
-    
-with c3:
-    st.metric("Força Ataque Home (%)", get_val(linha_cantos, "FAH", "{:.2f}"))
-    st.metric("Precisão Chutes H (%)", get_val(linha_cantos, "Precisao_CG_H", "{:.2f}"))
-    
+    with c1:
+        st.metric("Posse Home (%)", get_val(linha_cantos, "Posse_Bola_Home", "{:.2f}"))
+        st.metric("PPJH", get_val(linha_cantos, "PPJH", "{:.2f}"))
+        st.metric("Pressão Média Home (%)", get_val(linha_cantos, "Pressão_Média_Home", "{:.2f}"))
+        st.metric("APPM Home", get_val(linha_cantos, "APPM_Home", "{:.2f}"))
 
-with c4:
-    st.metric("Força Ataque Away (%)", get_val(linha_cantos, "FAA", "{:.2f}"))
-    st.metric("Precisão Chutes A (%)", get_val(linha_cantos, "Precisao_CG_A", "{:.2f}"))
-              
-with c5:
-    st.metric("Força Defesa Home (%)", get_val(linha_cantos, "FDH", "{:.2f}"))
-    st.metric("Clean Games Home (%)", get_val(linha_cantos, "Clean_Games_H"))
-    
-with c6:
-    st.metric("Força Defesa Away (%)", get_val(linha_cantos, "FDA", "{:.2f}"))
-    st.metric("Clean Games Away (%)", get_val(linha_cantos, "Clean_Games_A"))
+    with c2:
+        st.metric("Posse Away (%)", get_val(linha_cantos, "Posse_Bola_Away", "{:.2f}"))
+        st.metric("PPJA", get_val(linha_cantos, "PPJA", "{:.2f}"))
+        st.metric("Pressão Média Away (%)", get_val(linha_cantos, "Pressão_Média_Away", "{:.2f}"))
+        st.metric("APPM Away", get_val(linha_cantos, "APPM_Away", "{:.2f}"))
+
+    with c3:
+        st.metric("Força Ataque Home (%)", get_val(linha_cantos, "FAH", "{:.2f}"))
+        st.metric("Precisão Chutes H (%)", get_val(linha_exg, "Precisao_CG_H", "{:.2f}"))
+
+    with c4:
+        st.metric("Força Ataque Away (%)", get_val(linha_cantos, "FAA", "{:.2f}"))
+        st.metric("Precisão Chutes A (%)", get_val(linha_exg, "Precisao_CG_A", "{:.2f}"))
+
+    with c5:
+        st.metric("Força Defesa Home (%)", get_val(linha_cantos, "FDH", "{:.2f}"))
+        st.metric("Clean Games Home (%)", get_val(linha_exg, "Clean_Games_H"))
+
+    with c6:
+        st.metric("Força Defesa Away (%)", get_val(linha_cantos, "FDA", "{:.2f}"))
+        st.metric("Clean Games Away (%)", get_val(linha_exg, "Clean_Games_A"))
+
+    st.markdown("### 📊 Roadmap da Aba de Escanteios---")
+# =========================================
+# EXPECTATIVA
+# =========================================
+# Expectativa_Cantos
+
+# =========================================
+# HT (1º TEMPO)
+# =========================================
+# MF_Cantos_HT_Home
+# MF_Cantos_HT_Away
+# MC_Cantos_HT_Home
+# MC_Cantos_HT_Away
+
+# CV_Cantos_HT_Home
+# CV_Cantos_HT_Away
+
+# M4_Cantos_HT
+# M5_Cantos_HT
+
+# =========================================
+# FT (JOGO COMPLETO)
+# =========================================
+# MF_Cantos_FT_Home
+# MF_Cantos_FT_Away
+# MC_Cantos_FT_Home
+# MC_Cantos_FT_Away
+
+# CV_Cantos_FT_Home
+# CV_Cantos_FT_Away
+
+# M7,5_Cantos_FT
+# M8,5_Cantos_FT
+# M9,5_Cantos_FT
+
+# =========================================
+# JANELAS (TIMING DO JOGO)
+# =========================================
+# MF_Cantos_37HT_Home
+# MF_Cantos_37HT_Away
+# MC_Cantos_37HT_Home
+# MC_Cantos_37HT_Away
+
+# MF_Cantos_80FT_Home
+# MF_Cantos_80FT_Away
+# MC_Cantos_80FT_Home
+# MC_Cantos_80FT_Away
+
+# MF_Cantos_87FT_Home
+# MF_Cantos_87FT_Away
+# MC_Cantos_87FT_Home
+# MC_Cantos_87FT_Away
+
+# =========================================
+# DISTRIBUIÇÃO (RANGES)
+# =========================================
+# R3_Home
+# R3_Away
+# R5_Home
+# R5_Away
+# R7_Home
+# R7_Away
+# R9_Home
+# R9_Away
+
+# =========================================
+# RESULTADO / DOMÍNIO
+# =========================================
+# Mais_Cantos_Home
+# Mais_Cantos_Away
+
+# Dominio_Ofensivo
+# Dominio_Ofensivo_Num
+# Dominio_Cantos
+
+# =========================================
+# SCORE / PRESSÃO
+# =========================================
+# Score_Cantos_Home
+# Score_Cantos_Away
+
+# CPI_Home
+# CPI_Away
+# CPI_Total
+
+# CPG
+# Value_Signal
+
+# =========================================
+# RITMO DO JOGO
+# =========================================
+# Race_Dom_Home
+# Race_Dom_Away
+# Race_Total
+
+# Corner_Pace_Factor
+# Corner_Explosion_Index
+# CMI
+
+# =========================================
+# ALERTAS
+# =========================================
+# Trap_Signal
+
+# =========================================
+# POISSON (CANTOS)
+# =========================================
+# Lambda_Cantos_Home
+# Lambda_Cantos_Away
+
+# Placar_Cantos_Mais_Provavel
+
+# Prob_Over8_5_Cantos
+# Prob_Over9_5_Cantos
+# Prob_Over10_5_Cantos
+
+# Odd_Justa_Over8_5_Cantos
+# Odd_Justa_Over9_5_Cantos
+# Odd_Justa_Over10_5_Cantos
 
 
-st.markdown("""
-### 📊 Roadmap da Aba de Escanteios
-
----
-
-### ⚡ Fase 1 — Dados Base
-Serão exibidas as principais métricas de escanteios:
-
-• Escanteios feitos  
-• Escanteios concedidos  
-• Média de escanteios (últimos 5 jogos)  
-• Posse de bola  
-• Ataques perigosos  
-
----
-
-### 🧠 Fase 2 — Modelo Estatístico
-
-Cálculo dos escanteios esperados:
-
-• **ExC_H** — Escanteios esperados do mandante  
-• **ExC_A** — Escanteios esperados do visitante  
-• **ExC_Total** — Total esperado de escanteios  
-
----
-
-### 🎯 Fase 3 — Tomada de Decisão
-
-Indicadores para análise de mercado:
-
-• **Probabilidade Over 8.5**  
-• **Probabilidade Over 9.5**  
-• **Corner Dominance**  
-• **Value Bet em escanteios**  
-
----
-
-🚀 Esta aba fará parte do modelo avançado de análise do **Skynet** para mercados de escanteios.
-""")
