@@ -1066,9 +1066,9 @@ def cards_ofensivos(radar_home, radar_away, ief_home, ief_away, exg_total):
     tendencia = tendencia_gols(ief_home, ief_away, exg_total)
 
     if tendencia == "ALTÍSSIMA":
-        st.error("🚨🔥⚽🚨🔥⚽ Altíssima tendência de gols")
+        st.error("🚨🔥⚽🚨🔥⚽ Altíssima Tendência de Gols")
     elif tendencia == "ALTA":
-        st.warning("🔥⚽🔥⚽ Tendência alta de gols")
+        st.warning("🔥⚽🔥⚽ Tendência Pelo Menos Um Gol")
     else:
         st.info(f"Tendência: {tendencia}")
 
