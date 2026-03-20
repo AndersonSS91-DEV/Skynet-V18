@@ -2227,6 +2227,23 @@ with tab6:
         st.metric("Força Defesa Away (%)", get_val(linha_cantos, "FDA", "{:.2f}"))
         st.metric("Clean Games Away (%)", get_val(linha_exg, "Clean_Games_A"))
 
+    st.markdown("---")
+
+    
+# ===== ODDS (RESTAURADAS) =====
+    st.markdown("### 🚩 Escanteios")
+    a1, a2, a3 = st.columns(3)
+
+    with a1:
+        st.metric("Expectativa_Cantos", get_val(linha_cantos, "Expectativa_Cantos", "{:.2f}"))
+
+    with a2:
+        st.metric("Expectativa_Cantos", get_val(linha_cantos, "Expectativa_Cantos", "{:.2f}"))
+
+    with a3:
+        st.metric("Expectativa_Cantos", get_val(linha_cantos, "Expectativa_Cantos", "{:.2f}"))
+
+
     st.markdown("### 📊 Roadmap da Aba de Escanteios---")
 # =========================================
 # EXPECTATIVA
