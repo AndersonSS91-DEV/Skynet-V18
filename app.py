@@ -2193,42 +2193,41 @@ with tab5:
 # =========================================
 # ABA 6 — ESCANTEIOS
 # =========================================
+with tab6:
 
-st.markdown("### 📊📈 Dados Gerais")
+    st.markdown("### 📊📈 Dados Gerais")
 
-c1, c2, c3, c4, c5, c6 = st.columns(6)
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
 
-with c1:
-    st.metric("Posse Home (%)", get_val(linha_cantos, "Posse_Bola_Home", "{:.2f}"))
-    st.metric("PPJH", get_val(linha_cantos, "PPJH", "{:.2f}"))
-    st.metric("Pressão Média Home (%)", get_val(linha_cantos, "Pressão_Média_Home", "{:.2f}"))
-    st.metric("APPM Home", get_val(linha_cantos, "APPM_Home", "{:.2f}"))
+    with c1:
+        st.metric("Posse Home (%)", get_val(linha_cantos, "Posse_Bola_Home", "{:.2f}"))
+        st.metric("PPJH", get_val(linha_cantos, "PPJH", "{:.2f}"))
+        st.metric("Pressão Média Home (%)", get_val(linha_cantos, "Pressão_Média_Home", "{:.2f}"))
+        st.metric("APPM Home", get_val(linha_cantos, "APPM_Home", "{:.2f}"))
 
-with c2:
-    st.metric("Posse Away (%)", get_val(linha_cantos, "Posse_Bola_Away", "{:.2f}"))
-    st.metric("PPJA", get_val(linha_cantos, "PPJA", "{:.2f}"))
-    st.metric("Pressão Média Away (%)", get_val(linha_cantos, "Pressão_Média_Away", "{:.2f}"))
-    st.metric("APPM Away", get_val(linha_cantos, "APPM_Away", "{:.2f}"))
+    with c2:
+        st.metric("Posse Away (%)", get_val(linha_cantos, "Posse_Bola_Away", "{:.2f}"))
+        st.metric("PPJA", get_val(linha_cantos, "PPJA", "{:.2f}"))
+        st.metric("Pressão Média Away (%)", get_val(linha_cantos, "Pressão_Média_Away", "{:.2f}"))
+        st.metric("APPM Away", get_val(linha_cantos, "APPM_Away", "{:.2f}"))
 
-with c3:
-    st.metric("Força Ataque Home (%)", get_val(linha_cantos, "FAH", "{:.2f}"))
-    st.metric("Precisão Chutes H (%)", get_val(linha_cantos, "Precisao_CG_H", "{:.2f}"))
+    with c3:
+        st.metric("Força Ataque Home (%)", get_val(linha_cantos, "FAH", "{:.2f}"))
+        st.metric("Precisão Chutes H (%)", get_val(linha_cantos, "Precisao_CG_H", "{:.2f}"))
 
-with c4:
-    st.metric("Força Ataque Away (%)", get_val(linha_cantos, "FAA", "{:.2f}"))
-    st.metric("Precisão Chutes A (%)", get_val(linha_cantos, "Precisao_CG_A", "{:.2f}"))
+    with c4:
+        st.metric("Força Ataque Away (%)", get_val(linha_cantos, "FAA", "{:.2f}"))
+        st.metric("Precisão Chutes A (%)", get_val(linha_cantos, "Precisao_CG_A", "{:.2f}"))
 
-with c5:
-    st.metric("Força Defesa Home (%)", get_val(linha_cantos, "FDH", "{:.2f}"))
-    st.metric("Clean Games Home (%)", get_val(linha_cantos, "Clean_Games_H"))
+    with c5:
+        st.metric("Força Defesa Home (%)", get_val(linha_cantos, "FDH", "{:.2f}"))
+        st.metric("Clean Games Home (%)", get_val(linha_cantos, "Clean_Games_H"))
 
-with c6:
-    st.metric("Força Defesa Away (%)", get_val(linha_cantos, "FDA", "{:.2f}"))
-    st.metric("Clean Games Away (%)", get_val(linha_cantos, "Clean_Games_A"))
+    with c6:
+        st.metric("Força Defesa Away (%)", get_val(linha_cantos, "FDA", "{:.2f}"))
+        st.metric("Clean Games Away (%)", get_val(linha_cantos, "Clean_Games_A"))
 
-st.markdown("""
-### 📊 Roadmap da Aba de Escanteios---
-""")
+    st.markdown("### 📊 Roadmap da Aba de Escanteios---")
 # =========================================
 # EXPECTATIVA
 # =========================================
