@@ -2213,19 +2213,19 @@ with tab6:
 
     with c3:
         st.metric("Força Ataque Home (%)", get_val(linha_cantos, "FAH", "{:.2f}"))
-        st.metric("Precisão Chutes H (%)", get_val(linha_cantos, "Precisao_CG_H", "{:.2f}"))
+        st.metric("Precisão Chutes H (%)", get_val(linha_exg, "Precisao_CG_H", "{:.2f}"))
 
     with c4:
         st.metric("Força Ataque Away (%)", get_val(linha_cantos, "FAA", "{:.2f}"))
-        st.metric("Precisão Chutes A (%)", get_val(linha_cantos, "Precisao_CG_A", "{:.2f}"))
+        st.metric("Precisão Chutes A (%)", get_val(linha_exg, "Precisao_CG_A", "{:.2f}"))
 
     with c5:
         st.metric("Força Defesa Home (%)", get_val(linha_cantos, "FDH", "{:.2f}"))
-        st.metric("Clean Games Home (%)", get_val(linha_cantos, "Clean_Games_H"))
+        st.metric("Clean Games Home (%)", get_val(linha_exg, "Clean_Games_H"))
 
     with c6:
         st.metric("Força Defesa Away (%)", get_val(linha_cantos, "FDA", "{:.2f}"))
-        st.metric("Clean Games Away (%)", get_val(linha_cantos, "Clean_Games_A"))
+        st.metric("Clean Games Away (%)", get_val(linha_exg, "Clean_Games_A"))
 
     st.markdown("### 📊 Roadmap da Aba de Escanteios---")
 # =========================================
