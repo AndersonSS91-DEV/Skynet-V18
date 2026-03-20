@@ -2232,23 +2232,34 @@ with tab6:
     
 # ===== ODDS (RESTAURADAS) =====
     st.markdown("### 🚩 Escanteios")
-    a1, a2, a3 = st.columns(3)
+    a1, a2, a3, a4, a5 = st.columns(5)
 
     with a1:
         st.metric("Expectativa_Cantos", get_val(linha_cantos, "Expectativa_Cantos", "{:.2f}"))
 
     with a2:
-        st.metric("Expectativa_Cantos", get_val(linha_cantos, "Expectativa_Cantos", "{:.2f}"))
-
+        st.metric("Cantos Marcados; Média (FT_Home)", get_val(linha_cantos, "MF_Cantos_FT_Home", "{:.2f}"))
+        st.metric("Cantos Marcados; Média (HT_Home)", get_val(linha_cantos, "MF_Cantos_HT_Home", "{:.2f}"))
+        
     with a3:
-        st.metric("Expectativa_Cantos", get_val(linha_cantos, "Expectativa_Cantos", "{:.2f}"))
+        st.metric("Cantos Marcados; Média  (FT_Away)", get_val(linha_cantos, "MF_Cantos_FT_Away", "{:.2f}"))
+        st.metric("Cantos Marcados; Média  (HT_Away)", get_val(linha_cantos, "MF_Cantos_HT_Away", "{:.2f}"))
+        
+    with a4:
+        st.metric("Cantos Sofridos; Média  (FT_Home)", get_val(linha_cantos, "MC_Cantos_FT_Home", "{:.2f}"))
+        st.metric("Cantos Sofridos; Média  (HT_Home)", get_val(linha_cantos, "MC_Cantos_HT_Home", "{:.2f}"))
+        
+    with a5:
+        st.metric("Cantos Sofridos; Média (FT_Away)", get_val(linha_cantos, "MC_Cantos_FT_Away", "{:.2f}"))
+        st.metric("Cantos Sofridos; Média (HT_Away)", get_val(linha_cantos, "MC_Cantos_HT_Away", "{:.2f}"))
 
-
+    
     st.markdown("### 📊 Roadmap da Aba de Escanteios---")
-# =========================================
-# EXPECTATIVA
-# =========================================
-# Expectativa_Cantos
+
+
+# M7,5_Cantos_FT
+# M8,5_Cantos_FT
+# M9,5_Cantos_FT
 
 # =========================================
 # HT (1º TEMPO)
@@ -2258,27 +2269,8 @@ with tab6:
 # MC_Cantos_HT_Home
 # MC_Cantos_HT_Away
 
-# CV_Cantos_HT_Home
-# CV_Cantos_HT_Away
-
 # M4_Cantos_HT
 # M5_Cantos_HT
-
-# =========================================
-# FT (JOGO COMPLETO)
-# =========================================
-# MF_Cantos_FT_Home
-# MF_Cantos_FT_Away
-# MC_Cantos_FT_Home
-# MC_Cantos_FT_Away
-
-# CV_Cantos_FT_Home
-# CV_Cantos_FT_Away
-
-# M7,5_Cantos_FT
-# M8,5_Cantos_FT
-# M9,5_Cantos_FT
-
 # =========================================
 # JANELAS (TIMING DO JOGO)
 # =========================================
