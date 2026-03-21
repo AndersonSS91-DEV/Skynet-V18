@@ -2313,31 +2313,51 @@ with tab6:
         st.metric("R9_Away", get_val(linha_cantos, "R9_Away", "{:.2f}"))
 
 # =========================================
-# GARANTE TODAS AS COLUNAS NA LINHA
+# GARANTE CAMPOS SEM DEPENDÊNCIA DE FUNÇÃO
 # =========================================
 
 def garantir_campos_linha(row):
 
-    # SCORE
-    if "Score_Supremo" not in row:
-        row["Score_Supremo"] = calcular_score_supremo(row)
+    # =========================
+    # SCORE SUPREMO (INLINE)
+    # =========================
+    score = 0
 
+    score += min(row.get("CPI_Total", 0) * 10, 30)
+    score += min(row.get("Corner_Pace_Factor", 0) * 20, 20)
+    score += min(row.get("Corner_Explosion_Index", 0) * 2.5, 20)
+    score += min(row.get("CMI", 0) / 2, 10)
+
+    ht_val = str(row.get("HT_Corner_Value", ""))
+
+    if "EXPLOSÃO" in ht_val:
+        score += 10
+    elif "FORTE" in ht_val:
+        score += 6
+
+    if str(row.get("Trap_Signal", "")) != "":
+        score -= 15
+
+    score = max(min(score, 100), 0)
+
+    row["Score_Supremo"] = score
+
+    # =========================
     # NIVEL
-    if "Nivel_Jogo" not in row:
-        score = row["Score_Supremo"]
-
-        if score >= 75:
-            row["Nivel_Jogo"] = "💣 ELITE"
-        elif score >= 60:
-            row["Nivel_Jogo"] = "🔥 FORTE"
-        elif score >= 45:
-            row["Nivel_Jogo"] = "⚡ MÉDIO"
-        else:
-            row["Nivel_Jogo"] = "❄️ FRACO"
+    # =========================
+    if score >= 75:
+        row["Nivel_Jogo"] = "💣 ELITE"
+    elif score >= 60:
+        row["Nivel_Jogo"] = "🔥 FORTE"
+    elif score >= 45:
+        row["Nivel_Jogo"] = "⚡ MÉDIO"
+    else:
+        row["Nivel_Jogo"] = "❄️ FRACO"
 
     return row
 
 
+# APLICA NA LINHA
 linha_cantos = garantir_campos_linha(linha_cantos)
 
                   
