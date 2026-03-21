@@ -2286,54 +2286,36 @@ with tab6:
         st.metric("Cantos Sofridos; Média (80FT_Away", get_val(linha_cantos, "MC_Cantos_80FT_Away", "{:.2f}"))
         st.metric("Cantos Marcados; Média (87FT_Away)", get_val(linha_cantos, "MF_Cantos_87FT_Away", "{:.2f}"))
         st.metric("Cantos Sofridos; Média (87FT_Away", get_val(linha_cantos, "MC_Cantos_87FT_Away", "{:.2f}"))
-         
-    st.markdown("### 📊 Roadmap da Aba de Escanteios---")
-# Dominio_Ofensivo
-# Dominio_Cantos
+
 
                   
-# =========================================
-# RITMO DO JOGO
-# =========================================
-# Race_Dom_Home
-# Race_Dom_Away
-# Race_Total
-        
-# R3_Home
-# R3_Away
-        
-# R5_Home
-# R5_Away
-        
-# R7_Home
-# R7_Away
-        
-# R9_Home
-# R9_Away
+    st.markdown("### 🚩 Dados - Race Escanteios")
+    d1, d2, d3, d4, d5 = st.columns(5)
 
-# =========================================
-# SCORE / PRESSÃO
-# =========================================
-# Score_Cantos_Home
-# Score_Cantos_Away
+    with d1:
+        st.metric("Race_Dom_Home", get_val(linha_cantos, "Race_Dom_Home", "{:.2f}"))
+        st.metric("Race_Dom_Away", get_val(linha_cantos, "Race_Dom_Away", "{:.2f}"))
+        st.metric("Race_Total", get_val(linha_cantos, "Race_Total", "{:.2f}"))
+                  
+    with d2:
+        st.metric("R3_Home", get_val(linha_cantos, "R3_Home", "{:.2f}"))
+        st.metric("R3_Away", get_val(linha_cantos, "R3_Away", "{:.2f}"))
 
-# CPI_Home
-# CPI_Away
-# CPI_Total
+    with d3:
+        st.metric("R5_Home", get_val(linha_cantos, "R5_Home", "{:.2f}"))
+        st.metric("R5_Away", get_val(linha_cantos, "R5_Away", "{:.2f}"))
+                  
+    with d4:
+        st.metric("R7_Home", get_val(linha_cantos, "R7_Home", "{:.2f}"))
+        st.metric("R7_Away", get_val(linha_cantos, "R7_Away", "{:.2f}"))
 
-# CPG
-# Value_Signal (card único)
+    with d5:
+        st.metric("R9_Home", get_val(linha_cantos, "R9_Home", "{:.2f}"))
+        st.metric("R9_Away", get_val(linha_cantos, "R9_Away", "{:.2f}"))
 
+                  
+    st.markdown("### 📊 Roadmap da Aba de Escanteios---")
 
-
-# Corner_Pace_Factor
-# Corner_Explosion_Index
-# CMI
-
-# =========================================
-# ALERTAS
-# =========================================
-# Trap_Signal (CARD)
 
 
 
