@@ -2255,51 +2255,34 @@ with tab6:
 
     
     st.markdown("### 📊 Roadmap da Aba de Escanteios---")
+# ===== ESCANTEIOS LIMITES) =====
+    st.markdown("### 🚩 Escanteios Limites")
+    b1, b2, b3, b4, b5 = st.columns(6)
 
+    with b1:
 
-# M7,5_Cantos_FT
-# M8,5_Cantos_FT
-# M9,5_Cantos_FT
+    with b2:
+        st.metric("Cantos Marcados; Média (37HT_Home)", get_val(linha_cantos, "MF_Cantos_37HT_Home", "{:.2f}"))
+        st.metric("Cantos Sofridos; Média (37HT_Home)", get_val(linha_cantos, "MC_Cantos_37HT_Home", "{:.2f}"))
 
-# =========================================
-# HT (1º TEMPO)
-# =========================================
-# MF_Cantos_HT_Home
-# MF_Cantos_HT_Away
-# MC_Cantos_HT_Home
-# MC_Cantos_HT_Away
+    with b3:
+        st.metric("Cantos Marcados; Média (37HT_Away)", get_val(linha_cantos, "MF_Cantos_37HT_Away", "{:.2f}"))
+        st.metric("Cantos Sofridos; Média (37HT_Away", get_val(linha_cantos, "MC_Cantos_37HT_Away", "{:.2f}"))
 
-# M4_Cantos_HT
-# M5_Cantos_HT
-# =========================================
-# JANELAS (TIMING DO JOGO)
-# =========================================
-# MF_Cantos_37HT_Home
-# MF_Cantos_37HT_Away
-# MC_Cantos_37HT_Home
-# MC_Cantos_37HT_Away
+    with b4:
+        st.metric("Cantos Marcados; Média (80FT_Home)", get_val(linha_cantos, "MF_Cantos_80FT_Home", "{:.2f}"))
+        st.metric("Cantos Sofridos; Média (80FT_Home)", get_val(linha_cantos, "MC_Cantos_80FT_Home", "{:.2f}"))
+        st.metric("Cantos Marcados; Média (87FT_Home)", get_val(linha_cantos, "MF_Cantos_87FT_Home", "{:.2f}"))
+        st.metric("Cantos Sofridos; Média (87FT_Home)", get_val(linha_cantos, "MC_Cantos_87FT_Home", "{:.2f}"))
+        
+    with b5:
+        st.metric("Cantos Marcados; Média (80FT_Away)", get_val(linha_cantos, "MF_Cantos_80FT_Away", "{:.2f}"))
+        st.metric("Cantos Sofridos; Média (80FT_Away", get_val(linha_cantos, "MC_Cantos_80FT_Away", "{:.2f}"))
+        st.metric("Cantos Marcados; Média (87FT_Away)", get_val(linha_cantos, "MF_Cantos_87FT_Away", "{:.2f}"))
+        st.metric("Cantos Sofridos; Média (87FT_Away", get_val(linha_cantos, "MC_Cantos_87FT_Away", "{:.2f}"))
 
-# MF_Cantos_80FT_Home
-# MF_Cantos_80FT_Away
-# MC_Cantos_80FT_Home
-# MC_Cantos_80FT_Away
-
-# MF_Cantos_87FT_Home
-# MF_Cantos_87FT_Away
-# MC_Cantos_87FT_Home
-# MC_Cantos_87FT_Away
-
-# =========================================
-# DISTRIBUIÇÃO (RANGES)
-# =========================================
-# R3_Home
-# R3_Away
-# R5_Home
-# R5_Away
-# R7_Home
-# R7_Away
-# R9_Home
-# R9_Away
+    with b6:
+        
 
 # =========================================
 # RESULTADO / DOMÍNIO
@@ -2310,6 +2293,28 @@ with tab6:
 # Dominio_Ofensivo
 # Dominio_Ofensivo_Num
 # Dominio_Cantos
+        
+# =========================================
+# RITMO DO JOGO
+# =========================================
+# Race_Dom_Home
+# Race_Dom_Away
+# Race_Total
+
+        
+# R3_Home
+# R3_Away
+        
+# R5_Home
+# R5_Away
+        
+# R7_Home
+# R7_Away
+        
+# R9_Home
+# R9_Away
+
+
 
 # =========================================
 # SCORE / PRESSÃO
@@ -2322,14 +2327,9 @@ with tab6:
 # CPI_Total
 
 # CPG
-# Value_Signal
+# Value_Signal (card único)
 
-# =========================================
-# RITMO DO JOGO
-# =========================================
-# Race_Dom_Home
-# Race_Dom_Away
-# Race_Total
+
 
 # Corner_Pace_Factor
 # Corner_Explosion_Index
@@ -2351,9 +2351,5 @@ with tab6:
 # Prob_Over8_5_Cantos
 # Prob_Over9_5_Cantos
 # Prob_Over10_5_Cantos
-
-# Odd_Justa_Over8_5_Cantos
-# Odd_Justa_Over9_5_Cantos
-# Odd_Justa_Over10_5_Cantos
 
 
