@@ -2312,6 +2312,34 @@ with tab6:
         st.metric("R9_Home", get_val(linha_cantos, "R9_Home", "{:.2f}"))
         st.metric("R9_Away", get_val(linha_cantos, "R9_Away", "{:.2f}"))
 
+# =========================================
+# GARANTE TODAS AS COLUNAS NA LINHA
+# =========================================
+
+def garantir_campos_linha(row):
+
+    # SCORE
+    if "Score_Supremo" not in row:
+        row["Score_Supremo"] = calcular_score_supremo(row)
+
+    # NIVEL
+    if "Nivel_Jogo" not in row:
+        score = row["Score_Supremo"]
+
+        if score >= 75:
+            row["Nivel_Jogo"] = "💣 ELITE"
+        elif score >= 60:
+            row["Nivel_Jogo"] = "🔥 FORTE"
+        elif score >= 45:
+            row["Nivel_Jogo"] = "⚡ MÉDIO"
+        else:
+            row["Nivel_Jogo"] = "❄️ FRACO"
+
+    return row
+
+
+linha_cantos = garantir_campos_linha(linha_cantos)
+
                   
     # =========================================================
 # 🚀 CENTRAL PREMIUM — ESCANTEIOS (NÍVEL ABSURDO)
