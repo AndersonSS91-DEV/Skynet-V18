@@ -2230,7 +2230,7 @@ with tab6:
     st.markdown("---")
 
     
-# ===== ODDS (RESTAURADAS) =====
+    # ===== ODDS (RESTAURADAS) =====
     st.markdown("### 🚩 Escanteios")
     a1, a2, a3, a4, a5 = st.columns(5)
 
@@ -2242,9 +2242,9 @@ with tab6:
     with a2:
         st.metric("Cantos Marcados; Média (FT_Home)", get_val(linha_cantos, "MF_Cantos_FT_Home", "{:.2f}"))
         st.metric("Cantos Marcados; Média (HT_Home)", get_val(linha_cantos, "MF_Cantos_HT_Home", "{:.2f}"))
-        st.metric("Provável Placar Cantos - FT", get_val(linha_cantos, "Placar_Cantos_Mais_Provavel")
-        st.metric("Provável Placar Cantos - HT", get_val(linha_cantos, "Placar_Cantos_HT_Mais_Provavel")
-                  
+        st.metric("Provável Placar Cantos - FT", get_val(linha_cantos, "Placar_Cantos_Mais_Provavel"))
+        st.metric("Provável Placar Cantos - HT", get_val(linha_cantos, "Placar_Cantos_HT_Mais_Provavel"))
+
     with a3:
         st.metric("Cantos Marcados; Média  (FT_Away)", get_val(linha_cantos, "MF_Cantos_FT_Away", "{:.2f}"))
         st.metric("Cantos Marcados; Média  (HT_Away)", get_val(linha_cantos, "MF_Cantos_HT_Away", "{:.2f}"))
@@ -2263,7 +2263,7 @@ with tab6:
         st.metric("Prob Over 10,5 Cantos", get_val(linha_cantos, "Prob_Over10_5_Cantos", "{:.2f}"))
         st.metric("Prob_Over4_5_Cantos_HT", get_val(linha_cantos, "Prob_Over4_5_Cantos_HT", "{:.2f}"))
 
-# ===== ESCANTEIOS LIMITES) =====
+    # ===== ESCANTEIOS LIMITES) =====
     st.markdown("### 🚩 Escanteios Limites")
     b1, b2, b3, b4 = st.columns(4)
 
@@ -2273,7 +2273,7 @@ with tab6:
 
     with b2:
         st.metric("Cantos Marcados; Média (37HT_Away)", get_val(linha_cantos, "MF_Cantos_37HT_Away", "{:.2f}"))
-        st.metric("Cantos Sofridos; Média (37HT_Away", get_val(linha_cantos, "MC_Cantos_37HT_Away", "{:.2f}"))
+        st.metric("Cantos Sofridos; Média (37HT_Away)", get_val(linha_cantos, "MC_Cantos_37HT_Away", "{:.2f}"))
 
     with b3:
         st.metric("Cantos Marcados; Média (80FT_Home)", get_val(linha_cantos, "MF_Cantos_80FT_Home", "{:.2f}"))
@@ -2283,10 +2283,9 @@ with tab6:
         
     with b4:
         st.metric("Cantos Marcados; Média (80FT_Away)", get_val(linha_cantos, "MF_Cantos_80FT_Away", "{:.2f}"))
-        st.metric("Cantos Sofridos; Média (80FT_Away", get_val(linha_cantos, "MC_Cantos_80FT_Away", "{:.2f}"))
+        st.metric("Cantos Sofridos; Média (80FT_Away)", get_val(linha_cantos, "MC_Cantos_80FT_Away", "{:.2f}"))
         st.metric("Cantos Marcados; Média (87FT_Away)", get_val(linha_cantos, "MF_Cantos_87FT_Away", "{:.2f}"))
-        st.metric("Cantos Sofridos; Média (87FT_Away", get_val(linha_cantos, "MC_Cantos_87FT_Away", "{:.2f}"))
-
+        st.metric("Cantos Sofridos; Média (87FT_Away)", get_val(linha_cantos, "MC_Cantos_87FT_Away", "{:.2f}"))
 
                   
     st.markdown("### 🚩 Dados - Race Escanteios")
@@ -2315,7 +2314,6 @@ with tab6:
 
                   
     st.markdown("### 📊 Roadmap da Aba de Escanteios---")
-
 
 
 
