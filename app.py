@@ -2393,7 +2393,7 @@ st.markdown("# 🚀 CENTRAL INTELIGENTE DE ESCANTEIOS")
 # =========================
 with st.container():
 
-    score = linha_cantos["Score_Supremo"]
+    score = linha_cantos.get("Score_Supremo", 0)
     nivel = linha_cantos["Nivel_Jogo"]
 
     if score >= 75:
