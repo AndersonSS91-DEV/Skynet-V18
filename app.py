@@ -2194,6 +2194,15 @@ with tab5:
 # =========================================
 with tab6:
 
+    def render_escanteios():
+
+        linha = df_cantos[df_cantos["JOGO"] == jogo].iloc[0]
+
+        st.markdown("### 🚀 ESCANTEIOS")
+        st.write(linha["Expectativa_Cantos"])
+
+    render_escanteios()
+
     st.markdown("### 📊📈 Dados Gerais")
 
     c1, c2, c3, c4, c5, c6 = st.columns(6)
