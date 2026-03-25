@@ -2194,14 +2194,18 @@ with tab5:
 # =========================================
 with tab6:
 
-    def render_escanteios():
+    linha_cantos = df_cantos[df_cantos["JOGO"] == jogo].iloc[0]
 
-        linha = df_cantos[df_cantos["JOGO"] == jogo].iloc[0]
+    def render_escanteios(linha):
 
-        st.markdown("### 🚀 ESCANTEIOS")
-        st.write(linha["Expectativa_Cantos"])
+        st.markdown("# 🚀 CENTRAL INTELIGENTE DE ESCANTEIOS")
 
-    render_escanteios()
+        score = linha.get("Score_Supremo", 0)
+        nivel = linha.get("Nivel_Jogo", "-")
+
+        st.markdown(f"## {nivel} | 🎯 {score:.1f}/100")
+
+    render_escanteios(linha_cantos)
 
     st.markdown("### 📊📈 Dados Gerais")
 
