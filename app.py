@@ -2189,7 +2189,6 @@ with tab5:
     else:
         st.info("Sem sinal estrutural forte")
 
-
 # =========================================
 # ABA 6 — ESCANTEIOS
 # =========================================
