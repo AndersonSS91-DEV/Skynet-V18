@@ -2196,7 +2196,6 @@ with tab5:
 with tab6:
 
     linha_cantos = df_cantos[df_cantos["JOGO"] == jogo].iloc[0]
-    linha_cantos = garantir_campos_linha(linha_cantos)
 
     def render_escanteios(linha):
 
