@@ -1168,10 +1168,43 @@ def mostrar_card(df_base, jogo):
 
     row = linha.iloc[0]
 
-    score = calcular_score(row)
-    estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
-    cor = cor_card(row["Interpretacao"])
+    # =========================================
+    # 🔒 SCORE SEGURO
+    # =========================================
+    try:
+        score = calcular_score(row)
 
+        if score is None or pd.isna(score):
+            score = 0
+
+        score = float(score)
+
+    except:
+        score = 0
+
+    # =========================================
+    # ⭐ ESTRELAS SEGURAS
+    # =========================================
+    estrelas_qtd = int(max(min(round(score / 2), 5), 0))
+
+    estrelas = "⭐" * estrelas_qtd + "☆" * (5 - estrelas_qtd)
+
+    # =========================================
+    # 🎨 COR SEGURA
+    # =========================================
+    try:
+        cor = cor_card(row["Interpretacao"])
+    except:
+        cor = "#2b2b2b"
+
+    # =========================================
+    # 🧠 TEXTO SEGURO
+    # =========================================
+    interpretacao = str(row.get("Interpretacao", "Sem interpretação"))
+
+    # =========================================
+    # 🎯 CARD
+    # =========================================
     card = f"""
     <div style="background:{cor};
                 padding:18px;
@@ -1181,16 +1214,13 @@ def mostrar_card(df_base, jogo):
                 font-size:18px;
                 font-weight:600;
                 margin-bottom:18px;">
-        🧠 {row["Interpretacao"]}
+        🧠 {interpretacao}
         <br>
         <span style="font-size:26px;">{estrelas}</span>
     </div>
     """
 
     st.markdown(card, unsafe_allow_html=True)
-
-media_score = df_mgf["Score_Ofensivo"].mean()
-desvio_score = df_mgf["Score_Ofensivo"].std()
 
 # =========================================
 # ABAS
