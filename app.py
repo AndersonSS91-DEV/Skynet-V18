@@ -1168,10 +1168,43 @@ def mostrar_card(df_base, jogo):
 
     row = linha.iloc[0]
 
-    score = calcular_score(row)
-    estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
-    cor = cor_card(row["Interpretacao"])
+    # =========================================
+    # 🔒 SCORE SEGURO
+    # =========================================
+    try:
+        score = calcular_score(row)
 
+        if score is None or pd.isna(score):
+            score = 0
+
+        score = float(score)
+
+    except:
+        score = 0
+
+    # =========================================
+    # ⭐ ESTRELAS SEGURAS
+    # =========================================
+    estrelas_qtd = int(max(min(round(score / 2), 5), 0))
+
+    estrelas = "⭐" * estrelas_qtd + "☆" * (5 - estrelas_qtd)
+
+    # =========================================
+    # 🎨 COR SEGURA
+    # =========================================
+    try:
+        cor = cor_card(row["Interpretacao"])
+    except:
+        cor = "#2b2b2b"
+
+    # =========================================
+    # 🧠 TEXTO SEGURO
+    # =========================================
+    interpretacao = str(row.get("Interpretacao", "Sem interpretação"))
+
+    # =========================================
+    # 🎯 CARD
+    # =========================================
     card = f"""
     <div style="background:{cor};
                 padding:18px;
@@ -1181,16 +1214,13 @@ def mostrar_card(df_base, jogo):
                 font-size:18px;
                 font-weight:600;
                 margin-bottom:18px;">
-        🧠 {row["Interpretacao"]}
+        🧠 {interpretacao}
         <br>
         <span style="font-size:26px;">{estrelas}</span>
     </div>
     """
 
     st.markdown(card, unsafe_allow_html=True)
-
-media_score = df_mgf["Score_Ofensivo"].mean()
-desvio_score = df_mgf["Score_Ofensivo"].std()
 
 # =========================================
 # ABAS
@@ -2189,411 +2219,214 @@ with tab5:
     else:
         st.info("Sem sinal estrutural forte")
 
-
 # =========================================
-# ABA 6 — ESCANTEIOS
+# ABA 6 — ESCANTEIOS (REFATORADA PRO)
 # =========================================
 with tab6:
 
-    st.markdown("### 📊📈 Dados Gerais")
-
-    c1, c2, c3, c4, c5, c6 = st.columns(6)
-
-    with c1:
-        st.metric("Posse Home (%)", get_val(linha_cantos, "Posse_Bola_Home", "{:.2f}"))
-        st.metric("PPJH", get_val(linha_cantos, "PPJH", "{:.2f}"))
-        st.metric("Pressão Média Home (%)", get_val(linha_cantos, "Pressão_Média_Home", "{:.2f}"))
-        st.metric("APPM Home", get_val(linha_cantos, "APPM_Home", "{:.2f}"))
-
-    with c2:
-        st.metric("Posse Away (%)", get_val(linha_cantos, "Posse_Bola_Away", "{:.2f}"))
-        st.metric("PPJA", get_val(linha_cantos, "PPJA", "{:.2f}"))
-        st.metric("Pressão Média Away (%)", get_val(linha_cantos, "Pressão_Média_Away", "{:.2f}"))
-        st.metric("APPM Away", get_val(linha_cantos, "APPM_Away", "{:.2f}"))
-
-    with c3:
-        st.metric("Força Ataque Home (%)", get_val(linha_cantos, "FAH", "{:.2f}"))
-        st.metric("Precisão Chutes H (%)", get_val(linha_exg, "Precisao_CG_H", "{:.2f}"))
-
-    with c4:
-        st.metric("Força Ataque Away (%)", get_val(linha_cantos, "FAA", "{:.2f}"))
-        st.metric("Precisão Chutes A (%)", get_val(linha_exg, "Precisao_CG_A", "{:.2f}"))
-
-    with c5:
-        st.metric("Força Defesa Home (%)", get_val(linha_cantos, "FDH", "{:.2f}"))
-        st.metric("Clean Games Home (%)", get_val(linha_exg, "Clean_Games_H"))
-
-    with c6:
-        st.metric("Força Defesa Away (%)", get_val(linha_cantos, "FDA", "{:.2f}"))
-        st.metric("Clean Games Away (%)", get_val(linha_exg, "Clean_Games_A"))
-
-    st.markdown("---")
-
-    
-    # ===== ODDS (RESTAURADAS) =====
-    st.markdown("### 🚩 Escanteios")
-    a1, a2, a3, a4, a5 = st.columns(5)
-
-    with a1:
-        st.metric("Expectativa_Cantos", get_val(linha_cantos, "Expectativa_Cantos", "{:.2f}"))
-        st.metric("Mais_Cantos_Home", get_val(linha_cantos, "Mais_Cantos_Home", "{:.2f}"))
-        st.metric("Mais_Cantos_Away", get_val(linha_cantos, "Mais_Cantos_Away", "{:.2f}"))
-
-    with a2:
-        st.metric("Cantos Marcados; Média (FT_Home)", get_val(linha_cantos, "MF_Cantos_FT_Home", "{:.2f}"))
-        st.metric("Cantos Marcados; Média (HT_Home)", get_val(linha_cantos, "MF_Cantos_HT_Home", "{:.2f}"))
-        st.metric("Provável Placar Cantos - FT", get_val(linha_cantos, "Placar_Cantos_Mais_Provavel"))
-        st.metric("Provável Placar Cantos - HT", get_val(linha_cantos, "Placar_Cantos_HT_Mais_Provavel"))
-
-    with a3:
-        st.metric("Cantos Marcados; Média  (FT_Away)", get_val(linha_cantos, "MF_Cantos_FT_Away", "{:.2f}"))
-        st.metric("Cantos Marcados; Média  (HT_Away)", get_val(linha_cantos, "MF_Cantos_HT_Away", "{:.2f}"))
-        st.metric("Prob Over 8,5 Cantos", get_val(linha_cantos, "Prob_Over8_5_Cantos", "{:.2f}"))
-        st.metric("Prob_Over2_5_Cantos_HT", get_val(linha_cantos, "Prob_Over2_5_Cantos_HT", "{:.2f}"))
-        
-    with a4:
-        st.metric("Cantos Sofridos; Média  (FT_Home)", get_val(linha_cantos, "MC_Cantos_FT_Home", "{:.2f}"))
-        st.metric("Cantos Sofridos; Média  (HT_Home)", get_val(linha_cantos, "MC_Cantos_HT_Home", "{:.2f}"))
-        st.metric("Prob Over 9,5 Cantos", get_val(linha_cantos, "Prob_Over9_5_Cantos", "{:.2f}"))
-        st.metric("Prob_Over3_5_Cantos_HT", get_val(linha_cantos, "Prob_Over3_5_Cantos_HT", "{:.2f}"))
-        
-    with a5:
-        st.metric("Cantos Sofridos; Média (FT_Away)", get_val(linha_cantos, "MC_Cantos_FT_Away", "{:.2f}"))
-        st.metric("Cantos Sofridos; Média (HT_Away)", get_val(linha_cantos, "MC_Cantos_HT_Away", "{:.2f}"))
-        st.metric("Prob Over 10,5 Cantos", get_val(linha_cantos, "Prob_Over10_5_Cantos", "{:.2f}"))
-        st.metric("Prob_Over4_5_Cantos_HT", get_val(linha_cantos, "Prob_Over4_5_Cantos_HT", "{:.2f}"))
-
-    # ===== ESCANTEIOS LIMITES) =====
-    st.markdown("### 🚩 Escanteios Limites")
-    b1, b2, b3, b4 = st.columns(4)
-
-    with b1:
-        st.metric("Cantos Marcados; Média (37HT_Home)", get_val(linha_cantos, "MF_Cantos_37HT_Home", "{:.2f}"))
-        st.metric("Cantos Sofridos; Média (37HT_Home)", get_val(linha_cantos, "MC_Cantos_37HT_Home", "{:.2f}"))
-
-    with b2:
-        st.metric("Cantos Marcados; Média (37HT_Away)", get_val(linha_cantos, "MF_Cantos_37HT_Away", "{:.2f}"))
-        st.metric("Cantos Sofridos; Média (37HT_Away)", get_val(linha_cantos, "MC_Cantos_37HT_Away", "{:.2f}"))
-
-    with b3:
-        st.metric("Cantos Marcados; Média (80FT_Home)", get_val(linha_cantos, "MF_Cantos_80FT_Home", "{:.2f}"))
-        st.metric("Cantos Sofridos; Média (80FT_Home)", get_val(linha_cantos, "MC_Cantos_80FT_Home", "{:.2f}"))
-        st.metric("Cantos Marcados; Média (87FT_Home)", get_val(linha_cantos, "MF_Cantos_87FT_Home", "{:.2f}"))
-        st.metric("Cantos Sofridos; Média (87FT_Home)", get_val(linha_cantos, "MC_Cantos_87FT_Home", "{:.2f}"))
-        
-    with b4:
-        st.metric("Cantos Marcados; Média (80FT_Away)", get_val(linha_cantos, "MF_Cantos_80FT_Away", "{:.2f}"))
-        st.metric("Cantos Sofridos; Média (80FT_Away)", get_val(linha_cantos, "MC_Cantos_80FT_Away", "{:.2f}"))
-        st.metric("Cantos Marcados; Média (87FT_Away)", get_val(linha_cantos, "MF_Cantos_87FT_Away", "{:.2f}"))
-        st.metric("Cantos Sofridos; Média (87FT_Away)", get_val(linha_cantos, "MC_Cantos_87FT_Away", "{:.2f}"))
-
-                  
-    st.markdown("### 🚩 Dados - Race Escanteios")
-    d1, d2, d3, d4, d5 = st.columns(5)
-
-    with d1:
-        st.metric("Race_Dom_Home", get_val(linha_cantos, "Race_Dom_Home", "{:.2f}"))
-        st.metric("Race_Dom_Away", get_val(linha_cantos, "Race_Dom_Away", "{:.2f}"))
-        st.metric("Race_Total", get_val(linha_cantos, "Race_Total", "{:.2f}"))
-                  
-    with d2:
-        st.metric("R3_Home", get_val(linha_cantos, "R3_Home", "{:.2f}"))
-        st.metric("R3_Away", get_val(linha_cantos, "R3_Away", "{:.2f}"))
-
-    with d3:
-        st.metric("R5_Home", get_val(linha_cantos, "R5_Home", "{:.2f}"))
-        st.metric("R5_Away", get_val(linha_cantos, "R5_Away", "{:.2f}"))
-                  
-    with d4:
-        st.metric("R7_Home", get_val(linha_cantos, "R7_Home", "{:.2f}"))
-        st.metric("R7_Away", get_val(linha_cantos, "R7_Away", "{:.2f}"))
-
-    with d5:
-        st.metric("R9_Home", get_val(linha_cantos, "R9_Home", "{:.2f}"))
-        st.metric("R9_Away", get_val(linha_cantos, "R9_Away", "{:.2f}"))
-
-# =========================================
-# GARANTE CAMPOS SEM DEPENDÊNCIA DE FUNÇÃO
-# =========================================
-
-def garantir_campos_linha(row):
-
-    # =========================
-    # SCORE SUPREMO (INLINE)
-    # =========================
-    score = 0
-
-    score += min(row.get("CPI_Total", 0) * 10, 30)
-    score += min(row.get("Corner_Pace_Factor", 0) * 20, 20)
-    score += min(row.get("Corner_Explosion_Index", 0) * 2.5, 20)
-    score += min(row.get("CMI", 0) / 2, 10)
-
-    ht_val = str(row.get("HT_Corner_Value", ""))
-
-    if "EXPLOSÃO" in ht_val:
-        score += 10
-    elif "FORTE" in ht_val:
-        score += 6
-
-    if str(row.get("Trap_Signal", "")) != "":
-        score -= 15
-
-    score = max(min(score, 100), 0)
-
-    row["Score_Supremo"] = score
-
-    # =========================
-    # NIVEL
-    # =========================
-    if score >= 75:
-        row["Nivel_Jogo"] = "💣 ELITE"
-    elif score >= 60:
-        row["Nivel_Jogo"] = "🔥 FORTE"
-    elif score >= 45:
-        row["Nivel_Jogo"] = "⚡ MÉDIO"
-    else:
-        row["Nivel_Jogo"] = "❄️ FRACO"
-
-    return row
-
-
-# APLICA NA LINHA
-linha_cantos = garantir_campos_linha(linha_cantos)
-
-                  
-    # =========================================================
-# 🚀 CENTRAL PREMIUM — ESCANTEIOS (NÍVEL ABSURDO)
-# =========================================================
-
-# =========================
-# SCORE SUPREMO
-# =========================
-def calcular_score_supremo(row):
-
-    score = 0
-
-    # PRESSÃO
-    score += min(row["CPI_Total"] * 10, 30)
-
-    # RITMO
-    score += min(row["Corner_Pace_Factor"] * 20, 20)
-
-    # EXPLOSÃO
-    score += min(row["Corner_Explosion_Index"] * 2.5, 20)
-
-    # MOMENTUM
-    score += min(row["CMI"] / 2, 10)
-
-    # HT EDGE
-    if "EXPLOSÃO" in str(row["HT_Corner_Value"]):
-        score += 10
-    elif "FORTE" in str(row["HT_Corner_Value"]):
-        score += 6
-
-    # PENALIDADE
-    if str(row["Trap_Signal"]) != "":
-        score -= 15
-
-    return max(min(score, 100), 0)
-
-
-df_cantos["Score_Supremo"] = df_cantos.apply(calcular_score_supremo, axis=1)
-
-
-# =========================
-# CLASSIFICAÇÃO
-# =========================
-def classificar_jogo(score):
-
-    if score >= 75:
-        return "💣 ELITE"
-    elif score >= 60:
-        return "🔥 FORTE"
-    elif score >= 45:
-        return "⚡ MÉDIO"
-    else:
-        return "❄️ FRACO"
-
-df_cantos["Nivel_Jogo"] = df_cantos["Score_Supremo"].apply(classificar_jogo)
-
-
-# =========================
-# HEAT
-# =========================
-def heat_label(x):
-
-    if x >= 75: return "🔥🔥🔥"
-    if x >= 60: return "🔥🔥"
-    if x >= 45: return "🔥"
-    return "❄️"
-
-df_cantos["Heat"] = df_cantos["Score_Supremo"].apply(heat_label)
-
-
-# =========================================================
-# 🧠 UI — DASHBOARD
-# =========================================================
-
-st.markdown("# 🚀 CENTRAL INTELIGENTE DE ESCANTEIOS")
-
-# =========================
-# CARD MASTER
-# =========================
-with st.container():
-
-    score = linha_cantos.get("Score_Supremo", 0)
-    nivel = linha_cantos["Nivel_Jogo"]
-
-    if score >= 75:
-        cor = "🟢"
-    elif score >= 60:
-        cor = "🟡"
-    elif score >= 45:
-        cor = "🟠"
-    else:
-        cor = "🔴"
-
-    st.markdown(f"""
-    ## {cor} {nivel}
-    ### 🎯 Score Supremo: **{score:.1f} / 100**
-    """)
-
-# =========================
-# ENTRADA RECOMENDADA
-# =========================
-with st.container():
-
-    st.markdown("## 🎯 Entrada Recomendada")
-
-    score = linha_cantos["Score_Supremo"]
-
-    if score >= 75:
-        entrada = "💣 OVER 9.5 + OVER 8.5 (FORTE)"
-    elif score >= 60:
-        entrada = "🔥 OVER 8.5"
-    elif score >= 50:
-        entrada = "⚡ OVER 7.5 (LIVE)"
-    else:
-        entrada = "❌ SEM ENTRADA"
-
-    st.success(entrada)
-
-# =========================
-# DIREÇÃO
-# =========================
-with st.container():
-
-    st.markdown("## 🎯 Direção do Jogo")
-
-    c1, c2, c3 = st.columns(3)
-
-    h = linha_cantos["Score_Cantos_Home"]
-    a = linha_cantos["Score_Cantos_Away"]
-
-    if h > a * 1.15:
-        direcao = "🏠 PRESSÃO HOME"
-    elif a > h * 1.15:
-        direcao = "✈️ PRESSÃO AWAY"
-    else:
-        direcao = "⚖️ EQUILIBRADO"
-
-    with c1:
-        st.metric("Score H", f"{h:.1f}")
-
-    with c2:
-        st.metric("Score A", f"{a:.1f}")
-
-    with c3:
-        st.markdown(f"### {direcao}")
-
-# =========================
-# RITMO
-# =========================
-with st.container():
-
-    st.markdown("## ⚡ Ritmo & Dinâmica")
-
-    c1, c2, c3 = st.columns(3)
-
-    pace = linha_cantos["Corner_Pace_Factor"]
-    explosion = linha_cantos["Corner_Explosion_Index"]
-    cmi = linha_cantos["CMI"]
-
-    with c1:
-        st.metric("Pace", f"{pace:.2f}")
-
-    with c2:
-        st.metric("Explosion", f"{explosion:.2f}")
-
-    with c3:
-        st.metric("Momentum", f"{cmi:.2f}")
-
-# =========================
-# HT
-# =========================
-with st.container():
-
-    st.markdown("## 🟢 Entrada HT")
+    st.markdown("## 🚩 CENTRAL INTELIGENTE DE ESCANTEIOS")
+
+    # =========================================
+    # 🛡️ FUNÇÕES AUXILIARES (SEGURANÇA TOTAL)
+    # =========================================
+    def garantir_campos_linha(linha, campos=None):
+        if linha is None:
+            return pd.Series()
+
+        if campos is None:
+            return linha
+
+        for c in campos:
+            if c not in linha.index:
+                linha[c] = np.nan
+
+        return linha
+
+
+    def safe_float(valor):
+        try:
+            return float(valor)
+        except:
+            return np.nan
+
+
+    # =========================================
+    # 📥 CARREGAMENTO DO JOGO
+    # =========================================
+    df_jogo_cantos = df_cantos[df_cantos["JOGO"] == jogo]
+
+    if df_jogo_cantos.empty:
+        st.warning("⚠️ Sem dados de escanteios para este jogo.")
+        st.stop()
+
+    linha_cantos = df_jogo_cantos.iloc[0]
+
+    # =========================================
+    # 🔒 GARANTIR CAMPOS (ANTI-CRASH)
+    # =========================================
+    campos_base = [
+        "Nivel_Jogo", "Expectativa_Cantos", "CV_Cantos",
+        "MF_Cantos_HT_Home", "MF_Cantos_HT_Away",
+        "MC_Cantos_HT_Home", "MC_Cantos_HT_Away",
+        "MF_Cantos_FT_Home", "MF_Cantos_FT_Away",
+        "MC_Cantos_FT_Home", "MC_Cantos_FT_Away"
+    ]
+
+    linha_cantos = garantir_campos_linha(linha_cantos, campos_base)
+
+    # =========================================
+    # 🎯 VARIÁVEIS PRINCIPAIS
+    # =========================================
+    exp = safe_float(linha_cantos["Expectativa_Cantos"])
+    cv  = safe_float(linha_cantos["CV_Cantos"])
+
+    mf_ht_h = safe_float(linha_cantos["MF_Cantos_HT_Home"])
+    mf_ht_a = safe_float(linha_cantos["MF_Cantos_HT_Away"])
+
+    mf_ft_h = safe_float(linha_cantos["MF_Cantos_FT_Home"])
+    mf_ft_a = safe_float(linha_cantos["MF_Cantos_FT_Away"])
+
+    # =========================================
+    # 📊 DADOS GERAIS
+    # =========================================
+    st.markdown("### 📊 Dados Gerais")
 
     c1, c2, c3, c4 = st.columns(4)
 
-    p35 = linha_cantos["Prob_Over3_5_Cantos_HT"]
-
-    if "EXPLOSÃO" in str(linha_cantos["HT_Corner_Value"]):
-        sinal = "💣 HT FORTE"
-    elif p35 >= 60:
-        sinal = "🔥 OVER HT"
-    elif p35 >= 50:
-        sinal = "⚡ POSSÍVEL"
-    else:
-        sinal = "❄️ FRACO"
-
     with c1:
-        st.metric("Prob O3.5", f"{p35:.1f}%")
+        st.metric("🏷️ Nível", get_val(linha_cantos, "Nivel_Jogo"))
 
     with c2:
-        st.metric("λ HT H", f"{linha_cantos['Lambda_Cantos_HT_Home']:.2f}")
+        st.metric("🎯 Expectativa", f"{exp:.2f}" if not np.isnan(exp) else "—")
 
     with c3:
-        st.metric("λ HT A", f"{linha_cantos['Lambda_Cantos_HT_Away']:.2f}")
+        st.metric("📉 CV", f"{cv:.2f}" if not np.isnan(cv) else "—")
 
     with c4:
-        st.markdown(f"### {sinal}")
+        if not np.isnan(exp):
+            if exp >= 11:
+                leitura = "🔥 Over forte"
+            elif exp >= 9:
+                leitura = "⚖️ Equilibrado"
+            else:
+                leitura = "❄️ Under"
+        else:
+            leitura = "—"
 
-# =========================
-# ALERTAS
-# =========================
-with st.container():
+        st.metric("🧠 Leitura", leitura)
 
-    st.markdown("## 🚨 Alertas")
+    st.markdown("---")
 
-    if linha_cantos["Trap_Signal"] != "":
-        st.error("🪤 ARMADILHA DETECTADA")
+    # =========================================
+    # ⏱️ 1º TEMPO
+    # =========================================
+    st.markdown("### ⏱️ 1º Tempo")
 
-    elif linha_cantos["Corner_Pace_Factor"] < 0.9:
-        st.warning("❄️ JOGO LENTO")
+    c1, c2 = st.columns(2)
 
+    with c1:
+        st.metric("MF HT Home", f"{mf_ht_h:.2f}" if not np.isnan(mf_ht_h) else "—")
+        st.metric("MC HT Home", get_val(linha_cantos, "MC_Cantos_HT_Home", "{:.2f}"))
+
+    with c2:
+        st.metric("MF HT Away", f"{mf_ht_a:.2f}" if not np.isnan(mf_ht_a) else "—")
+        st.metric("MC HT Away", get_val(linha_cantos, "MC_Cantos_HT_Away", "{:.2f}"))
+
+    st.markdown("---")
+
+    # =========================================
+    # 🕒 FULL TIME
+    # =========================================
+    st.markdown("### 🕒 Full Time")
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.metric("MF FT Home", f"{mf_ft_h:.2f}" if not np.isnan(mf_ft_h) else "—")
+        st.metric("MC FT Home", get_val(linha_cantos, "MC_Cantos_FT_Home", "{:.2f}"))
+
+    with c2:
+        st.metric("MF FT Away", f"{mf_ft_a:.2f}" if not np.isnan(mf_ft_a) else "—")
+        st.metric("MC FT Away", get_val(linha_cantos, "MC_Cantos_FT_Away", "{:.2f}"))
+
+    st.markdown("---")
+
+    # =========================================
+    # 🧠💀 INTELIGÊNCIA DE ESCANTEIOS
+    # =========================================
+    st.markdown("### 🧠 Inteligência de Cantos")
+
+    sinais = []
+
+    if not np.isnan(exp):
+
+        # 🔥 Over
+        if exp >= 11.5:
+            sinais.append("🔥 Over 10.5 muito forte")
+
+        if exp >= 10:
+            sinais.append("⚡ Over 9.5 com valor")
+
+        # ❄️ Under
+        if exp <= 8:
+            sinais.append("❄️ Under 9.5 interessante")
+
+    # 🎯 pressão FT
+    if not np.isnan(mf_ft_h) and not np.isnan(mf_ft_a):
+
+        if mf_ft_h > mf_ft_a * 1.3:
+            sinais.append("🏠 Pressão HOME")
+
+        if mf_ft_a > mf_ft_h * 1.3:
+            sinais.append("✈️ Pressão AWAY")
+
+    # 🎯 pressão HT
+    if not np.isnan(mf_ht_h) and not np.isnan(mf_ht_a):
+
+        if mf_ht_h > mf_ht_a * 1.3:
+            sinais.append("⏱️ HT forte HOME")
+
+        if mf_ht_a > mf_ht_h * 1.3:
+            sinais.append("⏱️ HT forte AWAY")
+
+    # =========================================
+    # 🎯 OUTPUT FINAL
+    # =========================================
+    if sinais:
+        st.error(" | ".join(sinais))
     else:
-        st.success("✅ JOGO LIMPO")
+        st.info("⚖️ Sem padrão forte identificado")
 
-# =========================
-# RANKING
-# =========================
-st.markdown("## 🏆 TOP JOGOS DO DIA")
+    # =========================================
+    # 🚀 SCORE DE ESCANTEIOS (NOVA FEATURE)
+    # =========================================
+    st.markdown("### 🚀 Score de Pressão de Cantos")
 
-df_rank = df_cantos.sort_values("Score_Supremo", ascending=False)
+    try:
+        score = 0
 
-st.dataframe(
-    df_rank[[
-        "Home_Team",
-        "Visitor_Team",
-        "Score_Supremo",
-        "Nivel_Jogo",
-        "Heat",
-        "Value_Signal"
-    ]].head(10),
-    use_container_width=True
-)
+        if not np.isnan(exp):
+            score += exp * 5
+
+        if not np.isnan(mf_ft_h) and not np.isnan(mf_ft_a):
+            score += (mf_ft_h + mf_ft_a) * 3
+
+        if not np.isnan(cv):
+            score += (1 - min(cv, 1)) * 20
+
+        score = min(round(score, 1), 100)
+
+        st.metric("🔥 Score Cantos", score)
+
+        if score >= 80:
+            st.error("💀 Jogo extremamente forte para cantos")
+        elif score >= 60:
+            st.warning("🔥 Boa oportunidade")
+        else:
+            st.info("⚖️ Jogo neutro")
+
+    except:
+        st.info("Score indisponível")
 
 
 
