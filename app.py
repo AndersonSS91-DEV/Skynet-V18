@@ -2174,22 +2174,6 @@ with tab5:
             *radar_away_vg
         ))
         
-    # =========================================
-    # 🧠💀 POISSON INTELLIGENCE
-    # =========================================
-
-    st.markdown("### 🧠💀 Poisson Intelligence")
-
-    estrutura, mercado, direcao = poisson_intelligence(matriz)
-
-    sinais = estrutura + mercado + direcao
-
-    if sinais:
-        st.error(" | ".join(sinais))
-    else:
-        st.info("Sem sinal estrutural forte")
-
-
 # =========================================
 # ABA 6 — ESCANTEIOS (100% ORIGINAL + FIX)
 # =========================================
