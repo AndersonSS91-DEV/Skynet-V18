@@ -2183,14 +2183,7 @@ with tab6:
 
     def render_escanteios(linha):
 
-        st.markdown("# 🚀 CENTRAL INTELIGENTE DE ESCANTEIOS")
-
-        score = linha.get("Score_Supremo", 0)
-        nivel = linha.get("Nivel_Jogo", "-")
-
-        st.markdown(f"## {nivel} | 🎯 {score:.1f}/100")
-
-    render_escanteios(linha_cantos)
+        st.markdown("# 🚀 🚩Escanteios - Dados Estatísticos")
 
     st.markdown("### 📊📈 Dados Gerais")
 
