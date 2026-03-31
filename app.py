@@ -2374,21 +2374,74 @@ with tab6:
     ### 🎯 Score Supremo: **{score:.1f} / 100**
     """)
 
-    # =========================================
-    # ENTRADA RECOMENDADA
-    # =========================================
-    st.markdown("## 🎯 Entrada Recomendada")
+# =========================================
+# 🎯 ENTRADA RECOMENDADA (MODELO HÍBRIDO REAL)
+# =========================================
+st.markdown("## 🎯 Entrada Recomendada")
 
-    if score >= 75:
-        entrada = "💣 OVER 9.5 + OVER 8.5 (FORTE)"
-    elif score >= 60:
-        entrada = "🔥 OVER 8.5"
-    elif score >= 50:
-        entrada = "⚡ OVER 7.5 (LIVE)"
+prob_85 = linha_cantos.get("Prob_Over8_5_Cantos", 0)
+prob_95 = linha_cantos.get("Prob_Over9_5_Cantos", 0)
+exp_cantos = linha_cantos.get("Expectativa_Cantos", 0)
+
+entrada = ""
+cor = "normal"
+
+# =========================
+# FILTRO PRINCIPAL (ANTI-ERRO)
+# =========================
+if prob_85 < 45:
+    entrada = "❌ SEM ENTRADA (Probabilidade muito baixa)"
+    cor = "error"
+
+# =========================
+# ENTRADAS FORTES
+# =========================
+elif prob_85 >= 60 and score >= 70:
+
+    if prob_95 >= 45:
+        entrada = "💣 OVER 9.5 (VALOR ALTO)"
     else:
-        entrada = "❌ SEM ENTRADA"
+        entrada = "🔥 OVER 8.5 (FORTE)"
 
+    cor = "success"
+
+# =========================
+# ENTRADAS BOAS
+# =========================
+elif prob_85 >= 55 and score >= 60:
+    entrada = "🔥 OVER 8.5"
+    cor = "success"
+
+# =========================
+# ENTRADA MODERADA
+# =========================
+elif prob_85 >= 50 and score >= 55:
+    entrada = "⚡ OVER 8.5 (MODERADO)"
+    cor = "warning"
+
+# =========================
+# LIVE
+# =========================
+elif exp_cantos >= 10:
+    entrada = "⚡ OVER 7.5 (LIVE)"
+    cor = "warning"
+
+# =========================
+# SEM VALOR
+# =========================
+else:
+    entrada = "❌ SEM ENTRADA"
+    cor = "error"
+
+# =========================
+# OUTPUT VISUAL
+# =========================
+if cor == "success":
     st.success(entrada)
+elif cor == "warning":
+    st.warning(entrada)
+else:
+    st.error(entrada)
 
     # =========================================
     # DIREÇÃO
