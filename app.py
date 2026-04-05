@@ -24,7 +24,7 @@ import unicodedata
 st.write("VERSAO TESTE 123")
 
 st.set_page_config(
-    page_title="⚽🏆Poisson Skynet🏆⚽",
+    page_title="⚽🏆Poisson Skynet V30.1🏆⚽",
     layout="wide"
 )
 st.markdown(
