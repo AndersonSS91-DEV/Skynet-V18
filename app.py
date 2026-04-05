@@ -2339,7 +2339,7 @@ with tab6:
     # =========================================
     # HEADER
     # =========================================
-    st.markdown("# 🚀 CENTRAL INTELIGENTE DE ESCANTEIOS")
+    st.markdown("## 🚀 CENTRAL INTELIGENTE DE ESCANTEIOS")
 
     score = linha_cantos.get("Score_Supremo", 0)
     nivel = linha_cantos.get("Nivel_Jogo", "-")
