@@ -2307,12 +2307,14 @@ with tab6:
         cor = "🔴"
 
     st.markdown(f"""
-    ## {cor} {nivel}
-    ### 🎯 Score Supremo: **{score:.1f} / 100**
-    """)
-        # =========================================
+## {cor} {nivel}
+### 🎯 Score Supremo: **{score:.1f} / 100**
+""")
+
+    # =========================================
     # 🎯 ENTRADA RECOMENDADA (MODELO HÍBRIDO REAL)
     # =========================================
+
     st.markdown("## 🎯 ENTRADA RECOMENDADA")
 
     prob_85 = linha_cantos.get("Prob_Over8_5_Cantos", 0)
