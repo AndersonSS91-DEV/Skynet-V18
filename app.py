@@ -2236,7 +2236,7 @@ with tab6:
     # =========================================
     # 📊 DADOS GERAIS
     # =========================================
-    st.markdown("### 📊📈 DADOS GERAIS")
+    st.markdown("## 📊📈 Dados Gerais")
 
     c1, c2, c3, c4, c5, c6 = st.columns(6)
 
@@ -2273,7 +2273,7 @@ with tab6:
     # =========================================
     # 🚩 ESCANTEIOS
     # =========================================
-    st.markdown("## 🚩 ESCANTEIOS")
+    st.markdown("# 🚩 Escanteios")
 
     a1, a2, a3, a4, a5 = st.columns(5)
 
@@ -2309,7 +2309,7 @@ with tab6:
 # =========================================
 # 🚀 CENTRAL INTELIGENTE — ESCANTEIOS
 # =========================================
-st.markdown("## 🚀 CENTRAL INTELIGENTE DE ESCANTEIOS")
+st.markdown("# 🚀 Central Inteligente de Escanteios")
 
 score_supremo = float(linha_cantos.get("Score_Supremo", 0))
 nivel_jogo = linha_cantos.get("Nivel_Jogo", "-")
@@ -2331,7 +2331,7 @@ st.markdown(f"""
 # =========================================
 # 🎯 ENTRADA RECOMENDADA
 # =========================================
-st.markdown("## 🎯 ENTRADA RECOMENDADA")
+st.markdown("# 🎯 Entrada Recomendada")
 
 prob_over_85 = float(linha_cantos.get("Prob_Over8_5_Cantos", 0))
 prob_over_95 = float(linha_cantos.get("Prob_Over9_5_Cantos", 0))
@@ -2361,7 +2361,7 @@ else:
 # =========================================
 # 🎯 DIREÇÃO DO JOGO
 # =========================================
-st.markdown("## 🎯 DIREÇÃO DO JOGO")
+st.markdown("# 🎯 Direção do Jogo")
 
 col1, col2, col3 = st.columns(3)
 
@@ -2369,11 +2369,11 @@ score_home = float(linha_cantos.get("Score_Cantos_Home", 0))
 score_away = float(linha_cantos.get("Score_Cantos_Away", 0))
 
 if score_home > score_away * 1.15:
-    direcao_jogo = "🏠 PRESSÃO HOME"
+    direcao_jogo = "🏠 Pressão Home"
 elif score_away > score_home * 1.15:
-    direcao_jogo = "✈️ PRESSÃO AWAY"
+    direcao_jogo = "✈️ Pressão Away"
 else:
-    direcao_jogo = "⚖️ EQUILIBRADO"
+    direcao_jogo = "⚖️ Equilibrado"
 
 with col1:
     st.metric("Score Home", f"{score_home:.1f}")
@@ -2387,7 +2387,7 @@ with col3:
 # =========================================
 # ⚡ RITMO DO JOGO
 # =========================================
-st.markdown("## ⚡ RITMO & DINÂMICA")
+st.markdown("# ⚡ Ritmo & Dinâmica")
 
 col1, col2, col3 = st.columns(3)
 
@@ -2407,7 +2407,7 @@ with col3:
 # =========================================
 # 🟢 ENTRADA HT
 # =========================================
-st.markdown("## 🟢 ENTRADA HT")
+st.markdown("# 🟢 Direção HT(Primeiro Tempo)")
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -2416,16 +2416,16 @@ lambda_ht_home = float(linha_cantos.get("Lambda_Cantos_HT_Home", 0))
 lambda_ht_away = float(linha_cantos.get("Lambda_Cantos_HT_Away", 0))
 
 if "EXPLOSÃO" in str(linha_cantos.get("HT_Corner_Value", "")):
-    sinal_ht = "💣 HT FORTE"
+    sinal_ht = "💣 HT Dinâmico"
 elif prob_ht_over35 >= 60:
-    sinal_ht = "🔥 OVER HT"
+    sinal_ht = "🔥 Tendência de Over HT"
 elif prob_ht_over35 >= 50:
-    sinal_ht = "⚡ POSSÍVEL"
+    sinal_ht = "⚡ Normal"
 else:
-    sinal_ht = "❄️ FRACO"
+    sinal_ht = "❄️ Tendência de HT Lento"
 
 with col1:
-    st.metric("Prob Over 3.5 HT", f"{prob_ht_over35:.1f}%")
+    st.metric("Prob. Over 3.5 HT", f"{prob_ht_over35:.1f}%")
 
 with col2:
     st.metric("λ HT Home", f"{lambda_ht_home:.2f}")
@@ -2445,8 +2445,8 @@ trap_signal = str(linha_cantos.get("Trap_Signal", ""))
 pace_factor = float(linha_cantos.get("Corner_Pace_Factor", 0))
 
 if trap_signal != "":
-    st.error("🪤 ARMADILHA DETECTADA")
+    st.error("🪤 Armadilha Detectada")
 elif pace_factor < 0.9:
-    st.warning("❄️ JOGO LENTO")
+    st.warning("❄️ Tendência de Jogo Lento")
 else:
-    st.success("✅ JOGO LIMPO")
+    st.success("✅ Tendência de Jogo Dinâmico")
