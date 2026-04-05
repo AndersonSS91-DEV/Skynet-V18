@@ -2273,7 +2273,7 @@ with tab6:
     # =========================================
     # 🚩 ESCANTEIOS
     # =========================================
-    st.markdown("# 🚩 Escanteios")
+    st.markdown("## 🚩 Escanteios")
 
     a1, a2, a3, a4, a5 = st.columns(5)
 
@@ -2309,7 +2309,7 @@ with tab6:
 # =========================================
 # 🚀 CENTRAL INTELIGENTE — ESCANTEIOS
 # =========================================
-st.markdown("# 🚀 Central Inteligente de Escanteios")
+st.markdown("## 🚀 Central Inteligente de Escanteios")
 
 score_supremo = float(linha_cantos.get("Score_Supremo", 0))
 nivel_jogo = linha_cantos.get("Nivel_Jogo", "-")
@@ -2331,7 +2331,7 @@ st.markdown(f"""
 # =========================================
 # 🎯 ENTRADA RECOMENDADA
 # =========================================
-st.markdown("# 🎯 Entrada Recomendada")
+st.markdown("## 🎯 Entrada Recomendada")
 
 prob_over_85 = float(linha_cantos.get("Prob_Over8_5_Cantos", 0))
 prob_over_95 = float(linha_cantos.get("Prob_Over9_5_Cantos", 0))
@@ -2361,7 +2361,7 @@ else:
 # =========================================
 # 🎯 DIREÇÃO DO JOGO
 # =========================================
-st.markdown("# 🎯 Direção do Jogo")
+st.markdown("## 🎯 Direção do Jogo")
 
 col1, col2, col3 = st.columns(3)
 
@@ -2387,7 +2387,7 @@ with col3:
 # =========================================
 # ⚡ RITMO DO JOGO
 # =========================================
-st.markdown("# ⚡ Ritmo & Dinâmica")
+st.markdown("## ⚡ Ritmo & Dinâmica")
 
 col1, col2, col3 = st.columns(3)
 
@@ -2407,7 +2407,7 @@ with col3:
 # =========================================
 # 🟢 ENTRADA HT
 # =========================================
-st.markdown("# 🟢 Direção HT(Primeiro Tempo)")
+st.markdown("## 🟢 Direção HT(Primeiro Tempo)")
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -2439,7 +2439,7 @@ with col4:
 # =========================================
 # 🚨 ALERTAS
 # =========================================
-st.markdown("## 🚨 ALERTAS")
+st.markdown("## 🚨 Alertas")
 
 trap_signal = str(linha_cantos.get("Trap_Signal", ""))
 pace_factor = float(linha_cantos.get("Corner_Pace_Factor", 0))
