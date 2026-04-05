@@ -1,3 +1,8 @@
+import os
+import streamlit as st
+
+st.write("TESTE FORÇADO 777")
+st.write(os.path.abspath(__file__))
 # =========================================
 # STREAMLIT — POISSON SKYNET (HÍBRIDO)
 # =========================================
