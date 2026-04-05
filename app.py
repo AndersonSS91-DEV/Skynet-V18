@@ -2306,6 +2306,24 @@ with tab6:
         st.metric("Prob Over 10.5", get_val(linha_cantos, "Prob_Over10_5_Cantos", "{:.2f}"))
         st.metric("Prob Over HT 4.5", get_val(linha_cantos, "Prob_Over4_5_Cantos_HT", "{:.2f}"))
 
+       
+# =========================================
+# ABA 6 — ESCANTEIOS (BLINDADA)
+# =========================================
+with tab6:
+
+    container_tab6 = st.container()
+
+    with container_tab6:
+
+        df_filtrado = df_cantos[df_cantos["JOGO"] == jogo]
+
+        if df_filtrado.empty:
+            st.warning("Sem dados de escanteios para este jogo")
+            st.stop()
+
+        linha_cantos = df_filtrado.iloc[0]
+
         # =========================================
         # 🚀 CENTRAL INTELIGENTE — ESCANTEIOS
         # =========================================
@@ -2450,3 +2468,4 @@ with tab6:
             st.warning("❄️ Tendência de Jogo Lento")
         else:
             st.success("✅ Tendência de Jogo Dinâmico")
+
