@@ -2182,10 +2182,9 @@ with tab6:
     linha_cantos = df_cantos[df_cantos["JOGO"] == jogo].iloc[0]
 
     def render_escanteios(linha):
+        st.markdown("## 🚩 ESCANTEIOS - DADOS ESTATÍSTICOS")
 
-        st.markdown("# 🚀 🚩Escanteios - Dados Estatísticos")
-
-    st.markdown("### 📊📈 Dados Gerais")
+    st.markdown("### 📊📈 DADOS GERAIS")
 
     c1, c2, c3, c4, c5, c6 = st.columns(6)
 
@@ -2220,7 +2219,7 @@ with tab6:
     st.markdown("---")
 
     # ===== ESCANTEIOS =====
-    st.markdown("### 🚩 Escanteios")
+    st.markdown("## 🚩 ESCANTEIOS")
 
     a1, a2, a3, a4, a5 = st.columns(5)
 
@@ -2257,9 +2256,7 @@ with tab6:
     # GARANTE CAMPOS
     # =========================================
     def garantir_campos_linha(row):
-
         score = 0
-
         score += min(row.get("CPI_Total", 0) * 10, 30)
         score += min(row.get("Corner_Pace_Factor", 0) * 20, 20)
         score += min(row.get("Corner_Explosion_Index", 0) * 2.5, 20)
@@ -2293,50 +2290,6 @@ with tab6:
     linha_cantos = garantir_campos_linha(linha_cantos)
 
     # =========================================
-    # SCORE / CLASSIFICAÇÃO GLOBAL (MANTIDO)
-    # =========================================
-    def calcular_score_supremo(row):
-
-        score = 0
-
-        score += min(row["CPI_Total"] * 10, 30)
-        score += min(row["Corner_Pace_Factor"] * 20, 20)
-        score += min(row["Corner_Explosion_Index"] * 2.5, 20)
-        score += min(row["CMI"] / 2, 10)
-
-        if "EXPLOSÃO" in str(row["HT_Corner_Value"]):
-            score += 10
-        elif "FORTE" in str(row["HT_Corner_Value"]):
-            score += 6
-
-        if str(row["Trap_Signal"]) != "":
-            score -= 15
-
-        return max(min(score, 100), 0)
-
-    def classificar_jogo(score):
-
-        if score >= 75:
-            return "💣 ELITE"
-        elif score >= 60:
-            return "🔥 FORTE"
-        elif score >= 45:
-            return "⚡ MÉDIO"
-        else:
-            return "❄️ FRACO"
-
-    def heat_label(x):
-
-        if x >= 75: return "🔥🔥🔥"
-        if x >= 60: return "🔥🔥"
-        if x >= 45: return "🔥"
-        return "❄️"
-
-    df_cantos["Score_Supremo"] = df_cantos.apply(calcular_score_supremo, axis=1)
-    df_cantos["Nivel_Jogo"] = df_cantos["Score_Supremo"].apply(classificar_jogo)
-    df_cantos["Heat"] = df_cantos["Score_Supremo"].apply(heat_label)
-
-    # =========================================
     # HEADER
     # =========================================
     st.markdown("## 🚀 CENTRAL INTELIGENTE DE ESCANTEIOS")
@@ -2357,7 +2310,6 @@ with tab6:
     ## {cor} {nivel}
     ### 🎯 Score Supremo: **{score:.1f} / 100**
     """)
-
         # =========================================
     # 🎯 ENTRADA RECOMENDADA (MODELO HÍBRIDO REAL)
     # =========================================
@@ -2370,56 +2322,33 @@ with tab6:
     entrada = ""
     cor = "normal"
 
-    # =========================
-    # FILTRO PRINCIPAL (ANTI-ERRO)
-    # =========================
     if prob_85 < 45:
         entrada = "❌ SEM ENTRADA (Probabilidade muito baixa)"
         cor = "error"
 
-    # =========================
-    # ENTRADAS FORTES
-    # =========================
     elif prob_85 >= 60 and score >= 70:
-
         if prob_95 >= 45:
             entrada = "💣 OVER 9.5 (VALOR ALTO)"
         else:
             entrada = "🔥 OVER 8.5 (FORTE)"
-
         cor = "success"
 
-    # =========================
-    # ENTRADAS BOAS
-    # =========================
     elif prob_85 >= 55 and score >= 60:
         entrada = "🔥 OVER 8.5"
         cor = "success"
 
-    # =========================
-    # ENTRADA MODERADA
-    # =========================
     elif prob_85 >= 50 and score >= 55:
         entrada = "⚡ OVER 8.5 (MODERADO)"
         cor = "warning"
 
-    # =========================
-    # LIVE
-    # =========================
     elif exp_cantos >= 10:
         entrada = "⚡ OVER 7.5 (LIVE)"
         cor = "warning"
 
-    # =========================
-    # SEM VALOR
-    # =========================
     else:
         entrada = "❌ SEM ENTRADA"
         cor = "error"
 
-    # =========================
-    # OUTPUT VISUAL
-    # =========================
     if cor == "success":
         st.success(entrada)
     elif cor == "warning":
