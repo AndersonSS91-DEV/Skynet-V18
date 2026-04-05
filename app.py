@@ -19,7 +19,7 @@ import base64
 from pathlib import Path
 import unicodedata
 # =========================================
-# CONFIG
+# CONFIG  
 # =========================================
 st.write("VERSAO TESTE 123")
 
