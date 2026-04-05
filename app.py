@@ -2253,12 +2253,11 @@ with tab6:
         st.metric("Prob_Over4_5_Cantos_HT", get_val(linha_cantos, "Prob_Over4_5_Cantos_HT", "{:.2f}"))
 
     # =========================================
-    # GARANTE CAMPOS
+    # 🔥 SCORE / CENTRAL (SEU BLOCO ORIGINAL)
     # =========================================
+
     def garantir_campos_linha(row):
-
         score = 0
-
         score += min(row.get("CPI_Total", 0) * 10, 30)
         score += min(row.get("Corner_Pace_Factor", 0) * 20, 20)
         score += min(row.get("Corner_Explosion_Index", 0) * 2.5, 20)
@@ -2291,7 +2290,57 @@ with tab6:
 
     linha_cantos = garantir_campos_linha(linha_cantos)
 
+    def calcular_score_supremo(row):
+        score = 0
+        score += min(row["CPI_Total"] * 10, 30)
+        score += min(row["Corner_Pace_Factor"] * 20, 20)
+        score += min(row["Corner_Explosion_Index"] * 2.5, 20)
+        score += min(row["CMI"] / 2, 10)
+
+        if "EXPLOSÃO" in str(row["HT_Corner_Value"]):
+            score += 10
+        elif "FORTE" in str(row["HT_Corner_Value"]):
+            score += 6
+
+        if str(row["Trap_Signal"]) != "":
+            score -= 15
+
+        return max(min(score, 100), 0)
+
+    def classificar_jogo(score):
+        if score >= 75: return "💣 ELITE"
+        elif score >= 60: return "🔥 FORTE"
+        elif score >= 45: return "⚡ MÉDIO"
+        else: return "❄️ FRACO"
+
+    def heat_label(x):
+        if x >= 75: return "🔥🔥🔥"
+        if x >= 60: return "🔥🔥"
+        if x >= 45: return "🔥"
+        return "❄️"
+
+    df_cantos["Score_Supremo"] = df_cantos.apply(calcular_score_supremo, axis=1)
+    df_cantos["Nivel_Jogo"] = df_cantos["Score_Supremo"].apply(classificar_jogo)
+    df_cantos["Heat"] = df_cantos["Score_Supremo"].apply(heat_label)
+
+    st.markdown("# 🚀 CENTRAL INTELIGENTE DE ESCANTEIOS")
+
+    score = linha_cantos.get("Score_Supremo", 0)
+    nivel = linha_cantos.get("Nivel_Jogo", "-")
+
+    if score >= 75:
+        cor = "🟢"
+    elif score >= 60:
+        cor = "🟡"
+    elif score >= 45:
+        cor = "🟠"
+    else:
+        cor = "🔴"
+
+    st.markdown(f"## {cor} {nivel}")
+    st.markdown(f"### 🎯 Score Supremo: **{score:.1f} / 100**")
+
     # =========================================
-    # RESTANTE DO SEU CÓDIGO CONTINUA AQUI
-    # (SEM ALTERAÇÃO — AGORA DENTRO DO TAB6)
+    # 🎯 ENTRADA + DIREÇÃO + RESTANTE
+    # (continua exatamente igual — já dentro da aba)
     # =========================================
