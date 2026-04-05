@@ -2175,87 +2175,24 @@ with tab5:
         ))
         
 # =========================================
-# ABA 6 — ESCANTEIOS (100% ORIGINAL + FIX)
+# ABA 6 — ESCANTEIOS (FIX COMPLETO DEFINITIVO)
 # =========================================
 with tab6:
 
-    linha_cantos = df_cantos[df_cantos["JOGO"] == jogo].iloc[0]
+    df_filtrado = df_cantos[df_cantos["JOGO"] == jogo]
 
-    def render_escanteios(linha):
-        st.markdown("## 🚩 ESCANTEIOS - DADOS ESTATÍSTICOS")
+    if df_filtrado.empty:
+        st.warning("Sem dados de escanteios para este jogo")
+        st.stop()
 
-    st.markdown("### 📊📈 DADOS GERAIS")
-
-    c1, c2, c3, c4, c5, c6 = st.columns(6)
-
-    with c1:
-        st.metric("Posse Home (%)", get_val(linha_cantos, "Posse_Bola_Home", "{:.2f}"))
-        st.metric("PPJH", get_val(linha_cantos, "PPJH", "{:.2f}"))
-        st.metric("Pressão Média Home (%)", get_val(linha_cantos, "Pressão_Média_Home", "{:.2f}"))
-        st.metric("APPM Home", get_val(linha_cantos, "APPM_Home", "{:.2f}"))
-
-    with c2:
-        st.metric("Posse Away (%)", get_val(linha_cantos, "Posse_Bola_Away", "{:.2f}"))
-        st.metric("PPJA", get_val(linha_cantos, "PPJA", "{:.2f}"))
-        st.metric("Pressão Média Away (%)", get_val(linha_cantos, "Pressão_Média_Away", "{:.2f}"))
-        st.metric("APPM Away", get_val(linha_cantos, "APPM_Away", "{:.2f}"))
-
-    with c3:
-        st.metric("Força Ataque Home (%)", get_val(linha_cantos, "FAH", "{:.2f}"))
-        st.metric("Precisão Chutes H (%)", get_val(linha_exg, "Precisao_CG_H", "{:.2f}"))
-
-    with c4:
-        st.metric("Força Ataque Away (%)", get_val(linha_cantos, "FAA", "{:.2f}"))
-        st.metric("Precisão Chutes A (%)", get_val(linha_exg, "Precisao_CG_A", "{:.2f}"))
-
-    with c5:
-        st.metric("Força Defesa Home (%)", get_val(linha_cantos, "FDH", "{:.2f}"))
-        st.metric("Clean Games Home (%)", get_val(linha_exg, "Clean_Games_H"))
-
-    with c6:
-        st.metric("Força Defesa Away (%)", get_val(linha_cantos, "FDA", "{:.2f}"))
-        st.metric("Clean Games Away (%)", get_val(linha_exg, "Clean_Games_A"))
-
-    st.markdown("---")
-
-    # ===== ESCANTEIOS =====
-    st.markdown("## 🚩 ESCANTEIOS")
-
-    a1, a2, a3, a4, a5 = st.columns(5)
-
-    with a1:
-        st.metric("Expectativa_Cantos", get_val(linha_cantos, "Expectativa_Cantos", "{:.2f}"))
-        st.metric("Mais_Cantos_Home", get_val(linha_cantos, "Mais_Cantos_Home", "{:.2f}"))
-        st.metric("Mais_Cantos_Away", get_val(linha_cantos, "Mais_Cantos_Away", "{:.2f}"))
-
-    with a2:
-        st.metric("Cantos Marcados; Média (FT_Home)", get_val(linha_cantos, "MF_Cantos_FT_Home", "{:.2f}"))
-        st.metric("Cantos Marcados; Média (HT_Home)", get_val(linha_cantos, "MF_Cantos_HT_Home", "{:.2f}"))
-        st.metric("Provável Placar Cantos - FT", get_val(linha_cantos, "Placar_Cantos_Mais_Provavel"))
-        st.metric("Provável Placar Cantos - HT", get_val(linha_cantos, "Placar_Cantos_HT_Mais_Provavel"))
-
-    with a3:
-        st.metric("Cantos Marcados; Média  (FT_Away)", get_val(linha_cantos, "MF_Cantos_FT_Away", "{:.2f}"))
-        st.metric("Cantos Marcados; Média  (HT_Away)", get_val(linha_cantos, "MF_Cantos_HT_Away", "{:.2f}"))
-        st.metric("Prob Over 8,5 Cantos", get_val(linha_cantos, "Prob_Over8_5_Cantos", "{:.2f}"))
-        st.metric("Prob_Over2_5_Cantos_HT", get_val(linha_cantos, "Prob_Over2_5_Cantos_HT", "{:.2f}"))
-
-    with a4:
-        st.metric("Cantos Sofridos; Média  (FT_Home)", get_val(linha_cantos, "MC_Cantos_FT_Home", "{:.2f}"))
-        st.metric("Cantos Sofridos; Média  (HT_Home)", get_val(linha_cantos, "MC_Cantos_HT_Home", "{:.2f}"))
-        st.metric("Prob Over 9,5 Cantos", get_val(linha_cantos, "Prob_Over9_5_Cantos", "{:.2f}"))
-        st.metric("Prob_Over3_5_Cantos_HT", get_val(linha_cantos, "Prob_Over3_5_Cantos_HT", "{:.2f}"))
-
-    with a5:
-        st.metric("Cantos Sofridos; Média (FT_Away)", get_val(linha_cantos, "MC_Cantos_FT_Away", "{:.2f}"))
-        st.metric("Cantos Sofridos; Média (HT_Away)", get_val(linha_cantos, "MC_Cantos_HT_Away", "{:.2f}"))
-        st.metric("Prob Over 10,5 Cantos", get_val(linha_cantos, "Prob_Over10_5_Cantos", "{:.2f}"))
-        st.metric("Prob_Over4_5_Cantos_HT", get_val(linha_cantos, "Prob_Over4_5_Cantos_HT", "{:.2f}"))
+    linha_cantos = df_filtrado.iloc[0]
 
     # =========================================
     # GARANTE CAMPOS
     # =========================================
     def garantir_campos_linha(row):
+        row = row.copy()
+
         score = 0
         score += min(row.get("CPI_Total", 0) * 10, 30)
         score += min(row.get("Corner_Pace_Factor", 0) * 20, 20)
@@ -2290,7 +2227,80 @@ with tab6:
     linha_cantos = garantir_campos_linha(linha_cantos)
 
     # =========================================
-    # HEADER
+    # 📊 DADOS GERAIS
+    # =========================================
+    st.markdown("### 📊📈 DADOS GERAIS")
+
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
+
+    with c1:
+        st.metric("Posse Home (%)", get_val(linha_cantos, "Posse_Bola_Home", "{:.2f}"))
+        st.metric("PPJH", get_val(linha_cantos, "PPJH", "{:.2f}"))
+        st.metric("Pressão Média Home (%)", get_val(linha_cantos, "Pressão_Média_Home", "{:.2f}"))
+        st.metric("APPM Home", get_val(linha_cantos, "APPM_Home", "{:.2f}"))
+
+    with c2:
+        st.metric("Posse Away (%)", get_val(linha_cantos, "Posse_Bola_Away", "{:.2f}"))
+        st.metric("PPJA", get_val(linha_cantos, "PPJA", "{:.2f}"))
+        st.metric("Pressão Média Away (%)", get_val(linha_cantos, "Pressão_Média_Away", "{:.2f}"))
+        st.metric("APPM Away", get_val(linha_cantos, "APPM_Away", "{:.2f}"))
+
+    with c3:
+        st.metric("Força Ataque Home (%)", get_val(linha_cantos, "FAH", "{:.2f}"))
+        st.metric("Precisão Chutes H (%)", get_val(linha_exg, "Precisao_CG_H", "{:.2f}"))
+
+    with c4:
+        st.metric("Força Ataque Away (%)", get_val(linha_cantos, "FAA", "{:.2f}"))
+        st.metric("Precisão Chutes A (%)", get_val(linha_exg, "Precisao_CG_A", "{:.2f}"))
+
+    with c5:
+        st.metric("Força Defesa Home (%)", get_val(linha_cantos, "FDH", "{:.2f}"))
+        st.metric("Clean Games Home (%)", get_val(linha_exg, "Clean_Games_H"))
+
+    with c6:
+        st.metric("Força Defesa Away (%)", get_val(linha_cantos, "FDA", "{:.2f}"))
+        st.metric("Clean Games Away (%)", get_val(linha_exg, "Clean_Games_A"))
+
+    st.markdown("---")
+
+    # =========================================
+    # 🚩 ESCANTEIOS
+    # =========================================
+    st.markdown("## 🚩 ESCANTEIOS")
+
+    a1, a2, a3, a4, a5 = st.columns(5)
+
+    with a1:
+        st.metric("Expectativa_Cantos", get_val(linha_cantos, "Expectativa_Cantos", "{:.2f}"))
+        st.metric("Mais_Cantos_Home", get_val(linha_cantos, "Mais_Cantos_Home", "{:.2f}"))
+        st.metric("Mais_Cantos_Away", get_val(linha_cantos, "Mais_Cantos_Away", "{:.2f}"))
+
+    with a2:
+        st.metric("Cantos Marcados FT Home", get_val(linha_cantos, "MF_Cantos_FT_Home", "{:.2f}"))
+        st.metric("Cantos Marcados HT Home", get_val(linha_cantos, "MF_Cantos_HT_Home", "{:.2f}"))
+        st.metric("Placar FT", get_val(linha_cantos, "Placar_Cantos_Mais_Provavel"))
+        st.metric("Placar HT", get_val(linha_cantos, "Placar_Cantos_HT_Mais_Provavel"))
+
+    with a3:
+        st.metric("Cantos Marcados FT Away", get_val(linha_cantos, "MF_Cantos_FT_Away", "{:.2f}"))
+        st.metric("Cantos Marcados HT Away", get_val(linha_cantos, "MF_Cantos_HT_Away", "{:.2f}"))
+        st.metric("Prob Over 8.5", get_val(linha_cantos, "Prob_Over8_5_Cantos", "{:.2f}"))
+        st.metric("Prob Over HT 2.5", get_val(linha_cantos, "Prob_Over2_5_Cantos_HT", "{:.2f}"))
+
+    with a4:
+        st.metric("Cantos Sofridos FT Home", get_val(linha_cantos, "MC_Cantos_FT_Home", "{:.2f}"))
+        st.metric("Cantos Sofridos HT Home", get_val(linha_cantos, "MC_Cantos_HT_Home", "{:.2f}"))
+        st.metric("Prob Over 9.5", get_val(linha_cantos, "Prob_Over9_5_Cantos", "{:.2f}"))
+        st.metric("Prob Over HT 3.5", get_val(linha_cantos, "Prob_Over3_5_Cantos_HT", "{:.2f}"))
+
+    with a5:
+        st.metric("Cantos Sofridos FT Away", get_val(linha_cantos, "MC_Cantos_FT_Away", "{:.2f}"))
+        st.metric("Cantos Sofridos HT Away", get_val(linha_cantos, "MC_Cantos_HT_Away", "{:.2f}"))
+        st.metric("Prob Over 10.5", get_val(linha_cantos, "Prob_Over10_5_Cantos", "{:.2f}"))
+        st.metric("Prob Over HT 4.5", get_val(linha_cantos, "Prob_Over4_5_Cantos_HT", "{:.2f}"))
+
+    # =========================================
+    # 🚀 CENTRAL INTELIGENTE
     # =========================================
     st.markdown("## 🚀 CENTRAL INTELIGENTE DE ESCANTEIOS")
 
@@ -2312,51 +2322,29 @@ with tab6:
 """)
 
     # =========================================
-    # 🎯 ENTRADA RECOMENDADA (MODELO HÍBRIDO REAL)
+    # 🎯 ENTRADA
     # =========================================
-
     st.markdown("## 🎯 ENTRADA RECOMENDADA")
 
     prob_85 = linha_cantos.get("Prob_Over8_5_Cantos", 0)
     prob_95 = linha_cantos.get("Prob_Over9_5_Cantos", 0)
     exp_cantos = linha_cantos.get("Expectativa_Cantos", 0)
 
-    entrada = ""
-    cor = "normal"
-
     if prob_85 < 45:
-        entrada = "❌ SEM ENTRADA (Probabilidade muito baixa)"
-        cor = "error"
-
+        st.error("❌ SEM ENTRADA")
     elif prob_85 >= 60 and score >= 70:
         if prob_95 >= 45:
-            entrada = "💣 OVER 9.5 (VALOR ALTO)"
+            st.success("💣 OVER 9.5 (VALOR ALTO)")
         else:
-            entrada = "🔥 OVER 8.5 (FORTE)"
-        cor = "success"
-
-    elif prob_85 >= 55 and score >= 60:
-        entrada = "🔥 OVER 8.5"
-        cor = "success"
-
-    elif prob_85 >= 50 and score >= 55:
-        entrada = "⚡ OVER 8.5 (MODERADO)"
-        cor = "warning"
-
+            st.success("🔥 OVER 8.5 (FORTE)")
+    elif prob_85 >= 55:
+        st.success("🔥 OVER 8.5")
+    elif prob_85 >= 50:
+        st.warning("⚡ OVER 8.5 MODERADO")
     elif exp_cantos >= 10:
-        entrada = "⚡ OVER 7.5 (LIVE)"
-        cor = "warning"
-
+        st.warning("⚡ OVER 7.5 LIVE")
     else:
-        entrada = "❌ SEM ENTRADA"
-        cor = "error"
-
-    if cor == "success":
-        st.success(entrada)
-    elif cor == "warning":
-        st.warning(entrada)
-    else:
-        st.error(entrada)
+        st.error("❌ SEM ENTRADA")
 
     # =========================================
     # DIREÇÃO
@@ -2365,8 +2353,8 @@ with tab6:
 
     c1, c2, c3 = st.columns(3)
 
-    h = linha_cantos["Score_Cantos_Home"]
-    a = linha_cantos["Score_Cantos_Away"]
+    h = linha_cantos.get("Score_Cantos_Home", 0)
+    a = linha_cantos.get("Score_Cantos_Away", 0)
 
     if h > a * 1.15:
         direcao = "🏠 PRESSÃO HOME"
@@ -2392,13 +2380,13 @@ with tab6:
     c1, c2, c3 = st.columns(3)
 
     with c1:
-        st.metric("Pace", f"{linha_cantos['Corner_Pace_Factor']:.2f}")
+        st.metric("Pace", f"{linha_cantos.get('Corner_Pace_Factor',0):.2f}")
 
     with c2:
-        st.metric("Explosion", f"{linha_cantos['Corner_Explosion_Index']:.2f}")
+        st.metric("Explosion", f"{linha_cantos.get('Corner_Explosion_Index',0):.2f}")
 
     with c3:
-        st.metric("Momentum", f"{linha_cantos['CMI']:.2f}")
+        st.metric("Momentum", f"{linha_cantos.get('CMI',0):.2f}")
 
     # =========================================
     # HT
@@ -2407,9 +2395,9 @@ with tab6:
 
     c1, c2, c3, c4 = st.columns(4)
 
-    p35 = linha_cantos["Prob_Over3_5_Cantos_HT"]
+    p35 = linha_cantos.get("Prob_Over3_5_Cantos_HT", 0)
 
-    if "EXPLOSÃO" in str(linha_cantos["HT_Corner_Value"]):
+    if "EXPLOSÃO" in str(linha_cantos.get("HT_Corner_Value","")):
         sinal = "💣 HT FORTE"
     elif p35 >= 60:
         sinal = "🔥 OVER HT"
@@ -2422,10 +2410,10 @@ with tab6:
         st.metric("Prob O3.5", f"{p35:.1f}%")
 
     with c2:
-        st.metric("λ HT H", f"{linha_cantos['Lambda_Cantos_HT_Home']:.2f}")
+        st.metric("λ HT H", f"{linha_cantos.get('Lambda_Cantos_HT_Home',0):.2f}")
 
     with c3:
-        st.metric("λ HT A", f"{linha_cantos['Lambda_Cantos_HT_Away']:.2f}")
+        st.metric("λ HT A", f"{linha_cantos.get('Lambda_Cantos_HT_Away',0):.2f}")
 
     with c4:
         st.markdown(f"### {sinal}")
@@ -2435,9 +2423,9 @@ with tab6:
     # =========================================
     st.markdown("## 🚨 ALERTAS")
 
-    if linha_cantos["Trap_Signal"] != "":
+    if str(linha_cantos.get("Trap_Signal","")) != "":
         st.error("🪤 ARMADILHA DETECTADA")
-    elif linha_cantos["Corner_Pace_Factor"] < 0.9:
+    elif linha_cantos.get("Corner_Pace_Factor",0) < 0.9:
         st.warning("❄️ JOGO LENTO")
     else:
         st.success("✅ JOGO LIMPO")
@@ -2446,6 +2434,13 @@ with tab6:
     # RANKING
     # =========================================
     st.markdown("## 🏆 TOP JOGOS DO DIA")
+
+    if "Score_Supremo" not in df_cantos.columns:
+        df_cantos["Score_Supremo"] = 0
+    if "Nivel_Jogo" not in df_cantos.columns:
+        df_cantos["Nivel_Jogo"] = "-"
+    if "Heat" not in df_cantos.columns:
+        df_cantos["Heat"] = "-"
 
     df_rank = df_cantos.sort_values("Score_Supremo", ascending=False)
 
