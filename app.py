@@ -2344,7 +2344,7 @@ with tab6:
         st.metric("Prob Over 10.5", get_val(linha_cantos, "Prob_Over10_5_Cantos", "{:.2f}"))
         st.metric("Prob Over HT 4.5", get_val(linha_cantos, "Prob_Over4_5_Cantos_HT", "{:.2f}"))
 
-       
+    st.markdown("---")
 # =========================================
 # ABA 6 — ESCANTEIOS (BLINDADA)
 # =========================================
@@ -2384,6 +2384,8 @@ with tab6:
     ### 🎯 Score Supremo: **{score_supremo:.1f} / 100**
     """)
 
+    st.markdown("---")
+    
     # =========================================
     # 🎯 ENTRADA RECOMENDADA
     # =========================================
@@ -2460,6 +2462,8 @@ with tab6:
     with col3:
         st.metric("Momentum", f"{momentum:.2f}")
 
+    
+    st.markdown("---")
     # =========================================
     # 🟢 ENTRADA HT
     # =========================================
@@ -2492,6 +2496,8 @@ with tab6:
     with col4:
         st.markdown(f"### {sinal_ht}")
 
+    
+    st.markdown("---")
     # =========================================
     # 🚨 ALERTAS
     # =========================================
