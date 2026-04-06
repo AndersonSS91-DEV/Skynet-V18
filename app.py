@@ -2180,6 +2180,44 @@ with tab5:
             linha_vg["Visitor_Team"],
             *radar_away_vg
         ))
+
+
+
+
+def calcular_score_supremo(row):
+
+    score = 0
+
+    score += min(row.get("CPI_Total", 0) * 10, 30)
+    score += min(row.get("Corner_Pace_Factor", 0) * 20, 20)
+    score += min(row.get("Corner_Explosion_Index", 0) * 2.5, 20)
+    score += min(row.get("CMI", 0) / 2, 10)
+
+    if "EXPLOSÃO" in str(row.get("HT_Corner_Value", "")):
+        score += 10
+    elif "FORTE" in str(row.get("HT_Corner_Value", "")):
+        score += 6
+
+    if str(row.get("Trap_Signal", "")) != "":
+        score -= 15
+
+    return max(min(score, 100), 0)
+
+
+def classificar_jogo(score):
+
+    if score >= 75:
+        return "💣 ELITE"
+    elif score >= 60:
+        return "🔥 FORTE"
+    elif score >= 45:
+        return "⚡ MÉDIO"
+    else:
+        return "❄️ FRACO"
+
+df_cantos["Score_Supremo"] = df_cantos.apply(calcular_score_supremo, axis=1)
+df_cantos["Nivel_Jogo"] = df_cantos["Score_Supremo"].apply(classificar_jogo)
+
         
 # =========================================
 # ABA 6 — ESCANTEIOS (FIX COMPLETO DEFINITIVO)
