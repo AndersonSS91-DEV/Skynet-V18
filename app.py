@@ -218,6 +218,21 @@ ul[role="listbox"] li {
     border-radius: 18px;
 }
 
+st.markdown("""
+<style>
+
+/* MUDA TODOS OS WARNING PRA ROXO */
+div[data-testid="stAlert"][data-baseweb="notification"] {
+    background-color: #6A0DAD !important;
+    color: white !important;
+}
+
+/* TEXTO */
+div[data-testid="stAlert"] p {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 # =========================================
