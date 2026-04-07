@@ -188,9 +188,9 @@ ul[role="listbox"] li {
     padding: 10px !important;
 }
 
-===========================================
-# BARRA DE ROLAGEM
-===========================================
+/* =========================================
+   BARRA DE ROLAGEM
+========================================= */
 
 /* largura da barra */
 ::-webkit-scrollbar {
@@ -220,7 +220,7 @@ ul[role="listbox"] li {
 
 st.markdown("""
 </style>
-""", unsafe_allow_html=True
+""", unsafe_allow_html=True)
 
 # =========================================
 # 🎬 BANNER CARROSSEL (OFICIAL SKYNET)
