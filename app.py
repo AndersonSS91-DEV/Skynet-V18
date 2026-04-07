@@ -1540,14 +1540,14 @@ if cond_alerta:
     text-align:left;
     color:white;
     font-weight:600;
+    font-size:14px;
+    line-height:1.4;
     margin-bottom:8px;
 ">
  ⚠️⚠️Evitar Operar Match Odds⚠️⚠️
 </div>
 """, unsafe_allow_html=True)
   
-
-
     cards_ofensivos(
         radar_home_consenso,
         radar_away_consenso,
