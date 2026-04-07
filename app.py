@@ -188,9 +188,9 @@ ul[role="listbox"] li {
     padding: 10px !important;
 }
 
-/* =========================================
-   BARRA DE ROLAGEM
-========================================= */
+===========================================
+# BARRA DE ROLAGEM
+===========================================
 
 /* largura da barra */
 ::-webkit-scrollbar {
@@ -218,10 +218,8 @@ ul[role="listbox"] li {
     border-radius: 18px;
 }
 
-st.markdown("""
 </style>
 """, unsafe_allow_html=True)
-
 # =========================================
 # 🎬 BANNER CARROSSEL (OFICIAL SKYNET)
 # =========================================
@@ -975,7 +973,7 @@ def leitura_consenso(nome, radar_vals):
 
     elif exg < 40:
         leitura = "👉 dificuldade para criar oportunidades"
-   
+
     else:
         leitura = "👉 perfil ofensivo equilibrado"
 
@@ -986,7 +984,7 @@ def leitura_consenso(nome, radar_vals):
 
 {texto}
 
-"🧠 leitura:"
+🧠 leitura:
 {leitura}
 """
 
@@ -1518,18 +1516,29 @@ with tab1:
 # ⚠️ TESTE
 # =========================================
 st.markdown("""
-<div style="
-    background: linear-gradient(90deg, #6A0DAD, #8A2BE2);
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    color: white;
-    font-size: 0.875rem;
-    font-weight: 600;
-    line-height: 1.25rem;
-    margin-bottom: 0.5rem;
-">
-    ⚠️ Evitar Operar Match Odds
-</div>
+<style>
+
+/* PADRÃO EXATO DOS ALERTAS DO STREAMLIT */
+div[data-testid="stAlert"] {
+    padding: 0.75rem 1rem !important;
+    border-radius: 0.5rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+    font-weight: 600 !important;
+}
+
+/* COR ROXA SOMENTE PARA WARNING */
+div[data-testid="stAlert"][data-baseweb="notification"]:has(svg[data-testid="stAlertIcon-warning"]) {
+    background-color: #6A0DAD !important;
+    color: white !important;
+}
+
+/* TEXTO */
+div[data-testid="stAlert"] p {
+    margin: 0 !important;
+}
+
+</style>
 """, unsafe_allow_html=True)
 
 # =========================================
