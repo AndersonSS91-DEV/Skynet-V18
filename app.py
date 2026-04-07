@@ -1512,10 +1512,19 @@ with tab1:
     st.pyplot(fig, use_container_width=False)
 
     
-    # =========================================
+
+# =========================
+# MGF ZEBRA (CORRETO)
+# =========================
+
+if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]:
+    mgf_zebra = linha_mgf["MGF_H"]
+else:
+    mgf_zebra = linha_mgf["MGF_A"]
+
+# =========================================
 # ⚠️ ALERTA MATCH ODDS (JOGO ATUAL)
 # =========================================
-
 cond_alerta = (
     (linha_exg["VR01"] <= 0.15) or
     (linha_exg["Odd_BTTS_YES"] <= 1.78) or
