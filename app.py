@@ -1518,24 +1518,16 @@ with tab1:
 st.markdown("""
 <style>
 
-/* PADRÃO DOS ALERTAS */
-div[data-testid="stAlert"] {
-    padding: 0.75rem 1rem !important;
-    border-radius: 0.5rem !important;
-    font-size: 0.875rem !important;
-    line-height: 1.25rem !important;
-    font-weight: 600 !important;
-}
-
-/* LARANJA PARA WARNING */
-div[data-testid="stAlert"][data-baseweb="notification"] {
+/* LARANJA APENAS PARA WARNING */
+div[data-testid="stAlert"][data-baseweb="notification"][kind="warning"] {
     background-color: #FF8C00 !important;
     color: white !important;
 }
 
 /* TEXTO */
 div[data-testid="stAlert"] p {
-    margin: 0 !important;
+    color: white !important;
+    font-weight: 600 !important;
 }
 
 </style>
