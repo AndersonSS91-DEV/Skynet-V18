@@ -1525,29 +1525,26 @@ else:
 # =========================================
 # ⚠️ ALERTA MATCH ODDS (JOGO ATUAL)
 # =========================================
+
+# 🔥 DEFINE ZEBRA (TIME COM MAIOR ODD)
+if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]:
+    mgf_zebra = linha_mgf["MGF_H"]
+else:
+    mgf_zebra = linha_mgf["MGF_A"]
+
+# 🔥 CONDIÇÃO DO ALERTA
 cond_alerta = (
     (linha_exg["VR01"] <= 0.15) or
     (linha_exg["Odd_BTTS_YES"] <= 1.78) or
-    (linha_mgf["MGF_Zebra"] >= 1.20)
+    (mgf_zebra >= 1.20)
 )
 
+# 🔥 CARD PADRÃO (MESMO TAMANHO DOS OUTROS)
 if cond_alerta:
-    st.markdown("""
-<div style="
-    background-color:#6A0DAD;
-    padding:10px 15px;
-    border-radius:10px;
-    text-align:left;
-    color:white;
-    font-weight:600;
-    font-size:14px;
-    line-height:1.4;
-    margin-bottom:8px;
-">
- ⚠️⚠️Evitar Operar Match Odds⚠️⚠️
-</div>
-""", unsafe_allow_html=True)
-  
+    st.warning("⚠️ Evitar Operar Match Odds")
+
+
+    
     cards_ofensivos(
         radar_home_consenso,
         radar_away_consenso,
