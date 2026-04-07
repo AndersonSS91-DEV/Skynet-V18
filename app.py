@@ -219,22 +219,9 @@ ul[role="listbox"] li {
 }
 
 st.markdown("""
-<style>
-
-/* MUDA TODOS OS WARNING PRA ROXO */
-div[data-testid="stAlert"][data-baseweb="notification"] {
-    background-color: #6A0DAD !important;
-    color: white !important;
-}
-
-/* TEXTO */
-div[data-testid="stAlert"] p {
-    color: white !important;
-    font-weight: 600 !important;
-}
-
 </style>
-""", unsafe_allow_html=True)
+""", unsafe_allow_html=True
+
 # =========================================
 # 🎬 BANNER CARROSSEL (OFICIAL SKYNET)
 # =========================================
@@ -1531,29 +1518,18 @@ with tab1:
 # ⚠️ TESTE
 # =========================================
 st.markdown("""
-<style>
-
-/* PADRÃO EXATO DOS ALERTAS DO STREAMLIT */
-div[data-testid="stAlert"] {
-    padding: 0.75rem 1rem !important;
-    border-radius: 0.5rem !important;
-    font-size: 0.875rem !important;
-    line-height: 1.25rem !important;
-    font-weight: 600 !important;
-}
-
-/* COR ROXA SOMENTE PARA WARNING */
-div[data-testid="stAlert"][data-baseweb="notification"]:has(svg[data-testid="stAlertIcon-warning"]) {
-    background-color: #6A0DAD !important;
-    color: white !important;
-}
-
-/* TEXTO */
-div[data-testid="stAlert"] p {
-    margin: 0 !important;
-}
-
-</style>
+<div style="
+    background: linear-gradient(90deg, #6A0DAD, #8A2BE2);
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    margin-bottom: 0.5rem;
+">
+    ⚠️ Evitar Operar Match Odds
+</div>
 """, unsafe_allow_html=True)
 
 # =========================================
