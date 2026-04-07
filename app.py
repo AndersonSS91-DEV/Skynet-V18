@@ -1533,19 +1533,19 @@ cond_alerta = (
 
 if cond_alerta:
     st.markdown("""
-    <div style="
-        background-color:#6A0DAD;
-        padding:15px;
-        border-radius:12px;
-        text-align:center;
-        color:white;
-        font-weight:bold;
-        margin-top:10px;
-    ">
-        ⚠️ EVITAR OPERAR MATCH ODDS
-    </div>
-    """, unsafe_allow_html=True)
-    
+<div style="
+    background-color:#6A0DAD;
+    padding:10px 15px;
+    border-radius:10px;
+    text-align:left;
+    color:white;
+    font-weight:600;
+    margin-bottom:8px;
+">
+ ⚠️⚠️Evitar Operar Match Odds⚠️⚠️
+</div>
+""", unsafe_allow_html=True)
+  
 
 
     cards_ofensivos(
