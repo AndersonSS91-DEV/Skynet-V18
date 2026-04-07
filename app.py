@@ -1518,7 +1518,7 @@ with tab1:
 st.markdown("""
 <style>
 
-/* PADRÃO EXATO DOS ALERTAS DO STREAMLIT */
+/* PADRÃO DOS ALERTAS */
 div[data-testid="stAlert"] {
     padding: 0.75rem 1rem !important;
     border-radius: 0.5rem !important;
@@ -1527,9 +1527,9 @@ div[data-testid="stAlert"] {
     font-weight: 600 !important;
 }
 
-/* COR ROXA SOMENTE PARA WARNING */
-div[data-testid="stAlert"][data-baseweb="notification"]:has(svg[data-testid="stAlertIcon-warning"]) {
-    background-color: #6A0DAD !important;
+/* LARANJA PARA WARNING */
+div[data-testid="stAlert"][data-baseweb="notification"] {
+    background-color: #FF8C00 !important;
     color: white !important;
 }
 
@@ -1553,7 +1553,7 @@ if (
         else linha_mgf["MGF_A"]
     ) >= 1.20
 ):
-    st.warning("⚠️ Evitar Operar Match Odds")
+    st.warning("⚠️ Evitar Operar Match Odds ⚠️")
 
 
     
