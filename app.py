@@ -1511,28 +1511,6 @@ with tab1:
 
     st.pyplot(fig, use_container_width=False)
 
-    
-# =========================================
-# ⚠️ TESTE
-# =========================================
-st.markdown("""
-<style>
-
-/* LARANJA APENAS PARA WARNING */
-div[data-testid="stAlert"][data-baseweb="notification"][kind="warning"] {
-    background-color: #FF8C00 !important;
-    color: white !important;
-}
-
-/* TEXTO */
-div[data-testid="stAlert"] p {
-    color: white !important;
-    font-weight: 600 !important;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
 # =========================================
 # ⚠️ ALERTA MATCH ODDS
 # =========================================
@@ -1545,8 +1523,20 @@ if (
         else linha_mgf["MGF_A"]
     ) >= 1.20
 ):
-    st.warning("⚠️ Evitar Operar Match Odds ⚠️")
-
+st.markdown("""
+<div style="
+    background: linear-gradient(90deg, #FF8C00, #FF6A00);
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    margin-bottom: 0.5rem;
+">
+    ⚠️ Evitar Operar Match Odds
+</div>
+""", unsafe_allow_html=True)
 
     
     cards_ofensivos(
