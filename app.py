@@ -1,3 +1,8 @@
+import os
+import streamlit as st
+
+st.write("TESTE FORÇADO 777")
+st.write(os.path.abspath(__file__))
 # =========================================
 # STREAMLIT — POISSON SKYNET (HÍBRIDO)
 # =========================================
@@ -19,10 +24,12 @@ import base64
 from pathlib import Path
 import unicodedata
 # =========================================
-# CONFIG
+# CONFIG  
 # =========================================
+st.write("VERSAO TESTE 123")
+
 st.set_page_config(
-    page_title="⚽🏆Poisson Skynet🏆⚽",
+    page_title="⚽🏆Poisson Skynet V30.1🏆⚽",
     layout="wide"
 )
 st.markdown(
@@ -1505,8 +1512,51 @@ with tab1:
     st.pyplot(fig, use_container_width=False)
 
     
+# =========================================
+# ⚠️ TESTE
+# =========================================
+st.markdown("""
+<style>
+
+/* PADRÃO EXATO DOS ALERTAS DO STREAMLIT */
+div[data-testid="stAlert"] {
+    padding: 0.75rem 1rem !important;
+    border-radius: 0.5rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+    font-weight: 600 !important;
+}
+
+/* COR ROXA SOMENTE PARA WARNING */
+div[data-testid="stAlert"][data-baseweb="notification"]:has(svg[data-testid="stAlertIcon-warning"]) {
+    background-color: #6A0DAD !important;
+    color: white !important;
+}
+
+/* TEXTO */
+div[data-testid="stAlert"] p {
+    margin: 0 !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =========================================
+# ⚠️ ALERTA MATCH ODDS
+# =========================================
+
+if (
+    (linha_exg["VR01"] <= 0.15) or
+    (linha_exg["Odd_BTTS_YES"] <= 1.78) or
+    (
+        linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
+        else linha_mgf["MGF_A"]
+    ) >= 1.20
+):
+    st.warning("⚠️ Evitar Operar Match Odds")
 
 
+    
     cards_ofensivos(
         radar_home_consenso,
         radar_away_consenso,
@@ -2173,6 +2223,44 @@ with tab5:
             linha_vg["Visitor_Team"],
             *radar_away_vg
         ))
+
+
+
+
+def calcular_score_supremo(row):
+
+    score = 0
+
+    score += min(row.get("CPI_Total", 0) * 10, 30)
+    score += min(row.get("Corner_Pace_Factor", 0) * 20, 20)
+    score += min(row.get("Corner_Explosion_Index", 0) * 2.5, 20)
+    score += min(row.get("CMI", 0) / 2, 10)
+
+    if "EXPLOSÃO" in str(row.get("HT_Corner_Value", "")):
+        score += 10
+    elif "FORTE" in str(row.get("HT_Corner_Value", "")):
+        score += 6
+
+    if str(row.get("Trap_Signal", "")) != "":
+        score -= 15
+
+    return max(min(score, 100), 0)
+
+
+def classificar_jogo(score):
+
+    if score >= 75:
+        return "💣 ELITE"
+    elif score >= 60:
+        return "🔥 FORTE"
+    elif score >= 45:
+        return "⚡ MÉDIO"
+    else:
+        return "❄️ FRACO"
+
+df_cantos["Score_Supremo"] = df_cantos.apply(calcular_score_supremo, axis=1)
+df_cantos["Nivel_Jogo"] = df_cantos["Score_Supremo"].apply(classificar_jogo)
+
         
 # =========================================
 # ABA 6 — ESCANTEIOS (FIX COMPLETO DEFINITIVO)
@@ -2229,7 +2317,7 @@ with tab6:
     # =========================================
     # 📊 DADOS GERAIS
     # =========================================
-    st.markdown("### 📊📈 DADOS GERAIS")
+    st.markdown("## 📊📈 Dados Gerais")
 
     c1, c2, c3, c4, c5, c6 = st.columns(6)
 
@@ -2266,7 +2354,7 @@ with tab6:
     # =========================================
     # 🚩 ESCANTEIOS
     # =========================================
-    st.markdown("## 🚩 ESCANTEIOS")
+    st.markdown("## 🚩 Escanteios")
 
     a1, a2, a3, a4, a5 = st.columns(5)
 
@@ -2299,4 +2387,171 @@ with tab6:
         st.metric("Prob Over 10.5", get_val(linha_cantos, "Prob_Over10_5_Cantos", "{:.2f}"))
         st.metric("Prob Over HT 4.5", get_val(linha_cantos, "Prob_Over4_5_Cantos_HT", "{:.2f}"))
 
+    st.markdown("---")
+# =========================================
+# ABA 6 — ESCANTEIOS (BLINDADA)
+# =========================================
+with tab6:
 
+    container_tab6 = st.container()
+
+    with container_tab6:
+
+        df_filtrado = df_cantos[df_cantos["JOGO"] == jogo]
+
+        if df_filtrado.empty:
+            st.warning("Sem dados de escanteios para este jogo")
+            st.stop()
+
+        linha_cantos = df_filtrado.iloc[0]
+
+            # =========================================
+    # 🚀 CENTRAL INTELIGENTE — ESCANTEIOS
+    # =========================================
+    st.markdown("## 🚀 Central Inteligente de Escanteios")
+
+    score_supremo = float(linha_cantos.get("Score_Supremo", 0))
+    nivel_jogo = linha_cantos.get("Nivel_Jogo", "-")
+
+    if score_supremo >= 75:
+        status_cor = "🟢"
+    elif score_supremo >= 60:
+        status_cor = "🟡"
+    elif score_supremo >= 45:
+        status_cor = "🟠"
+    else:
+        status_cor = "🔴"
+
+    st.markdown(f"""
+    ## {status_cor} {nivel_jogo}
+    ### 🎯 Score Supremo: **{score_supremo:.1f} / 100**
+    """)
+
+    st.markdown("---")
+    
+    # =========================================
+    # 🎯 ENTRADA RECOMENDADA
+    # =========================================
+    st.markdown("## 🎯 Entrada Recomendada")
+
+    prob_over_85 = float(linha_cantos.get("Prob_Over8_5_Cantos", 0))
+    prob_over_95 = float(linha_cantos.get("Prob_Over9_5_Cantos", 0))
+    expectativa_cantos = float(linha_cantos.get("Expectativa_Cantos", 0))
+
+    if prob_over_85 < 45:
+        st.error("❌ SEM ENTRADA")
+
+    elif prob_over_85 >= 60 and score_supremo >= 70:
+        if prob_over_95 >= 45:
+            st.success("💣 OVER 9.5 (VALOR ALTO)")
+        else:
+            st.success("🔥 OVER 8.5 (FORTE)")
+
+    elif prob_over_85 >= 55:
+        st.success("🔥 OVER 8.5")
+
+    elif prob_over_85 >= 50:
+        st.warning("⚡ OVER 8.5 (MODERADO)")
+
+    elif expectativa_cantos >= 10:
+        st.warning("⚡ OVER 7.5 (LIVE)")
+
+    else:
+        st.error("❌ SEM ENTRADA")
+
+    # =========================================
+    # 🎯 DIREÇÃO DO JOGO
+    # =========================================
+    st.markdown("## 🎯 Direção do Jogo")
+
+    col1, col2, col3 = st.columns(3)
+
+    score_home = float(linha_cantos.get("Score_Cantos_Home", 0))
+    score_away = float(linha_cantos.get("Score_Cantos_Away", 0))
+
+    if score_home > score_away * 1.15:
+        direcao_jogo = "🏠 Pressão Home"
+    elif score_away > score_home * 1.15:
+        direcao_jogo = "✈️ Pressão Away"
+    else:
+        direcao_jogo = "⚖️ Equilibrado"
+
+    with col1:
+        st.metric("Score Home", f"{score_home:.1f}")
+
+    with col2:
+        st.metric("Score Away", f"{score_away:.1f}")
+
+    with col3:
+        st.markdown(f"### {direcao_jogo}")
+
+    # =========================================
+    # ⚡ RITMO DO JOGO
+    # =========================================
+    st.markdown("## ⚡ Ritmo & Dinâmica")
+
+    col1, col2, col3 = st.columns(3)
+
+    pace = float(linha_cantos.get("Corner_Pace_Factor", 0))
+    explosao = float(linha_cantos.get("Corner_Explosion_Index", 0))
+    momentum = float(linha_cantos.get("CMI", 0))
+
+    with col1:
+        st.metric("Pace", f"{pace:.2f}")
+
+    with col2:
+        st.metric("Explosão", f"{explosao:.2f}")
+
+    with col3:
+        st.metric("Momentum", f"{momentum:.2f}")
+
+    
+    st.markdown("---")
+    # =========================================
+    # 🟢 ENTRADA HT
+    # =========================================
+    st.markdown("## 🟢 Direção HT(Primeiro Tempo)")
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    prob_ht_over35 = float(linha_cantos.get("Prob_Over3_5_Cantos_HT", 0))
+    lambda_ht_home = float(linha_cantos.get("Lambda_Cantos_HT_Home", 0))
+    lambda_ht_away = float(linha_cantos.get("Lambda_Cantos_HT_Away", 0))
+
+    if "EXPLOSÃO" in str(linha_cantos.get("HT_Corner_Value", "")):
+        sinal_ht = "💣 HT Dinâmico"
+    elif prob_ht_over35 >= 60:
+        sinal_ht = "🔥 Tendência de Over HT"
+    elif prob_ht_over35 >= 50:
+        sinal_ht = "⚡ Normal"
+    else:
+        sinal_ht = "❄️ Tendência de HT Lento"
+
+    with col1:
+        st.metric("Prob. Over 3.5 HT", f"{prob_ht_over35:.1f}%")
+
+    with col2:
+        st.metric("λ HT Home", f"{lambda_ht_home:.2f}")
+
+    with col3:
+        st.metric("λ HT Away", f"{lambda_ht_away:.2f}")
+
+    with col4:
+        st.markdown(f"### {sinal_ht}")
+
+    
+    st.markdown("---")
+    # =========================================
+    # 🚨 ALERTAS
+    # =========================================
+    st.markdown("## 🚨 Alertas")
+
+    trap_signal = str(linha_cantos.get("Trap_Signal", ""))
+    pace_factor = float(linha_cantos.get("Corner_Pace_Factor", 0))
+
+    if trap_signal != "":
+        st.error("🪤 Armadilha Detectada")
+    elif pace_factor < 0.9:
+        st.warning("❄️ Tendência de Jogo Lento")
+    else:
+        st.success("✅ Tendência de Jogo Dinâmico")
