@@ -1512,6 +1512,27 @@ with tab1:
     st.pyplot(fig, use_container_width=False)
 
     
+    with col4:
+
+    qtd_alertas = df_consenso["Alerta_MatchOdds"].sum()
+
+    st.markdown(f"""
+    <div style="
+        background-color:#6A0DAD;
+        padding:15px;
+        border-radius:12px;
+        text-align:center;
+        color:white;
+        font-weight:bold;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    ">
+        ⚠️ EVITAR MATCH ODDS<br>
+        <span style="font-size:28px;">{qtd_alertas}</span><br>
+        jogos com risco elevado
+    </div>
+    """, unsafe_allow_html=True)
+
+    
 
 
     cards_ofensivos(
