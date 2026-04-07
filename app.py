@@ -988,7 +988,7 @@ def leitura_consenso(nome, radar_vals):
 
     elif exg < 40:
         leitura = "👉 dificuldade para criar oportunidades"
-
+   
     else:
         leitura = "👉 perfil ofensivo equilibrado"
 
