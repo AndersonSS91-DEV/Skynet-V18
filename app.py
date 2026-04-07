@@ -1511,39 +1511,50 @@ with tab1:
 
     st.pyplot(fig, use_container_width=False)
 
+    
 # =========================================
-# ⚠️ ALERTA MATCH ODDS (JOGO ATUAL)
+# ⚠️ TESTE
+# =========================================
+st.markdown("""
+<style>
+
+/* PADRÃO EXATO DOS ALERTAS DO STREAMLIT */
+div[data-testid="stAlert"] {
+    padding: 0.75rem 1rem !important;
+    border-radius: 0.5rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+    font-weight: 600 !important;
+}
+
+/* COR ROXA SOMENTE PARA WARNING */
+div[data-testid="stAlert"][data-baseweb="notification"]:has(svg[data-testid="stAlertIcon-warning"]) {
+    background-color: #6A0DAD !important;
+    color: white !important;
+}
+
+/* TEXTO */
+div[data-testid="stAlert"] p {
+    margin: 0 !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =========================================
+# ⚠️ ALERTA MATCH ODDS
 # =========================================
 
-# 🔥 DEFINE ZEBRA (MAIOR ODD)
-if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]:
-    mgf_zebra = linha_mgf["MGF_H"]
-else:
-    mgf_zebra = linha_mgf["MGF_A"]
-
-# 🔥 CONDIÇÃO
-cond_alerta = (
+if (
     (linha_exg["VR01"] <= 0.15) or
     (linha_exg["Odd_BTTS_YES"] <= 1.78) or
-    (mgf_zebra >= 1.20)
-)
+    (
+        linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
+        else linha_mgf["MGF_A"]
+    ) >= 1.20
+):
+    st.warning("⚠️ Evitar Operar Match Odds")
 
-# 🔥 CARD (ISOLADO, NÃO VAZA)
-if cond_alerta:
-    st.markdown("""
-    <div style="
-        background: linear-gradient(90deg, #FF8C00, #FF6A00);
-        padding: 0.75rem 1rem;
-        border-radius: 0.5rem;
-        color: white;
-        font-size: 0.875rem;
-        font-weight: 600;
-        line-height: 1.25rem;
-        margin-bottom: 0.5rem;
-    ">
-        ⚠️ Evitar Operar Match Odds
-    </div>
-    """, unsafe_allow_html=True)
 
     
     cards_ofensivos(
