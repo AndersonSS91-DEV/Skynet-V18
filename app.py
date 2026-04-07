@@ -1511,30 +1511,30 @@ with tab1:
 
     st.pyplot(fig, use_container_width=False)
 
-# =========================================
-# ⚠️ ALERTA MATCH ODDS
-# =========================================
-if (
-    (linha_exg["VR01"] <= 0.15) or
-    (linha_exg["Odd_BTTS_YES"] <= 1.78) or
-    (
-        linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
-        else linha_mgf["MGF_A"]
-    ) >= 1.20
-):
-    st.markdown("""
-    <div style="
-        background: #FF8C00;
-        padding: 12px 16px;
-        border-radius: 12px;
-        color: white;
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 12px;
-    ">
-        ⚠️ Evitar Operar Match Odds
-    </div>
-    """, unsafe_allow_html=True)
+    # =========================================
+    # ⚠️ ALERTA MATCH ODDS
+    # =========================================
+    if (
+        (linha_exg["VR01"] <= 0.15) or
+        (linha_exg["Odd_BTTS_YES"] <= 1.78) or
+        (
+            linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
+            else linha_mgf["MGF_A"]
+        ) >= 1.20
+    ):
+        st.markdown("""
+        <div style="
+            background: #FF8C00;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        ">
+            ⚠️ Evitar Operar Match Odds
+        </div>
+        """, unsafe_allow_html=True)
   
     cards_ofensivos(
         radar_home_consenso,
