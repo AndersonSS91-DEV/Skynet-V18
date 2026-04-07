@@ -1515,13 +1515,14 @@ with tab1:
     # ⚠️ ALERTA MATCH ODDS
     # =========================================
     if (
-        (linha_exg["VR01"] <= 0.15) or
-        (linha_exg["Odd_BTTS_YES"] <= 1.78) or
+        (linha_exg["VR01"] <= 0.15) and
+        (linha_exg["Odd_BTTS_YES"] <= 1.80) and
         (
             linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
             else linha_mgf["MGF_A"]
-        ) >= 1.20
+        ) >= 1.60
     ):
+
         st.markdown("""
         <div style="
             background: #FF8C00;
