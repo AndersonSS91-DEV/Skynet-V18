@@ -1183,16 +1183,16 @@ def mostrar_card(df_base, jogo):
 
     card = f"""
     <div style="background:{cor};
-            padding:18px;
-            border-radius:14px;
-            box-shadow:0 0 10px rgba(0,0,0,0.45);
-            color:white;
-            font-size:18px;
-            font-weight:600;
-            margin-bottom:18px;">
-    🧠 {row["Interpretacao"]}
-    <br>
-    <span style="font-size:26px;">{estrelas}</span>
+                padding:18px;
+                border-radius:14px;
+                box-shadow:0 0 10px rgba(0,0,0,0.45);
+                color:white;
+                font-size:18px;
+                font-weight:600;
+                margin-bottom:18px;">
+        🧠 {row["Interpretacao"]}
+        <br>
+        <span style="font-size:26px;">{estrelas}</span>
     </div>
     """
 
