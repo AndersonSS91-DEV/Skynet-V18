@@ -999,7 +999,7 @@ def leitura_consenso(nome, radar_vals):
 
 {texto}
 
-🧠 leitura:
+"🧠 leitura:"
 {leitura}
 """
 
