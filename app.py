@@ -1512,11 +1512,18 @@ with tab1:
     st.pyplot(fig, use_container_width=False)
 
     
-    with col4:
+    # =========================================
+# ⚠️ ALERTA MATCH ODDS (JOGO ATUAL)
+# =========================================
 
-    qtd_alertas = df_consenso["Alerta_MatchOdds"].sum()
+cond_alerta = (
+    (linha_exg["VR01"] <= 0.15) or
+    (linha_exg["Odd_BTTS_YES"] <= 1.78) or
+    (linha_mgf["MGF_Zebra"] >= 1.20)
+)
 
-    st.markdown(f"""
+if cond_alerta:
+    st.markdown("""
     <div style="
         background-color:#6A0DAD;
         padding:15px;
@@ -1524,14 +1531,11 @@ with tab1:
         text-align:center;
         color:white;
         font-weight:bold;
-        box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        margin-top:10px;
     ">
-        ⚠️ EVITAR MATCH ODDS<br>
-        <span style="font-size:28px;">{qtd_alertas}</span><br>
-        jogos com risco elevado
+        ⚠️ EVITAR OPERAR MATCH ODDS
     </div>
     """, unsafe_allow_html=True)
-
     
 
 
