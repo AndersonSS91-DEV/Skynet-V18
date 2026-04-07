@@ -1512,31 +1512,38 @@ with tab1:
     st.pyplot(fig, use_container_width=False)
 
 # =========================================
-# ⚠️ ALERTA MATCH ODDS
+# ⚠️ ALERTA MATCH ODDS (JOGO ATUAL)
 # =========================================
 
-if (
+# 🔥 DEFINE ZEBRA (MAIOR ODD)
+if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]:
+    mgf_zebra = linha_mgf["MGF_H"]
+else:
+    mgf_zebra = linha_mgf["MGF_A"]
+
+# 🔥 CONDIÇÃO
+cond_alerta = (
     (linha_exg["VR01"] <= 0.15) or
     (linha_exg["Odd_BTTS_YES"] <= 1.78) or
-    (
-        linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
-        else linha_mgf["MGF_A"]
-    ) >= 1.20
-):
-st.markdown("""
-<div style="
-    background: linear-gradient(90deg, #FF8C00, #FF6A00);
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    color: white;
-    font-size: 0.875rem;
-    font-weight: 600;
-    line-height: 1.25rem;
-    margin-bottom: 0.5rem;
-">
-    ⚠️ Evitar Operar Match Odds
-</div>
-""", unsafe_allow_html=True)
+    (mgf_zebra >= 1.20)
+)
+
+# 🔥 CARD (ISOLADO, NÃO VAZA)
+if cond_alerta:
+    st.markdown("""
+    <div style="
+        background: linear-gradient(90deg, #FF8C00, #FF6A00);
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 600;
+        line-height: 1.25rem;
+        margin-bottom: 0.5rem;
+    ">
+        ⚠️ Evitar Operar Match Odds
+    </div>
+    """, unsafe_allow_html=True)
 
     
     cards_ofensivos(
