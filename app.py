@@ -1,8 +1,3 @@
-import os
-import streamlit as st
-
-st.write("TESTE FORÇADO 777")
-st.write(os.path.abspath(__file__))
 # =========================================
 # STREAMLIT — POISSON SKYNET (HÍBRIDO)
 # =========================================
@@ -1511,52 +1506,32 @@ with tab1:
 
     st.pyplot(fig, use_container_width=False)
 
-    
-# =========================================
-# ⚠️ TESTE
-# =========================================
-st.markdown("""
-<style>
+    # =========================================
+    # ⚠️ ALERTA MATCH ODDS
+    # =========================================
+    if (
+        (linha_exg["VR01"] <= 0.15) and
+        (linha_exg["Odd_BTTS_YES"] <= 1.80) and
+        (
+            linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
+            else linha_mgf["MGF_A"]
+        ) >= 1.60
+    ):
 
-/* PADRÃO EXATO DOS ALERTAS DO STREAMLIT */
-div[data-testid="stAlert"] {
-    padding: 0.75rem 1rem !important;
-    border-radius: 0.5rem !important;
-    font-size: 0.875rem !important;
-    line-height: 1.25rem !important;
-    font-weight: 600 !important;
-}
-
-/* COR ROXA SOMENTE PARA WARNING */
-div[data-testid="stAlert"][data-baseweb="notification"]:has(svg[data-testid="stAlertIcon-warning"]) {
-    background-color: #6A0DAD !important;
-    color: white !important;
-}
-
-/* TEXTO */
-div[data-testid="stAlert"] p {
-    margin: 0 !important;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# =========================================
-# ⚠️ ALERTA MATCH ODDS
-# =========================================
-
-if (
-    (linha_exg["VR01"] <= 0.15) or
-    (linha_exg["Odd_BTTS_YES"] <= 1.78) or
-    (
-        linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
-        else linha_mgf["MGF_A"]
-    ) >= 1.20
-):
-    st.warning("⚠️ Evitar Operar Match Odds")
-
-
-    
+        st.markdown("""
+        <div style="
+            background: #FF8C00;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        ">
+            ⚠️ Evitar Operar Match Odds
+        </div>
+        """, unsafe_allow_html=True)
+  
     cards_ofensivos(
         radar_home_consenso,
         radar_away_consenso,
