@@ -1515,7 +1515,7 @@ with tab1:
         (
             linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
             else linha_mgf["MGF_A"]
-        ) >= 1.60
+        ) >= 1.00
     ):
 
         st.markdown("""
