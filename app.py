@@ -1533,7 +1533,7 @@ with tab1:
         """, unsafe_allow_html=True)
         
     # =========================================
-    # 🎯 ENTRADAS + SCORE SUPREMO (CORRIGIDO)
+    # 🎯 ENTRADAS + SCORE REAL (BASE DATASET)
     # =========================================
 
     # ================================
@@ -1545,7 +1545,7 @@ with tab1:
     exg_diff = abs(exg_home - exg_away)
     exg_total = exg_home + exg_away
 
-    btts = linha_exg.get("Prob_BTTS", 0)
+    btts = linha_mgf.get("BTTS_%", 0) / 100  # já vem em %
 
     # ================================
     # 🎯 ENTRADA PRINCIPAL
@@ -1553,16 +1553,16 @@ with tab1:
     entrada_1 = "Sem entrada"
     entrada_2 = ""
 
-    if exg_diff >= 1.2:
+    if exg_total >= 2.8:
+        entrada_1 = "Over 2.5"
+
+    elif exg_diff >= 1.2:
         if exg_home > exg_away:
             entrada_1 = "Back Casa"
         else:
             entrada_1 = "Back Visitante"
 
-    elif exg_total >= 2.8:
-        entrada_1 = "Over 2.5"
-
-    elif exg_diff < 0.6 and btts >= 0.60:
+    elif btts >= 0.60:
         entrada_1 = "BTTS YES"
 
     elif exg_total <= 2.2:
@@ -1571,8 +1571,11 @@ with tab1:
     # ================================
     # 🎯 ENTRADA SECUNDÁRIA
     # ================================
-    if entrada_1 == "Over 2.5" and btts >= 0.55:
+    if entrada_1 == "Over 2.5" and btts >= 0.50:
         entrada_2 = "BTTS YES"
+
+    elif entrada_1 == "BTTS YES" and exg_total >= 2.8:
+        entrada_2 = "Over 2.5"
 
     elif entrada_1 == "Back Casa" and exg_total >= 2.5:
         entrada_2 = "Over 2.5"
@@ -1580,48 +1583,36 @@ with tab1:
     elif entrada_1 == "Back Visitante" and exg_total >= 2.5:
         entrada_2 = "Over 2.5"
 
-    elif entrada_1 == "BTTS YES" and exg_total >= 2.8:
-        entrada_2 = "Over 2.5"
-
     # ================================
-    # 🧠 SCORE PROFISSIONAL
+    # 🧠 SCORE REAL (ESCALA CORRETA)
     # ================================
-    score_forca = min(exg_diff * 20, 100)
-    score_gols = min(exg_total * 35, 100)
-    score_btts = btts * 100
+    score_gols = exg_total * 20
+    score_btts = linha_mgf.get("BTTS_%", 0)
+    score_forca = exg_diff * 10
 
-    # 🔥 bônus jogo aberto
-    bonus = 0
-    if exg_total >= 2.8:
-        bonus += 10
-    if btts >= 0.60:
-        bonus += 10
+    score_final = score_gols + score_btts + score_forca
 
-    score_final = (
-        score_forca * 0.25 +
-        score_gols * 0.45 +
-        score_btts * 0.30 +
-        bonus
-    )
+    # limite
+    score_final = min(score_final, 100)
 
     # ================================
     # 🏷️ CLASSIFICAÇÃO
     # ================================
-    if score_final >= 85:
+    if score_final >= 90:
         classe = "A+"
     elif score_final >= 75:
         classe = "A"
-    elif score_final >= 68:
+    elif score_final >= 65:
         classe = "B"
-    elif score_final >= 60:
+    elif score_final >= 55:
         classe = "C"
-    elif score_final >= 50:
+    elif score_final >= 45:
         classe = "D"
     else:
         classe = "E"
 
     # ================================
-    # 🚫 FILTRO FINAL (LIXO REAL)
+    # 🚫 FILTRO FINAL
     # ================================
     if entrada_1 == "Sem entrada":
         classe = "E"
@@ -1641,6 +1632,8 @@ with tab1:
     <b>🎯 Entrada 2:</b> {entrada_2 if entrada_2 else '-'}<br>
     <b>🏷️ Classe:</b> {classe}<br>
     <b>🧠 Score:</b> {score_final:.1f}<br>
+    <b>⚽ ExG Total:</b> {exg_total:.2f}<br>
+    <b>🔥 BTTS:</b> {linha_mgf.get("BTTS_%", 0):.1f}%<br>
     </div>
     """, unsafe_allow_html=True)
   
