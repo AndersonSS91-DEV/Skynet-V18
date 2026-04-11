@@ -1533,11 +1533,11 @@ with tab1:
         """, unsafe_allow_html=True)
         
     # =========================================
-    # 🎯 ENTRADA + SCORE + CLASSIFICAÇÃO (FIXO)
+    # 🎯 ENTRADAS + SCORE SUPREMO (CORRIGIDO)
     # =========================================
 
     # ================================
-    # 🔢 BASE (SEMPRE PRIMEIRO)
+    # 🔢 BASE
     # ================================
     exg_home = linha_mgf.get("ExG_Home_MGF", 0)
     exg_away = linha_mgf.get("ExG_Away_MGF", 0)
@@ -1545,34 +1545,63 @@ with tab1:
     exg_diff = abs(exg_home - exg_away)
     exg_total = exg_home + exg_away
 
+    btts = linha_exg.get("Prob_BTTS", 0)
+
     # ================================
-    # 🎯 ENTRADA
+    # 🎯 ENTRADA PRINCIPAL
     # ================================
-    entrada = "Sem entrada"
+    entrada_1 = "Sem entrada"
+    entrada_2 = ""
 
     if exg_diff >= 1.2:
-        entrada = "Back Casa" if exg_home > exg_away else "Back Visitante"
+        if exg_home > exg_away:
+            entrada_1 = "Back Casa"
+        else:
+            entrada_1 = "Back Visitante"
 
     elif exg_total >= 2.8:
-        entrada = "Over 2.5"
+        entrada_1 = "Over 2.5"
 
-    elif exg_diff < 0.6 and linha_exg.get("Prob_BTTS", 0) >= 0.60:
-        entrada = "BTTS YES"
+    elif exg_diff < 0.6 and btts >= 0.60:
+        entrada_1 = "BTTS YES"
 
     elif exg_total <= 2.2:
-        entrada = "Under 2.5"
+        entrada_1 = "Under 2.5"
 
     # ================================
-    # 🧠 SCORE (SEM EV / SEM CV)
+    # 🎯 ENTRADA SECUNDÁRIA
     # ================================
-    score_forca = min(exg_diff * 30, 100)
-    score_gols = min(exg_total * 30, 100)
-    score_btts = linha_exg.get("Prob_BTTS", 0) * 100
+    if entrada_1 == "Over 2.5" and btts >= 0.55:
+        entrada_2 = "BTTS YES"
+
+    elif entrada_1 == "Back Casa" and exg_total >= 2.5:
+        entrada_2 = "Over 2.5"
+
+    elif entrada_1 == "Back Visitante" and exg_total >= 2.5:
+        entrada_2 = "Over 2.5"
+
+    elif entrada_1 == "BTTS YES" and exg_total >= 2.8:
+        entrada_2 = "Over 2.5"
+
+    # ================================
+    # 🧠 SCORE PROFISSIONAL
+    # ================================
+    score_forca = min(exg_diff * 20, 100)
+    score_gols = min(exg_total * 35, 100)
+    score_btts = btts * 100
+
+    # 🔥 bônus jogo aberto
+    bonus = 0
+    if exg_total >= 2.8:
+        bonus += 10
+    if btts >= 0.60:
+        bonus += 10
 
     score_final = (
-        score_forca * 0.4 +
-        score_gols * 0.4 +
-        score_btts * 0.2
+        score_forca * 0.25 +
+        score_gols * 0.45 +
+        score_btts * 0.30 +
+        bonus
     )
 
     # ================================
@@ -1592,6 +1621,12 @@ with tab1:
         classe = "E"
 
     # ================================
+    # 🚫 FILTRO FINAL (LIXO REAL)
+    # ================================
+    if entrada_1 == "Sem entrada":
+        classe = "E"
+
+    # ================================
     # 📊 CARD FINAL
     # ================================
     st.markdown(f"""
@@ -1600,9 +1635,10 @@ with tab1:
         padding: 16px;
         border-radius: 12px;
         color: white;
-        margin-top: 10px;
+        margin-top: 12px;
     ">
-    <b>🎯 Entrada:</b> {entrada}<br>
+    <b>🎯 Entrada 1:</b> {entrada_1}<br>
+    <b>🎯 Entrada 2:</b> {entrada_2 if entrada_2 else '-'}<br>
     <b>🏷️ Classe:</b> {classe}<br>
     <b>🧠 Score:</b> {score_final:.1f}<br>
     </div>
