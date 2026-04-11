@@ -1533,42 +1533,56 @@ with tab1:
         """, unsafe_allow_html=True)
         
 # ================================
-# 🎯 SUGESTÃO DE ENTRADA
+# 🛠️ SAFE GET (ANTI-ERRO)
+# ================================
+def safe_get(df, col, default=0):
+    if col in df.index:
+        return df[col]
+    return default
+
+
+# ================================
+# 🎯 SUGESTÃO DE ENTRADA (CORRIGIDO)
 # ================================
 entrada = "Sem entrada"
 
-exg_home = row["ExG_Home_MGF"]
-exg_away = row["ExG_Away_MGF"]
+exg_home = safe_get(linha_mgf, "ExG_Home_MGF")
+exg_away = safe_get(linha_mgf, "ExG_Away_MGF")
+
 exg_diff = abs(exg_home - exg_away)
 exg_total = exg_home + exg_away
 
 odd = 0
 p = 0
 
+# 🔹 Dominância clara
 if exg_diff >= 1.2:
     if exg_home > exg_away:
         entrada = "Back Casa"
-        odd = row["Odds_Casa"]
-        p = row["Prob_H"]
+        odd = safe_get(linha_exg, "Odds_Casa")
+        p = safe_get(linha_exg, "Prob_H")
     else:
         entrada = "Back Visitante"
-        odd = row["Odds_Visitante"]
-        p = row["Prob_A"]
+        odd = safe_get(linha_exg, "Odds_Visitante")
+        p = safe_get(linha_exg, "Prob_A")
 
+# 🔹 Jogo aberto
 elif exg_total >= 2.8:
     entrada = "Over 2.5"
-    odd = row["Odds_Over_2,5FT"]
-    p = row["Prob_Over_2,5"]
+    odd = safe_get(linha_exg, "Odds_Over_2,5FT")
+    p = safe_get(linha_exg, "Prob_Over_2.5")
 
-elif exg_diff < 0.6 and row["Prob_BTTS"] >= 0.60:
+# 🔹 BTTS
+elif exg_diff < 0.6 and safe_get(linha_exg, "Prob_BTTS") >= 0.60:
     entrada = "BTTS YES"
-    odd = row["Odd_BTTS_YES"]
-    p = row["Prob_BTTS"]
+    odd = safe_get(linha_exg, "Odd_BTTS_YES")
+    p = safe_get(linha_exg, "Prob_BTTS")
 
+# 🔹 Under
 elif exg_total <= 2.2:
     entrada = "Under 2.5"
-    odd = row["Odds_Under_2,5FT"]
-    p = row["Prob_Under_2,5"]
+    odd = safe_get(linha_exg, "Odds_Under_2,5FT")
+    p = safe_get(linha_exg, "Prob_Under_2.5")
 
 
 # ================================
@@ -1577,14 +1591,13 @@ elif exg_total <= 2.2:
 score_forca = min(exg_diff * 25, 100)
 
 score_value = (
-    (row["EV"] * 100) * 0.6 +
-    (row["VR01"] * 100) * 0.4
+    (safe_get(linha_exg, "EV") * 100) * 0.6 +
+    (safe_get(linha_exg, "VR01") * 100) * 0.4
 )
 
-score_confianca = max(0, 100 - (row["CV_Medio"] * 100))
+score_confianca = max(0, 100 - (safe_get(linha_mgf, "CV_Medio") * 100))
 
-ligas_ruins = ["Brazil", "Argentina", "MLS"]
-score_contexto = 60 if any(l in row["League"] for l in ligas_ruins) else 100
+score_contexto = 100  # (sem league no seu DF atual)
 
 score_final = (
     score_value * 0.35 +
@@ -1626,13 +1639,13 @@ kelly = max(0, kelly)
 
 
 # ================================
-# 🔒 FILTRO
+# 🔒 FILTRO FINAL
 # ================================
 if (
     entrada == "Sem entrada"
-    or row["EV"] <= 0
+    or safe_get(linha_exg, "EV") <= 0
     or p < 0.55
-    or row["CV_Medio"] > 0.28
+    or safe_get(linha_mgf, "CV_Medio") > 0.28
 ):
     classe = "E"
     stake = 0
