@@ -1515,23 +1515,198 @@ with tab1:
         (
             linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
             else linha_mgf["MGF_A"]
-        ) >= 1.60
+        ) >= 1.00
     ):
 
         st.markdown("""
+        
         <div style="
-            background: #FF8C00;
-            padding: 12px 16px;
+            width: 100%;
+            background: linear-gradient(135deg, #1e1e1e, #2c3e50);
+            padding: 16px;
             border-radius: 12px;
             color: white;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 12px;
+            margin-top: 12px;
         ">
-            ⚠️ Evitar Operar Match Odds
+                    ⚠️ Evitar Operar Match Odds
         </div>
         """, unsafe_allow_html=True)
-  
+        
+    # =========================================
+    # 🎯 ENTRADAS + SCORE REAL (BASE DATASET)
+    # =========================================
+
+    # ================================
+    # 🔢 BASE
+    # ================================
+    exg_home = linha_mgf.get("ExG_Home_MGF", 0)
+    exg_away = linha_mgf.get("ExG_Away_MGF", 0)
+
+    exg_diff = abs(exg_home - exg_away)
+    exg_total = exg_home + exg_away
+
+    btts = linha_mgf.get("BTTS_%", 0) / 100
+
+    # ================================
+    # 🎯 ENTRADA PRINCIPAL
+    # ================================
+    entrada_1 = "Sem entrada"
+    entrada_2 = ""
+
+    if exg_total >= 2.8:
+        entrada_1 = "Over 2.5"
+
+    elif exg_diff >= 1.2:
+        if exg_home > exg_away:
+            entrada_1 = "Back Casa"
+        else:
+            entrada_1 = "Back Visitante"
+
+    elif btts >= 0.60:
+        entrada_1 = "BTTS YES"
+
+    elif exg_total <= 2.2:
+        entrada_1 = "Under 2.5"
+
+    # ================================
+    # 🎯 ENTRADA SECUNDÁRIA
+    # ================================
+    if entrada_1 == "Over 2.5" and btts >= 0.50:
+        entrada_2 = "BTTS YES"
+
+    elif entrada_1 == "BTTS YES" and exg_total >= 2.8:
+        entrada_2 = "Over 2.5"
+
+    elif entrada_1 == "Back Casa" and exg_total >= 2.5:
+        entrada_2 = "Over 2.5"
+
+    elif entrada_1 == "Back Visitante" and exg_total >= 2.5:
+        entrada_2 = "Over 2.5"
+
+    # ================================
+    # 🧠 SCORE
+    # ================================
+    score_gols = min(exg_total * 15, 100)
+    score_btts = (btts * 100) * 0.8
+    score_forca = min(exg_diff * 10, 100)
+
+    liga = str(linha_exg.get("League", "")).lower()
+
+    penal_liga = 0
+    if "brazil" in liga:
+        penal_liga = -15
+    elif "argentina" in liga:
+        penal_liga = -10
+
+    bonus = 0
+    if exg_total >= 3.5:
+        bonus += 10
+    if btts >= 0.65:
+        bonus += 10
+
+    score_final = (
+        score_gols * 0.5 +
+        score_btts * 0.3 +
+        score_forca * 0.2 +
+        bonus +
+        penal_liga
+    )
+
+    score_final = max(min(score_final, 100), 0)
+
+    # ================================
+    # 🏷️ CLASSIFICAÇÃO
+    # ================================
+    if score_final >= 85:
+        classe = "A+"
+    elif score_final >= 72:
+        classe = "A"
+    elif score_final >= 62:
+        classe = "B"
+    elif score_final >= 55:
+        classe = "C"
+    elif score_final >= 45:
+        classe = "D"
+    else:
+        classe = "E"
+
+    if entrada_1 == "Sem entrada":
+        classe = "E"
+
+    # =========================================
+    # 🚨 DETECTOR DE LINHA FALSA (ANTES DA STAKE)
+    # =========================================
+    linha_falsa = False
+
+    if (
+        exg_total >= 2.8 and
+        btts < 0.62 and
+        exg_diff < 0.7
+    ):
+        linha_falsa = True
+
+    if "brazil" in liga or "argentina" in liga:
+        if exg_total < 3.2:
+            linha_falsa = True
+
+    # =========================================
+    # 💰 STAKE DINÂMICA
+    # =========================================
+    p = max(btts, 0.50)
+    odd = 2.0
+
+    b = odd - 1
+    q = 1 - p
+
+    if b > 0:
+        kelly = (b * p - q) / b
+    else:
+        kelly = 0
+
+    kelly = max(0, kelly)
+
+    if classe == "A+":
+        stake = kelly * 0.60
+    elif classe == "A":
+        stake = kelly * 0.45
+    elif classe == "B":
+        stake = kelly * 0.25
+    elif classe == "C":
+        stake = kelly * 0.10
+    else:
+        stake = 0
+
+    # redutores
+    if linha_falsa:
+        stake *= 0.4
+
+    if exg_total < 2.4:
+        stake *= 0.5
+
+    stake = min(stake, 0.10)
+
+    # =========================================
+    # 📊 CARD FINAL
+    # =========================================
+    st.markdown(f"""
+    <div style="
+        background: linear-gradient(135deg, #1e1e1e, #2c3e50);
+        padding: 16px;
+        border-radius: 12px;
+        color: white;
+        margin-top: 12px;
+    ">
+    <b>🎯 Entrada 1:</b> {entrada_1}<br>
+    <b>🎯 Entrada 2:</b> {entrada_2 if entrada_2 else '-'}<br>
+    <b>🏷️ Classe:</b> {classe}<br>
+    <b>🧠 Score:</b> {score_final:.1f}<br>
+    <b>💰 Stake:</b> {stake*100:.2f}%<br>
+    <b>⚽ ExG:</b> {exg_total:.2f}<br>
+    <b>🔥 BTTS:</b> {linha_mgf.get("BTTS_%", 0):.1f}%<br>
+    </div>
+    """, unsafe_allow_html=True)
+
+    
     cards_ofensivos(
         radar_home_consenso,
         radar_away_consenso,
