@@ -1545,7 +1545,7 @@ with tab1:
     exg_diff = abs(exg_home - exg_away)
     exg_total = exg_home + exg_away
 
-    btts = linha_mgf.get("BTTS_%", 0) / 100  # já vem em %
+    btts = linha_mgf.get("BTTS_%", 0) / 100
 
     # ================================
     # 🎯 ENTRADA PRINCIPAL
@@ -1584,19 +1584,12 @@ with tab1:
         entrada_2 = "Over 2.5"
 
     # ================================
-    # 🧠 SCORE REAL CORRIGIDO
+    # 🧠 SCORE
     # ================================
-
-    # gols
     score_gols = min(exg_total * 15, 100)
-
-    # btts precisa ser alto de verdade
     score_btts = (btts * 100) * 0.8
-
-    # força leve
     score_forca = min(exg_diff * 10, 100)
 
-    # penalização liga ruim
     liga = str(linha_exg.get("League", "")).lower()
 
     penal_liga = 0
@@ -1605,7 +1598,6 @@ with tab1:
     elif "argentina" in liga:
         penal_liga = -10
 
-    # bônus só se for MUITO forte
     bonus = 0
     if exg_total >= 3.5:
         bonus += 10
@@ -1638,20 +1630,29 @@ with tab1:
     else:
         classe = "E"
 
-    # ================================
-    # 🚫 FILTRO FINAL
-    # ================================
     if entrada_1 == "Sem entrada":
         classe = "E"
 
-            # =========================================
+    # =========================================
+    # 🚨 DETECTOR DE LINHA FALSA (ANTES DA STAKE)
+    # =========================================
+    linha_falsa = False
+
+    if (
+        exg_total >= 2.8 and
+        btts < 0.62 and
+        exg_diff < 0.7
+    ):
+        linha_falsa = True
+
+    if "brazil" in liga or "argentina" in liga:
+        if exg_total < 3.2:
+            linha_falsa = True
+
+    # =========================================
     # 💰 STAKE DINÂMICA
     # =========================================
-
-    # probabilidade base (usa BTTS ou fallback)
     p = max(btts, 0.50)
-
-    # odds padrão (ajusta depois se quiser)
     odd = 2.0
 
     b = odd - 1
@@ -1664,9 +1665,6 @@ with tab1:
 
     kelly = max(0, kelly)
 
-    # ================================
-    # 🎯 AJUSTE POR CLASSE
-    # ================================
     if classe == "A+":
         stake = kelly * 0.60
     elif classe == "A":
@@ -1678,21 +1676,18 @@ with tab1:
     else:
         stake = 0
 
-    # ================================
-    # 🚨 REDUTOR DE RISCO
-    # ================================
+    # redutores
     if linha_falsa:
         stake *= 0.4
 
     if exg_total < 2.4:
         stake *= 0.5
 
-    # limite
     stake = min(stake, 0.10)
 
-    # ================================
+    # =========================================
     # 📊 CARD FINAL
-    # ================================
+    # =========================================
     st.markdown(f"""
     <div style="
         background: linear-gradient(135deg, #1e1e1e, #2c3e50);
@@ -1710,7 +1705,8 @@ with tab1:
     <b>🔥 BTTS:</b> {linha_mgf.get("BTTS_%", 0):.1f}%<br>
     </div>
     """, unsafe_allow_html=True)
-  
+
+    
     cards_ofensivos(
         radar_home_consenso,
         radar_away_consenso,
