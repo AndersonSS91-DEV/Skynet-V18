@@ -1531,13 +1531,14 @@ with tab1:
             ⚠️ Evitar Operar Match Odds
         </div>
         """, unsafe_allow_html=True)
-        # ================================
-# 🎯 SUGESTÃO DE ENTRADA (PRIMEIRO!)
+        
+# ================================
+# 🎯 SUGESTÃO DE ENTRADA
 # ================================
 entrada = "Sem entrada"
 
-exg_home = linha["ExG_Home_MGF"]
-exg_away = linha["ExG_Away_MGF"]
+exg_home = row["ExG_Home_MGF"]
+exg_away = row["ExG_Away_MGF"]
 exg_diff = abs(exg_home - exg_away)
 exg_total = exg_home + exg_away
 
@@ -1547,43 +1548,43 @@ p = 0
 if exg_diff >= 1.2:
     if exg_home > exg_away:
         entrada = "Back Casa"
-        odd = linha["Odds_Casa"]
-        p = linha["Prob_H"]
+        odd = row["Odds_Casa"]
+        p = row["Prob_H"]
     else:
         entrada = "Back Visitante"
-        odd = linha["Odds_Visitante"]
-        p = linha["Prob_A"]
+        odd = row["Odds_Visitante"]
+        p = row["Prob_A"]
 
 elif exg_total >= 2.8:
     entrada = "Over 2.5"
-    odd = linha["Odds_Over_2,5FT"]
-    p = linha["Prob_Over_2,5"]
+    odd = row["Odds_Over_2,5FT"]
+    p = row["Prob_Over_2,5"]
 
-elif exg_diff < 0.6 and linha["Prob_BTTS"] >= 0.60:
+elif exg_diff < 0.6 and row["Prob_BTTS"] >= 0.60:
     entrada = "BTTS YES"
-    odd = linha["Odd_BTTS_YES"]
-    p = linha["Prob_BTTS"]
+    odd = row["Odd_BTTS_YES"]
+    p = row["Prob_BTTS"]
 
 elif exg_total <= 2.2:
     entrada = "Under 2.5"
-    odd = linha["Odds_Under_2,5FT"]
-    p = linha["Prob_Under_2,5"]
+    odd = row["Odds_Under_2,5FT"]
+    p = row["Prob_Under_2,5"]
 
 
 # ================================
-# 🧠 SCORE SUPREMO 2.0
+# 🧠 SCORE
 # ================================
 score_forca = min(exg_diff * 25, 100)
 
 score_value = (
-    (linha["EV"] * 100) * 0.6 +
-    (linha["VR01"] * 100) * 0.4
+    (row["EV"] * 100) * 0.6 +
+    (row["VR01"] * 100) * 0.4
 )
 
-score_confianca = max(0, 100 - (linha["CV_Medio"] * 100))
+score_confianca = max(0, 100 - (row["CV_Medio"] * 100))
 
 ligas_ruins = ["Brazil", "Argentina", "MLS"]
-score_contexto = 60 if any(l in linha["League"] for l in ligas_ruins) else 100
+score_contexto = 60 if any(l in row["League"] for l in ligas_ruins) else 100
 
 score_final = (
     score_value * 0.35 +
@@ -1625,20 +1626,17 @@ kelly = max(0, kelly)
 
 
 # ================================
-# 🔒 FILTRO FINAL (ANTI-ERRO)
+# 🔒 FILTRO
 # ================================
 if (
     entrada == "Sem entrada"
-    or linha["EV"] <= 0
+    or row["EV"] <= 0
     or p < 0.55
-    or linha["CV_Medio"] > 0.28
+    or row["CV_Medio"] > 0.28
 ):
     classe = "E"
     stake = 0
 else:
-    # ================================
-    # 💸 STAKE FINAL
-    # ================================
     if classe == "A+":
         stake = kelly * 0.60
     elif classe == "A":
@@ -1649,10 +1647,6 @@ else:
         stake = kelly * 0.10
     else:
         stake = 0
-
-    
-
-    
   
     cards_ofensivos(
         radar_home_consenso,
