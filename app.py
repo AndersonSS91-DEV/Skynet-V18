@@ -1532,39 +1532,67 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
         
-# ================================
-# 🧠 SCORE BASEADO EM POISSON
-# ================================
-score_forca = min(exg_diff * 30, 100)
-score_gols = min(exg_total * 30, 100)
-
-btts = linha_exg.get("Prob_BTTS", 0)
-score_btts = btts * 100
-
-score_final = (
-    score_forca * 0.4 +
-    score_gols * 0.4 +
-    score_btts * 0.2
-)
-
-# ================================
-# 🏷️ CLASSIFICAÇÃO
-# ================================
-if score_final >= 85:
-    classe = "A+"
-elif score_final >= 75:
-    classe = "A"
-elif score_final >= 68:
-    classe = "B"
-elif score_final >= 60:
-    classe = "C"
-elif score_final >= 50:
-    classe = "D"
-else:
-    classe = "E"
+    # =========================================
+    # 🎯 ENTRADA + SCORE + CLASSIFICAÇÃO (FIXO)
+    # =========================================
 
     # ================================
-    # 📊 CARD VISUAL
+    # 🔢 BASE (SEMPRE PRIMEIRO)
+    # ================================
+    exg_home = linha_mgf.get("ExG_Home_MGF", 0)
+    exg_away = linha_mgf.get("ExG_Away_MGF", 0)
+
+    exg_diff = abs(exg_home - exg_away)
+    exg_total = exg_home + exg_away
+
+    # ================================
+    # 🎯 ENTRADA
+    # ================================
+    entrada = "Sem entrada"
+
+    if exg_diff >= 1.2:
+        entrada = "Back Casa" if exg_home > exg_away else "Back Visitante"
+
+    elif exg_total >= 2.8:
+        entrada = "Over 2.5"
+
+    elif exg_diff < 0.6 and linha_exg.get("Prob_BTTS", 0) >= 0.60:
+        entrada = "BTTS YES"
+
+    elif exg_total <= 2.2:
+        entrada = "Under 2.5"
+
+    # ================================
+    # 🧠 SCORE (SEM EV / SEM CV)
+    # ================================
+    score_forca = min(exg_diff * 30, 100)
+    score_gols = min(exg_total * 30, 100)
+    score_btts = linha_exg.get("Prob_BTTS", 0) * 100
+
+    score_final = (
+        score_forca * 0.4 +
+        score_gols * 0.4 +
+        score_btts * 0.2
+    )
+
+    # ================================
+    # 🏷️ CLASSIFICAÇÃO
+    # ================================
+    if score_final >= 85:
+        classe = "A+"
+    elif score_final >= 75:
+        classe = "A"
+    elif score_final >= 68:
+        classe = "B"
+    elif score_final >= 60:
+        classe = "C"
+    elif score_final >= 50:
+        classe = "D"
+    else:
+        classe = "E"
+
+    # ================================
+    # 📊 CARD FINAL
     # ================================
     st.markdown(f"""
     <div style="
@@ -1577,7 +1605,6 @@ else:
     <b>🎯 Entrada:</b> {entrada}<br>
     <b>🏷️ Classe:</b> {classe}<br>
     <b>🧠 Score:</b> {score_final:.1f}<br>
-    <b>💰 Stake:</b> {stake*100:.2f}%<br>
     </div>
     """, unsafe_allow_html=True)
   
