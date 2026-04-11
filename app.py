@@ -1532,134 +1532,143 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
         
-# ================================
-# 🛠️ SAFE GET (ANTI-ERRO)
-# ================================
-def safe_get(df, col, default=0):
-    if col in df.index:
-        return df[col]
-    return default
+    # =========================================
+    # 🎯 ENTRADA + SCORE + KELLY (CORRIGIDO)
+    # =========================================
 
+    entrada = "Sem entrada"
 
-# ================================
-# 🎯 SUGESTÃO DE ENTRADA (CORRIGIDO)
-# ================================
-entrada = "Sem entrada"
+    # ================================
+    # 🔢 DADOS BASE
+    # ================================
+    exg_home = linha_mgf.get("ExG_Home_MGF", 0)
+    exg_away = linha_mgf.get("ExG_Away_MGF", 0)
 
-exg_home = safe_get(linha_mgf, "ExG_Home_MGF")
-exg_away = safe_get(linha_mgf, "ExG_Away_MGF")
+    exg_diff = abs(exg_home - exg_away)
+    exg_total = exg_home + exg_away
 
-exg_diff = abs(exg_home - exg_away)
-exg_total = exg_home + exg_away
+    odd = 0
+    p = 0
 
-odd = 0
-p = 0
+    # ================================
+    # 🎯 SUGESTÃO DE ENTRADA
+    # ================================
+    if exg_diff >= 1.2:
+        if exg_home > exg_away:
+            entrada = "Back Casa"
+            odd = linha_exg.get("Odds_Casa", 0)
+            p = linha_exg.get("Prob_H", 0)
+        else:
+            entrada = "Back Visitante"
+            odd = linha_exg.get("Odds_Visitante", 0)
+            p = linha_exg.get("Prob_A", 0)
 
-# 🔹 Dominância clara
-if exg_diff >= 1.2:
-    if exg_home > exg_away:
-        entrada = "Back Casa"
-        odd = safe_get(linha_exg, "Odds_Casa")
-        p = safe_get(linha_exg, "Prob_H")
+    elif exg_total >= 2.8:
+        entrada = "Over 2.5"
+        odd = linha_exg.get("Odds_Over_2,5FT", 0)
+        p = linha_exg.get("Prob_Over_2.5", 0)
+
+    elif exg_diff < 0.6 and linha_exg.get("Prob_BTTS", 0) >= 0.60:
+        entrada = "BTTS YES"
+        odd = linha_exg.get("Odd_BTTS_YES", 0)
+        p = linha_exg.get("Prob_BTTS", 0)
+
+    elif exg_total <= 2.2:
+        entrada = "Under 2.5"
+        odd = linha_exg.get("Odds_Under_2,5FT", 0)
+        p = linha_exg.get("Prob_Under_2.5", 0)
+
+    # ================================
+    # 🧠 SCORE
+    # ================================
+    score_forca = min(exg_diff * 25, 100)
+
+    ev = linha_exg.get("EV", 0)
+    vr = linha_exg.get("VR01", 0)
+
+    score_value = (ev * 100 * 0.6) + (vr * 100 * 0.4)
+
+    cv = linha_mgf.get("CV_Medio", 0)
+    score_confianca = max(0, 100 - (cv * 100))
+
+    score_contexto = 100
+
+    score_final = (
+        score_value * 0.35 +
+        score_forca * 0.30 +
+        score_confianca * 0.20 +
+        score_contexto * 0.15
+    )
+
+    # ================================
+    # 🏷️ CLASSIFICAÇÃO
+    # ================================
+    if score_final >= 85:
+        classe = "A+"
+    elif score_final >= 75:
+        classe = "A"
+    elif score_final >= 68:
+        classe = "B"
+    elif score_final >= 60:
+        classe = "C"
+    elif score_final >= 50:
+        classe = "D"
     else:
-        entrada = "Back Visitante"
-        odd = safe_get(linha_exg, "Odds_Visitante")
-        p = safe_get(linha_exg, "Prob_A")
+        classe = "E"
 
-# 🔹 Jogo aberto
-elif exg_total >= 2.8:
-    entrada = "Over 2.5"
-    odd = safe_get(linha_exg, "Odds_Over_2,5FT")
-    p = safe_get(linha_exg, "Prob_Over_2.5")
+    # ================================
+    # 💰 KELLY
+    # ================================
+    b = odd - 1
+    q = 1 - p
 
-# 🔹 BTTS
-elif exg_diff < 0.6 and safe_get(linha_exg, "Prob_BTTS") >= 0.60:
-    entrada = "BTTS YES"
-    odd = safe_get(linha_exg, "Odd_BTTS_YES")
-    p = safe_get(linha_exg, "Prob_BTTS")
-
-# 🔹 Under
-elif exg_total <= 2.2:
-    entrada = "Under 2.5"
-    odd = safe_get(linha_exg, "Odds_Under_2,5FT")
-    p = safe_get(linha_exg, "Prob_Under_2.5")
-
-
-# ================================
-# 🧠 SCORE
-# ================================
-score_forca = min(exg_diff * 25, 100)
-
-score_value = (
-    (safe_get(linha_exg, "EV") * 100) * 0.6 +
-    (safe_get(linha_exg, "VR01") * 100) * 0.4
-)
-
-score_confianca = max(0, 100 - (safe_get(linha_mgf, "CV_Medio") * 100))
-
-score_contexto = 100  # (sem league no seu DF atual)
-
-score_final = (
-    score_value * 0.35 +
-    score_forca * 0.30 +
-    score_confianca * 0.20 +
-    score_contexto * 0.15
-)
-
-
-# ================================
-# 🏷️ CLASSIFICAÇÃO
-# ================================
-if score_final >= 85:
-    classe = "A+"
-elif score_final >= 75:
-    classe = "A"
-elif score_final >= 68:
-    classe = "B"
-elif score_final >= 60:
-    classe = "C"
-elif score_final >= 50:
-    classe = "D"
-else:
-    classe = "E"
-
-
-# ================================
-# 💰 KELLY
-# ================================
-b = odd - 1
-q = 1 - p
-
-if b > 0:
-    kelly = (b * p - q) / b
-else:
-    kelly = 0
-
-kelly = max(0, kelly)
-
-
-# ================================
-# 🔒 FILTRO FINAL
-# ================================
-if (
-    entrada == "Sem entrada"
-    or safe_get(linha_exg, "EV") <= 0
-    or p < 0.55
-    or safe_get(linha_mgf, "CV_Medio") > 0.28
-):
-    classe = "E"
-    stake = 0
-else:
-    if classe == "A+":
-        stake = kelly * 0.60
-    elif classe == "A":
-        stake = kelly * 0.40
-    elif classe == "B":
-        stake = kelly * 0.25
-    elif classe == "C":
-        stake = kelly * 0.10
+    if b > 0:
+        kelly = (b * p - q) / b
     else:
+        kelly = 0
+
+    kelly = max(0, kelly)
+
+    # ================================
+    # 🔒 FILTRO FINAL
+    # ================================
+    if (
+        entrada == "Sem entrada"
+        or ev <= 0
+        or p < 0.55
+        or cv > 0.28
+    ):
+        classe = "E"
         stake = 0
+    else:
+        if classe == "A+":
+            stake = kelly * 0.60
+        elif classe == "A":
+            stake = kelly * 0.40
+        elif classe == "B":
+            stake = kelly * 0.25
+        elif classe == "C":
+            stake = kelly * 0.10
+        else:
+            stake = 0
+
+    # ================================
+    # 📊 CARD VISUAL
+    # ================================
+    st.markdown(f"""
+    <div style="
+        background: linear-gradient(135deg, #1e1e1e, #2c3e50);
+        padding: 16px;
+        border-radius: 12px;
+        color: white;
+        margin-top: 10px;
+    ">
+    <b>🎯 Entrada:</b> {entrada}<br>
+    <b>🏷️ Classe:</b> {classe}<br>
+    <b>🧠 Score:</b> {score_final:.1f}<br>
+    <b>💰 Stake:</b> {stake*100:.2f}%<br>
+    </div>
+    """, unsafe_allow_html=True)
   
     cards_ofensivos(
         radar_home_consenso,
