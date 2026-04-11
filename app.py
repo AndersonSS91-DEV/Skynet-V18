@@ -1584,25 +1584,52 @@ with tab1:
         entrada_2 = "Over 2.5"
 
     # ================================
-    # 🧠 SCORE REAL (ESCALA CORRETA)
+    # 🧠 SCORE REAL CORRIGIDO
     # ================================
-    score_gols = exg_total * 20
-    score_btts = linha_mgf.get("BTTS_%", 0)
-    score_forca = exg_diff * 10
 
-    score_final = score_gols + score_btts + score_forca
+    # gols
+    score_gols = min(exg_total * 15, 100)
 
-    # limite
-    score_final = min(score_final, 100)
+    # btts precisa ser alto de verdade
+    score_btts = (btts * 100) * 0.8
+
+    # força leve
+    score_forca = min(exg_diff * 10, 100)
+
+    # penalização liga ruim
+    liga = str(linha_exg.get("League", "")).lower()
+
+    penal_liga = 0
+    if "brazil" in liga:
+        penal_liga = -15
+    elif "argentina" in liga:
+        penal_liga = -10
+
+    # bônus só se for MUITO forte
+    bonus = 0
+    if exg_total >= 3.5:
+        bonus += 10
+    if btts >= 0.65:
+        bonus += 10
+
+    score_final = (
+        score_gols * 0.5 +
+        score_btts * 0.3 +
+        score_forca * 0.2 +
+        bonus +
+        penal_liga
+    )
+
+    score_final = max(min(score_final, 100), 0)
 
     # ================================
     # 🏷️ CLASSIFICAÇÃO
     # ================================
-    if score_final >= 90:
+    if score_final >= 85:
         classe = "A+"
-    elif score_final >= 75:
+    elif score_final >= 72:
         classe = "A"
-    elif score_final >= 65:
+    elif score_final >= 62:
         classe = "B"
     elif score_final >= 55:
         classe = "C"
@@ -1616,6 +1643,52 @@ with tab1:
     # ================================
     if entrada_1 == "Sem entrada":
         classe = "E"
+
+            # =========================================
+    # 💰 STAKE DINÂMICA
+    # =========================================
+
+    # probabilidade base (usa BTTS ou fallback)
+    p = max(btts, 0.50)
+
+    # odds padrão (ajusta depois se quiser)
+    odd = 2.0
+
+    b = odd - 1
+    q = 1 - p
+
+    if b > 0:
+        kelly = (b * p - q) / b
+    else:
+        kelly = 0
+
+    kelly = max(0, kelly)
+
+    # ================================
+    # 🎯 AJUSTE POR CLASSE
+    # ================================
+    if classe == "A+":
+        stake = kelly * 0.60
+    elif classe == "A":
+        stake = kelly * 0.45
+    elif classe == "B":
+        stake = kelly * 0.25
+    elif classe == "C":
+        stake = kelly * 0.10
+    else:
+        stake = 0
+
+    # ================================
+    # 🚨 REDUTOR DE RISCO
+    # ================================
+    if linha_falsa:
+        stake *= 0.4
+
+    if exg_total < 2.4:
+        stake *= 0.5
+
+    # limite
+    stake = min(stake, 0.10)
 
     # ================================
     # 📊 CARD FINAL
@@ -1632,7 +1705,8 @@ with tab1:
     <b>🎯 Entrada 2:</b> {entrada_2 if entrada_2 else '-'}<br>
     <b>🏷️ Classe:</b> {classe}<br>
     <b>🧠 Score:</b> {score_final:.1f}<br>
-    <b>⚽ ExG Total:</b> {exg_total:.2f}<br>
+    <b>💰 Stake:</b> {stake*100:.2f}%<br>
+    <b>⚽ ExG:</b> {exg_total:.2f}<br>
     <b>🔥 BTTS:</b> {linha_mgf.get("BTTS_%", 0):.1f}%<br>
     </div>
     """, unsafe_allow_html=True)
