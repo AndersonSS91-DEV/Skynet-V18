@@ -1531,6 +1531,128 @@ with tab1:
             ⚠️ Evitar Operar Match Odds
         </div>
         """, unsafe_allow_html=True)
+        # ================================
+# 🎯 SUGESTÃO DE ENTRADA (PRIMEIRO!)
+# ================================
+entrada = "Sem entrada"
+
+exg_home = linha["ExG_Home_MGF"]
+exg_away = linha["ExG_Away_MGF"]
+exg_diff = abs(exg_home - exg_away)
+exg_total = exg_home + exg_away
+
+odd = 0
+p = 0
+
+if exg_diff >= 1.2:
+    if exg_home > exg_away:
+        entrada = "Back Casa"
+        odd = linha["Odds_Casa"]
+        p = linha["Prob_H"]
+    else:
+        entrada = "Back Visitante"
+        odd = linha["Odds_Visitante"]
+        p = linha["Prob_A"]
+
+elif exg_total >= 2.8:
+    entrada = "Over 2.5"
+    odd = linha["Odds_Over_2,5FT"]
+    p = linha["Prob_Over_2,5"]
+
+elif exg_diff < 0.6 and linha["Prob_BTTS"] >= 0.60:
+    entrada = "BTTS YES"
+    odd = linha["Odd_BTTS_YES"]
+    p = linha["Prob_BTTS"]
+
+elif exg_total <= 2.2:
+    entrada = "Under 2.5"
+    odd = linha["Odds_Under_2,5FT"]
+    p = linha["Prob_Under_2,5"]
+
+
+# ================================
+# 🧠 SCORE SUPREMO 2.0
+# ================================
+score_forca = min(exg_diff * 25, 100)
+
+score_value = (
+    (linha["EV"] * 100) * 0.6 +
+    (linha["VR01"] * 100) * 0.4
+)
+
+score_confianca = max(0, 100 - (linha["CV_Medio"] * 100))
+
+ligas_ruins = ["Brazil", "Argentina", "MLS"]
+score_contexto = 60 if any(l in linha["League"] for l in ligas_ruins) else 100
+
+score_final = (
+    score_value * 0.35 +
+    score_forca * 0.30 +
+    score_confianca * 0.20 +
+    score_contexto * 0.15
+)
+
+
+# ================================
+# 🏷️ CLASSIFICAÇÃO
+# ================================
+if score_final >= 85:
+    classe = "A+"
+elif score_final >= 75:
+    classe = "A"
+elif score_final >= 68:
+    classe = "B"
+elif score_final >= 60:
+    classe = "C"
+elif score_final >= 50:
+    classe = "D"
+else:
+    classe = "E"
+
+
+# ================================
+# 💰 KELLY
+# ================================
+b = odd - 1
+q = 1 - p
+
+if b > 0:
+    kelly = (b * p - q) / b
+else:
+    kelly = 0
+
+kelly = max(0, kelly)
+
+
+# ================================
+# 🔒 FILTRO FINAL (ANTI-ERRO)
+# ================================
+if (
+    entrada == "Sem entrada"
+    or linha["EV"] <= 0
+    or p < 0.55
+    or linha["CV_Medio"] > 0.28
+):
+    classe = "E"
+    stake = 0
+else:
+    # ================================
+    # 💸 STAKE FINAL
+    # ================================
+    if classe == "A+":
+        stake = kelly * 0.60
+    elif classe == "A":
+        stake = kelly * 0.40
+    elif classe == "B":
+        stake = kelly * 0.25
+    elif classe == "C":
+        stake = kelly * 0.10
+    else:
+        stake = 0
+
+    
+
+    
   
     cards_ofensivos(
         radar_home_consenso,
