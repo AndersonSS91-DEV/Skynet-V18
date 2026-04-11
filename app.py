@@ -1519,14 +1519,17 @@ with tab1:
     ):
 
         st.markdown("""
+        
         <div style="
-            background: #FF8C00;
-            padding: 12px 16px;
+            width: 100%;
+            display: block;
+            background: linear-gradient(135deg, #1e1e1e, #2c3e50);
+            padding: 16px;
             border-radius: 12px;
             color: white;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 12px;
+            margin-top: 12px;
+            box-sizing: border-box;
+            border-left: 6px solid #00E5FF;
         ">
             ⚠️ Evitar Operar Match Odds
         </div>
