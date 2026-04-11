@@ -1522,16 +1522,13 @@ with tab1:
         
         <div style="
             width: 100%;
-            display: block;
             background: linear-gradient(135deg, #1e1e1e, #2c3e50);
             padding: 16px;
             border-radius: 12px;
             color: white;
             margin-top: 12px;
-            box-sizing: border-box;
-            border-left: 6px solid #00E5FF;
         ">
-            ⚠️ Evitar Operar Match Odds
+                    ⚠️ Evitar Operar Match Odds
         </div>
         """, unsafe_allow_html=True)
         
