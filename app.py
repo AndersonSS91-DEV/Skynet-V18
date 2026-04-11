@@ -1578,27 +1578,21 @@ with tab1:
         odd = linha_exg.get("Odds_Under_2,5FT", 0)
         p = linha_exg.get("Prob_Under_2.5", 0)
 
-    # ================================
-    # 🧠 SCORE
-    # ================================
-    score_forca = min(exg_diff * 25, 100)
+# ================================
+# 🧠 SCORE BASEADO EM JOGO REAL
+# ================================
+score_forca = min(exg_diff * 30, 100)
 
-    ev = linha_exg.get("EV", 0)
-    vr = linha_exg.get("VR01", 0)
+score_gols = min(exg_total * 30, 100)
 
-    score_value = (ev * 100 * 0.6) + (vr * 100 * 0.4)
+btts = linha_exg.get("Prob_BTTS", 0)
+score_btts = btts * 100
 
-    cv = linha_mgf.get("CV_Medio", 0)
-    score_confianca = max(0, 100 - (cv * 100))
-
-    score_contexto = 100
-
-    score_final = (
-        score_value * 0.35 +
-        score_forca * 0.30 +
-        score_confianca * 0.20 +
-        score_contexto * 0.15
-    )
+score_final = (
+    score_forca * 0.4 +
+    score_gols * 0.4 +
+    score_btts * 0.2
+)
 
     # ================================
     # 🏷️ CLASSIFICAÇÃO
