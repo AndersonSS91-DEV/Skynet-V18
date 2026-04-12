@@ -1507,32 +1507,6 @@ with tab1:
     st.pyplot(fig, use_container_width=False)
 
     # =========================================
-    # ⚠️ ALERTA MATCH ODDS
-    # =========================================
-    if (
-        (linha_exg["VR01"] <= 0.15) and
-        (linha_exg["Odd_BTTS_YES"] <= 1.80) and
-        (
-            linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
-            else linha_mgf["MGF_A"]
-        ) >= 1.00
-    ):
-
-        st.markdown("""
-        
-        <div style="
-            width: 100%;
-            background: linear-gradient(135deg, #1e1e1e, #2c3e50);
-            padding: 16px;
-            border-radius: 12px;
-            color: white;
-            margin-top: 12px;
-        ">
-                    ⚠️ Evitar Operar Match Odds
-        </div>
-        """, unsafe_allow_html=True)
-        
-     # =========================================
     # 🎯 ENTRADAS + SCORE REAL (BASE DATASET)
     # =========================================
 
@@ -1701,53 +1675,54 @@ with tab1:
         cor = "#555555"
 
     # =========================================
-    # ⚠️ ALERTA MATCH ODDS (LARANJA PADRÃO)
+    # ⚠️ ALERTA MATCH ODDS (LARGURA CORRETA)
     # =========================================
-    st.markdown("""
-    <div style="
-        width: 100%;
-        display: block;
-        background: #FF8C00;
-        padding: 12px 16px;
-        border-radius: 12px;
-        color: white;
-        font-size: 18px;
-        font-weight: 700;
-        margin-bottom: 12px;
-        box-sizing: border-box;
-    ">
-    ⚠️ Evitar Operar Match Odds
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container():
+        st.markdown("""
+        <div style="
+            width: 100%;
+            background: #FF8C00;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            box-sizing: border-box;
+            margin-bottom: 12px;
+        ">
+        ⚠️ Evitar Operar Match Odds
+        </div>
+        """, unsafe_allow_html=True)
 
     # =========================================
-    # 📊 CARD FINAL PADRÃO
+    # 📊 CARD FINAL (LARGURA IGUAL AOS DE BAIXO)
     # =========================================
-    st.markdown(f"""
-    <div style="
-        width: 100%;
-        display: block;
-        background: linear-gradient(135deg, #1e1e1e, #2c3e50);
-        padding: 16px;
-        border-radius: 12px;
-        color: white;
-        margin-top: 12px;
-        box-sizing: border-box;
-        border-left: 6px solid {cor};
-    ">
+    with st.container():
+        st.markdown(f"""
+        <div style="
+            width: 100%;
+            background: linear-gradient(135deg, #1e1e1e, #2c3e50);
+            padding: 16px;
+            border-radius: 12px;
+            color: white;
+            box-sizing: border-box;
+            border-left: 6px solid {cor};
+        ">
 
-    🎯 <b>Entrada 1:</b> {entrada_1}<br>
-    🎯 <b>Entrada 2:</b> {entrada_2 if entrada_2 else '-'}<br><br>
+        🎯 <b>Entrada 1:</b> {entrada_1}<br>
+        🎯 <b>Entrada 2:</b> {entrada_2 if entrada_2 else '-'}<br><br>
 
-    🏷️ <b>Classe:</b> {classe}<br>
-    🧠 <b>Score:</b> {score_final:.1f}<br>
-    💰 <b>Stake:</b> {stake*100:.2f}%<br><br>
+        🏷️ <b>Classe:</b> {classe}<br>
+        🧠 <b>Score:</b> {score_final:.1f}<br>
+        💰 <b>Stake:</b> {stake*100:.2f}%<br><br>
 
-    ⚽ <b>ExG:</b> {exg_total:.2f}<br>
-    🔥 <b>BTTS:</b> {linha_mgf.get("BTTS_%", 0):.1f}%
+        ⚽ <b>ExG:</b> {exg_total:.2f}<br>
+        🔥 <b>BTTS:</b> {linha_mgf.get("BTTS_%", 0):.1f}%
 
-    </div>
-    """, unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
+
+
+    
     
     cards_ofensivos(
         radar_home_consenso,
