@@ -1675,9 +1675,10 @@ with tab1:
         cor = "#555555"
 
     # =========================================
-    # ⚠️ ALERTA MATCH ODDS (LARGURA CORRETA)
+    # ⚠️ ALERTA MATCH ODDS (LARGURA PERFEITA)
     # =========================================
-    with st.container():
+    col = st.columns(1)[0]
+    with col:
         st.markdown("""
         <div style="
             width: 100%;
@@ -1694,9 +1695,10 @@ with tab1:
         """, unsafe_allow_html=True)
 
     # =========================================
-    # 📊 CARD FINAL (LARGURA IGUAL AOS DE BAIXO)
+    # 📊 CARD FINAL (AGORA 100% ALINHADO)
     # =========================================
-    with st.container():
+    col = st.columns(1)[0]
+    with col:
         st.markdown(f"""
         <div style="
             width: 100%;
