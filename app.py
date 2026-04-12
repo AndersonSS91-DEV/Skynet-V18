@@ -1506,123 +1506,105 @@ with tab1:
 
     st.pyplot(fig, use_container_width=False)
 
-    # =========================================
-    # ⚠️ ALERTA MATCH ODDS (MANTIDO)
-    # =========================================
-    alerta_match_odds = False
-
-    if (
-        (linha_exg["VR01"] <= 0.15) and
-        (linha_exg["Odd_BTTS_YES"] <= 1.80) and
-        (
-            linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
-            else linha_mgf["MGF_A"]
-        ) >= 1.00
-    ):
-        alerta_match_odds = True
-
-        st.markdown("""
-        <div style="
-            width: 100%;
-            background: #FF8C00;
-            padding: 12px 16px;
-            border-radius: 12px;
-            color: white;
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            box-sizing: border-box;
-        ">
-            ⚠️ Evitar Operar Match Odds
-        </div>
-        """, unsafe_allow_html=True)
-
-
-    # =========================================
-    # 🎯 ENTRADAS + SCORE (SEM QUEBRAR FLUXO)
+        # =========================================
+    # 🎯 ENTRADAS + SCORE (SEGURO E ESTÁVEL)
     # =========================================
 
-    exg_home = linha_mgf.get("ExG_Home_MGF", 0)
-    exg_away = linha_mgf.get("ExG_Away_MGF", 0)
+    def calcular_entrada_score(linha_mgf, linha_exg):
 
-    exg_diff = abs(exg_home - exg_away)
-    exg_total = exg_home + exg_away
-    btts = linha_mgf.get("BTTS_%", 0) / 100
+        exg_home = linha_mgf.get("ExG_Home_MGF", 0)
+        exg_away = linha_mgf.get("ExG_Away_MGF", 0)
 
-    entrada_1 = "Sem entrada"
-    entrada_2 = ""
+        exg_diff = abs(exg_home - exg_away)
+        exg_total = exg_home + exg_away
+        btts = linha_mgf.get("BTTS_%", 0) / 100
 
-    if exg_total >= 2.8:
-        entrada_1 = "Over 2.5"
+        entrada_1 = "Sem entrada"
+        entrada_2 = ""
 
-    elif exg_diff >= 1.2:
-        if exg_home > exg_away:
-            entrada_1 = "Back Casa"
+        if exg_total >= 2.8:
+            entrada_1 = "Over 2.5"
+
+        elif exg_diff >= 1.2:
+            if exg_home > exg_away:
+                entrada_1 = "Back Casa"
+            else:
+                entrada_1 = "Back Visitante"
+
+        elif btts >= 0.60:
+            entrada_1 = "BTTS YES"
+
+        elif exg_total <= 2.2:
+            entrada_1 = "Under 2.5"
+
+        if entrada_1 == "Over 2.5" and btts >= 0.50:
+            entrada_2 = "BTTS YES"
+
+        elif entrada_1 == "BTTS YES" and exg_total >= 2.8:
+            entrada_2 = "Over 2.5"
+
+        score = (exg_total * 20) + (btts * 100 * 0.5) - (exg_diff * 5)
+        score = max(min(score, 100), 0)
+
+        if score >= 80:
+            classe = "A+"
+        elif score >= 70:
+            classe = "A"
+        elif score >= 60:
+            classe = "B"
+        elif score >= 50:
+            classe = "C"
         else:
-            entrada_1 = "Back Visitante"
+            classe = "D"
 
-    elif btts >= 0.60:
-        entrada_1 = "BTTS YES"
+        p = max(btts, 0.50)
+        odd = 2.0
 
-    elif exg_total <= 2.2:
-        entrada_1 = "Under 2.5"
+        b = odd - 1
+        q = 1 - p
 
-    if entrada_1 == "Over 2.5" and btts >= 0.50:
-        entrada_2 = "BTTS YES"
+        if b > 0:
+            kelly = (b * p - q) / b
+        else:
+            kelly = 0
 
-    elif entrada_1 == "BTTS YES" and exg_total >= 2.8:
-        entrada_2 = "Over 2.5"
+        kelly = max(0, kelly)
+        stake = min(kelly * 0.5, 0.10)
 
-    # ================= SCORE =================
-    score = (exg_total * 20) + (btts * 100 * 0.5) - (exg_diff * 5)
-    score = max(min(score, 100), 0)
+        return {
+            "entrada_1": entrada_1,
+            "entrada_2": entrada_2,
+            "classe": classe,
+            "score": score,
+            "stake": stake,
+            "exg_total": exg_total,
+            "btts": linha_mgf.get("BTTS_%", 0)
+        }
 
-    if score >= 80:
-        classe = "A+"
-    elif score >= 70:
-        classe = "A"
-    elif score >= 60:
-        classe = "B"
-    elif score >= 50:
-        classe = "C"
+
+    # ================================
+    # 📊 EXECUÇÃO (SEM QUEBRAR FLUXO)
+    # ================================
+    dados = calcular_entrada_score(linha_mgf, linha_exg)
+
+    texto = f"""
+🎯 Entrada 1: {dados['entrada_1']}
+🎯 Entrada 2: {dados['entrada_2'] if dados['entrada_2'] else "-"}
+
+🏷️ Classe: {dados['classe']}
+🧠 Score: {dados['score']:.1f}
+💰 Stake: {dados['stake']*100:.2f}%
+
+⚽ ExG: {dados['exg_total']:.2f}
+🔥 BTTS: {dados['btts']:.1f}%
+"""
+
+    if dados["classe"] in ["A+", "A"]:
+        st.success(texto)
+    elif dados["classe"] == "B":
+        st.warning(texto)
     else:
-        classe = "D"
-
-    # ================= STAKE =================
-    p = max(btts, 0.50)
-    odd = 2.0
-
-    b = odd - 1
-    q = 1 - p
-
-    kelly = (b * p - q) / b if b > 0 else 0
-    kelly = max(0, kelly)
-
-    stake = min(kelly * 0.5, 0.10)
-
-    # ================= CARD =================
-    st.markdown(f"""
-    <div style="
-        width: 100%;
-        background: linear-gradient(135deg, #1e1e1e, #2c3e50);
-        padding: 16px;
-        border-radius: 12px;
-        color: white;
-        margin-bottom: 12px;
-        box-sizing: border-box;
-        border-left: 6px solid {'#00E5FF' if classe in ['A+','A'] else '#FFA500' if classe=='B' else '#999'};
-    ">
-        🎯 <b>Entrada 1:</b> {entrada_1}<br>
-        🎯 <b>Entrada 2:</b> {entrada_2 if entrada_2 else '-'}<br><br>
-
-        🏷️ <b>Classe:</b> {classe}<br>
-        🧠 <b>Score:</b> {score:.1f}<br>
-        💰 <b>Stake:</b> {stake*100:.2f}%<br><br>
-
-        ⚽ <b>ExG:</b> {exg_total:.2f}<br>
-        🔥 <b>BTTS:</b> {linha_mgf.get("BTTS_%", 0):.1f}%
-    </div>
-    """, unsafe_allow_html=True)
+        st.info(texto)
 
     
     
