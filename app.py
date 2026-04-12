@@ -1506,6 +1506,34 @@ with tab1:
 
     st.pyplot(fig, use_container_width=False)
 
+        # =========================================
+    # ⚠️ ALERTA MATCH ODDS (COLE AQUI)
+    # =========================================
+    if (
+        (linha_exg["VR01"] <= 0.15) and
+        (linha_exg["Odd_BTTS_YES"] <= 1.80) and
+        (
+            linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
+            else linha_mgf["MGF_A"]
+        ) >= 1.00
+    ):
+
+        st.markdown("""
+        <div style="
+            width: 100%;
+            background: #FF8C00;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+        ">
+            ⚠️ Evitar Operar Match Odds
+        </div>
+        """, unsafe_allow_html=True)
+
     # =========================================
     # 🎯 ENTRADAS + SCORE (SEGURO E ESTÁVEL)
     # =========================================
@@ -1605,34 +1633,6 @@ with tab1:
         st.warning(texto)
     else:
         st.info(texto)
-
-        # =========================================
-    # ⚠️ ALERTA MATCH ODDS (SEM QUEBRAR NADA)
-    # =========================================
-    if (
-        (linha_exg["VR01"] <= 0.15) and
-        (linha_exg["Odd_BTTS_YES"] <= 1.80) and
-        (
-            linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
-            else linha_mgf["MGF_A"]
-        ) >= 1.00
-    ):
-
-        st.markdown("""
-        <div style="
-            width: 100%;
-            background: #FF8C00;
-            padding: 12px 16px;
-            border-radius: 12px;
-            color: white;
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            box-sizing: border-box;
-        ">
-            ⚠️ Evitar Operar Match Odds
-        </div>
-        """, unsafe_allow_html=True)
 
     
     
