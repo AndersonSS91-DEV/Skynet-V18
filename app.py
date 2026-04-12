@@ -1532,7 +1532,7 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
         
-    # =========================================
+     # =========================================
     # 🎯 ENTRADAS + SCORE REAL (BASE DATASET)
     # =========================================
 
@@ -1634,7 +1634,7 @@ with tab1:
         classe = "E"
 
     # =========================================
-    # 🚨 DETECTOR DE LINHA FALSA (ANTES DA STAKE)
+    # 🚨 DETECTOR DE LINHA FALSA
     # =========================================
     linha_falsa = False
 
@@ -1676,7 +1676,6 @@ with tab1:
     else:
         stake = 0
 
-    # redutores
     if linha_falsa:
         stake *= 0.4
 
@@ -1686,26 +1685,69 @@ with tab1:
     stake = min(stake, 0.10)
 
     # =========================================
-    # 📊 CARD FINAL
+    # 🎨 COR POR CLASSE
+    # =========================================
+    if classe == "A+":
+        cor = "#00FF7F"
+    elif classe == "A":
+        cor = "#00E5FF"
+    elif classe == "B":
+        cor = "#FFD700"
+    elif classe == "C":
+        cor = "#FF8C00"
+    elif classe == "D":
+        cor = "#FF4C4C"
+    else:
+        cor = "#555555"
+
+    # =========================================
+    # ⚠️ ALERTA MATCH ODDS (LARANJA PADRÃO)
+    # =========================================
+    st.markdown("""
+    <div style="
+        width: 100%;
+        display: block;
+        background: #FF8C00;
+        padding: 12px 16px;
+        border-radius: 12px;
+        color: white;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        box-sizing: border-box;
+    ">
+    ⚠️ Evitar Operar Match Odds
+    </div>
+    """, unsafe_allow_html=True)
+
+    # =========================================
+    # 📊 CARD FINAL PADRÃO
     # =========================================
     st.markdown(f"""
     <div style="
+        width: 100%;
+        display: block;
         background: linear-gradient(135deg, #1e1e1e, #2c3e50);
         padding: 16px;
         border-radius: 12px;
         color: white;
         margin-top: 12px;
+        box-sizing: border-box;
+        border-left: 6px solid {cor};
     ">
-    <b>🎯 Entrada 1:</b> {entrada_1}<br>
-    <b>🎯 Entrada 2:</b> {entrada_2 if entrada_2 else '-'}<br>
-    <b>🏷️ Classe:</b> {classe}<br>
-    <b>🧠 Score:</b> {score_final:.1f}<br>
-    <b>💰 Stake:</b> {stake*100:.2f}%<br>
-    <b>⚽ ExG:</b> {exg_total:.2f}<br>
-    <b>🔥 BTTS:</b> {linha_mgf.get("BTTS_%", 0):.1f}%<br>
+
+    🎯 <b>Entrada 1:</b> {entrada_1}<br>
+    🎯 <b>Entrada 2:</b> {entrada_2 if entrada_2 else '-'}<br><br>
+
+    🏷️ <b>Classe:</b> {classe}<br>
+    🧠 <b>Score:</b> {score_final:.1f}<br>
+    💰 <b>Stake:</b> {stake*100:.2f}%<br><br>
+
+    ⚽ <b>ExG:</b> {exg_total:.2f}<br>
+    🔥 <b>BTTS:</b> {linha_mgf.get("BTTS_%", 0):.1f}%
+
     </div>
     """, unsafe_allow_html=True)
-
     
     cards_ofensivos(
         radar_home_consenso,
