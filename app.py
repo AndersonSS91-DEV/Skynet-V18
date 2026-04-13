@@ -1197,15 +1197,15 @@ desvio_score = df_mgf["Score_Ofensivo"].std()
 # =========================================
 # ABAS
 # =========================================
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
 "📊🧠 Resumo",
 "📁🧠 Dados",
 "📊⚽ MGF",
 "⚔️⚽ ATK x DEF",
 "💎⚽ VG",
-"🚩 Escanteios"
+"🚩 Escanteios",
+"🤖 IA"
 ])
-
 # =========================================
 # ABA 1 — RESUMO >>>>>>. ESCUDOS QUASE PERFEITOS >>>>> SALVAR ESSE CÓDIGO
 # =========================================
@@ -2634,3 +2634,149 @@ with tab6:
         st.warning("❄️ Tendência de Jogo Lento")
     else:
         st.success("✅ Tendência de Jogo Dinâmico")
+
+
+
+
+# =========================================
+# 🤖 FUNÇÃO RANKING IA (OBRIGATÓRIA)
+# =========================================
+def gerar_ranking_ia(df):
+
+    lista = []
+
+    for _, row in df.iterrows():
+
+        linha_mgf = row
+        linha_exg = row
+
+        dados = calcular_entrada_score(linha_mgf, linha_exg)
+
+        # ================================
+        # 📊 EDGE (VALOR REAL)
+        # ================================
+        btts = dados["btts"] / 100
+        prob_modelo = max(btts, 0.50)
+
+        odd = row.get("Odd_BTTS_YES", 2.0)
+
+        if odd > 0:
+            prob_mercado = 1 / odd
+        else:
+            prob_mercado = 0
+
+        edge = (prob_modelo - prob_mercado) * 100
+
+        lista.append({
+            "Jogo": f"{row.get('Home_Team', '')} x {row.get('Visitor_Team', '')}",
+            "Entrada": dados["entrada_1"],
+            "Classe": dados["classe"],
+            "Score": round(dados["score"], 1),
+            "Stake (%)": round(dados["stake"] * 100, 2),
+            "ExG": round(dados["exg_total"], 2),
+            "BTTS (%)": round(dados["btts"], 1),
+            "Edge (%)": round(edge, 2)
+        })
+
+    df_rank = pd.DataFrame(lista)
+
+    # =========================================
+    # 🔥 FILTRO (SÓ JOGO BOM)
+    # =========================================
+    df_rank = df_rank[df_rank["Classe"].isin(["A+", "A"])]
+
+    # =========================================
+    # 📈 ORDENAÇÃO PROFISSIONAL
+    # =========================================
+    ordem_classe = {"A+": 0, "A": 1}
+
+    df_rank["ordem"] = df_rank["Classe"].map(ordem_classe)
+
+    df_rank = df_rank.sort_values(
+        by=["ordem", "Edge (%)", "Score"],
+        ascending=[True, False, False]
+    ).drop(columns="ordem")
+
+    return df_rank
+    
+with tab7:
+
+    st.markdown("## 🤖 Central de Decisão IA")
+
+    # =========================================
+    # ⚠️ ALERTA MATCH ODDS
+    # =========================================
+    if (
+        (linha_exg["VR01"] <= 0.15) and
+        (linha_exg["Odd_BTTS_YES"] <= 1.80) and
+        (
+            linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
+            else linha_mgf["MGF_A"]
+        ) >= 1.00
+    ):
+        st.warning("⚠️ Evitar Operar Match Odds")
+
+    # =========================================
+    # 📊 RANKING IA (FORA DO IF!)
+    # =========================================
+    df_rank = gerar_ranking_ia(df_mgf)
+
+    st.markdown("### 🔥 Top Oportunidades do Dia")
+
+    st.dataframe(
+        df_rank,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    # =========================================
+    # 🎯 JOGO SELECIONADO
+    # =========================================
+    dados = calcular_entrada_score(linha_mgf, linha_exg)
+
+    texto = f"""
+🎯 Entrada 1: {dados['entrada_1']}
+🎯 Entrada 2: {dados['entrada_2'] if dados['entrada_2'] else '-'}
+
+🏷️ Classe: {dados['classe']}
+🧠 Score: {dados['score']:.1f}
+💰 Stake: {dados['stake']*100:.2f}%
+
+⚽ ExG: {dados['exg_total']:.2f}
+🔥 BTTS: {dados['btts']:.1f}%
+"""
+
+    # =========================================
+    # 🎨 VISUAL POR CLASSE (COM A+ CORRETO)
+    # =========================================
+    if dados["classe"] == "A+":
+        st.success("🔥 A+ ELITE\n" + texto)
+
+    elif dados["classe"] == "A":
+        st.success(texto)
+
+    elif dados["classe"] == "B":
+        st.warning(texto)
+
+    elif dados["classe"] == "C":
+        st.info(texto)
+
+    else:
+        st.error(texto)
+
+    # =========================================
+    # ⚔️ DIREÇÃO (CONSENSO REAL)
+    # =========================================
+    direcao = st.session_state.get("direcao_consenso", "Sem leitura")
+
+    if "HOME" in direcao:
+        st.success(direcao)
+
+    elif "AWAY" in direcao:
+        st.success(direcao)
+
+    elif "Equilibrado" in direcao:
+        st.warning(direcao)
+
+    else:
+        st.info(direcao)
