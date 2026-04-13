@@ -2653,8 +2653,8 @@ with tab7:
     ):
         st.warning("⚠️ Evitar Operar Match Odds")
 
-        # =========================================
-    # 📊 RANKING IA
+    # =========================================
+    # 📊 RANKING IA (FORA DO IF!)
     # =========================================
     df_rank = gerar_ranking_ia(df_v_teams)
 
@@ -2671,16 +2671,7 @@ with tab7:
     # =========================================
     dados = calcular_entrada_score(linha_mgf, linha_exg)
 
-    if dados["classe"] == "A+":
-        box = st.success
-    elif dados["classe"] == "A":
-        box = st.success
-    elif dados["classe"] == "B":
-        box = st.warning
-    else:
-        box = st.error
-
-    box(f"""
+    texto = f"""
 🎯 Entrada 1: {dados['entrada_1']}
 🎯 Entrada 2: {dados['entrada_2'] if dados['entrada_2'] else '-'}
 
@@ -2690,17 +2681,39 @@ with tab7:
 
 ⚽ ExG: {dados['exg_total']:.2f}
 🔥 BTTS: {dados['btts']:.1f}%
-""")
+"""
 
-# =========================================
-# ⚔️ DIREÇÃO (CONSENSO REAL)
-# =========================================
-direcao = st.session_state.get("direcao_consenso", "Sem leitura")
-if "HOME" in direcao:
-    st.success(direcao)
-elif "AWAY" in direcao:
-    st.success(direcao)
-elif "Equilibrado" in direcao:
-    st.warning(direcao)
-else:
-    st.info(direcao)
+    # =========================================
+    # 🎨 VISUAL POR CLASSE (COM A+ CORRETO)
+    # =========================================
+    if dados["classe"] == "A+":
+        st.success("🔥 A+ ELITE\n" + texto)
+
+    elif dados["classe"] == "A":
+        st.success(texto)
+
+    elif dados["classe"] == "B":
+        st.warning(texto)
+
+    elif dados["classe"] == "C":
+        st.info(texto)
+
+    else:
+        st.error(texto)
+
+    # =========================================
+    # ⚔️ DIREÇÃO (CONSENSO REAL)
+    # =========================================
+    direcao = st.session_state.get("direcao_consenso", "Sem leitura")
+
+    if "HOME" in direcao:
+        st.success(direcao)
+
+    elif "AWAY" in direcao:
+        st.success(direcao)
+
+    elif "Equilibrado" in direcao:
+        st.warning(direcao)
+
+    else:
+        st.info(direcao)
