@@ -1197,15 +1197,15 @@ desvio_score = df_mgf["Score_Ofensivo"].std()
 # =========================================
 # ABAS
 # =========================================
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
 "📊🧠 Resumo",
 "📁🧠 Dados",
 "📊⚽ MGF",
 "⚔️⚽ ATK x DEF",
 "💎⚽ VG",
 "🚩 Escanteios"
+"🤖 IA"
 ])
-
 # =========================================
 # ABA 1 — RESUMO >>>>>>. ESCUDOS QUASE PERFEITOS >>>>> SALVAR ESSE CÓDIGO
 # =========================================
@@ -2634,3 +2634,59 @@ with tab6:
         st.warning("❄️ Tendência de Jogo Lento")
     else:
         st.success("✅ Tendência de Jogo Dinâmico")
+
+with tab7:
+
+    st.markdown("## 🤖 Central de Decisão IA")
+
+    # =========================================
+    # ⚠️ ALERTA MATCH ODDS
+    # =========================================
+    if (
+        (linha_exg["VR01"] <= 0.15) and
+        (linha_exg["Odd_BTTS_YES"] <= 1.80) and
+        (
+            linha_mgf["MGF_H"] if linha_exg["Odds_Casa"] > linha_exg["Odds_Visitante"]
+            else linha_mgf["MGF_A"]
+        ) >= 1.00
+    ):
+
+        st.markdown("""
+        <div style="
+            width: 100%;
+            background: #FF8C00;
+            padding: 14px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            margin-bottom: 15px;
+        ">
+            ⚠️ Evitar Operar Match Odds
+        </div>
+        """, unsafe_allow_html=True)
+
+    # =========================================
+    # 🎯 ENTRADAS + SCORE
+    # =========================================
+    dados = calcular_entrada_score(linha_mgf, linha_exg)
+
+    st.markdown(f"""
+    <div style="
+        width: 100%;
+        background: linear-gradient(135deg, #1e1e1e, #2c3e50);
+        padding: 18px;
+        border-radius: 12px;
+        color: white;
+        box-sizing: border-box;
+    ">
+        🎯 <b>Entrada 1:</b> {dados['entrada_1']}<br>
+        🎯 <b>Entrada 2:</b> {dados['entrada_2'] if dados['entrada_2'] else '-'}<br><br>
+
+        🏷️ <b>Classe:</b> {dados['classe']}<br>
+        🧠 <b>Score:</b> {dados['score']:.1f}<br>
+        💰 <b>Stake:</b> {dados['stake']*100:.2f}%<br><br>
+
+        ⚽ <b>ExG Total:</b> {dados['exg_total']:.2f}<br>
+        🔥 <b>BTTS:</b> {dados['btts']:.1f}%
+    </div>
+    """, unsafe_allow_html=True)
