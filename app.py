@@ -2651,7 +2651,6 @@ with tab7:
             else linha_mgf["MGF_A"]
         ) >= 1.00
     ):
-
         st.markdown("""
         <div style="
             width: 100%;
@@ -2672,24 +2671,17 @@ with tab7:
     dados = calcular_entrada_score(linha_mgf, linha_exg)
 
     st.markdown(f"""
-    <div style="
-        width: 100%;
-        background: linear-gradient(135deg, #1e1e1e, #2c3e50);
-        padding: 18px;
-        border-radius: 12px;
-        color: white;
-        box-sizing: border-box;
-    ">
+🎯 **Entrada 1:** {dados['entrada_1']}  
+🎯 **Entrada 2:** {dados['entrada_2'] if dados['entrada_2'] else '-'}  
 
-        🎯 <b>Entrada 1:</b> {dados['entrada_1']}<br>
-        🎯 <b>Entrada 2:</b> {dados['entrada_2'] if dados['entrada_2'] else '-'}<br><br>
+---
 
-        🏷️ <b>Classe:</b> {dados['classe']}<br>
-        🧠 <b>Score:</b> {dados['score']:.1f}<br>
-        💰 <b>Stake:</b> {dados['stake']*100:.2f}%<br><br>
+🏷️ **Classe:** {dados['classe']}  
+🧠 **Score:** {dados['score']:.1f}  
+💰 **Stake:** {dados['stake']*100:.2f}%  
 
-        ⚽ <b>ExG Total:</b> {dados['exg_total']:.2f}<br>  
-        🔥 <b>BTTS:</b> {dados['btts']:.1f}%
+---
 
-    </div>
-    """, unsafe_allow_html=True)
+⚽ **ExG Total:** {dados['exg_total']:.2f}  
+🔥 **BTTS:** {dados['btts']:.1f}%  
+""")
