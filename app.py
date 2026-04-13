@@ -2681,7 +2681,7 @@ with tab7:
 💰 **Stake:** {dados['stake']*100:.2f}%  
 
 ---
-
+ 
 ⚽ **ExG Total:** {dados['exg_total']:.2f}  
 🔥 **BTTS:** {dados['btts']:.1f}%  
 """)
