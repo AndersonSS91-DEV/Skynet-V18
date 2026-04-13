@@ -2660,6 +2660,7 @@ with tab7:
             color: white;
             font-weight: 700;
             margin-bottom: 15px;
+            box-sizing: border-box;
         ">
             ⚠️ Evitar Operar Match Odds
         </div>
@@ -2670,18 +2671,42 @@ with tab7:
     # =========================================
     dados = calcular_entrada_score(linha_mgf, linha_exg)
 
+    # cor por classe
+    cor_classe = {
+        "A+": "#00E676",
+        "A": "#00C853",
+        "B": "#FFD600",
+        "C": "#FF9100",
+        "D": "#FF5252",
+        "E": "#9E9E9E"
+    }.get(dados["classe"], "#00E5FF")
+
     st.markdown(f"""
-🎯 **Entrada 1:** {dados['entrada_1']}  
-🎯 **Entrada 2:** {dados['entrada_2'] if dados['entrada_2'] else '-'}  
+    <div style="
+        width: 100%;
+        display: block;
+        background: linear-gradient(135deg, #1e1e1e, #2c3e50);
+        padding: 18px;
+        border-radius: 12px;
+        color: white;
+        margin-bottom: 15px;
+        box-sizing: border-box;
+        border-left: 6px solid {cor_classe};
+    ">
 
----
+        <div>🎯 <b>Entrada 1:</b> {dados['entrada_1']}</div>
+        <div>🎯 <b>Entrada 2:</b> {dados['entrada_2'] if dados['entrada_2'] else '-'}</div>
 
-🏷️ **Classe:** {dados['classe']}  
-🧠 **Score:** {dados['score']:.1f}  
-💰 **Stake:** {dados['stake']*100:.2f}%  
+        <div style="margin-top:10px;">
+            🏷️ <b>Classe:</b> {dados['classe']}<br>
+            🧠 <b>Score:</b> {dados['score']:.1f}<br>
+            💰 <b>Stake:</b> {dados['stake']*100:.2f}%
+        </div>
 
----
- 
-⚽ **ExG Total:** {dados['exg_total']:.2f}  
-🔥 **BTTS:** {dados['btts']:.1f}%  
-""")
+        <div style="margin-top:10px;">
+            ⚽ <b>ExG Total:</b> {dados['exg_total']:.2f}<br>
+            🔥 <b>BTTS:</b> {dados['btts']:.1f}%
+        </div>
+
+    </div>
+    """, unsafe_allow_html=True)
