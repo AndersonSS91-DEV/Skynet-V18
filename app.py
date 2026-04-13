@@ -2636,6 +2636,69 @@ with tab6:
         st.success("✅ Tendência de Jogo Dinâmico")
 
 
+
+
+# =========================================
+# 🤖 FUNÇÃO RANKING IA (OBRIGATÓRIA)
+# =========================================
+def gerar_ranking_ia(df):
+
+    lista = []
+
+    for _, row in df.iterrows():
+
+        linha_mgf = row
+        linha_exg = row
+
+        dados = calcular_entrada_score(linha_mgf, linha_exg)
+
+        # ================================
+        # 📊 EDGE (VALOR REAL)
+        # ================================
+        btts = dados["btts"] / 100
+        prob_modelo = max(btts, 0.50)
+
+        odd = row.get("Odd_BTTS_YES", 2.0)
+
+        if odd > 0:
+            prob_mercado = 1 / odd
+        else:
+            prob_mercado = 0
+
+        edge = (prob_modelo - prob_mercado) * 100
+
+        lista.append({
+            "Jogo": f"{row.get('Home_Team', '')} x {row.get('Visitor_Team', '')}",
+            "Entrada": dados["entrada_1"],
+            "Classe": dados["classe"],
+            "Score": round(dados["score"], 1),
+            "Stake (%)": round(dados["stake"] * 100, 2),
+            "ExG": round(dados["exg_total"], 2),
+            "BTTS (%)": round(dados["btts"], 1),
+            "Edge (%)": round(edge, 2)
+        })
+
+    df_rank = pd.DataFrame(lista)
+
+    # =========================================
+    # 🔥 FILTRO (SÓ JOGO BOM)
+    # =========================================
+    df_rank = df_rank[df_rank["Classe"].isin(["A+", "A"])]
+
+    # =========================================
+    # 📈 ORDENAÇÃO PROFISSIONAL
+    # =========================================
+    ordem_classe = {"A+": 0, "A": 1}
+
+    df_rank["ordem"] = df_rank["Classe"].map(ordem_classe)
+
+    df_rank = df_rank.sort_values(
+        by=["ordem", "Edge (%)", "Score"],
+        ascending=[True, False, False]
+    ).drop(columns="ordem")
+
+    return df_rank
+    
 with tab7:
 
     st.markdown("## 🤖 Central de Decisão IA")
