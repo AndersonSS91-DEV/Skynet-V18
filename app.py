@@ -2719,7 +2719,7 @@ with tab7:
     # =========================================
     # 📊 RANKING IA (FORA DO IF!)
     # =========================================
-    df_rank = gerar_ranking_ia(df_v_teams)
+    df_rank = gerar_ranking_ia(df_mgf)
 
     st.markdown("### 🔥 Top Oportunidades do Dia")
 
