@@ -2681,7 +2681,8 @@ with tab7:
         "E": "#9E9E9E"
     }.get(dados["classe"], "#00E5FF")
 
-    st.markdown(f"""
+st.markdown(
+    f"""
     <div style="
         width: 100%;
         display: block;
@@ -2709,4 +2710,6 @@ with tab7:
         </div>
 
     </div>
-    """, unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
