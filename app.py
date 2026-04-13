@@ -2651,27 +2651,29 @@ with tab7:
             else linha_mgf["MGF_A"]
         ) >= 1.00
     ):
-        st.markdown("""
-        <div style="
-            width: 100%;
-            background: #FF8C00;
-            padding: 14px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 700;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-        ">
-            ⚠️ Evitar Operar Match Odds
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div style="
+                width: 100%;
+                background: #FF8C00;
+                padding: 14px;
+                border-radius: 12px;
+                color: white;
+                font-weight: 700;
+                margin-bottom: 15px;
+                box-sizing: border-box;
+            ">
+                ⚠️ Evitar Operar Match Odds
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     # =========================================
     # 🎯 ENTRADAS + SCORE
     # =========================================
     dados = calcular_entrada_score(linha_mgf, linha_exg)
 
-    # cor por classe
     cor_classe = {
         "A+": "#00E676",
         "A": "#00C853",
@@ -2681,35 +2683,34 @@ with tab7:
         "E": "#9E9E9E"
     }.get(dados["classe"], "#00E5FF")
 
-st.markdown(
-    f"""
-    <div style="
-        width: 100%;
-        display: block;
-        background: linear-gradient(135deg, #1e1e1e, #2c3e50);
-        padding: 18px;
-        border-radius: 12px;
-        color: white;
-        margin-bottom: 15px;
-        box-sizing: border-box;
-        border-left: 6px solid {cor_classe};
-    ">
+    html_card = f"""
+<div style="
+    width: 100%;
+    display: block;
+    background: linear-gradient(135deg, #1e1e1e, #2c3e50);
+    padding: 18px;
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border-left: 6px solid {cor_classe};
+">
 
-        <div>🎯 <b>Entrada 1:</b> {dados['entrada_1']}</div>
-        <div>🎯 <b>Entrada 2:</b> {dados['entrada_2'] if dados['entrada_2'] else '-'}</div>
+    <div>🎯 <b>Entrada 1:</b> {dados['entrada_1']}</div>
+    <div>🎯 <b>Entrada 2:</b> {dados['entrada_2'] if dados['entrada_2'] else '-'}</div>
 
-        <div style="margin-top:10px;">
-            🏷️ <b>Classe:</b> {dados['classe']}<br>
-            🧠 <b>Score:</b> {dados['score']:.1f}<br>
-            💰 <b>Stake:</b> {dados['stake']*100:.2f}%
-        </div>
-
-        <div style="margin-top:10px;">
-            ⚽ <b>ExG Total:</b> {dados['exg_total']:.2f}<br>
-            🔥 <b>BTTS:</b> {dados['btts']:.1f}%
-        </div>
-
+    <div style="margin-top:10px;">
+        🏷️ <b>Classe:</b> {dados['classe']}<br>
+        🧠 <b>Score:</b> {dados['score']:.1f}<br>
+        💰 <b>Stake:</b> {dados['stake']*100:.2f}%
     </div>
-    """,
-    unsafe_allow_html=True
-)
+
+    <div style="margin-top:10px;">
+        ⚽ <b>ExG Total:</b> {dados['exg_total']:.2f}<br>
+        🔥 <b>BTTS:</b> {dados['btts']:.1f}%
+    </div>
+
+</div>
+"""
+
+    st.markdown(html_card, unsafe_allow_html=True)
