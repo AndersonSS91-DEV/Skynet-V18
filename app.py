@@ -2635,6 +2635,7 @@ with tab6:
     else:
         st.success("✅ Tendência de Jogo Dinâmico")
 
+
 with tab7:
 
     st.markdown("## 🤖 Central de Decisão IA")
@@ -2679,6 +2680,7 @@ with tab7:
         color: white;
         box-sizing: border-box;
     ">
+
         🎯 <b>Entrada 1:</b> {dados['entrada_1']}<br>
         🎯 <b>Entrada 2:</b> {dados['entrada_2'] if dados['entrada_2'] else '-'}<br><br>
 
@@ -2688,5 +2690,6 @@ with tab7:
 
         ⚽ <b>ExG Total:</b> {dados['exg_total']:.2f}<br>
         🔥 <b>BTTS:</b> {dados['btts']:.1f}%
+
     </div>
     """, unsafe_allow_html=True)
