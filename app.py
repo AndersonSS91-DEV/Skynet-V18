@@ -2688,7 +2688,7 @@ with tab7:
         🧠 <b>Score:</b> {dados['score']:.1f}<br>
         💰 <b>Stake:</b> {dados['stake']*100:.2f}%<br><br>
 
-        ⚽ <b>ExG Total:</b> {dados['exg_total']:.2f}<br>
+        ⚽ <b>ExG Total:</b> {dados['exg_total']:.2f}<br>  
         🔥 <b>BTTS:</b> {dados['btts']:.1f}%
 
     </div>
