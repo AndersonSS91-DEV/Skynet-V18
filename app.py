@@ -2653,13 +2653,27 @@ with tab7:
     ):
         st.warning("⚠️ Evitar Operar Match Odds")
 
+        # =========================================
+    # 📊 RANKING IA
     # =========================================
-    # 🎯 ENTRADAS + SCORE
+    df_rank = gerar_ranking_ia(df_v_teams)
+
+    st.markdown("### 🔥 Top Oportunidades do Dia")
+
+    st.dataframe(
+        df_rank,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    # =========================================
+    # 🎯 JOGO SELECIONADO
     # =========================================
     dados = calcular_entrada_score(linha_mgf, linha_exg)
 
-    # cor por classe
-    if dados["classe"] in ["A+", "A"]:
+    if dados["classe"] == "A+":
+        box = st.success
+    elif dados["classe"] == "A":
         box = st.success
     elif dados["classe"] == "B":
         box = st.warning
@@ -2674,7 +2688,19 @@ with tab7:
 🧠 Score: {dados['score']:.1f}
 💰 Stake: {dados['stake']*100:.2f}%
 
-⚽ ExG Total: {dados['exg_total']:.2f}
+⚽ ExG: {dados['exg_total']:.2f}
 🔥 BTTS: {dados['btts']:.1f}%
 """)
 
+# =========================================
+# ⚔️ DIREÇÃO (CONSENSO REAL)
+# =========================================
+direcao = st.session_state.get("direcao_consenso", "Sem leitura")
+if "HOME" in direcao:
+    st.success(direcao)
+elif "AWAY" in direcao:
+    st.success(direcao)
+elif "Equilibrado" in direcao:
+    st.warning(direcao)
+else:
+    st.info(direcao)
