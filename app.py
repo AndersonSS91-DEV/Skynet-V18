@@ -2635,203 +2635,235 @@ with tab6:
     else:
         st.success("✅ Tendência de Jogo Dinâmico")
 
-
-
-
 # =========================================
-# 🤖 FUNÇÕES IA (FORA DO TAB)
+# 🤖 MOTOR IA FINAL (COM EXEMPLOS REAIS)
 # =========================================
 
 import pandas as pd
-import numpy as np
 
-def calcular_edge_row(row):
+def classificar_jogo(row):
 
-    btts = row.get("BTTS_%", 0) / 100
-    prob_modelo = max(btts, 0.50)
+    def g(x, default=0):
+        v = row.get(x, default)
+        return 0 if pd.isna(v) else v
 
-    odd = row.get("Odd_BTTS_YES", 2.0)
+    cg_home = g("Media_CG_H_01")
+    cg_away = g("Media_CG_A_01")
 
-    if odd > 0:
-        prob_mercado = 1 / odd
-    else:
-        prob_mercado = 0
+    mgf_home = g("MGF_H")
+    mgf_away = g("MGF_A")
 
-    edge_base = prob_modelo - prob_mercado
+    mgc_home = g("MGC_H")
+    mgc_away = g("MGC_A")
 
-    cg_home = row.get("Media_CG_H_01", 0)
-    cg_away = row.get("Media_CG_A_01", 0)
+    vr01 = g("VR01")
 
-    cv_home = row.get("CV_CG_H_01", 1)
-    cv_away = row.get("CV_CG_A_01", 1)
+    # compatível com seu rename
+    coef_over = g("COEF_OVER1FT") if "COEF_OVER1FT" in row else g("Coeficiente_Over_1,5FT")
 
-    ajuste = 0
+    # =========================================
+    # 🔍 FILTRO LIXO (Sub20 / odds vazias)
+    # =========================================
+    if (
+        g("Odd_BTTS_YES") == 0 or
+        g("Odds_Over_2,5FT") == 0 or
+        g("Odds_Casa") == 0 or
+        g("Odds_Visitante") == 0
+    ):
+        return None
 
-    if 2.8 <= cg_home <= 5.0:
-        ajuste += 0.02
-    if 2.8 <= cg_away <= 5.0:
-        ajuste += 0.02
+    tipo = "⚫ No Bet"
+    entrada = "Evitar"
+    momento = "-"
+    classe = "D"
 
-    if cg_home > 5.5:
-        ajuste += 0.03
-    if cg_away > 5.5:
-        ajuste += 0.03
+    # =========================================
+    # 🔥 PIROTÉCNICO (PSV x FC Utrecht)
+    # =========================================
+    if coef_over > 3 and mgf_home >= 2 and mgf_away >= 1.5:
+        tipo = "🔥 Pirotécnico (PSV x FC Utrecht)"
+        entrada = "Over 3.0 / BTTS"
+        momento = "Pré + Live"
+        classe = "A+"
 
-    if cv_home > 0.35:
-        ajuste -= 0.03
-    if cv_away > 0.35:
-        ajuste -= 0.03
+    # =========================================
+    # 💣 GOLEADA (Rangers x Dundee)
+    # =========================================
+    elif coef_over > 3 and mgc_away >= 2:
+        tipo = "💣 Goleada (Rangers x Dundee)"
+        entrada = "Over + Handicap Casa"
+        momento = "Pré"
+        classe = "A+"
 
-    vr01 = row.get("VR01", 0)
+    # =========================================
+    # 🔴 REVERSÃO (Heidenheim x Freiburg)
+    # =========================================
+    elif mgc_home > 1.5 and mgc_away > 1.5:
+        tipo = "🔴 Reversão (Heidenheim x Freiburg)"
+        entrada = "Over + Lay"
+        momento = "Live"
+        classe = "A"
 
-    if vr01 >= 0.12:
-        ajuste += 0.04
-    elif vr01 <= 0.05:
-        ajuste -= 0.03
+    # =========================================
+    # 🟢 DOMINÂNCIA LIMPA (Del Valle x Orense)
+    # =========================================
+    elif vr01 > 0.25 and mgf_home > mgf_away:
+        tipo = "🟢 Dominância (Del Valle x Orense)"
+        entrada = "Lay Empate / Back Casa"
+        momento = "Pré"
+        classe = "A"
 
-    return edge_base + ajuste
+    # =========================================
+    # 🔴 FAVORITO FALSO (Atlético x Barcelona / Trabzon x Galata)
+    # =========================================
+    elif vr01 < 0 and mgf_home > mgf_away:
+        tipo = "🔴 Favorito Falso (Atlético / Trabzon)"
+        entrada = "Lay Visitante"
+        momento = "Live"
+        classe = "A+"
+
+    # =========================================
+    # 🔵 UNDER DEFENSIVO (Universitario x Alianza Lima)
+    # =========================================
+    elif coef_over < 1.5 and mgf_home < 1.5 and mgf_away < 1.5:
+        tipo = "🔵 Under Defensivo (Universitario x Alianza Lima)"
+        entrada = "Under 2.5 / 3.0"
+        momento = "Pré + Pós-gol"
+        classe = "A"
+
+    # =========================================
+    # 🟣 UNDER FALSO (Werder Bremen x Augsburg)
+    # =========================================
+    elif coef_over < 2 and mgc_home > 1.5:
+        tipo = "🟣 Under Falso (Werder Bremen x Augsburg)"
+        entrada = "Over Live"
+        momento = "Live"
+        classe = "B"
+
+    # =========================================
+    # 🟡 OVER BÁSICO (Jogos médios padrão)
+    # =========================================
+    elif coef_over > 1.8:
+        tipo = "🟡 Over Básico"
+        entrada = "Over 1.5"
+        momento = "Live"
+        classe = "B"
+
+    return {
+        "Tipo": tipo,
+        "Entrada": entrada,
+        "Momento": momento,
+        "Classe": classe
+    }
 
 
-def classificar(edge):
+# =========================================
+# 📊 RANKING IA FINAL
+# =========================================
 
-    if edge >= 0.14:
-        return "A+"
-    elif edge >= 0.10:
-        return "A"
-    elif edge >= 0.05:
-        return "B"
-    elif edge > 0:
-        return "C"
-    else:
-        return "E"
-
-
-def escolher_mercado_row(row):
-
-    exg_total = row.get("ExG_Home_MGF", 0) + row.get("ExG_Away_MGF", 0)
-    btts = row.get("BTTS_%", 0) / 100
-    vr01 = row.get("VR01", 0)
-
-    if vr01 >= 0.12 and exg_total >= 2.5:
-        return "Back Favorito / Over 2.5"
-
-    if exg_total >= 3.0:
-        return "Over 2.5"
-
-    elif exg_total >= 2.5 and btts >= 0.55:
-        return "Over 2.0"
-
-    elif exg_total <= 2.1 and btts < 0.50:
-        return "Under 2.5"
-
-    return "-"
-
-
-def calcular_stake(edge):
-
-    if edge <= 0:
-        return 0
-
-    return min(edge * 0.8, 0.10)
-
-
-def gerar_ranking_ia(df_mgf, df_exg):
+def gerar_ranking_ia(df):
 
     lista = []
 
-    for i in range(len(df_mgf)):
+    for _, row in df.iterrows():
 
-        row = {**df_mgf.iloc[i].to_dict(), **df_exg.iloc[i].to_dict()}
+        res = classificar_jogo(row)
 
-        if row.get("Odds_Casa", 0) == 0:
+        if not res:
             continue
 
-        edge = calcular_edge_row(row)
-        classe = classificar(edge)
-
-        if classe not in ["A+", "A"]:
+        if res["Classe"] not in ["A+", "A"]:
             continue
 
         lista.append({
             "Jogo": f"{row.get('Home_Team','')} x {row.get('Visitor_Team','')}",
-            "Classe": classe,
-            "Edge (%)": round(edge * 100, 2),
-            "VR01": round(row.get("VR01", 0), 2),
-            "CG Home": round(row.get("Media_CG_H_01", 0), 2),
-            "CG Away": round(row.get("Media_CG_A_01", 0), 2),
-            "Mercado": escolher_mercado_row(row)
+            "Tipo": res["Tipo"],
+            "Entrada": res["Entrada"],
+            "Momento": res["Momento"],
+            "Classe": res["Classe"]
         })
+
+    if not lista:
+        return pd.DataFrame()
 
     df_rank = pd.DataFrame(lista)
 
-    if not df_rank.empty:
+    ordem = {"A+": 0, "A": 1}
+    df_rank["ordem"] = df_rank["Classe"].map(ordem)
 
-        ordem = {"A+": 0, "A": 1}
-        df_rank["ordem"] = df_rank["Classe"].map(ordem)
-
-        df_rank = df_rank.sort_values(
-            by=["ordem", "Edge (%)"],
-            ascending=[True, False]
-        ).drop(columns="ordem")
-
-    return df_rank
+    return df_rank.sort_values(by="ordem").drop(columns="ordem")
 
 
 # =========================================
-# 🚀 EXECUÇÃO (DENTRO DO TAB)
+# 🚀 ABA IA FINAL (STREAMLIT)
 # =========================================
 
 with tab7:
 
     st.markdown("## 🤖 Central de Decisão IA")
 
-    df_rank = gerar_ranking_ia(df_mgf, df_exg)
+    # =========================================
+    # 📊 RANKING
+    # =========================================
+    df_rank = gerar_ranking_ia(df_v_teams)
 
-    st.markdown("### 🔥 Top Oportunidades")
+    st.markdown("### 🔥 Top Jogos do Dia")
 
-    st.dataframe(df_rank, use_container_width=True, hide_index=True)
+    if not df_rank.empty:
+        st.dataframe(df_rank, use_container_width=True, hide_index=True)
+    else:
+        st.info("Nenhum jogo A+/A encontrado")
 
-    # ================================
+    # =========================================
     # 🎯 JOGO ATUAL
-    # ================================
-    row = {**linha_mgf.to_dict(), **linha_exg.to_dict()}
+    # =========================================
+    resultado = classificar_jogo(linha_mgf)
 
-    edge = calcular_edge_row(row)
-    classe = classificar(edge)
-    mercado = escolher_mercado_row(row)
-    stake = calcular_stake(edge)
+    if resultado:
 
-    cores = {
-        "A+": "#00FFAA",
-        "A": "#00E5FF",
-        "B": "#FFD166",
-        "C": "#FF8C00",
-        "D": "#FF4D4D",
-        "E": "#8B0000"
-    }
+        texto = f"""
+🧠 Tipo: {resultado['Tipo']}
+🎯 Entrada: {resultado['Entrada']}
+⏱️ Momento: {resultado['Momento']}
+🏷️ Classe: {resultado['Classe']}
+"""
 
-    cor = cores.get(classe, "#2b2b2b")
+        if resultado["Classe"] == "A+":
+            st.success(texto)
+        elif resultado["Classe"] == "A":
+            st.success(texto)
+        elif resultado["Classe"] == "B":
+            st.warning(texto)
+        else:
+            st.info(texto)
 
-    st.markdown(f"""
-    <div style="
-        width: 100%;
-        background: linear-gradient(135deg, #1e1e1e, #2c3e50);
-        padding: 18px;
-        border-radius: 12px;
-        color: white;
-        box-sizing: border-box;
-        border-left: 6px solid {cor};
-    ">
+    # =========================================
+    # 📋 TABELA FINAL (SEM LIXO)
+    # =========================================
+    st.markdown("### 📋 Todos os Jogos Filtrados")
 
-    <b>🎯 Mercado:</b> {mercado}<br><br>
+    df_clean = df_v_teams[
+        (df_v_teams["Odd_BTTS_YES"] > 0) &
+        (df_v_teams["Odds_Over_2,5FT"] > 0) &
+        (df_v_teams["Odds_Casa"] > 0) &
+        (df_v_teams["Odds_Visitante"] > 0)
+    ]
 
-    <b>🏷️ Classe:</b> {classe}<br>
-    <b>🧠 Edge:</b> {edge*100:.2f}%<br>
-    <b>💰 Stake:</b> {stake*100:.2f}%<br><br>
+    lista = []
 
-    <b>📊 VR01:</b> {row.get("VR01",0):.2f}<br>
-    <b>⚙️ CG Home:</b> {row.get("Media_CG_H_01",0):.2f}<br>
-    <b>⚙️ CG Away:</b> {row.get("Media_CG_A_01",0):.2f}<br>
+    for _, row in df_clean.iterrows():
 
-    </div>
-    """, unsafe_allow_html=True)
+        res = classificar_jogo(row)
+
+        if res:
+            lista.append({
+                "Jogo": f"{row.get('Home_Team','')} x {row.get('Visitor_Team','')}",
+                "Tipo": res["Tipo"],
+                "Entrada": res["Entrada"],
+                "Classe": res["Classe"]
+            })
+
+    if lista:
+        st.dataframe(pd.DataFrame(lista), use_container_width=True, hide_index=True)
+    else:
+        st.info("Sem jogos válidos após filtro")
