@@ -2635,6 +2635,8 @@ with tab6:
     else:
         st.success("✅ Tendência de Jogo Dinâmico")
 
+
+
 # =========================================
 # 🤖 MOTOR IA FINAL (COM EXEMPLOS REAIS)
 # =========================================
