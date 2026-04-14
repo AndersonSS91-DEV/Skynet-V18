@@ -2805,7 +2805,16 @@ with tab7:
     # =========================================
     # 📊 RANKING
     # =========================================
-    df_rank = gerar_ranking_ia(df_v_teams)
+    base_df = globals().get("df_v_teams", None)
+
+if base_df is None:
+    base_df = globals().get("df", None)
+
+if base_df is None:
+    st.error("DataFrame base não encontrado")
+    st.stop()
+
+df_rank = gerar_ranking_ia(base_df)
 
     st.markdown("### 🔥 Top Jogos do Dia")
 
