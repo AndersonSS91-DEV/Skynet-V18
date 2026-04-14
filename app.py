@@ -2638,9 +2638,6 @@ with tab6:
 # =========================================
 # 🤖 MOTOR IA FINAL (COM EXEMPLOS REAIS)
 # =========================================
-
-import pandas as pd
-
 def classificar_jogo(row):
 
     def g(x, default=0):
@@ -2672,69 +2669,77 @@ def classificar_jogo(row):
     entrada = "Evitar"
     momento = "-"
     classe = "D"
+    motivo = "Sem edge identificável"
 
     # =========================================
-    # 🔥 PIROTÉCNICO (PSV x FC Utrecht)
+    # 🔥 PIROTÉCNICO (PSV x Utrecht)
     # =========================================
     if coef_over > 3 and mgf_home >= 2 and mgf_away >= 1.5:
-        tipo = "🔥 Pirotécnico (PSV x FC Utrecht)"
+        tipo = "🔥 Pirotécnico (PSV x Utrecht)"
         entrada = "Over 3.0 / BTTS"
         momento = "Pré + Live"
         classe = "A+"
+        motivo = f"CoefOver {coef_over:.2f} alto + MGF elevado ({mgf_home}/{mgf_away}) → jogo explosivo"
 
     # =========================================
-    # 💣 GOLEADA (Rangers x Dundee)
+    # 💣 GOLEADA (Rangers)
     # =========================================
     elif coef_over > 3 and mgc_away >= 2:
-        tipo = "💣 Goleada (Rangers x Dundee)"
+        tipo = "💣 Goleada (Rangers)"
         entrada = "Over + Handicap Casa"
         momento = "Pré"
         classe = "A+"
+        motivo = f"MGC visitante alto ({mgc_away}) → defesa fraca + tendência de goleada"
 
     # =========================================
-    # 🔴 REVERSÃO (Heidenheim x Freiburg)
+    # 🔴 REVERSÃO
     # =========================================
     elif mgc_home > 1.5 and mgc_away > 1.5:
-        tipo = "🔴 Reversão (Heidenheim x Freiburg)"
+        tipo = "🔴 Reversão"
         entrada = "Over + Lay"
         momento = "Live"
         classe = "A"
+        motivo = f"Ambos sofrem gols ({mgc_home}/{mgc_away}) → jogo instável"
 
     # =========================================
-    # 🟢 DOMINÂNCIA (Del Valle x Orense)
+    # 🟢 DOMINÂNCIA
     # =========================================
     elif vr01 > 0.25 and mgf_home > mgf_away:
-        tipo = "🟢 Dominância (Del Valle x Orense)"
+        tipo = "🟢 Dominância"
         entrada = "Lay Empate / Back Casa"
         momento = "Pré"
         classe = "A"
+        motivo = f"VR01 {vr01:.2f} alto → controle do mandante"
 
     # =========================================
-    # 🔴 FAVORITO FALSO (Atlético / Trabzon)
+    # 🔴 FAVORITO FALSO
     # =========================================
     elif vr01 < 0 and mgf_home > mgf_away:
-        tipo = "🔴 Favorito Falso (Atlético / Trabzon)"
+        tipo = "🔴 Favorito Falso"
         entrada = "Lay Visitante"
         momento = "Live"
         classe = "A+"
+        motivo = f"VR01 {vr01:.2f} negativo → mercado errado no favorito"
 
     # =========================================
-    # 🔵 UNDER DEFENSIVO (Universitario x Alianza)
+    # 🔵 UNDER DEFENSIVO
     # =========================================
     elif coef_over < 1.5 and mgf_home < 1.5 and mgf_away < 1.5:
-        tipo = "🔵 Under Defensivo (Universitario x Alianza)"
+        tipo = "🔵 Under Defensivo"
         entrada = "Under 2.5 / 3.0"
         momento = "Pré + Pós-gol"
         classe = "A"
+        motivo = f"CoefOver baixo ({coef_over:.2f}) + baixa produção → jogo travado"
 
     # =========================================
-    # 🟣 UNDER FALSO (Werder Bremen x Augsburg)
+    # 🟣 UNDER FALSO
     # =========================================
     elif coef_over < 2 and mgc_home > 1.5:
-        tipo = "🟣 Under Falso (Werder Bremen x Augsburg)"
+        tipo = "🟣 Under Falso"
         entrada = "Over Live"
         momento = "Live"
         classe = "B"
+        motivo = f"MGC alto ({mgc_home}) → defesa fraca quebra under"
 
     # =========================================
     # 🟡 OVER BÁSICO
@@ -2744,12 +2749,14 @@ def classificar_jogo(row):
         entrada = "Over 1.5"
         momento = "Live"
         classe = "B"
+        motivo = f"CoefOver {coef_over:.2f} → tendência leve de gols"
 
     return {
         "Tipo": tipo,
         "Entrada": entrada,
         "Momento": momento,
-        "Classe": classe
+        "Classe": classe,
+        "Motivo": motivo
     }
 
 
@@ -2838,6 +2845,9 @@ with tab7:
 🎯 Entrada: {resultado['Entrada']}
 ⏱️ Momento: {resultado['Momento']}
 🏷️ Classe: {resultado['Classe']}
+
+📊 Motivo IA:
+{resultado['Motivo']}
 """
 
         if resultado["Classe"] == "A+":
