@@ -2639,70 +2639,12 @@ with tab6:
 
 
 # =========================================
-# 🤖 FUNÇÃO RANKING IA (OBRIGATÓRIA)
+# 🤖 FUNÇÕES IA (FORA DO TAB)
 # =========================================
-def gerar_ranking_ia(df):
 
-    lista = []
+import pandas as pd
+import numpy as np
 
-    for _, row in df.iterrows():
-
-        linha_mgf = row
-        linha_exg = row
-
-        dados = calcular_entrada_score(linha_mgf, linha_exg)
-
-        # ================================
-        # 📊 EDGE (VALOR REAL)
-        # ================================
-        btts = dados["btts"] / 100
-        prob_modelo = max(btts, 0.50)
-
-        odd = row.get("Odd_BTTS_YES", 2.0)
-
-        if odd > 0:
-            prob_mercado = 1 / odd
-        else:
-            prob_mercado = 0
-
-        edge = (prob_modelo - prob_mercado) * 100
-
-        lista.append({
-            "Jogo": f"{row.get('Home_Team', '')} x {row.get('Visitor_Team', '')}",
-            "Entrada": dados["entrada_1"],
-            "Classe": dados["classe"],
-            "Score": round(dados["score"], 1),
-            "Stake (%)": round(dados["stake"] * 100, 2),
-            "ExG": round(dados["exg_total"], 2),
-            "BTTS (%)": round(dados["btts"], 1),
-            "Edge (%)": round(edge, 2)
-        })
-
-    df_rank = pd.DataFrame(lista)
-
-    # =========================================
-    # 🔥 FILTRO (SÓ JOGO BOM)
-    # =========================================
-    df_rank = df_rank[df_rank["Classe"].isin(["A+", "A"])]
-
-    # =========================================
-    # 📈 ORDENAÇÃO PROFISSIONAL
-    # =========================================
-    ordem_classe = {"A+": 0, "A": 1}
-
-    df_rank["ordem"] = df_rank["Classe"].map(ordem_classe)
-
-    df_rank = df_rank.sort_values(
-        by=["ordem", "Edge (%)", "Score"],
-        ascending=[True, False, False]
-    ).drop(columns="ordem")
-
-    return df_rank
-    
-with tab7:
-# =========================================
-# 🧠 EDGE REAL (COM CG + VR01)
-# =========================================
 def calcular_edge_row(row):
 
     btts = row.get("BTTS_%", 0) / 100
@@ -2717,59 +2659,39 @@ def calcular_edge_row(row):
 
     edge_base = prob_modelo - prob_mercado
 
-    # =========================================
-    # 🔥 AJUSTE COM CG (SEU DIFERENCIAL)
-    # =========================================
     cg_home = row.get("Media_CG_H_01", 0)
     cg_away = row.get("Media_CG_A_01", 0)
 
     cv_home = row.get("CV_CG_H_01", 1)
     cv_away = row.get("CV_CG_A_01", 1)
 
-    ajuste_cg = 0
+    ajuste = 0
 
-    # faixa ideal
     if 2.8 <= cg_home <= 5.0:
-        ajuste_cg += 0.02
+        ajuste += 0.02
     if 2.8 <= cg_away <= 5.0:
-        ajuste_cg += 0.02
+        ajuste += 0.02
 
-    # time subestimado (valor oculto)
     if cg_home > 5.5:
-        ajuste_cg += 0.03
+        ajuste += 0.03
     if cg_away > 5.5:
-        ajuste_cg += 0.03
+        ajuste += 0.03
 
-    # penaliza instabilidade
     if cv_home > 0.35:
-        ajuste_cg -= 0.03
+        ajuste -= 0.03
     if cv_away > 0.35:
-        ajuste_cg -= 0.03
+        ajuste -= 0.03
 
-    # =========================================
-    # 🔥 AJUSTE VR01 (DOMINÂNCIA REAL)
-    # =========================================
     vr01 = row.get("VR01", 0)
 
-    ajuste_vr = 0
-
     if vr01 >= 0.12:
-        ajuste_vr += 0.04
-
+        ajuste += 0.04
     elif vr01 <= 0.05:
-        ajuste_vr -= 0.03
+        ajuste -= 0.03
 
-    # =========================================
-    # 🎯 EDGE FINAL
-    # =========================================
-    edge_final = edge_base + ajuste_cg + ajuste_vr
-
-    return edge_final
+    return edge_base + ajuste
 
 
-# =========================================
-# 🏷️ CLASSIFICAÇÃO
-# =========================================
 def classificar(edge):
 
     if edge >= 0.14:
@@ -2784,37 +2706,27 @@ def classificar(edge):
         return "E"
 
 
-# =========================================
-# 🎯 ESCOLHA DE MERCADO
-# =========================================
 def escolher_mercado_row(row):
 
     exg_total = row.get("ExG_Home_MGF", 0) + row.get("ExG_Away_MGF", 0)
     btts = row.get("BTTS_%", 0) / 100
     vr01 = row.get("VR01", 0)
 
-    # DOMINANTE
     if vr01 >= 0.12 and exg_total >= 2.5:
-        return "Back Favorito ou Over 2.5"
+        return "Back Favorito / Over 2.5"
 
-    # OVER
     if exg_total >= 3.0:
         return "Over 2.5"
 
     elif exg_total >= 2.5 and btts >= 0.55:
-        return "Over 2.0 (Asiático)"
+        return "Over 2.0"
 
-    # UNDER
     elif exg_total <= 2.1 and btts < 0.50:
         return "Under 2.5"
 
-    else:
-        return "-"
+    return "-"
 
 
-# =========================================
-# 💰 STAKE
-# =========================================
 def calcular_stake(edge):
 
     if edge <= 0:
@@ -2823,9 +2735,6 @@ def calcular_stake(edge):
     return min(edge * 0.8, 0.10)
 
 
-# =========================================
-# 📊 RANKING IA (AGORA COM TEU MODELO)
-# =========================================
 def gerar_ranking_ia(df_mgf, df_exg):
 
     lista = []
@@ -2834,14 +2743,12 @@ def gerar_ranking_ia(df_mgf, df_exg):
 
         row = {**df_mgf.iloc[i].to_dict(), **df_exg.iloc[i].to_dict()}
 
-        # filtro básico
         if row.get("Odds_Casa", 0) == 0:
             continue
 
         edge = calcular_edge_row(row)
         classe = classificar(edge)
 
-        # 🔥 FILTRO REAL
         if classe not in ["A+", "A"]:
             continue
 
@@ -2857,9 +2764,9 @@ def gerar_ranking_ia(df_mgf, df_exg):
 
     df_rank = pd.DataFrame(lista)
 
-    ordem = {"A+": 0, "A": 1}
-
     if not df_rank.empty:
+
+        ordem = {"A+": 0, "A": 1}
         df_rank["ordem"] = df_rank["Classe"].map(ordem)
 
         df_rank = df_rank.sort_values(
@@ -2871,66 +2778,60 @@ def gerar_ranking_ia(df_mgf, df_exg):
 
 
 # =========================================
-# 🚀 EXECUÇÃO
+# 🚀 EXECUÇÃO (DENTRO DO TAB)
 # =========================================
 
-st.markdown("## 🤖 Central de Decisão IA")
+with tab7:
 
-df_rank = gerar_ranking_ia(df_mgf, df_exg)
+    st.markdown("## 🤖 Central de Decisão IA")
 
-st.markdown("### 🔥 Top Oportunidades")
+    df_rank = gerar_ranking_ia(df_mgf, df_exg)
 
-st.dataframe(df_rank, use_container_width=True, hide_index=True)
+    st.markdown("### 🔥 Top Oportunidades")
 
+    st.dataframe(df_rank, use_container_width=True, hide_index=True)
 
-# =========================================
-# 🎯 JOGO ATUAL
-# =========================================
-row = {**linha_mgf.to_dict(), **linha_exg.to_dict()}
+    # ================================
+    # 🎯 JOGO ATUAL
+    # ================================
+    row = {**linha_mgf.to_dict(), **linha_exg.to_dict()}
 
-edge = calcular_edge_row(row)
-classe = classificar(edge)
-mercado = escolher_mercado_row(row)
-stake = calcular_stake(edge)
+    edge = calcular_edge_row(row)
+    classe = classificar(edge)
+    mercado = escolher_mercado_row(row)
+    stake = calcular_stake(edge)
 
-# =========================================
-# 🎨 COR
-# =========================================
-cores = {
-    "A+": "#00FFAA",
-    "A": "#00E5FF",
-    "B": "#FFD166",
-    "C": "#FF8C00",
-    "D": "#FF4D4D",
-    "E": "#8B0000"
-}
+    cores = {
+        "A+": "#00FFAA",
+        "A": "#00E5FF",
+        "B": "#FFD166",
+        "C": "#FF8C00",
+        "D": "#FF4D4D",
+        "E": "#8B0000"
+    }
 
-cor = cores.get(classe, "#2b2b2b")
+    cor = cores.get(classe, "#2b2b2b")
 
+    st.markdown(f"""
+    <div style="
+        width: 100%;
+        background: linear-gradient(135deg, #1e1e1e, #2c3e50);
+        padding: 18px;
+        border-radius: 12px;
+        color: white;
+        box-sizing: border-box;
+        border-left: 6px solid {cor};
+    ">
 
-# =========================================
-# 📊 CARD FINAL
-# =========================================
-st.markdown(f"""
-<div style="
-    width: 100%;
-    background: linear-gradient(135deg, #1e1e1e, #2c3e50);
-    padding: 18px;
-    border-radius: 12px;
-    color: white;
-    box-sizing: border-box;
-    border-left: 6px solid {cor};
-">
+    <b>🎯 Mercado:</b> {mercado}<br><br>
 
-<b>🎯 Mercado:</b> {mercado}<br><br>
+    <b>🏷️ Classe:</b> {classe}<br>
+    <b>🧠 Edge:</b> {edge*100:.2f}%<br>
+    <b>💰 Stake:</b> {stake*100:.2f}%<br><br>
 
-<b>🏷️ Classe:</b> {classe}<br>
-<b>🧠 Edge:</b> {edge*100:.2f}%<br>
-<b>💰 Stake:</b> {stake*100:.2f}%<br><br>
+    <b>📊 VR01:</b> {row.get("VR01",0):.2f}<br>
+    <b>⚙️ CG Home:</b> {row.get("Media_CG_H_01",0):.2f}<br>
+    <b>⚙️ CG Away:</b> {row.get("Media_CG_A_01",0):.2f}<br>
 
-<b>📊 VR01:</b> {row.get("VR01",0):.2f}<br>
-<b>⚙️ CG Home:</b> {row.get("Media_CG_H_01",0):.2f}<br>
-<b>⚙️ CG Away:</b> {row.get("Media_CG_A_01",0):.2f}<br>
-
-</div>
-""", unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)e)
