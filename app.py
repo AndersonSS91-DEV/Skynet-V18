@@ -2834,4 +2834,4 @@ with tab7:
     <b>⚙️ CG Away:</b> {row.get("Media_CG_A_01",0):.2f}<br>
 
     </div>
-    """, unsafe_allow_html=True)e)
+    """, unsafe_allow_html=True)
