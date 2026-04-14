@@ -2647,9 +2647,6 @@ def classificar_jogo(row):
         v = row.get(x, default)
         return 0 if pd.isna(v) else v
 
-    cg_home = g("Media_CG_H_01")
-    cg_away = g("Media_CG_A_01")
-
     mgf_home = g("MGF_H")
     mgf_away = g("MGF_A")
 
@@ -2658,11 +2655,10 @@ def classificar_jogo(row):
 
     vr01 = g("VR01")
 
-    # compatível com seu rename
     coef_over = g("COEF_OVER1FT") if "COEF_OVER1FT" in row else g("Coeficiente_Over_1,5FT")
 
     # =========================================
-    # 🔍 FILTRO LIXO (Sub20 / odds vazias)
+    # 🔍 FILTRO LIXO
     # =========================================
     if (
         g("Odd_BTTS_YES") == 0 or
@@ -2705,7 +2701,7 @@ def classificar_jogo(row):
         classe = "A"
 
     # =========================================
-    # 🟢 DOMINÂNCIA LIMPA (Del Valle x Orense)
+    # 🟢 DOMINÂNCIA (Del Valle x Orense)
     # =========================================
     elif vr01 > 0.25 and mgf_home > mgf_away:
         tipo = "🟢 Dominância (Del Valle x Orense)"
@@ -2714,7 +2710,7 @@ def classificar_jogo(row):
         classe = "A"
 
     # =========================================
-    # 🔴 FAVORITO FALSO (Atlético x Barcelona / Trabzon x Galata)
+    # 🔴 FAVORITO FALSO (Atlético / Trabzon)
     # =========================================
     elif vr01 < 0 and mgf_home > mgf_away:
         tipo = "🔴 Favorito Falso (Atlético / Trabzon)"
@@ -2723,10 +2719,10 @@ def classificar_jogo(row):
         classe = "A+"
 
     # =========================================
-    # 🔵 UNDER DEFENSIVO (Universitario x Alianza Lima)
+    # 🔵 UNDER DEFENSIVO (Universitario x Alianza)
     # =========================================
     elif coef_over < 1.5 and mgf_home < 1.5 and mgf_away < 1.5:
-        tipo = "🔵 Under Defensivo (Universitario x Alianza Lima)"
+        tipo = "🔵 Under Defensivo (Universitario x Alianza)"
         entrada = "Under 2.5 / 3.0"
         momento = "Pré + Pós-gol"
         classe = "A"
@@ -2741,7 +2737,7 @@ def classificar_jogo(row):
         classe = "B"
 
     # =========================================
-    # 🟡 OVER BÁSICO (Jogos médios padrão)
+    # 🟡 OVER BÁSICO
     # =========================================
     elif coef_over > 1.8:
         tipo = "🟡 Over Básico"
@@ -2758,7 +2754,7 @@ def classificar_jogo(row):
 
 
 # =========================================
-# 📊 RANKING IA FINAL
+# 📊 RANKING IA
 # =========================================
 
 def gerar_ranking_ia(df):
@@ -2795,7 +2791,7 @@ def gerar_ranking_ia(df):
 
 
 # =========================================
-# 🚀 ABA IA FINAL (STREAMLIT)
+# 🚀 ABA IA FINAL (CORRIGIDA)
 # =========================================
 
 with tab7:
@@ -2803,25 +2799,32 @@ with tab7:
     st.markdown("## 🤖 Central de Decisão IA")
 
     # =========================================
+    # 📊 DATAFRAME BASE (BLINDADO)
+    # =========================================
+    base_df = None
+
+    if 'df_v_teams' in globals():
+        base_df = df_v_teams
+    elif 'df' in globals():
+        base_df = df
+    elif 'df_final' in globals():
+        base_df = df_final
+
+    if base_df is None:
+        st.error("❌ Nenhum DataFrame encontrado")
+        st.stop()
+
+    # =========================================
     # 📊 RANKING
     # =========================================
-    base_df = globals().get("df_v_teams", None)
-
-if base_df is None:
-    base_df = globals().get("df", None)
-
-if base_df is None:
-    st.error("DataFrame base não encontrado")
-    st.stop()
-
-df_rank = gerar_ranking_ia(base_df)
+    df_rank = gerar_ranking_ia(base_df)
 
     st.markdown("### 🔥 Top Jogos do Dia")
 
     if not df_rank.empty:
         st.dataframe(df_rank, use_container_width=True, hide_index=True)
     else:
-        st.info("Nenhum jogo A+/A encontrado")
+        st.info("Nenhum jogo A+/A")
 
     # =========================================
     # 🎯 JOGO ATUAL
@@ -2851,11 +2854,11 @@ df_rank = gerar_ranking_ia(base_df)
     # =========================================
     st.markdown("### 📋 Todos os Jogos Filtrados")
 
-    df_clean = df_v_teams[
-        (df_v_teams["Odd_BTTS_YES"] > 0) &
-        (df_v_teams["Odds_Over_2,5FT"] > 0) &
-        (df_v_teams["Odds_Casa"] > 0) &
-        (df_v_teams["Odds_Visitante"] > 0)
+    df_clean = base_df[
+        (base_df["Odd_BTTS_YES"] > 0) &
+        (base_df["Odds_Over_2,5FT"] > 0) &
+        (base_df["Odds_Casa"] > 0) &
+        (base_df["Odds_Visitante"] > 0)
     ]
 
     lista = []
@@ -2875,4 +2878,4 @@ df_rank = gerar_ranking_ia(base_df)
     if lista:
         st.dataframe(pd.DataFrame(lista), use_container_width=True, hide_index=True)
     else:
-        st.info("Sem jogos válidos após filtro")
+        st.info("Sem jogos válidos")
