@@ -2913,7 +2913,7 @@ with tab7:
     # =========================================
     if not base_df.empty:
         linha = base_df.iloc[0]
-        resultado = classificar_jogo(linha)
+        resultado = classificar_jogo(linha_mgf)
 
         if resultado:
 
