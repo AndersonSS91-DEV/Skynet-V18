@@ -2634,6 +2634,8 @@ with tab6:
         st.warning("❄️ Tendência de Jogo Lento")
     else:
         st.success("✅ Tendência de Jogo Dinâmico")
+
+
 # =========================================
 # 🤖 MOTOR IA FINAL (VERSÃO PROFISSIONAL)
 # =========================================
@@ -2646,9 +2648,6 @@ def classificar_jogo(row):
         v = row.get(x, default)
         return 0 if pd.isna(v) else v
 
-    # ===============================
-    # 📊 MÉTRICAS BASE
-    # ===============================
     time_A = {
         "lado": "Casa",
         "mgf": g("MGF_H"),
@@ -2691,14 +2690,13 @@ def classificar_jogo(row):
     risco = "-"
 
     # =========================================
-    # 🔥 PIROTÉCNICO (PSV x Utrecht)
+    # 🔥 PIROTÉCNICO
     # =========================================
     if coef_over > 3 and time_A["mgf"] >= 2 and time_B["mgf"] >= 1.5:
         tipo = "🔥 Pirotécnico (PSV x Utrecht)"
         entrada = "BTTS + Over 2.5/3.0"
         momento = "Pré + Live"
         classe = "A+"
-        motivo = "Alta produção ofensiva"
         principal = "Over alto + BTTS"
         secundario = "Lay líder"
         risco = "Jogo caótico"
@@ -2724,6 +2722,14 @@ def classificar_jogo(row):
             secundario = "Over HT"
             risco = "Controle precoce"
 
+        else:
+            tipo = "🔥 Over forte"
+            entrada = "Over 2.5"
+            classe = "A"
+            principal = "Over"
+            secundario = "BTTS"
+            risco = "Sem dominância clara"
+
     # =========================================
     # 🔴 REVERSÃO
     # =========================================
@@ -2747,7 +2753,7 @@ def classificar_jogo(row):
         risco = "Baixa conversão"
 
     # =========================================
-    # 🟣 HANDICAP VALUE (Atlético x Barcelona)
+    # 🟣 HANDICAP VALUE (ANTES DO UNDER)
     # =========================================
     elif vr01 < 0 and favorito < 2.2 and (time_A["mgf"] >= 1.5 or time_B["mgf"] >= 1.5):
         tipo = "🟣 Handicap Value (Atlético x Barcelona)"
@@ -2758,7 +2764,7 @@ def classificar_jogo(row):
         risco = "Favorito decide no talento"
 
     # =========================================
-    # 🔵 UNDER INTELIGENTE (Cerro / Nacional / LDU)
+    # 🔵 UNDER INTELIGENTE
     # =========================================
     elif coef_over < 2.2 and time_A["mgf"] < 2 and time_B["mgf"] < 2:
         tipo = "🔵 Under Inteligente (Cerro / LDU)"
@@ -2815,3 +2821,16 @@ def classificar_jogo(row):
         "Secundario": secundario,
         "Risco": risco
     }
+    texto = f"""
+🧠 Tipo: {resultado['Tipo']}
+🎯 Entrada: {resultado['Entrada']}
+⏱️ Momento: {resultado['Momento']}
+🏷️ Classe: {resultado['Classe']}
+
+🥇 Principal: {resultado['Principal']}
+🥈 Secundário: {resultado['Secundario']}
+⚠️ Risco: {resultado['Risco']}
+
+📊 Motivo:
+{resultado['Motivo']}
+"""
