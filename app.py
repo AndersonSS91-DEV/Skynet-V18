@@ -2846,3 +2846,84 @@ def gerar_ranking_ia(df):
     df_rank["ordem"] = df_rank["Classe"].map(ordem)
 
     return df_rank.sort_values(by="ordem").drop(columns="ordem")
+# =========================================
+# 🚀 ABA IA FINAL
+# =========================================
+
+with tab7:
+
+    st.markdown("## 🤖 Central de Decisão IA")
+
+    # =========================================
+    # 📊 DEFINE BASE (SEM ERRO)
+    # =========================================
+    base_df = df  # <-- seu dataframe principal
+
+    # =========================================
+    # 📊 RANKING IA
+    # =========================================
+    df_rank = gerar_ranking_ia(base_df)
+
+    st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
+
+    if not df_rank.empty:
+        st.dataframe(df_rank, use_container_width=True, hide_index=True)
+    else:
+        st.info("Nenhum jogo A+/A encontrado")
+
+    # =========================================
+    # 🎯 JOGO SELECIONADO
+    # =========================================
+    resultado = classificar_jogo(linha_mgf)
+
+    if resultado:
+
+        texto = f"""
+🧠 Tipo: {resultado['Tipo']}
+🎯 Entrada: {resultado['Entrada']}
+⏱️ Momento: {resultado['Momento']}
+🏷️ Classe: {resultado['Classe']}
+
+📊 Motivo:
+{resultado['Motivo']}
+"""
+
+        if resultado["Classe"] == "A+":
+            st.success(texto)
+        elif resultado["Classe"] == "A":
+            st.success(texto)
+        elif resultado["Classe"] == "B":
+            st.warning(texto)
+        else:
+            st.info(texto)
+
+    # =========================================
+    # 📋 TABELA FINAL (SEM LIXO)
+    # =========================================
+    st.markdown("### 📋 Todos os Jogos Filtrados")
+
+    df_clean = base_df[
+        (base_df["Odd_BTTS_YES"] > 0) &
+        (base_df["Odds_Over_2,5FT"] > 0) &
+        (base_df["Odds_Casa"] > 0) &
+        (base_df["Odds_Visitante"] > 0)
+    ]
+
+    lista = []
+
+    for _, row in df_clean.iterrows():
+
+        res = classificar_jogo(row)
+
+        if res:
+            lista.append({
+                "Jogo": f"{row.get('Home_Team','')} x {row.get('Visitor_Team','')}",
+                "Tipo": res["Tipo"],
+                "Entrada": res["Entrada"],
+                "Classe": res["Classe"]
+            })
+
+    if lista:
+        st.dataframe(pd.DataFrame(lista), use_container_width=True, hide_index=True)
+    else:
+        st.info("Sem jogos válidos após filtro")
