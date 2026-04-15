@@ -2673,6 +2673,27 @@ def classificar_jogo(row):
     coef_over = g("COEF_OVER1FT") if "COEF_OVER1FT" in row else g("Coeficiente_Over_1,5FT")
 
     # =========================================
+# ⚫ FILTRO NO BET (ANTI-FORÇA DE ENTRADA)
+# =========================================
+if (
+    coef_over > 2.8 and
+    time_A["mgf"] < 1.8 and
+    time_B["mgf"] < 1.5 and
+    time_A["mgc"] < 2 and
+    time_B["mgc"] < 2
+):
+    return {
+        "Tipo": "⚫ No Bet (Over Inflado)",
+        "Entrada": "Evitar",
+        "Momento": "-",
+        "Classe": "D",
+        "Motivo": "Mercado projeta gols sem sustentação",
+        "Principal": "Jogo inflado",
+        "Secundario": "-",
+        "Risco": "Entrar sem edge"
+    }
+
+    # =========================================
     # 🔍 FILTRO LIXO
     # =========================================
     if (
@@ -2697,7 +2718,30 @@ def classificar_jogo(row):
     principal = "-"
     secundario = "-"
     risco = "-"
+    
 
+    # ===============================
+    # 💀 FILTRO DE OVER FALSO
+    # ===============================
+    if coef_over > 3:
+
+    if (
+        (time_A["mgf"] >= 1.8 and time_B["mgc"] >= 2) or
+        (time_B["mgf"] >= 1.8 and time_A["mgc"] >= 2)
+    ):
+        # GOLEADA OK
+
+    elif (time_A["mgf"] >= 2 and time_B["mgf"] >= 1.5):
+        # PIROTÉCNICO OK
+
+    else:
+        # 🚨 AQUI É O PULO DO GATO
+        tipo = "⚫ No Bet (Over Inflado)"
+        entrada = "Evitar"
+        classe = "D"
+        motivo = "Mercado projeta gols sem sustentação"
+
+    
     # =========================================
     # 🔥 PIROTÉCNICO (PSV x Utrecht)
     # =========================================
@@ -2755,12 +2799,18 @@ def classificar_jogo(row):
     # 🟢 DOMINÂNCIA
     # =========================================
     elif vr01 > 0.25:
-        tipo = "🟢 Dominância (Del Valle)"
+
+    if time_A["mgf"] >= time_B["mgf"]:
+        tipo = "🟢 Dominância Casa (Del Valle)"
         entrada = "Lay empate / Back Casa"
-        classe = "A"
-        principal = "Controle casa"
-        secundario = "Under leve"
-        risco = "Baixa conversão"
+        motivo = "Casa superior ofensivamente"
+
+    else:
+        tipo = "🟢 Dominância Visitante (Del Valle invertido)"
+        entrada = "Lay empate / Back Visitante"
+        motivo = "Visitante superior ofensivamente"
+
+    classe = "A"
 
     # =========================================
     # 🟣 HANDICAP VALUE
