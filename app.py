@@ -2648,6 +2648,9 @@ def classificar_jogo(row):
         v = row.get(x, default)
         return 0 if pd.isna(v) else v
 
+    # ===============================
+    # 📊 MÉTRICAS BASE
+    # ===============================
     time_A = {
         "lado": "Casa",
         "mgf": g("MGF_H"),
@@ -2669,6 +2672,9 @@ def classificar_jogo(row):
     vr01 = g("VR01")
     coef_over = g("COEF_OVER1FT") if "COEF_OVER1FT" in row else g("Coeficiente_Over_1,5FT")
 
+    # =========================================
+    # 🔍 FILTRO LIXO
+    # =========================================
     if (
         g("Odd_BTTS_YES") == 0 or
         g("Odds_Over_2,5FT") == 0 or
@@ -2679,6 +2685,9 @@ def classificar_jogo(row):
 
     favorito = min(time_A["odd"], time_B["odd"])
 
+    # ===============================
+    # 🎯 DEFAULT
+    # ===============================
     tipo = "⚫ No Bet"
     entrada = "Evitar"
     momento = "-"
@@ -2690,13 +2699,14 @@ def classificar_jogo(row):
     risco = "-"
 
     # =========================================
-    # 🔥 PIROTÉCNICO
+    # 🔥 PIROTÉCNICO (PSV x Utrecht)
     # =========================================
     if coef_over > 3 and time_A["mgf"] >= 2 and time_B["mgf"] >= 1.5:
         tipo = "🔥 Pirotécnico (PSV x Utrecht)"
         entrada = "BTTS + Over 2.5/3.0"
         momento = "Pré + Live"
         classe = "A+"
+        motivo = "Alta produção ofensiva"
         principal = "Over alto + BTTS"
         secundario = "Lay líder"
         risco = "Jogo caótico"
@@ -2753,7 +2763,7 @@ def classificar_jogo(row):
         risco = "Baixa conversão"
 
     # =========================================
-    # 🟣 HANDICAP VALUE (ANTES DO UNDER)
+    # 🟣 HANDICAP VALUE
     # =========================================
     elif vr01 < 0 and favorito < 2.2 and (time_A["mgf"] >= 1.5 or time_B["mgf"] >= 1.5):
         tipo = "🟣 Handicap Value (Atlético x Barcelona)"
@@ -2821,7 +2831,73 @@ def classificar_jogo(row):
         "Secundario": secundario,
         "Risco": risco
     }
-    texto = f"""
+
+
+# =========================================
+# 📊 RANKING IA
+# =========================================
+
+def gerar_ranking_ia(df):
+
+    lista = []
+
+    for _, row in df.iterrows():
+
+        res = classificar_jogo(row)
+
+        if not res:
+            continue
+
+        if res["Classe"] not in ["A+", "A"]:
+            continue
+
+        lista.append({
+            "Jogo": f"{row.get('Home_Team','')} x {row.get('Visitor_Team','')}",
+            "Tipo": res["Tipo"],
+            "Entrada": res["Entrada"],
+            "Classe": res["Classe"]
+        })
+
+    if not lista:
+        return pd.DataFrame()
+
+    df_rank = pd.DataFrame(lista)
+
+    ordem = {"A+": 0, "A": 1}
+    df_rank["ordem"] = df_rank["Classe"].map(ordem)
+
+    return df_rank.sort_values(by="ordem").drop(columns="ordem")
+
+
+# =========================================
+# 🚀 ABA IA FINAL
+# =========================================
+
+with tab7:
+
+    st.markdown("## 🤖 Central de Decisão IA")
+
+    base_df = df
+
+    df_rank = gerar_ranking_ia(base_df)
+
+    st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
+
+    if not df_rank.empty:
+        st.dataframe(df_rank, use_container_width=True, hide_index=True)
+    else:
+        st.info("Nenhum jogo A+/A encontrado")
+
+    # =========================================
+    # 🎯 JOGO ATUAL
+    # =========================================
+    if not base_df.empty:
+        linha = base_df.iloc[0]
+        resultado = classificar_jogo(linha)
+
+        if resultado:
+
+            texto = f"""
 🧠 Tipo: {resultado['Tipo']}
 🎯 Entrada: {resultado['Entrada']}
 ⏱️ Momento: {resultado['Momento']}
@@ -2834,3 +2910,43 @@ def classificar_jogo(row):
 📊 Motivo:
 {resultado['Motivo']}
 """
+
+            if resultado["Classe"] == "A+":
+                st.success(texto)
+            elif resultado["Classe"] == "A":
+                st.success(texto)
+            elif resultado["Classe"] == "B":
+                st.warning(texto)
+            else:
+                st.info(texto)
+
+    # =========================================
+    # 📋 TABELA FINAL
+    # =========================================
+    st.markdown("### 📋 Todos os Jogos Filtrados")
+
+    df_clean = base_df[
+        (base_df["Odd_BTTS_YES"] > 0) &
+        (base_df["Odds_Over_2,5FT"] > 0) &
+        (base_df["Odds_Casa"] > 0) &
+        (base_df["Odds_Visitante"] > 0)
+    ]
+
+    lista = []
+
+    for _, row in df_clean.iterrows():
+
+        res = classificar_jogo(row)
+
+        if res:
+            lista.append({
+                "Jogo": f"{row.get('Home_Team','')} x {row.get('Visitor_Team','')}",
+                "Tipo": res["Tipo"],
+                "Entrada": res["Entrada"],
+                "Classe": res["Classe"]
+            })
+
+    if lista:
+        st.dataframe(pd.DataFrame(lista), use_container_width=True, hide_index=True)
+    else:
+        st.info("Sem jogos válidos após filtro")
