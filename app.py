@@ -2813,6 +2813,28 @@ def classificar_jogo(row):
         tipo = "🔴 Favorito falso (Trabzon)"
         entrada = "Lay favorito"
         classe = "A"
+        
+    # =========================================
+    # ⚖️ JOGO GRANDE (Atlético x Barcelona)
+    # =========================================
+    elif (
+        coef_over > 3 and
+        (
+            time_A["mgf"] >= 2 or
+            time_B["mgf"] >= 2
+        ) and
+        (
+            time_A["cg"] >= 3 or
+            time_B["cg"] >= 3
+        )
+    ):
+        tipo = "⚖️ Jogo grande (Atlético x Barcelona)"
+        entrada = "BTTS / Over 2.0 / Handicap"
+        classe = "A"
+        motivo = "Alta capacidade ofensiva com jogo equilibrado"
+        principal = "BTTS"
+        secundario = "Over 2.0"
+        risco = "Jogo travado por estratégia"
 
     # =========================================
     # ⚫ NO BET
