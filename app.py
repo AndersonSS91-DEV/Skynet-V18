@@ -2720,19 +2720,21 @@ if (
     risco = "-"
     
 
-    # ===============================
-    # 💀 FILTRO DE OVER FALSO
-    # ===============================
-    if coef_over > 3:
+# ===============================
+# 💀 FILTRO DE OVER FALSO
+# ===============================
+if coef_over > 3:
 
     if (
         (time_A["mgf"] >= 1.8 and time_B["mgc"] >= 2) or
         (time_B["mgf"] >= 1.8 and time_A["mgc"] >= 2)
     ):
         # GOLEADA OK
+        pass
 
     elif (time_A["mgf"] >= 2 and time_B["mgf"] >= 1.5):
         # PIROTÉCNICO OK
+        pass
 
     else:
         # 🚨 AQUI É O PULO DO GATO
@@ -2740,7 +2742,6 @@ if (
         entrada = "Evitar"
         classe = "D"
         motivo = "Mercado projeta gols sem sustentação"
-
     
     # =========================================
     # 🔥 PIROTÉCNICO (PSV x Utrecht)
