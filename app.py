@@ -2745,7 +2745,7 @@ def classificar_jogo(row):
     # =========================================
     elif vr01 < 0:
 
-        if favorito < 2.0:
+        if favorito < 2.0 and (time_A["mgf"] >= 1.8 or time_B["mgf"] >= 1.8):
             tipo = "⚖️ Jogo grande (Atlético x Barcelona)"
             entrada = "BTTS / Over 2.0 / Handicap"
             momento = "Live"
