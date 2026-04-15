@@ -2673,25 +2673,25 @@ def classificar_jogo(row):
     coef_over = g("COEF_OVER1FT") if "COEF_OVER1FT" in row else g("Coeficiente_Over_1,5FT")
 
     # =========================================
-# ⚫ FILTRO NO BET (ANTI-FORÇA DE ENTRADA)
-# =========================================
-if (
-    coef_over > 2.8 and
-    time_A["mgf"] < 1.8 and
-    time_B["mgf"] < 1.5 and
-    time_A["mgc"] < 2 and
-    time_B["mgc"] < 2
-):
-    return {
-        "Tipo": "⚫ No Bet (Over Inflado)",
-        "Entrada": "Evitar",
-        "Momento": "-",
-        "Classe": "D",
-        "Motivo": "Mercado projeta gols sem sustentação",
-        "Principal": "Jogo inflado",
-        "Secundario": "-",
-        "Risco": "Entrar sem edge"
-    }
+    # ⚫ FILTRO NO BET (ANTI-FORÇA DE ENTRADA)
+    # =========================================
+    if (
+        coef_over > 2.8 and
+        time_A["mgf"] < 1.8 and
+        time_B["mgf"] < 1.5 and
+        time_A["mgc"] < 2 and
+        time_B["mgc"] < 2
+    ):
+        return {
+            "Tipo": "⚫ No Bet (Over Inflado)",
+            "Entrada": "Evitar",
+            "Momento": "-",
+            "Classe": "D",
+            "Motivo": "Mercado projeta gols sem sustentação",
+            "Principal": "Jogo inflado",
+            "Secundario": "-",
+            "Risco": "Entrar sem edge"
+        }
 
     # =========================================
     # 🔍 FILTRO LIXO
@@ -2718,31 +2718,27 @@ if (
     principal = "-"
     secundario = "-"
     risco = "-"
-    
 
-# ===============================
-# 💀 FILTRO DE OVER FALSO
-# ===============================
-if coef_over > 3:
+    # ===============================
+    # 💀 FILTRO DE OVER FALSO
+    # ===============================
+    if coef_over > 3:
 
-    if (
-        (time_A["mgf"] >= 1.8 and time_B["mgc"] >= 2) or
-        (time_B["mgf"] >= 1.8 and time_A["mgc"] >= 2)
-    ):
-        # GOLEADA OK
-        pass
+        if (
+            (time_A["mgf"] >= 1.8 and time_B["mgc"] >= 2) or
+            (time_B["mgf"] >= 1.8 and time_A["mgc"] >= 2)
+        ):
+            pass
 
-    elif (time_A["mgf"] >= 2 and time_B["mgf"] >= 1.5):
-        # PIROTÉCNICO OK
-        pass
+        elif (time_A["mgf"] >= 2 and time_B["mgf"] >= 1.5):
+            pass
 
-    else:
-        # 🚨 AQUI É O PULO DO GATO
-        tipo = "⚫ No Bet (Over Inflado)"
-        entrada = "Evitar"
-        classe = "D"
-        motivo = "Mercado projeta gols sem sustentação"
-    
+        else:
+            tipo = "⚫ No Bet (Over Inflado)"
+            entrada = "Evitar"
+            classe = "D"
+            motivo = "Mercado projeta gols sem sustentação"
+
     # =========================================
     # 🔥 PIROTÉCNICO (PSV x Utrecht)
     # =========================================
@@ -2765,25 +2761,16 @@ if coef_over > 3:
             tipo = "💣 Goleada Casa (Rangers)"
             entrada = "Over + Handicap Casa"
             classe = "A+"
-            principal = "Goleada casa"
-            secundario = "Over HT"
-            risco = "Gol cedo trava linha"
 
         elif time_B["mgf"] >= 1.8 and time_A["mgc"] >= 2:
             tipo = "💣 Goleada Visitante (Bayern)"
             entrada = "Over + Handicap Visitante"
             classe = "A+"
-            principal = "Goleada visitante"
-            secundario = "Over HT"
-            risco = "Controle precoce"
 
         else:
             tipo = "🔥 Over forte"
             entrada = "Over 2.5"
             classe = "A"
-            principal = "Over"
-            secundario = "BTTS"
-            risco = "Sem dominância clara"
 
     # =========================================
     # 🔴 REVERSÃO
@@ -2792,26 +2779,23 @@ if coef_over > 3:
         tipo = "🔴 Reversão (Heidenheim)"
         entrada = "Over + Lay líder"
         classe = "A"
-        principal = "Over"
-        secundario = "Lay líder"
-        risco = "Jogo acelera demais"
 
     # =========================================
     # 🟢 DOMINÂNCIA
     # =========================================
     elif vr01 > 0.25:
 
-    if time_A["mgf"] >= time_B["mgf"]:
-        tipo = "🟢 Dominância Casa (Del Valle)"
-        entrada = "Lay empate / Back Casa"
-        motivo = "Casa superior ofensivamente"
+        if time_A["mgf"] >= time_B["mgf"]:
+            tipo = "🟢 Dominância Casa (Del Valle)"
+            entrada = "Lay empate / Back Casa"
+            motivo = "Casa superior ofensivamente"
 
-    else:
-        tipo = "🟢 Dominância Visitante (Del Valle invertido)"
-        entrada = "Lay empate / Back Visitante"
-        motivo = "Visitante superior ofensivamente"
+        else:
+            tipo = "🟢 Dominância Visitante (Del Valle invertido)"
+            entrada = "Lay empate / Back Visitante"
+            motivo = "Visitante superior ofensivamente"
 
-    classe = "A"
+        classe = "A"
 
     # =========================================
     # 🟣 HANDICAP VALUE
@@ -2820,9 +2804,6 @@ if coef_over > 3:
         tipo = "🟣 Handicap Value (Atlético x Barcelona)"
         entrada = "HA +1 / +1.25"
         classe = "A"
-        principal = "Zebra competitiva"
-        secundario = "BTTS / Over 2.0"
-        risco = "Favorito decide no talento"
 
     # =========================================
     # 🔵 UNDER INTELIGENTE
@@ -2831,9 +2812,6 @@ if coef_over > 3:
         tipo = "🔵 Under Inteligente (Cerro / LDU)"
         entrada = "Under 2.5"
         classe = "A"
-        principal = "Under"
-        secundario = "Gol único"
-        risco = "Gol cedo quebra leitura"
 
     # =========================================
     # 🔴 FAVORITO FALSO REAL
@@ -2842,9 +2820,6 @@ if coef_over > 3:
         tipo = "🔴 Favorito falso (Trabzon)"
         entrada = "Lay favorito"
         classe = "A"
-        principal = "Lay favorito"
-        secundario = "Over"
-        risco = "Eficiência inesperada"
 
     # =========================================
     # ⚫ NO BET
@@ -2857,9 +2832,6 @@ if coef_over > 3:
         tipo = "⚫ No Bet"
         entrada = "Evitar"
         classe = "D"
-        principal = "Equilíbrio total"
-        secundario = "-"
-        risco = "Aleatoriedade"
 
     # =========================================
     # 🟡 OVER BÁSICO
@@ -2868,9 +2840,6 @@ if coef_over > 3:
         tipo = "🟡 Over básico"
         entrada = "Over 1.5"
         classe = "B"
-        principal = "Over leve"
-        secundario = "BTTS"
-        risco = "Baixo ritmo"
 
     return {
         "Tipo": tipo,
