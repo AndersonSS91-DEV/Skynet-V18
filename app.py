@@ -2752,25 +2752,41 @@ def classificar_jogo(row):
         secundario = "Lay líder"
         risco = "Jogo caótico"
 
-    # =========================================
-    # 💣 GOLEADA
-    # =========================================
-    elif coef_over > 3:
+# =========================================
+# 💣 GOLEADA / OVER REAL
+# =========================================
+elif coef_over > 3:
 
-        if time_A["mgf"] >= 1.8 and time_B["mgc"] >= 2:
-            tipo = "💣 Goleada Casa (Rangers)"
-            entrada = "Over + Handicap Casa"
-            classe = "A+"
+    if time_A["mgf"] >= 1.8 and time_B["mgc"] >= 2:
+        tipo = "💣 Goleada Casa (Rangers)"
+        entrada = "Over + Handicap Casa"
+        classe = "A+"
+        motivo = "Casa produz e visitante sofre muito"
 
-        elif time_B["mgf"] >= 1.8 and time_A["mgc"] >= 2:
-            tipo = "💣 Goleada Visitante (Bayern)"
-            entrada = "Over + Handicap Visitante"
-            classe = "A+"
+    elif time_B["mgf"] >= 1.8 and time_A["mgc"] >= 2:
+        tipo = "💣 Goleada Visitante (Bayern)"
+        entrada = "Over + Handicap Visitante"
+        classe = "A+"
+        motivo = "Visitante produz e casa sofre muito"
 
-        else:
-            tipo = "🔥 Over forte"
-            entrada = "Over 2.5"
-            classe = "A"
+    elif time_A["mgf"] >= 2 and time_B["mgf"] >= 1.5:
+        tipo = "🔥 Pirotécnico (PSV x Utrecht)"
+        entrada = "BTTS + Over 2.5/3.0"
+        classe = "A+"
+        motivo = "Ambos produzem muito"
+
+    else:
+        # 💀 AQUI É A CORREÇÃO QUE FALTAVA
+        return {
+            "Tipo": "⚫ No Bet (Over Inflado - Santos)",
+            "Entrada": "Evitar",
+            "Momento": "-",
+            "Classe": "D",
+            "Motivo": "Mercado projeta gols sem edge real",
+            "Principal": "Sem dominância",
+            "Secundario": "-",
+            "Risco": "Entrar sem valor"
+        }
 
     # =========================================
     # 🔴 REVERSÃO
