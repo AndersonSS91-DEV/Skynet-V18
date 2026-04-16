@@ -2775,20 +2775,37 @@ def classificar_jogo(row):
         classe = "A"
 
     # =========================================
-    # 🟢 DOMINÂNCIA
+    # 🟢 DOMINÂNCIA (Del Valle)
     # =========================================
     elif vr01 > 0.25:
 
-        if time_A["mgf"] >= time_B["mgf"]:
+        # 🔥 DEFINE FAVORITO PELO MERCADO
+        if time_A["odd"] < time_B["odd"]:
+            favorito = "Casa"
+        else:
+            favorito = "Visitante"
+
+        # 🔒 CONFIRMA SUPORTE ESTATÍSTICO
+        if favorito == "Casa" and time_A["mgf"] >= 1.5:
             tipo = "🟢 Dominância Casa (Del Valle)"
             entrada = "Lay empate / Back Casa"
-            motivo = "Casa superior ofensivamente"
-        else:
-            tipo = "🟢 Dominância Visitante (Del Valle invertido)"
-            entrada = "Lay empate / Back Visitante"
-            motivo = "Visitante superior ofensivamente"
+            momento = "Pré"
+            classe = "A"
+            motivo = "Favorito forte + VR positivo"
 
-        classe = "A"
+        elif favorito == "Visitante" and time_B["mgf"] >= 1.5:
+            tipo = "🟢 Dominância Visitante (Del Valle)"
+            entrada = "Lay empate / Back Visitante"
+            momento = "Pré"
+            classe = "A"
+            motivo = "Favorito forte + VR positivo"
+
+        else:
+            tipo = "⚖️ Favorito sem confirmação"
+            entrada = "Evitar / Live"
+            momento = "-"
+            classe = "B"
+            motivo = "VR positivo sem suporte suficiente"
 
     # =========================================
     # 🟣 HANDICAP VALUE
@@ -2912,7 +2929,14 @@ with tab7:
 
     st.markdown("## 🤖 Central de Decisão IA")
 
-    base_df = df
+    # =========================================
+    # 📊 LÊ DIRETO DO XLS (IGUAL ESCANTEIOS)
+    # =========================================
+    try:
+        base_df = pd.read_excel(xls)
+    except:
+        st.error("Erro ao ler arquivo")
+        st.stop()
 
     df_rank = gerar_ranking_ia(base_df)
 
@@ -2923,6 +2947,17 @@ with tab7:
     else:
         st.info("Nenhum jogo A+/A encontrado")
 
+    # =========================================
+    # 📊 RANKING IA
+    # =========================================
+    df_rank = gerar_ranking_ia(base_df)
+
+    st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
+
+    if not df_rank.empty:
+        st.dataframe(df_rank, use_container_width=True, hide_index=True)
+    else:
+        st.info("Nenhum jogo A+/A encontrado")
     # =========================================
     # 🎯 JOGO ATUAL
     # =========================================
