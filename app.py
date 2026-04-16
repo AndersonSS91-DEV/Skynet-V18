@@ -2939,17 +2939,6 @@ with tab7:
         st.stop()
 
     # =========================================
-    # 📊 RANKING IA
-    # =========================================
-    df_rank = gerar_ranking_ia(base_df)
-
-    st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
-
-    if not df_rank.empty:
-        st.dataframe(df_rank, use_container_width=True, hide_index=True)
-    else:
-        st.info("Nenhum jogo A+/A encontrado")
-    # =========================================
     # 🎯 JOGO ATUAL
     # =========================================
     if not base_df.empty:
@@ -2980,6 +2969,18 @@ with tab7:
                 st.warning(texto)
             else:
                 st.info(texto)
+
+    # =========================================
+    # 📊 RANKING IA
+    # =========================================
+    df_rank = gerar_ranking_ia(base_df)
+
+    st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
+
+    if not df_rank.empty:
+        st.dataframe(df_rank, use_container_width=True, hide_index=True)
+    else:
+        st.info("Nenhum jogo A+/A encontrado")
 
     # =========================================
     # 📋 TABELA FINAL
