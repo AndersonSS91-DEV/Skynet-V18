@@ -2913,17 +2913,22 @@ with tab7:
     st.markdown("## 🤖 Central de Decisão IA")
 
     # =========================================
-    # 📊 DEFINE BASE HÍBRIDA CORRETA
+    # 📊 LÊ DIRETO DO XLS (IGUAL ESCANTEIOS)
     # =========================================
-    if 'df_v_teams' in locals() and not df_v_teams.empty:
-        base_df = df_v_teams.copy()
-
-    elif 'df_final' in locals() and not df_final.empty:
-        base_df = df_final.copy()
-
-    else:
-        st.error("Base híbrida não encontrada")
+    try:
+        base_df = pd.read_excel(xls)
+    except:
+        st.error("Erro ao ler arquivo")
         st.stop()
+
+    df_rank = gerar_ranking_ia(base_df)
+
+    st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
+
+    if not df_rank.empty:
+        st.dataframe(df_rank, use_container_width=True, hide_index=True)
+    else:
+        st.info("Nenhum jogo A+/A encontrado")
 
     # =========================================
     # 📊 RANKING IA
