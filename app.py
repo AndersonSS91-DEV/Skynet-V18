@@ -2779,16 +2779,30 @@ def classificar_jogo(row):
     # =========================================
     elif vr01 > 0.25:
 
-        if time_A["mgf"] >= time_B["mgf"]:
-            tipo = "🟢 Dominância Casa (Del Valle)"
-            entrada = "Lay empate / Back Casa"
-            motivo = "Casa superior ofensivamente"
-        else:
-            tipo = "🟢 Dominância Visitante (Del Valle invertido)"
-            entrada = "Lay empate / Back Visitante"
-            motivo = "Visitante superior ofensivamente"
+    # 🔥 DEFINE FAVORITO PELO MERCADO
+    if time_A["odd"] < time_B["odd"]:
+        favorito = "Casa"
+    else:
+        favorito = "Visitante"
 
+    # 🔒 CONFIRMA SE TEM SUPORTE ESTATÍSTICO
+    if favorito == "Casa" and time_A["mgf"] >= 1.5:
+        tipo = "🟢 Dominância Casa (Del Valle)"
+        entrada = "Lay empate / Back Casa"
         classe = "A"
+        motivo = "Favorito forte + VR positivo"
+
+    elif favorito == "Visitante" and time_B["mgf"] >= 1.5:
+        tipo = "🟢 Dominância Visitante (Del Valle)"
+        entrada = "Lay empate / Back Visitante"
+        classe = "A"
+        motivo = "Favorito forte + VR positivo"
+
+    else:
+        tipo = "⚖️ Favorito sem confirmação"
+        entrada = "Evitar / Live"
+        classe = "B"
+        motivo = "VR positivo sem suporte suficiente"
 
     # =========================================
     # 🟣 HANDICAP VALUE
