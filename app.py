@@ -2912,7 +2912,8 @@ with tab7:
 
     st.markdown("## 🤖 Central de Decisão IA")
 
-    base_df = df
+    # ✅ USA O DF HÍBRIDO CORRETO
+    base_df = df_v_teams.copy()
 
     df_rank = gerar_ranking_ia(base_df)
 
