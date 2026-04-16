@@ -2924,6 +2924,14 @@ with tab7:
     else:
         st.info("Nenhum jogo A+/A encontrado")
 
+    if 'df_v_teams' in locals() and not df_v_teams.empty:
+    base_df = df_v_teams.copy()
+elif 'df_final' in locals():
+    base_df = df_final.copy()
+else:
+    st.error("Base híbrida não encontrada")
+    st.stop()
+
     # =========================================
     # 🎯 JOGO ATUAL
     # =========================================
