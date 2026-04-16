@@ -2775,34 +2775,37 @@ def classificar_jogo(row):
         classe = "A"
 
     # =========================================
-    # 🟢 DOMINÂNCIA
+    # 🟢 DOMINÂNCIA (Del Valle)
     # =========================================
     elif vr01 > 0.25:
 
-    # 🔥 DEFINE FAVORITO PELO MERCADO
-    if time_A["odd"] < time_B["odd"]:
-        favorito = "Casa"
-    else:
-        favorito = "Visitante"
+        # 🔥 DEFINE FAVORITO PELO MERCADO
+        if time_A["odd"] < time_B["odd"]:
+            favorito = "Casa"
+        else:
+            favorito = "Visitante"
 
-    # 🔒 CONFIRMA SE TEM SUPORTE ESTATÍSTICO
-    if favorito == "Casa" and time_A["mgf"] >= 1.5:
-        tipo = "🟢 Dominância Casa (Del Valle)"
-        entrada = "Lay empate / Back Casa"
-        classe = "A"
-        motivo = "Favorito forte + VR positivo"
+        # 🔒 CONFIRMA SUPORTE ESTATÍSTICO
+        if favorito == "Casa" and time_A["mgf"] >= 1.5:
+            tipo = "🟢 Dominância Casa (Del Valle)"
+            entrada = "Lay empate / Back Casa"
+            momento = "Pré"
+            classe = "A"
+            motivo = "Favorito forte + VR positivo"
 
-    elif favorito == "Visitante" and time_B["mgf"] >= 1.5:
-        tipo = "🟢 Dominância Visitante (Del Valle)"
-        entrada = "Lay empate / Back Visitante"
-        classe = "A"
-        motivo = "Favorito forte + VR positivo"
+        elif favorito == "Visitante" and time_B["mgf"] >= 1.5:
+            tipo = "🟢 Dominância Visitante (Del Valle)"
+            entrada = "Lay empate / Back Visitante"
+            momento = "Pré"
+            classe = "A"
+            motivo = "Favorito forte + VR positivo"
 
-    else:
-        tipo = "⚖️ Favorito sem confirmação"
-        entrada = "Evitar / Live"
-        classe = "B"
-        motivo = "VR positivo sem suporte suficiente"
+        else:
+            tipo = "⚖️ Favorito sem confirmação"
+            entrada = "Evitar / Live"
+            momento = "-"
+            classe = "B"
+            motivo = "VR positivo sem suporte suficiente"
 
     # =========================================
     # 🟣 HANDICAP VALUE
