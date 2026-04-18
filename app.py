@@ -3038,7 +3038,7 @@ with tab7:
                 "Jogo": f"{row.get('Home_Team','')} x {row.get('Visitor_Team','')}",
                 "Tipo": res["Tipo"],
                 "Entrada": res["Entrada"],
-                "Classe": res["Classe"]
+                "Classe": res["Classe"],
                 "HA_Teste": row.get("HA_Teste", "")
             })
 
