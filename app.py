@@ -2884,7 +2884,39 @@ def classificar_jogo(row):
         "Risco": risco
     }
 
+# =========================================
+# 🧪 HANDICAP TESTE (ZEBRA FORTE CASA)
+# =========================================
+def detectar_handicap_teste(row):
 
+    def g(x, default=0):
+        v = row.get(x, default)
+        return 0 if pd.isna(v) else v
+
+    odd_casa = g("Odds_Casa")
+
+    # precisa ser zebra em casa
+    if not (2.0 <= odd_casa <= 5.0):
+        return ""
+
+    if (
+        g("Posse_H") >= 50 and
+        g("Forca_Ataque_H") >= 70 and
+        g("Forca_Defesa_H") >= 50 and
+        g("PPJ_H") >= 1.80 and
+        g("Prec_Chutes_H") >= 45 and
+        g("Chutes_Marcar_H") <= 3.5 and
+        g("MGF_H") >= 1.70 and
+        g("CV_GF_H") <= 0.80 and
+        3.0 <= g("Media_CG_H_01") <= 6.0 and
+        g("CV_CG_H_01") <= 0.80 and
+        g("Media_CG_H_02") >= 1.00 and
+        g("CV_CG_H_02") <= 0.80
+    ):
+        return "🧪 HA +1/+1.25 Casa (Teste)"
+
+    return ""
+    
 # =========================================
 # 📊 RANKING IA
 # =========================================
@@ -2934,6 +2966,7 @@ with tab7:
     # =========================================
     try:
         base_df = pd.read_excel(xls)
+        base_df["HA_Teste"] = base_df.apply(detectar_handicap_teste, axis=1)
     except:
         st.error("Erro ao ler arquivo")
         st.stop()
@@ -3006,6 +3039,7 @@ with tab7:
                 "Tipo": res["Tipo"],
                 "Entrada": res["Entrada"],
                 "Classe": res["Classe"]
+                "HA_Teste": row.get("HA_Teste", "")
             })
 
     if lista:
