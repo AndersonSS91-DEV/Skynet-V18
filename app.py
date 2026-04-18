@@ -2900,12 +2900,12 @@ def detectar_handicap_teste(row):
         return ""
 
     if (
-        g("Posse_H") >= 50 and
-        g("Forca_Ataque_H") >= 70 and
-        g("Forca_Defesa_H") >= 50 and
-        g("PPJ_H") >= 1.80 and
-        g("Prec_Chutes_H") >= 45 and
-        g("Chutes_Marcar_H") <= 3.5 and
+        g("Posse_Bola_Home") >= 50 and
+        g("FAH") >= 70 and
+        g("FDH") >= 50 and
+        g("PPJH") >= 1.80 and
+        g("Precisao_CG_H") >= 45 and
+        g("CHM") <= 3.5 and
         g("MGF_H") >= 1.70 and
         g("CV_GF_H") <= 0.80 and
         3.0 <= g("Media_CG_H_01") <= 6.0 and
@@ -2913,7 +2913,7 @@ def detectar_handicap_teste(row):
         g("Media_CG_H_02") >= 1.00 and
         g("CV_CG_H_02") <= 0.80
     ):
-        return "🧪 HA +1/+1.25 Casa (Teste)"
+        return "🧪 HA +1/+1.25 Home (Teste)"
 
     return ""
     
