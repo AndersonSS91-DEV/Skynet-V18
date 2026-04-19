@@ -1219,22 +1219,6 @@ with tab1:
     esc_home = escudo_path(home)
     esc_away = escudo_path(away)
 
-    # ===============================
-    # 🎯 PLACAR
-    # ===============================
-    def g(x):
-        v = linha_exg.get(x)
-        return "-" if pd.isna(v) else v
-
-    gols_home = g("Goals_Home") if "Goals_Home" in linha_exg else "-"
-    gols_away = g("Goals_Away") if "Goals_Away" in linha_exg else "-"
-
-    if gols_home == "-" and "Placar_H_Poisson" in linha_exg:
-        gols_home = g("Placar_H_Poisson")
-
-    if gols_away == "-" and "Placar_A_Poisson" in linha_exg:
-        gols_away = g("Placar_A_Poisson")
-
     header = st.container()
 
     with header:
@@ -1244,21 +1228,17 @@ with tab1:
         # 🏠 CASA
         # ===============================
         with c1:
+            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+
+            st.image(esc_home, width=105)
+
             st.markdown(
-                f"""
-                <div style='display:flex; align-items:center; justify-content:center; gap:10px;'>
-                    <img src='{esc_home}' width='70'>
-                    <div style='font-size:28px; font-weight:900;'>{gols_home}</div>
-                </div>
-                <div style='text-align:center; font-size:20px; font-weight:700; margin-top:6px'>
-                    {home.upper()}
-                </div>
-                """,
+                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>",
                 unsafe_allow_html=True
             )
 
         # ===============================
-        # ⚔️ VS (INALTERADO)
+        # ⚔️ VS
         # ===============================
         with c2:
             st.markdown(
@@ -1280,16 +1260,12 @@ with tab1:
         # 🛫 VISITANTE
         # ===============================
         with c3:
+            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+
+            st.image(esc_away, width=105)
+
             st.markdown(
-                f"""
-                <div style='display:flex; align-items:center; justify-content:center; gap:10px;'>
-                    <div style='font-size:28px; font-weight:900;'>{gols_away}</div>
-                    <img src='{esc_away}' width='70'>
-                </div>
-                <div style='text-align:center; font-size:20px; font-weight:700; margin-top:6px'>
-                    {away.upper()}
-                </div>
-                """,
+                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>",
                 unsafe_allow_html=True
             )
 
