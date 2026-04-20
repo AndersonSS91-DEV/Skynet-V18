@@ -2650,7 +2650,7 @@ with tab6:
         st.success("✅ Tendência de Jogo Dinâmico")
 
 # =========================================
-# 🤖 MOTOR IA FINAL (VERSÃO PROFISSIONAL)
+# 🤖 MOTOR IA FINAL (VERSÃO PROFISSIONAL) 🟡🟠🟧⚪🔘🔴🟠🟡🟢🔵🟣🟤⚫⚪🟥🟧🟨🟩🟦🟪🟫⬛⬜
 # =========================================
 
 import pandas as pd
@@ -2822,10 +2822,10 @@ def classificar_jogo(row):
             motivo = "VR positivo sem suporte suficiente"
 
     # =========================================
-    # ⚠⚠⚠ HANDICAP VALUE
+    # 🟡🟡 HANDICAP VALUE
     # =========================================
     elif vr01 < 0 and favorito < 2.2 and (time_A["mgf"] >= 1.5 or time_B["mgf"] >= 1.5):
-        tipo = "⚠⚠⚠ Handicap Análise (Atlético x Barça)"
+        tipo = "🟡🟡 Handicap Análise (Atlético x Barça)"
         entrada = "Análise de Handcap"
         classe = "A"
 
@@ -2880,10 +2880,10 @@ def classificar_jogo(row):
         classe = "D"
 
     # =========================================
-    # 🟡 OVER BÁSICO
+    # 🟠 OVER BÁSICO
     # =========================================
     elif coef_over > 1.8:
-        tipo = "🟡 Over básico"
+        tipo = "🟠 Over básico"
         entrada = "Over 1.5"
         classe = "B"
 
