@@ -2791,7 +2791,7 @@ def classificar_jogo(row):
     # =========================================
     # 🟢 DOMINÂNCIA (Del Valle)
     # =========================================
-    elif vr01 > 0.25:
+    elif vr01 > 0.16:
 
         # 🔥 DEFINE FAVORITO PELO MERCADO
         if time_A["odd"] < time_B["odd"]:
