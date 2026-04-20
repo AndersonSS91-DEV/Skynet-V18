@@ -2733,10 +2733,10 @@ def classificar_jogo(row):
     risco = "-"
 
     # =========================================
-    # 🔥 PIROTÉCNICO (PSV x Utrecht)
+    # 🔥🔥 PIROTÉCNICO (PSV x Utrecht)
     # =========================================
     if coef_over > 3 and time_A["mgf"] >= 2 and time_B["mgf"] >= 1.5:
-        tipo = "🔥 Pirotécnico (PSV x Utrecht)"
+        tipo = "🔥🔥 Pirotécnico (PSV x Utrecht)"
         entrada = "BTTS + Over 2.5/3.0"
         momento = "Pré + Live"
         classe = "A+"
@@ -2746,18 +2746,18 @@ def classificar_jogo(row):
         risco = "Jogo caótico"
 
     # =========================================
-    # 💣 GOLEADA / OVER REAL (CORRIGIDO)
+    # 💣💣 GOLEADA / OVER REAL (CORRIGIDO)
     # =========================================
     elif coef_over > 3:
 
         if time_A["mgf"] >= 1.8 and time_B["mgc"] >= 2:
-            tipo = "💣 Goleada Casa (Rangers)"
+            tipo = "💣💣 Goleada Casa (Rangers)"
             entrada = "Over + Handicap Casa"
             classe = "A+"
             motivo = "Casa produz e visitante sofre muito"
 
         elif time_B["mgf"] >= 1.8 and time_A["mgc"] >= 2:
-            tipo = "💣 Goleada Visitante (Bayern)"
+            tipo = "💣💣 Goleada Visitante (Bayern)"
             entrada = "Over + Handicap Visitante"
             classe = "A+"
             motivo = "Visitante produz e casa sofre muito"
