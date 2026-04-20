@@ -1,5 +1,5 @@
 # =========================================
-# STREAMLIT — POISSON SKYNET (HÍBRIDO)
+# STREAMLIT — POISSON SKYNET (HÍBRIDO)🚀🛸🚥🌋🗻⭐⭐⭐⭐⭐🌠🌠🌠🌠🌠❄☃🌬🌊🌊🌊🔥🔥🔥
 # =========================================
 import streamlit as st
 import pandas as pd
@@ -3073,16 +3073,25 @@ with tab7:
 
         if resultado:
 
-            texto = f"""
+            detalhes = ""
+
+if resultado.get("Principal"):
+    detalhes += f"🥇 Principal: {resultado['Principal']}\n"
+
+if resultado.get("Secundario"):
+    detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
+
+if resultado.get("Risco"):
+    detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
+
+
+texto = f"""
 🧠 Tipo: {resultado['Tipo']}
 🎯 Entrada: {resultado['Entrada']}
 ⏱️ Momento: {resultado['Momento']}
 🏷️ Classe: {resultado['Classe']}
 
-🥇 Principal: {resultado['Principal']}
-🥈 Secundário: {resultado['Secundario']}
-⚠️ Risco: {resultado['Risco']}
-
+{detalhes}
 📊 Motivo:
 {resultado['Motivo']}
 """
