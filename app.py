@@ -2822,11 +2822,11 @@ def classificar_jogo(row):
             motivo = "VR positivo sem suporte suficiente"
 
     # =========================================
-    # 🟣 HANDICAP VALUE
+    # ⚠⚠⚠ HANDICAP VALUE
     # =========================================
     elif vr01 < 0 and favorito < 2.2 and (time_A["mgf"] >= 1.5 or time_B["mgf"] >= 1.5):
-        tipo = "🟣 Handicap Value (Atlético x Barcelona)"
-        entrada = "HA +1 / +1.25"
+        tipo = "⚠⚠⚠ Handicap Análise (Atlético x Barça)"
+        entrada = "Análise de Handcap"
         classe = "A"
 
     # =========================================
