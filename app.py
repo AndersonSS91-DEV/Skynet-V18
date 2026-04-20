@@ -3064,47 +3064,44 @@ with tab7:
         st.error("Erro ao ler arquivo")
         st.stop()
 
-    # =========================================
-    # 🎯 JOGO ATUAL
-    # =========================================
-    if not base_df.empty:
-        linha = base_df.iloc[0]
-        resultado = classificar_jogo(linha_mgf)
+# =========================================
+# 🎯 JOGO ATUAL
+# =========================================
+if not base_df.empty:
+    linha = base_df.iloc[0]
+    resultado = classificar_jogo(linha_mgf)
 
-        if resultado:
+    if resultado:
 
-            detalhes = ""
+        detalhes = ""
 
-if resultado.get("Principal"):
-    detalhes += f"🥇 Principal: {resultado['Principal']}\n"
+        if resultado.get("Principal"):
+            detalhes += f"🥇 Principal: {resultado['Principal']}\n"
 
-if resultado.get("Secundario"):
-    detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
+        if resultado.get("Secundario"):
+            detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
 
-if resultado.get("Risco"):
-    detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
+        if resultado.get("Risco"):
+            detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
 
-
-texto = f"""
+        texto = f"""
 🧠 Tipo: {resultado['Tipo']}
 🎯 Entrada: {resultado['Entrada']}
 ⏱️ Momento: {resultado['Momento']}
 🏷️ Classe: {resultado['Classe']}
 
-{detalhes}
-📊 Motivo:
+{detalhes}📊 Motivo:
 {resultado['Motivo']}
 """
 
-            if resultado["Classe"] == "A+":
-                st.success(texto)
-            elif resultado["Classe"] == "A":
-                st.success(texto)
-            elif resultado["Classe"] == "B":
-                st.warning(texto)
-            else:
-                st.info(texto)
-
+        if resultado["Classe"] == "A+":
+            st.success(texto)
+        elif resultado["Classe"] == "A":
+            st.success(texto)
+        elif resultado["Classe"] == "B":
+            st.warning(texto)
+        else:
+            st.info(texto)
     # =========================================
     # 📊 RANKING IA
     # =========================================
