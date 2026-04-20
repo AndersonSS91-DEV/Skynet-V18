@@ -2907,115 +2907,79 @@ def detectar_handicap_value_profissional(row):
     import numpy as np
     import pandas as pd
 
-    # =========================
-    # 🔧 LEITURA ROBUSTA (ACEITA VARIAÇÕES DE NOME)
-    # =========================
-    def g_multi(keys, default=0):
-        for k in keys:
-            if k in row and not pd.isna(row[k]):
-                return row[k]
-        return default
+    def g(x, default=0):
+        v = row.get(x, default)
+        return default if pd.isna(v) else v
 
     # =========================
-    # 🔴 1. FILTRO BASE (JOIO)
+    # 🔴 1. FILTRO BASE (SÓ O ESSENCIAL)
     # =========================
 
-    if (
-        g_multi(["CV_GF_H", "CV GF H"]) > 0.80 or
-        g_multi(["CV_GF_A", "CV GF A"]) > 0.80
-    ):
-        return "🔴 Ignorar (Alta variância)"
+    if g("CV_GF_H") > 0.90 or g("CV_GF_A") > 0.90:
+        return "🔴 Ignorar (Alta variância extrema)"
 
-    if (
-        g_multi(["MGF_H"]) < 0.8 and
-        g_multi(["MGF_A"]) < 0.8
-    ):
-        return "🔴 Ignorar (Ataques fracos)"
+    if g("MGF_H") < 0.5 and g("MGF_A") < 0.5:
+        return "🔴 Ignorar (Ataques inexistentes)"
 
     # =========================
-    # 🎯 2. EFICIÊNCIA + VOLUME (O QUE FALTAVA)
+    # 🧠 2. FORÇA DOS TIMES
     # =========================
 
-    if (
-        g_multi(["Chutes_Marcar_H", "Chutes H (Marcar)"]) > 4.5 or
-        g_multi(["Chutes_Marcar_A", "Chutes A (Marcar)"]) > 4.5
-    ):
-        return "🔴 Ignorar (Baixa eficiência)"
-
-    if (
-        g_multi(["Prec_Chutes_H", "Prec Chutes H (%)"]) < 40 or
-        g_multi(["Prec_Chutes_A", "Prec Chutes A (%)"]) < 40
-    ):
-        return "🔴 Ignorar (Baixa precisão)"
-
-    if (
-        g_multi(["Media_CG_H_01"]) < 2.5 and
-        g_multi(["Media_CG_A_01"]) < 2.5
-    ):
-        return "🔴 Ignorar (Baixa produção)"
-
-    # =========================
-    # 🧠 3. FORÇA DOS TIMES
-    # =========================
-
-    forca_home = g_multi(["MGF_H"]) - g_multi(["MGC_H"])
-    forca_away = g_multi(["MGF_A"]) - g_multi(["MGC_A"])
+    forca_home = g("MGF_H") - g("MGC_H")
+    forca_away = g("MGF_A") - g("MGC_A")
 
     diff_forca = abs(forca_home - forca_away)
 
-    # =========================
-    # 🟡 4. FILTRO DE EQUILÍBRIO
-    # =========================
-
-    if diff_forca > 1.2:
+    if diff_forca > 1.5:
         return "🔴 Ignorar (Desequilíbrio claro)"
 
     # =========================
-    # 📊 5. PROBABILIDADE MODELO
+    # 📊 3. PROBABILIDADE MODELO
     # =========================
 
-    total = max(g_multi(["MGF_H"]) + g_multi(["MGF_A"]), 0.1)
+    total = max(g("MGF_H") + g("MGF_A"), 0.1)
 
-    prob_home_model = g_multi(["MGF_H"]) / total
-    prob_away_model = g_multi(["MGF_A"]) / total
+    prob_home_model = g("MGF_H") / total
+    prob_away_model = g("MGF_A") / total
 
     # =========================
-    # 💰 6. PROBABILIDADE MERCADO
+    # 💰 4. MERCADO
     # =========================
 
-    odd_home = max(g_multi(["Odds_Casa"]), 0.01)
-    odd_away = max(g_multi(["Odds_Visitante"]), 0.01)
+    odd_home = max(g("Odds_Casa"), 0.01)
+    odd_away = max(g("Odds_Visitante"), 0.01)
 
     prob_home_market = 1 / odd_home
     prob_away_market = 1 / odd_away
-
-    # =========================
-    # ⚡ 7. EDGE
-    # =========================
 
     edge_home = prob_home_model - prob_home_market
     edge_away = prob_away_model - prob_away_market
 
     # =========================
-    # 🧠 8. SCORE (QUALIDADE REAL)
+    # 🧠 5. SCORE (SEM BLOQUEAR)
     # =========================
 
     def score(prefix):
         s = 0
 
-        if g_multi([f"MGF_{prefix}"]) >= 1.5:
+        if g(f"MGF_{prefix}") >= 1.3:
             s += 1
 
-        if g_multi([f"MGC_{prefix}"]) <= 1.5:
+        if g(f"MGC_{prefix}") <= 1.6:
             s += 1
 
-        if g_multi([f"CV_GF_{prefix}", f"CV GF {prefix}"]) <= 0.80:
+        if g(f"CV_GF_{prefix}") <= 0.85:
             s += 1
 
-        if g_multi([f"Chutes_Marcar_{prefix}", f"Chutes {prefix} (Marcar)"]) <= 3.5:
+        # eficiência (agora NÃO bloqueia)
+        if g(f"Chutes_Marcar_{prefix}") <= 4.5:
             s += 1
 
-        if g_multi([f"Prec_Chutes_{prefix}", f"Prec Chutes {prefix} (%)"]) >= 45:
+        if g(f"Prec_Chutes_{prefix}") >= 40:
+            s += 1
+
+        # volume
+        if g(f"Media_CG_{prefix}_01") >= 2.0:
             s += 1
 
         return s
@@ -3024,27 +2988,27 @@ def detectar_handicap_value_profissional(row):
     score_away = score("A")
 
     # =========================
-    # 🧭 9. CLASSIFICAÇÃO FINAL
+    # 🧭 6. CLASSIFICAÇÃO
     # =========================
 
     # 🟢 FORTE
     if edge_home > 0.05 and score_home >= 4:
         linha = "-0.25" if diff_forca < 0.5 else "-0.5"
-        return f"🟢 Handicap Forte Casa {linha} (Score {score_home})"
+        return f"🟢 Handicap Forte Casa {linha}"
 
     if edge_away > 0.05 and score_away >= 4:
         linha = "+0.5" if diff_forca < 0.5 else "+1"
-        return f"🟢 Handicap Forte Visitante {linha} (Score {score_away})"
+        return f"🟢 Handicap Forte Visitante {linha}"
 
     # 🟡 INTERMEDIÁRIO
     if edge_home > 0.02 and score_home >= 3:
-        return f"🟡 Handicap Moderado Casa (Score {score_home})"
+        return f"🟡 Handicap Moderado Casa"
 
     if edge_away > 0.02 and score_away >= 3:
-        return f"🟡 Handicap Moderado Visitante (Score {score_away})"
+        return f"🟡 Handicap Moderado Visitante"
 
-    # 🔴 LIXO
-    return "🔴 Ignorar (Sem valor real)"
+    # 🔴 RESTO
+    return "🔴 Sem valor"
     
 # =========================================
 # 📊 RANKING IA
