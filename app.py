@@ -2898,38 +2898,28 @@ def classificar_jogo(row):
         "Risco": risco
     }
 
-def detectar_handicap_value(row):
 
-    import pandas as pd
 
-    def g(x, default=0.0):
+def detectar_handicap_value_profissional(row):
+
+    import numpy as np
+
+    def g(x, default=0):
         v = row.get(x, default)
-
-        if pd.isna(v):
-            return default
-
-        # converte string tipo "1,80"
-        if isinstance(v, str):
-            v = v.replace(",", ".")
-            try:
-                return float(v)
-            except:
-                return default
-
-        return float(v)
+        return default if pd.isna(v) else v
 
     # =========================
-    # 🔴 1. FILTRO JOIO
+    # 🔴 1. FILTRO BASE (JOIO)
     # =========================
 
     if g("CV_GF_H") > 0.80 or g("CV_GF_A") > 0.80:
-        return "🔴 Ignorar"
+        return "🔴 Ignorar (Alta variância)"
 
     if g("MGF_H") < 0.8 and g("MGF_A") < 0.8:
-        return "🔴 Ignorar"
+        return "🔴 Ignorar (Ataques fracos)"
 
     # =========================
-    # 🧠 2. FORÇA
+    # 🧠 2. FORÇA DOS TIMES
     # =========================
 
     forca_home = g("MGF_H") - g("MGC_H")
@@ -2937,11 +2927,15 @@ def detectar_handicap_value(row):
 
     diff_forca = abs(forca_home - forca_away)
 
+    # =========================
+    # 🟡 3. FILTRO DE EQUILÍBRIO
+    # =========================
+
     if diff_forca > 1.2:
-        return "🟡 Proteção"
+        return "🟡 Proteção (Desequilíbrio claro)"
 
     # =========================
-    # 📊 PROB MODELO
+    # 📊 4. PROBABILIDADE MODELO
     # =========================
 
     total = max(g("MGF_H") + g("MGF_A"), 0.1)
@@ -2950,7 +2944,7 @@ def detectar_handicap_value(row):
     prob_away_model = g("MGF_A") / total
 
     # =========================
-    # 💰 MERCADO
+    # 💰 5. PROBABILIDADE MERCADO
     # =========================
 
     odd_home = max(g("Odds_Casa"), 0.01)
@@ -2960,27 +2954,42 @@ def detectar_handicap_value(row):
     prob_away_market = 1 / odd_away
 
     # =========================
-    # ⚡ EDGE
+    # ⚡ 6. EDGE (OURO)
     # =========================
 
     edge_home = prob_home_model - prob_home_market
     edge_away = prob_away_model - prob_away_market
 
-    threshold = 0.05
+    threshold = 0.05  # pode ajustar depois
 
     # =========================
-    # 🔵 VALUE
+    # 🧭 7. DECISÃO FINAL
     # =========================
 
     if edge_home > threshold:
-        linha = "-0.25" if diff_forca < 0.4 else "-0.5"
-        return f"🔵 Casa {linha}"
 
-    if edge_away > threshold:
-        linha = "+0.5" if diff_forca < 0.4 else "+0.75"
-        return f"🔵 Visitante {linha}"
+        if diff_forca < 0.5:
+            linha = "-0.25"
+        else:
+            linha = "-0.5"
 
-    return "🟡 Proteção"
+        return f"🔵 VALUE Casa {linha} (Edge {edge_home:.2f})"
+
+    elif edge_away > threshold:
+
+        if diff_forca < 0.5:
+            linha = "+0.5"
+        else:
+            linha = "+1"
+
+        return f"🔵 VALUE Visitante {linha} (Edge {edge_away:.2f})"
+
+    # =========================
+    # 🟡 SEM EDGE → PROTEÇÃO
+    # =========================
+
+    return "🟡 Proteção (Sem edge claro)"
+    
     
 # =========================================
 # 📊 RANKING IA
