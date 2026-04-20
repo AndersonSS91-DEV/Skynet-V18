@@ -1206,6 +1206,8 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
 "🚩 Escanteios",
 "🤖 IA"
 ])
+
+
 # =========================================
 # ABA 1 — RESUMO >>>>>>. ESCUDOS QUASE PERFEITOS >>>>> SALVAR ESSE CÓDIGO
 # =========================================
@@ -1222,34 +1224,46 @@ with tab1:
     with header:
         c1, c2, c3 = st.columns(3)
 
+        # ===============================
+        # 🏠 CASA
+        # ===============================
         with c1:
             st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+
             st.image(esc_home, width=105)
+
             st.markdown(
                 f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>",
                 unsafe_allow_html=True
             )
 
+        # ===============================
+        # ⚔️ VS
+        # ===============================
         with c2:
-    # Aumente o valor de 'margin-right' para empurrar mais para a esquerda
             st.markdown(
-        """
-        <div style='
-            text-align: center; 
-            font-size: 28px; 
-            font-weight: 900; 
-            margin-top: 55px; 
-            margin-right: 240px;
-        '>
-            VS
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+                """
+                <div style='
+                    text-align: center; 
+                    font-size: 28px; 
+                    font-weight: 900; 
+                    margin-top: 55px; 
+                    margin-right: 240px;
+                '>
+                    VS
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
+        # ===============================
+        # 🛫 VISITANTE
+        # ===============================
         with c3:
             st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
+
             st.image(esc_away, width=105)
+
             st.markdown(
                 f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>",
                 unsafe_allow_html=True
@@ -2887,35 +2901,95 @@ def classificar_jogo(row):
 # =========================================
 # 🧪 HANDICAP TESTE (ZEBRA FORTE CASA)
 # =========================================
-def detectar_handicap_teste(row):
+def detectar_handicap_value_profissional(row):
+
+    import numpy as np
 
     def g(x, default=0):
         v = row.get(x, default)
-        return 0 if pd.isna(v) else v
+        return default if pd.isna(v) else v
 
-    odd_casa = g("Odds_Casa")
+    # =========================
+    # 🔴 1. FILTRO BASE (JOIO)
+    # =========================
 
-    # precisa ser zebra em casa
-    if not (2.0 <= odd_casa <= 5.0):
-        return ""
+    if g("CV_GF_H") > 0.80 or g("CV_GF_A") > 0.80:
+        return "🔴 Ignorar (Alta variância)"
 
-    if (
-        g("Posse_Bola_Home") >= 50 and
-        g("FAH") >= 70 and
-        g("FDH") >= 50 and
-        g("PPJH") >= 1.80 and
-        g("Precisao_CG_H") >= 45 and
-        g("CHM") <= 3.5 and
-        g("MGF_H") >= 1.70 and
-        g("CV_GF_H") <= 0.80 and
-        3.0 <= g("Media_CG_H_01") <= 6.0 and
-        g("CV_CG_H_01") <= 0.80 and
-        g("Media_CG_H_02") >= 1.00 and
-        g("CV_CG_H_02") <= 0.80
-    ):
-        return "🧪 HA +1/+1.25 Home (Teste)"
+    if g("MGF_H") < 0.8 and g("MGF_A") < 0.8:
+        return "🔴 Ignorar (Ataques fracos)"
 
-    return ""
+    # =========================
+    # 🧠 2. FORÇA DOS TIMES
+    # =========================
+
+    forca_home = g("MGF_H") - g("MGC_H")
+    forca_away = g("MGF_A") - g("MGC_A")
+
+    diff_forca = abs(forca_home - forca_away)
+
+    # =========================
+    # 🟡 3. FILTRO DE EQUILÍBRIO
+    # =========================
+
+    if diff_forca > 1.2:
+        return "🟡 Proteção (Desequilíbrio claro)"
+
+    # =========================
+    # 📊 4. PROBABILIDADE MODELO
+    # =========================
+
+    total = max(g("MGF_H") + g("MGF_A"), 0.1)
+
+    prob_home_model = g("MGF_H") / total
+    prob_away_model = g("MGF_A") / total
+
+    # =========================
+    # 💰 5. PROBABILIDADE MERCADO
+    # =========================
+
+    odd_home = max(g("Odds_Casa"), 0.01)
+    odd_away = max(g("Odds_Visitante"), 0.01)
+
+    prob_home_market = 1 / odd_home
+    prob_away_market = 1 / odd_away
+
+    # =========================
+    # ⚡ 6. EDGE (OURO)
+    # =========================
+
+    edge_home = prob_home_model - prob_home_market
+    edge_away = prob_away_model - prob_away_market
+
+    threshold = 0.05  # pode ajustar depois
+
+    # =========================
+    # 🧭 7. DECISÃO FINAL
+    # =========================
+
+    if edge_home > threshold:
+
+        if diff_forca < 0.5:
+            linha = "-0.25"
+        else:
+            linha = "-0.5"
+
+        return f"🔵 VALUE Casa {linha} (Edge {edge_home:.2f})"
+
+    elif edge_away > threshold:
+
+        if diff_forca < 0.5:
+            linha = "+0.5"
+        else:
+            linha = "+1"
+
+        return f"🔵 VALUE Visitante {linha} (Edge {edge_away:.2f})"
+
+    # =========================
+    # 🟡 SEM EDGE → PROTEÇÃO
+    # =========================
+
+    return "🟡 Proteção (Sem edge claro)"
     
 # =========================================
 # 📊 RANKING IA
@@ -2966,7 +3040,7 @@ with tab7:
     # =========================================
     try:
         base_df = pd.read_excel(xls)
-        base_df["HA_Teste"] = base_df.apply(detectar_handicap_teste, axis=1)
+        base_df["HA_Value"] = base_df.apply(detectar_handicap_value_profissional, axis=1)
     except:
         st.error("Erro ao ler arquivo")
         st.stop()
@@ -3039,7 +3113,7 @@ with tab7:
                 "Tipo": res["Tipo"],
                 "Entrada": res["Entrada"],
                 "Classe": res["Classe"],
-                "HA_Teste": row.get("HA_Teste", "")
+                "HA_Value": row.get("HA_Value", "")
             })
 
     if lista:
