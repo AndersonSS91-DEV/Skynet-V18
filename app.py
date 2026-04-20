@@ -2898,29 +2898,38 @@ def classificar_jogo(row):
         "Risco": risco
     }
 
-# =========================================
-# 🧪 HANDICAP TESTE (ZEBRA FORTE CASA)
-# =========================================
 def detectar_handicap_value(row):
 
-    def g(x, default=0):
+    import pandas as pd
+
+    def g(x, default=0.0):
         v = row.get(x, default)
-        return default if pd.isna(v) else v
+
+        if pd.isna(v):
+            return default
+
+        # converte string tipo "1,80"
+        if isinstance(v, str):
+            v = v.replace(",", ".")
+            try:
+                return float(v)
+            except:
+                return default
+
+        return float(v)
 
     # =========================
     # 🔴 1. FILTRO JOIO
     # =========================
 
-    # inconsistência alta
     if g("CV_GF_H") > 0.80 or g("CV_GF_A") > 0.80:
-        return "🔴 Ignorar | Alta variância"
+        return "🔴 Ignorar"
 
-    # ataques muito fracos
     if g("MGF_H") < 0.8 and g("MGF_A") < 0.8:
-        return "🔴 Ignorar | Baixa produção ofensiva"
+        return "🔴 Ignorar"
 
     # =========================
-    # 🧠 2. FORÇA DOS TIMES
+    # 🧠 2. FORÇA
     # =========================
 
     forca_home = g("MGF_H") - g("MGC_H")
@@ -2928,15 +2937,11 @@ def detectar_handicap_value(row):
 
     diff_forca = abs(forca_home - forca_away)
 
-    # =========================
-    # 🟡 3. DESEQUILÍBRIO
-    # =========================
-
     if diff_forca > 1.2:
-        return "🟡 Proteção | Desequilíbrio claro"
+        return "🟡 Proteção"
 
     # =========================
-    # 📊 4. PROB MODELO (simplificada)
+    # 📊 PROB MODELO
     # =========================
 
     total = max(g("MGF_H") + g("MGF_A"), 0.1)
@@ -2945,7 +2950,7 @@ def detectar_handicap_value(row):
     prob_away_model = g("MGF_A") / total
 
     # =========================
-    # 💰 5. PROB MERCADO
+    # 💰 MERCADO
     # =========================
 
     odd_home = max(g("Odds_Casa"), 0.01)
@@ -2955,7 +2960,7 @@ def detectar_handicap_value(row):
     prob_away_market = 1 / odd_away
 
     # =========================
-    # ⚡ 6. EDGE
+    # ⚡ EDGE
     # =========================
 
     edge_home = prob_home_model - prob_home_market
@@ -2964,32 +2969,18 @@ def detectar_handicap_value(row):
     threshold = 0.05
 
     # =========================
-    # 🔵 7. VALUE + LADO
+    # 🔵 VALUE
     # =========================
 
     if edge_home > threshold:
+        linha = "-0.25" if diff_forca < 0.4 else "-0.5"
+        return f"🔵 Casa {linha}"
 
-        if diff_forca < 0.4:
-            linha = "-0.25"
-        else:
-            linha = "-0.5"
+    if edge_away > threshold:
+        linha = "+0.5" if diff_forca < 0.4 else "+0.75"
+        return f"🔵 Visitante {linha}"
 
-        return f"🔵 Value Casa {linha} | Edge {edge_home:.2f}"
-
-    elif edge_away > threshold:
-
-        if diff_forca < 0.4:
-            linha = "+0.5"
-        else:
-            linha = "+0.75"
-
-        return f"🔵 Value Visitante {linha} | Edge {edge_away:.2f}"
-
-    # =========================
-    # 🟡 SEM EDGE
-    # =========================
-
-    return "🟡 Proteção | Sem edge"
+    return "🟡 Proteção"
     
 # =========================================
 # 📊 RANKING IA
