@@ -1240,27 +1240,62 @@ with tab1:
             )
 
         # ===============================
-        # ⚽ PLACAR
+        # ⚽ PLACAR FT + HT
         # ===============================
         with c2:
 
-            gols_home = linha_exg.get("Result Home", "-")
-            gols_away = linha_exg.get("Result Visitor", "-")
+            # FT (inteiro)
+            gols_home = linha_exg.get("Result Home", 0)
+            gols_away = linha_exg.get("Result Visitor", 0)
+
+            gols_home = int(gols_home)
+            gols_away = int(gols_away)
+
+            # HT (inteiro)
+            ht_home = linha_exg.get("HT Home", 0)
+            ht_away = linha_exg.get("HT Away", 0)
+
+            ht_home = int(ht_home)
+            ht_away = int(ht_away)
 
             st.markdown(
                 f"""
                 <div style='
                     display:flex;
-                    justify-content:center;
+                    flex-direction:column;
                     align-items:center;
-                    height:120px;
-                    font-size:48px;
-                    font-weight:900;
-                    gap:20px;
+                    justify-content:center;
+                    height:130px;
                 '>
-                    <span>{gols_home}</span>
-                    <span style='opacity:0.6'>x</span>
-                    <span>{gols_away}</span>
+
+                    <!-- FT -->
+                    <div style='
+                        font-size:48px;
+                        font-weight:900;
+                        display:flex;
+                        gap:18px;
+                        align-items:center;
+                    '>
+                        <span>{gols_home}</span>
+                        <span style='opacity:0.6;font-size:28px'>x</span>
+                        <span>{gols_away}</span>
+                    </div>
+
+                    <!-- HT -->
+                    <div style='
+                        font-size:22px;
+                        font-weight:700;
+                        opacity:0.7;
+                        margin-top:6px;
+                        display:flex;
+                        gap:10px;
+                        align-items:center;
+                    '>
+                        <span>{ht_home}</span>
+                        <span>x</span>
+                        <span>{ht_away}</span>
+                    </div>
+
                 </div>
                 """,
                 unsafe_allow_html=True
