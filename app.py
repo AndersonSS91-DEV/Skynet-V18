@@ -29,14 +29,15 @@ st.set_page_config(
 )
 
 
-st.markdown('<div id="app-root">', unsafe_allow_html=True)
-
 /* ===========================================
    🎯 ESCOPO GLOBAL CONTROLADO
 =========================================== */
 #app-root {
     font-family: 'Inter', sans-serif;
 }
+
+</style>
+""", unsafe_allow_html=True)
 
 /* ===========================================
    🧠 TIPOGRAFIA
