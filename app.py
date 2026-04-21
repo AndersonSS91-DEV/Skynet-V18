@@ -1244,8 +1244,8 @@ with tab1:
         # ===============================
         with c2:
 
-        gols_home = linha_exg.get("Goals_H", "-")
-        gols_away = linha_exg.get("Goals_A", "-")
+        gols_home = linha_exg.get("Result Home", "-")
+        gols_away = linha_exg.get("Result Visitor", "-")
         st.markdown(
             f"""
             <div style='
