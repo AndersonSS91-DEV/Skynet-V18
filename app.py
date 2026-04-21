@@ -1241,53 +1241,24 @@ with tab1:
 
         
         # ===============================
-        # ⚽ PLACAR FT + HT (ALINHADO E SEM HTML QUEBRADO)
+        # ⚔️ VS
         # ===============================
         with c2:
+            st.markdown(
+                """
+                <div style='
+                    text-align: center; 
+                    font-size: 34px; 
+                    font-weight: 900; 
+                    margin-top: 55px; 
+                    margin-right: 240px;
+                '>
+                    VS
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
-            # pega valores
-            gols_home = linha_exg.get("Result Home", 0)
-            gols_away = linha_exg.get("Result Visitor", 0)
-            ht_home   = linha_exg.get("HT Home", 0)
-            ht_away   = linha_exg.get("HT Away", 0)
-
-            # força inteiro
-            try:
-                gols_home = int(float(gols_home))
-                gols_away = int(float(gols_away))
-                ht_home   = int(float(ht_home))
-                ht_away   = int(float(ht_away))
-            except:
-                pass
-
-            # ---- FT (linha de cima) ----
-            ft_l, ft_x, ft_r = st.columns([0.05, 0.3, 2.95], vertical_alignment="center")
-
-            with ft_l:
-                st.markdown(f"<div style='text-align:center; font-size:48px; font-weight:700;'>{gols_home}</div>", unsafe_allow_html=True)
-
-            with ft_x:
-                st.markdown("<div style='text-align:center; font-size:28px; opacity:0.5;'>x</div>", unsafe_allow_html=True)
-
-            with ft_r:
-                st.markdown(f"<div style='text-align:center; font-size:48px; font-weight:700;'>{gols_away}</div>", unsafe_allow_html=True)
-
-            # espaço pequeno controlado
-            st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
-
-            # ---- HT (linha de baixo, MESMO GRID) ----
-            ht_l, ht_x, ht_r = st.columns([0.05, 0.3, 2.95], vertical_alignment="center")
-
-            with ht_l:
-                st.markdown(f"<div style='text-align:center; font-size:28px; opacity:0.6;'>{ht_home}</div>", unsafe_allow_html=True)
-
-            with ht_x:
-                st.markdown("<div style='text-align:center; font-size:20px; opacity:0.4;'>x</div>", unsafe_allow_html=True)
-
-            with ht_r:
-                st.markdown(f"<div style='text-align:center; font-size:28px; opacity:0.6;'>{ht_away}</div>", unsafe_allow_html=True)
-                    
-        
                     
         # ===============================
         # 🛫 VISITANTE
