@@ -1242,55 +1242,39 @@ with tab1:
         # ===============================
         # ⚽ PLACAR FT + HT
         # ===============================
-                # ===============================
-        # ⚽ PLACAR FT + HT
-        # ===============================
         with c2:
 
-            gols_home = int(linha_exg.get("Result Home", 0))
-            gols_away = int(linha_exg.get("Result Visitor", 0))
+            gols_home = linha_exg.get("Result Home", 0)
+            gols_away = linha_exg.get("Result Visitor", 0)
 
-            ht_home = int(linha_exg.get("HT Home", 0))
-            ht_away = int(linha_exg.get("HT Away", 0))
+            ht_home = linha_exg.get("HT Home", 0)
+            ht_away = linha_exg.get("HT Away", 0)
 
-            html_placar = f"""
-            <div style="
-                display:flex;
-                flex-direction:column;
-                align-items:center;
-                justify-content:center;
-                height:120px;
-            ">
+            # garante inteiro (sem 2.0)
+            try:
+                gols_home = int(float(gols_home))
+                gols_away = int(float(gols_away))
+                ht_home = int(float(ht_home))
+                ht_away = int(float(ht_away))
+            except:
+                pass
 
-                <div style="
-                    font-size:48px;
-                    font-weight:900;
-                    display:flex;
-                    gap:18px;
-                    align-items:center;
-                ">
-                    <span>{gols_home}</span>
-                    <span style="opacity:0.6;font-size:28px">x</span>
-                    <span>{gols_away}</span>
-                </div>
+            st.markdown(
+                f"""
+<div style="text-align:center; margin-top:10px;">
 
-                <div style="
-                    font-size:22px;
-                    font-weight:700;
-                    opacity:0.7;
-                    margin-top:6px;
-                    display:flex;
-                    gap:10px;
-                ">
-                    <span>{ht_home}</span>
-                    <span>x</span>
-                    <span>{ht_away}</span>
-                </div>
+    <div style="font-size:52px; font-weight:900;">
+        {gols_home} <span style="opacity:0.5;">x</span> {gols_away}
+    </div>
 
-            </div>
-            """
+    <div style="font-size:22px; opacity:0.7; margin-top:4px;">
+        {ht_home} x {ht_away}
+    </div>
 
-            st.markdown(html_placar, unsafe_allow_html=True)
+</div>
+""",
+                unsafe_allow_html=True
+            )
 
         # ===============================
         # 🛫 VISITANTE
