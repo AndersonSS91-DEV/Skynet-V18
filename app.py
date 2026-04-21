@@ -1242,67 +1242,32 @@ with tab1:
         # ===============================
         # ⚽ PLACAR FT + HT (VISUAL LIMPO)
         # ===============================
+                # ===============================
+        # ⚽ PLACAR FT + HT (VERSÃO FINAL)
+        # ===============================
         with c2:
 
-            gols_home = linha_exg.get("Result Home", 0)
-            gols_away = linha_exg.get("Result Visitor", 0)
+            gols_home = int(float(linha_exg.get("Result Home", 0)))
+            gols_away = int(float(linha_exg.get("Result Visitor", 0)))
 
-            ht_home = linha_exg.get("HT Home", 0)
-            ht_away = linha_exg.get("HT Away", 0)
+            ht_home = int(float(linha_exg.get("HT Home", 0)))
+            ht_away = int(float(linha_exg.get("HT Away", 0)))
 
-            try:
-                gols_home = int(float(gols_home))
-                gols_away = int(float(gols_away))
-                ht_home = int(float(ht_home))
-                ht_away = int(float(ht_away))
-            except:
-                pass
+            html = f"""
+<div style="text-align:center;">
 
-            st.markdown(
-                f"""
-                <div style="
-                    display:flex;
-                    flex-direction:column;
-                    align-items:center;
-                    justify-content:center;
-                    height:140px;
-                ">
+    <div style="font-size:64px; font-weight:900; line-height:1;">
+        {gols_home} <span style="font-size:28px; opacity:0.5;">x</span> {gols_away}
+    </div>
 
-                    <!-- FT -->
-                    <div style="
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                        gap:18px;
-                        font-size:64px;
-                        font-weight:900;
-                        line-height:1;
-                    ">
-                        <span>{gols_home}</span>
-                        <span style="font-size:28px; opacity:0.5; transform: translateY(6px);">x</span>
-                        <span>{gols_away}</span>
-                    </div>
+    <div style="font-size:20px; opacity:0.6; margin-top:4px;">
+        {ht_home} x {ht_away}
+    </div>
 
-                    <!-- HT -->
-                    <div style="
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                        gap:12px;
-                        font-size:20px;
-                        opacity:0.6;
-                        margin-top:4px;
-                        line-height:1;
-                    ">
-                        <span>{ht_home}</span>
-                        <span style="transform: translateY(-1px);">x</span>
-                        <span>{ht_away}</span>
-                    </div>
+</div>
+"""
 
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            st.markdown(html, unsafe_allow_html=True)
 
         # ===============================
         # 🛫 VISITANTE
