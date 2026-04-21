@@ -1238,36 +1238,56 @@ with tab1:
                 f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>",
                 unsafe_allow_html=True
             )
-       
+
+        
         # ===============================
-        # ⚽ PLACAR FT + HT (AJUSTE FINO)
+        # ⚽ PLACAR FT + HT (ALINHADO E SEM HTML QUEBRADO)
         # ===============================
         with c2:
-            # Pega e trata os valores
-            try:
-                gols_home = int(float(linha_exg.get("Result Home", 0)))
-                gols_away = int(float(linha_exg.get("Result Visitor", 0)))
-                ht_home   = int(float(linha_exg.get("HT Home", 0)))
-                ht_away   = int(float(linha_exg.get("HT Away", 0)))
-            except:
-                gols_home = gols_away = ht_home = ht_away = 0
 
-            # Estilização Direta
-            st.markdown(f"""
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; margin-top: 10px;">
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 30px; width: 100%;">
-                        <div style="font-size: 68px; font-weight: 900; color: white; width: 60px; text-align: right;">{gols_home}</div>
-                        <div style="font-size: 24px; color: gray; font-weight: 400;">x</div>
-                        <div style="font-size: 68px; font-weight: 900; color: white; width: 60px; text-align: left;">{gols_away}</div>
-                    </div>
+            # pega valores
+            gols_home = linha_exg.get("Result Home", 0)
+            gols_away = linha_exg.get("Result Visitor", 0)
+            ht_home   = linha_exg.get("HT Home", 0)
+            ht_away   = linha_exg.get("HT Away", 0)
+
+            # força inteiro
+            try:
+                gols_home = int(float(gols_home))
+                gols_away = int(float(gols_away))
+                ht_home   = int(float(ht_home))
+                ht_away   = int(float(ht_away))
+            except:
+                pass
+
+            # ---- FT (linha de cima) ----
+            ft_l, ft_x, ft_r = st.columns([0.10, 0.2, 0.2], vertical_alignment="center")
+
+            with ft_l:
+                st.markdown(f"<div style='text-align:center; font-size:64px; font-weight:900;'>{gols_home}</div>", unsafe_allow_html=True)
+
+            with ft_x:
+                st.markdown("<div style='text-align:center; font-size:28px; opacity:0.5;'>x</div>", unsafe_allow_html=True)
+
+            with ft_r:
+                st.markdown(f"<div style='text-align:center; font-size:64px; font-weight:900;'>{gols_away}</div>", unsafe_allow_html=True)
+
+            # espaço pequeno controlado
+            st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+
+            # ---- HT (linha de baixo, MESMO GRID) ----
+            ht_l, ht_x, ht_r = st.columns([0.10, 0.2, 0.2], vertical_alignment="center")
+
+            with ht_l:
+                st.markdown(f"<div style='text-align:center; font-size:28px; opacity:0.6;'>{ht_home}</div>", unsafe_allow_html=True)
+
+            with ht_x:
+                st.markdown("<div style='text-align:center; font-size:20px; opacity:0.4;'>x</div>", unsafe_allow_html=True)
+
+            with ht_r:
+                st.markdown(f"<div style='text-align:center; font-size:28px; opacity:0.6;'>{ht_away}</div>", unsafe_allow_html=True)
                     
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 25px; width: 100%; margin-top: -10px; opacity: 0.5;">
-                        <div style="font-size: 28px; width: 40px; text-align: right;">{ht_home}</div>
-                        <div style="font-size: 18px;">x</div>
-                        <div style="font-size: 28px; width: 40px; text-align: left;">{ht_away}</div>
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
+        
                     
         # ===============================
         # 🛫 VISITANTE
