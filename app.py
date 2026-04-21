@@ -28,18 +28,18 @@ st.set_page_config(
     layout="wide"
 )
 
+# =========================================
+# CSS GLOBAL (CORRIGIDO)
+# =========================================
 st.markdown("""
 <style>
 
 /* ===========================================
-   🎯 ESCOPO GLOBAL CONTROLADO
+   ESCOPO GLOBAL CONTROLADO
 =========================================== */
 #app-root {
     font-family: 'Inter', sans-serif;
 }
-
-st.markdown("""
-<style>
 
 /* ===========================================
    TIPOGRAFIA
@@ -67,11 +67,8 @@ st.markdown("""
     font-weight: 900 !important;
 }
 
-</style>
-""", unsafe_allow_html=True)
-
 /* ===========================================
-   🚨 ALERTAS
+   ALERTAS
 =========================================== */
 #app-root div[data-testid="stAlert"] {
     font-size: 18px !important;
@@ -82,7 +79,7 @@ st.markdown("""
 }
 
 /* ===========================================
-   🧭 TABS
+   TABS
 =========================================== */
 #app-root button[data-baseweb="tab"] {
     font-size: 18px !important;
@@ -99,7 +96,7 @@ st.markdown("""
 }
 
 /* ===========================================
-   🎛️ SELECTBOX
+   SELECTBOX
 =========================================== */
 #app-root div[data-baseweb="select"] {
     min-height: 55px !important;
@@ -124,7 +121,7 @@ st.markdown("""
 }
 
 /* ===========================================
-   📊 DATAFRAME
+   DATAFRAME
 =========================================== */
 #app-root div[data-testid="stDataFrame"] table {
     font-size: 18px !important;
@@ -140,7 +137,7 @@ st.markdown("""
 }
 
 /* ===========================================
-   🎨 SCROLLBAR
+   SCROLLBAR
 =========================================== */
 #app-root ::-webkit-scrollbar {
     width: 12px;
@@ -156,7 +153,7 @@ st.markdown("""
 }
 
 /* ===========================================
-   🧩 CARDS CUSTOM
+   CARDS
 =========================================== */
 #app-root .card {
     border-radius: 14px;
@@ -167,7 +164,7 @@ st.markdown("""
 }
 
 /* ===========================================
-   🧠 CONSENSO POISSON (ISOLADO)
+   POISSON BOX
 =========================================== */
 #app-root .poisson-box {
     background: linear-gradient(135deg, #3a1414, #1a0000);
@@ -178,7 +175,7 @@ st.markdown("""
 }
 
 /* ===========================================
-   🚫 PROTEÇÃO EXTRA (ANTI VAZAMENTO)
+   ANTI VAZAMENTO
 =========================================== */
 #app-root * {
     box-sizing: border-box;
@@ -186,6 +183,11 @@ st.markdown("""
 
 </style>
 """, unsafe_allow_html=True)
+
+# =========================================
+# WRAPPER GLOBAL (OBRIGATÓRIO)
+# =========================================
+st.markdown('<div id="app-root">', unsafe_allow_html=True)
 
 
 # =========================================
