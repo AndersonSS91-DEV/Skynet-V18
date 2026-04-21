@@ -1240,39 +1240,31 @@ with tab1:
             )
        
         # ===============================
-        # ⚽ PLACAR FT + HT (VERSÃO COMPACTA FLEXBOX)
+        # ⚽ PLACAR FT + HT (AJUSTE FINO)
         # ===============================
         with c2:
-            # Pega valores
-            gols_home = linha_exg.get("Result Home", 0)
-            gols_away = linha_exg.get("Result Visitor", 0)
-            ht_home   = linha_exg.get("HT Home", 0)
-            ht_away   = linha_exg.get("HT Away", 0)
-
-            # Força inteiro
+            # Pega e trata os valores
             try:
-                gols_home = int(float(gols_home))
-                gols_away = int(float(gols_away))
-                ht_home   = int(float(ht_home))
-                ht_away   = int(float(ht_away))
+                gols_home = int(float(linha_exg.get("Result Home", 0)))
+                gols_away = int(float(linha_exg.get("Result Visitor", 0)))
+                ht_home   = int(float(linha_exg.get("HT Home", 0)))
+                ht_away   = int(float(linha_exg.get("HT Away", 0)))
             except:
-                pass
+                gols_home = gols_away = ht_home = ht_away = 0
 
-            # HTML Único para Placar FT e HT
+            # Estilização Direta
             st.markdown(f"""
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-                    <div style="display: flex; align-items: center; gap: 20px; line-height: 1;">
-                        <span style="font-size: 64px; font-weight: 900; min-width: 50px; text-align: right;">{gols_home}</span>
-                        <span style="font-size: 28px; opacity: 0.5;">x</span>
-                        <span style="font-size: 64px; font-weight: 900; min-width: 50px; text-align: left;">{gols_away}</span>
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; margin-top: 10px;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 30px; width: 100%;">
+                        <div style="font-size: 68px; font-weight: 900; color: white; width: 60px; text-align: right;">{gols_home}</div>
+                        <div style="font-size: 24px; color: gray; font-weight: 400;">x</div>
+                        <div style="font-size: 68px; font-weight: 900; color: white; width: 60px; text-align: left;">{gols_away}</div>
                     </div>
                     
-                    <div style="height: 5px;"></div>
-                    
-                    <div style="display: flex; align-items: center; gap: 15px; opacity: 0.6; line-height: 1;">
-                        <span style="font-size: 28px; min-width: 30px; text-align: right;">{ht_home}</span>
-                        <span style="font-size: 20px; opacity: 0.4;">x</span>
-                        <span style="font-size: 28px; min-width: 30px; text-align: left;">{ht_away}</span>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 25px; width: 100%; margin-top: -10px; opacity: 0.5;">
+                        <div style="font-size: 28px; width: 40px; text-align: right;">{ht_home}</div>
+                        <div style="font-size: 18px;">x</div>
+                        <div style="font-size: 28px; width: 40px; text-align: left;">{ht_away}</div>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
