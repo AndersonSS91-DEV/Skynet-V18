@@ -1240,30 +1240,31 @@ with tab1:
             )
 
         # ===============================
-        # ⚔️ VS
+        # ⚽ PLACAR
         # ===============================
         with c2:
 
-        gols_home = linha_exg.get("Result Home", "-")
-        gols_away = linha_exg.get("Result Visitor", "-")
-        st.markdown(
-            f"""
-            <div style='
-                display:flex;
-                justify-content:center;
-                align-items:center;
-                height:120px;
-                font-size:48px;
-                font-weight:900;
-                gap:20px;
-            '>
-                <span>{gols_home}</span>
-                <span style='opacity:0.6'>x</span>
-                <span>{gols_away}</span>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+            gols_home = linha_exg.get("Result Home", "-")
+            gols_away = linha_exg.get("Result Visitor", "-")
+
+            st.markdown(
+                f"""
+                <div style='
+                    display:flex;
+                    justify-content:center;
+                    align-items:center;
+                    height:120px;
+                    font-size:48px;
+                    font-weight:900;
+                    gap:20px;
+                '>
+                    <span>{gols_home}</span>
+                    <span style='opacity:0.6'>x</span>
+                    <span>{gols_away}</span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
         # ===============================
         # 🛫 VISITANTE
