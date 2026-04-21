@@ -29,8 +29,7 @@ st.set_page_config(
 )
 
 
-st.markdown("""
-<style>
+st.markdown('<div id="app-root">', unsafe_allow_html=True)
 
 /* ===========================================
    🎯 ESCOPO GLOBAL CONTROLADO
@@ -3116,3 +3115,5 @@ if not base_df.empty:
         st.dataframe(pd.DataFrame(lista), use_container_width=True, hide_index=True)
     else:
         st.info("Sem jogos válidos após filtro")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
