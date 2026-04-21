@@ -1272,7 +1272,7 @@ with tab1:
     st.markdown("---")
 
 # =========================================
-# ⚽ CARD PLACAR (STREAMLIT PURO)
+# ⚽ CARD PLACAR (SIMPLES E ALINHADO)
 # =========================================
 
 gols_home = to_int_safe(linha_exg.get("Result Home"))
@@ -1281,37 +1281,38 @@ gols_away = to_int_safe(linha_exg.get("Result Visitor"))
 ht_home = to_int_safe(linha_exg.get("HT Home"))
 ht_away = to_int_safe(linha_exg.get("HT Away"))
 
-card = st.container()
+with st.container():
 
-with card:
+    st.markdown("")  # respiro
 
-    st.markdown("")
+    # CENTRALIZA O BLOCO
+    _, center, _ = st.columns([1,2,1])
 
-    # ===== FT =====
-    c1, c2, c3 = st.columns([3,1,3])
+    with center:
 
-    with c1:
-        st.markdown(f"### {gols_home}")
+        # FT
+        col1, col2, col3 = st.columns([3,1,3])
 
-    with c2:
-        st.markdown("### x")
+        with col1:
+            st.markdown(f"<h1 style='text-align:center'>{gols_home}</h1>", unsafe_allow_html=True)
 
-    with c3:
-        st.markdown(f"### {gols_away}")
+        with col2:
+            st.markdown("<h3 style='text-align:center; opacity:0.6'>x</h3>", unsafe_allow_html=True)
 
-    # ===== HT =====
-    c4, c5, c6 = st.columns([3,1,3])
+        with col3:
+            st.markdown(f"<h1 style='text-align:center'>{gols_away}</h1>", unsafe_allow_html=True)
 
-    with c4:
-        st.markdown(f"{ht_home}")
+        # HT
+        col4, col5, col6 = st.columns([3,1,3])
 
-    with c5:
-        st.markdown("x")
+        with col4:
+            st.markdown(f"<div style='text-align:center; opacity:0.6'>{ht_home}</div>", unsafe_allow_html=True)
 
-    with c6:
-        st.markdown(f"{ht_away}")
+        with col5:
+            st.markdown("<div style='text-align:center; opacity:0.4'>x</div>", unsafe_allow_html=True)
 
-    st.markdown("---")
+        with col6:
+            st.markdown(f"<div style='text-align:center; opacity:0.6'>{ht_away}</div>", unsafe_allow_html=True)
     
 # ===== ODDS (RESTAURADAS) =====
     st.markdown("### 🎯 Odds")
