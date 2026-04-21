@@ -1260,7 +1260,7 @@ with tab1:
                 pass
 
             # ---- FT (linha de cima) ----
-            ft_l, ft_x, ft_r = st.columns([-0,5, 0.6, 1.0], vertical_alignment="center")
+            ft_l, ft_x, ft_r = st.columns([-0.20, 0.6, 0.6], vertical_alignment="center")
 
             with ft_l:
                 st.markdown(f"<div style='text-align:center; font-size:64px; font-weight:900;'>{gols_home}</div>", unsafe_allow_html=True)
@@ -1275,7 +1275,7 @@ with tab1:
             st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
 
             # ---- HT (linha de baixo, MESMO GRID) ----
-            ht_l, ht_x, ht_r = st.columns([-0,5, 0.6, 1.0], vertical_alignment="center")
+            ht_l, ht_x, ht_r = st.columns([-0.20, 0.6, 0.6], vertical_alignment="center")
 
             with ht_l:
                 st.markdown(f"<div style='text-align:center; font-size:28px; opacity:0.6;'>{ht_home}</div>", unsafe_allow_html=True)
