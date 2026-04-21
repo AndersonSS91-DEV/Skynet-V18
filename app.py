@@ -3102,6 +3102,37 @@ with tab7:
             else:
                 st.info(texto)
 
+            # =========================================
+            # 🎯 EMOJIS VISUAIS (ABAIXO DO CARD)
+            # =========================================
+            home_emoji = classificar_filtro_duplo(
+                linha_mgf["Media_CG_H_01"], linha_mgf["CV_CG_H_01"],
+                linha_mgf["Media_CG_H_02"], linha_mgf["CV_CG_H_02"]
+            )
+
+            away_emoji = classificar_filtro_duplo(
+                linha_mgf["Media_CG_A_01"], linha_mgf["CV_CG_A_01"],
+                linha_mgf["Media_CG_A_02"], linha_mgf["CV_CG_A_02"]
+            )
+
+            st.markdown(f"""
+<div style="
+    margin-top:-10px;
+    padding:8px 12px;
+    border-radius:8px;
+    background: rgba(0,0,0,0.25);
+    display:flex;
+    justify-content:space-between;
+    font-size:18px;
+    font-weight:700;
+">
+    <span>🏠 {home_emoji}</span>
+    <span>⚔️</span>
+    <span>✈️ {away_emoji}</span>
+</div>
+""", unsafe_allow_html=True)
+                
+
         # =========================================
         # 📊 RANKING IA
         # =========================================
