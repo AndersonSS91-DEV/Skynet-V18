@@ -1243,20 +1243,27 @@ with tab1:
         # ⚔️ VS
         # ===============================
         with c2:
-            st.markdown(
-                """
-                <div style='
-                    text-align: center; 
-                    font-size: 28px; 
-                    font-weight: 900; 
-                    margin-top: 55px; 
-                    margin-right: 240px;
-                '>
-                    VS
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+
+        gols_home = linha_exg.get("Goals_H", "-")
+        gols_away = linha_exg.get("Goals_A", "-")
+        st.markdown(
+            f"""
+            <div style='
+                display:flex;
+                justify-content:center;
+                align-items:center;
+                height:120px;
+                font-size:48px;
+                font-weight:900;
+                gap:20px;
+            '>
+                <span>{gols_home}</span>
+                <span style='opacity:0.6'>x</span>
+                <span>{gols_away}</span>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
         # ===============================
         # 🛫 VISITANTE
