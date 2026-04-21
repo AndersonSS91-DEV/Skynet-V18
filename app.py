@@ -1224,7 +1224,7 @@ with tab1:
     header = st.container()
 
     with header:
-        c1, c2, c3 = st.columns(3)
+        c1, c2, c3, c4 = st.columns([1.2, 1, 1, 0.4])
 
         # ===============================
         # 🏠 CASA
@@ -1303,6 +1303,9 @@ with tab1:
 
   
     st.markdown("---")
+
+        with c4:
+            pass  # espaço vazio
 
     
 # ===== ODDS (RESTAURADAS) =====
