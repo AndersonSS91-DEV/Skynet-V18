@@ -27,37 +27,35 @@ st.set_page_config(
     page_title="⚽🏆Poisson Skynet V30.1🏆⚽",
     layout="wide"
 )
-st.markdown(
-    """
-    <h1 style="text-align:center;">⚽🏆 Poisson Skynet 🏆⚽</h1>
-    <hr style="width:560px; margin:auto; border:4px solid #FFD700;">
-    """,
-    unsafe_allow_html=True
-)
+
+
 st.markdown("""
 <style>
 
-/* ===== Fonte Global ===== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
-
-html, body, [class*="css"]  {
+/* ===========================================
+   🎯 ESCOPO GLOBAL CONTROLADO
+=========================================== */
+#app-root {
     font-family: 'Inter', sans-serif;
 }
 
-/* ===== Título Principal ===== */
-h1 {
+/* ===========================================
+   🧠 TIPOGRAFIA
+=========================================== */
+#app-root h1 {
     font-size: 46px !important;
     font-weight: 900 !important;
 }
 
-/* ===== Subheader ===== */
-h3 {
+#app-root h3 {
     font-size: 28px !important;
     font-weight: 800 !important;
 }
 
-/* ===== MÉTRICAS ===== */
-div[data-testid="metric-container"] label {
+/* ===========================================
+   📊 MÉTRICAS
+=========================================== */
+#app-root div[data-testid="metric-container"] label {
     font-size: 13px !important;
     text-transform: uppercase !important;
     letter-spacing: 1px !important;
@@ -65,156 +63,129 @@ div[data-testid="metric-container"] label {
     font-weight: 700 !important;
 }
 
-div[data-testid="metric-container"] > div {
-    font-size: 48px !important;
+#app-root div[data-testid="metric-container"] > div {
+    font-size: 42px !important;
     font-weight: 900 !important;
 }
 
-/* ===== ALERT CARDS ===== */
-div[data-testid="stAlert"] {
-    font-size: 20px !important;
+/* ===========================================
+   🚨 ALERTAS
+=========================================== */
+#app-root div[data-testid="stAlert"] {
+    font-size: 18px !important;
     font-weight: 700 !important;
     border-radius: 12px !important;
     padding: 12px 16px !important;
+    color: white !important;
 }
 
-/* mantém cores originais do Streamlit */
-div[data-testid="stAlert"] p {
-    font-size: 20px !important;
-}
-
-/* ===== TABS ===== */
-button[data-baseweb="tab"] {
+/* ===========================================
+   🧭 TABS
+=========================================== */
+#app-root button[data-baseweb="tab"] {
     font-size: 18px !important;
     font-weight: 700 !important;
 }
 
-/* ===== SELECTBOX ===== */
-div[data-baseweb="select"] {
-    font-size: 20px !important;
-    font-weight: 700 !important;
-}
-
-/* ===== DATAFRAME ===== */
-div[data-testid="stDataFrame"] table {
-    font-size: 17px !important;
-}
-
-div[data-testid="stDataFrame"] th {
-    font-size: 17px !important;
-    font-weight: 700 !important;
-}
-
-div[data-testid="stDataFrame"] td {
-    font-size: 17px !important;
-}
-
-/* texto dos cards st.info */
-div[data-testid="stAlert"] {
-    color: white !important;
-}
-
-div[data-testid="stAlert"] p {
-    color: white !important;
-}
-
-
-/* ===== TABELAS DATAFRAME ===== */
-
-div[data-testid="stDataFrame"] table {
-    font-size: 22px !important;
-}
-div[data-testid="stDataFrame"] th {
-    font-size: 20px !important;
-}
-
-/* ===== TABELAS DATAFRAME ===== */
-
-div[data-testid="stDataFrame"] table {
-    font-size: 22px !important;
-}
-div[data-testid="stDataFrame"] th {
-    font-size: 20px !important;
-}
-
-/* texto do valor selecionado */
-div[data-baseweb="select"] div {
-    font-size: 22px !important;
-    font-weight: 700 !important;
-}
-
-/* opções dentro da lista */
-ul[role="listbox"] li {
-    font-size: 16px !important;
-}
-
-button[aria-selected="true"] {
-    font-size: 22px !important;
+#app-root button[data-baseweb="tab"][aria-selected="true"] {
     color: #00E5FF !important;
 }
 
-button[data-baseweb="tab"][aria-selected="true"] * {
-    font-size: 26px !important;
+#app-root button[data-baseweb="tab"][aria-selected="true"] * {
+    font-size: 24px !important;
     color: #00E5FF !important;
 }
-/* ===== SELECTBOX TAMANHO ===== */
 
-/* caixa externa */
-div[data-baseweb="select"] {
+/* ===========================================
+   🎛️ SELECTBOX
+=========================================== */
+#app-root div[data-baseweb="select"] {
     min-height: 55px !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
 }
 
-/* área clicável */
-div[data-baseweb="select"] > div {
+#app-root div[data-baseweb="select"] > div {
     min-height: 55px !important;
     display: flex;
     align-items: center;
 }
 
-/* texto selecionado */
-div[data-baseweb="select"] span {
-    font-size: 22px !important;
+#app-root div[data-baseweb="select"] span {
+    font-size: 20px !important;
     font-weight: 700 !important;
 }
 
-/* itens do dropdown */
-ul[role="listbox"] li {
-    font-size: 18px !important;
+#app-root ul[role="listbox"] li {
+    font-size: 16px !important;
     padding: 10px !important;
 }
 
-===========================================
-# BARRA DE ROLAGEM
-===========================================
-
-/* largura da barra */
-::-webkit-scrollbar {
-    width: 30px;
+/* ===========================================
+   📊 DATAFRAME
+=========================================== */
+#app-root div[data-testid="stDataFrame"] table {
+    font-size: 18px !important;
 }
 
-/* fundo da barra */
-::-webkit-scrollbar-track {
+#app-root div[data-testid="stDataFrame"] th {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+}
+
+#app-root div[data-testid="stDataFrame"] td {
+    font-size: 17px !important;
+}
+
+/* ===========================================
+   🎨 SCROLLBAR
+=========================================== */
+#app-root ::-webkit-scrollbar {
+    width: 12px;
+}
+
+#app-root ::-webkit-scrollbar-track {
     background: #0e1117;
 }
 
-/* parte que move */
-::-webkit-scrollbar-thumb {
-    background: #444;
-    border-radius: 18px;
-}
-
-/* hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #666;
-}
-
-::-webkit-scrollbar-thumb {
+#app-root ::-webkit-scrollbar-thumb {
     background: linear-gradient(180deg,#3b82f6,#2563eb);
-    border-radius: 18px;
+    border-radius: 10px;
+}
+
+/* ===========================================
+   🧩 CARDS CUSTOM
+=========================================== */
+#app-root .card {
+    border-radius: 14px;
+    padding: 16px;
+    background: #1a1f2b;
+    box-shadow: 0 0 12px rgba(0,0,0,0.4);
+    margin-bottom: 12px;
+}
+
+/* ===========================================
+   🧠 CONSENSO POISSON (ISOLADO)
+=========================================== */
+#app-root .poisson-box {
+    background: linear-gradient(135deg, #3a1414, #1a0000);
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* ===========================================
+   🚫 PROTEÇÃO EXTRA (ANTI VAZAMENTO)
+=========================================== */
+#app-root * {
+    box-sizing: border-box;
 }
 
 </style>
 """, unsafe_allow_html=True)
+
+
 # =========================================
 # 🎬 BANNER CARROSSEL (OFICIAL SKYNET)
 # =========================================
