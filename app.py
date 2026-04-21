@@ -1211,7 +1211,19 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
 
 
 # =========================================
-# ABA 1 — RESUMO >>>>>>. ESCUDOS QUASE PERFEITOS >>>>> SALVAR ESSE CÓDIGO
+# 🔒 FUNÇÃO SEGURA (NÃO QUEBRA COM DADO SUJO)
+# =========================================
+def to_int_safe(v):
+    try:
+        if pd.isna(v) or str(v).strip() == "":
+            return "-"
+        return int(float(v))
+    except:
+        return "-"
+
+
+# =========================================
+# ABA 1 — RESUMO
 # =========================================
 with tab1:
 
@@ -1231,70 +1243,54 @@ with tab1:
         # ===============================
         with c1:
             st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-
             st.image(esc_home, width=105)
-
             st.markdown(
                 f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>",
                 unsafe_allow_html=True
             )
 
-        
         # ===============================
         # ⚔️ VS
         # ===============================
         with c2:
             st.markdown(
-                """
-                <div style='
-                    text-align: center; 
-                    font-size: 34px; 
-                    font-weight: 900; 
-                    margin-top: 55px; 
-                    margin-right: 240px;
-                '>
-                    VS
-                </div>
-                """,
+                "<div style='text-align:center;font-size:28px;font-weight:900;margin-top:55px;'>VS</div>",
                 unsafe_allow_html=True
             )
 
-                    
         # ===============================
         # 🛫 VISITANTE
         # ===============================
         with c3:
             st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-
             st.image(esc_away, width=105)
-
             st.markdown(
                 f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>",
                 unsafe_allow_html=True
             )
-  
+
     st.markdown("---")
 
-    
     # =========================================
     # ⚽ CARD PLACAR CENTRAL
     # =========================================
-    gols_home = int(float(linha_exg.get("Result Home", 0)))
-    gols_away = int(float(linha_exg.get("Result Visitor", 0)))
+    gols_home = to_int_safe(linha_exg.get("Result Home"))
+    gols_away = to_int_safe(linha_exg.get("Result Visitor"))
 
-    ht_home = int(float(linha_exg.get("HT Home", 0)))
-    ht_away = int(float(linha_exg.get("HT Away", 0)))
+    ht_home = to_int_safe(linha_exg.get("HT Home"))
+    ht_away = to_int_safe(linha_exg.get("HT Away"))
 
     st.markdown(f"""
     <div style="
         background: white;
         border-radius: 16px;
         padding: 20px 10px;
-        margin-top: 20px;
+        margin-top: 10px;
         text-align: center;
         box-shadow: 0 4px 20px rgba(0,0,0,0.25);
     ">
 
+        <!-- FT -->
         <div style="
             font-size:48px;
             font-weight:900;
@@ -1303,6 +1299,7 @@ with tab1:
             {gols_home} <span style="opacity:0.5;">x</span> {gols_away}
         </div>
 
+        <!-- HT -->
         <div style="
             font-size:20px;
             margin-top:6px;
