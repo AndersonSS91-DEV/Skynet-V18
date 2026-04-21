@@ -1240,7 +1240,7 @@ with tab1:
             )
 
         # ===============================
-        # ⚽ PLACAR FT + HT (SEM HTML)
+        # ⚽ PLACAR FT + HT (VISUAL LIMPO)
         # ===============================
         with c2:
 
@@ -1250,7 +1250,6 @@ with tab1:
             ht_home = linha_exg.get("HT Home", 0)
             ht_away = linha_exg.get("HT Away", 0)
 
-            # força inteiro
             try:
                 gols_home = int(float(gols_home))
                 gols_away = int(float(gols_away))
@@ -1259,29 +1258,34 @@ with tab1:
             except:
                 pass
 
+            # container central
+            st.markdown("<div style='text-align:center; padding-top:10px;'>", unsafe_allow_html=True)
+
             # ===== FT =====
-            col_a, col_x, col_b = st.columns([1,1,1])
+            col1, col2, col3 = st.columns([3,1,3])
 
-            with col_a:
-                st.markdown(f"<h1 style='text-align:center'>{gols_home}</h1>", unsafe_allow_html=True)
+            with col1:
+                st.markdown(f"<div style='font-size:64px; font-weight:900;'>{gols_home}</div>", unsafe_allow_html=True)
 
-            with col_x:
-                st.markdown("<h3 style='text-align:center; opacity:0.6'>x</h3>", unsafe_allow_html=True)
+            with col2:
+                st.markdown("<div style='font-size:26px; opacity:0.5; margin-top:20px;'>x</div>", unsafe_allow_html=True)
 
-            with col_b:
-                st.markdown(f"<h1 style='text-align:center'>{gols_away}</h1>", unsafe_allow_html=True)
+            with col3:
+                st.markdown(f"<div style='font-size:64px; font-weight:900;'>{gols_away}</div>", unsafe_allow_html=True)
 
             # ===== HT =====
-            col_a2, col_x2, col_b2 = st.columns([1,1,1])
+            col4, col5, col6 = st.columns([3,1,3])
 
-            with col_a2:
-                st.markdown(f"<div style='text-align:center; opacity:0.7'>{ht_home}</div>", unsafe_allow_html=True)
+            with col4:
+                st.markdown(f"<div style='font-size:20px; opacity:0.6;'>{ht_home}</div>", unsafe_allow_html=True)
 
-            with col_x2:
-                st.markdown("<div style='text-align:center; opacity:0.5'>x</div>", unsafe_allow_html=True)
+            with col5:
+                st.markdown("<div style='font-size:16px; opacity:0.4;'>x</div>", unsafe_allow_html=True)
 
-            with col_b2:
-                st.markdown(f"<div style='text-align:center; opacity:0.7'>{ht_away}</div>", unsafe_allow_html=True)
+            with col6:
+                st.markdown(f"<div style='font-size:20px; opacity:0.6;'>{ht_away}</div>", unsafe_allow_html=True)
+
+            st.markdown("</div>", unsafe_allow_html=True)
 
         # ===============================
         # 🛫 VISITANTE
