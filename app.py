@@ -27,167 +27,194 @@ st.set_page_config(
     page_title="⚽🏆Poisson Skynet V30.1🏆⚽",
     layout="wide"
 )
-
-# =========================================
-# CSS GLOBAL (CORRIGIDO)
-# =========================================
+st.markdown(
+    """
+    <h1 style="text-align:center;">⚽🏆 Poisson Skynet 🏆⚽</h1>
+    <hr style="width:560px; margin:auto; border:4px solid #FFD700;">
+    """,
+    unsafe_allow_html=True
+)
 st.markdown("""
 <style>
 
-/* ===========================================
-   ESCOPO GLOBAL CONTROLADO
-=========================================== */
-#app-root {
+/* ===== Fonte Global ===== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+
+html, body, [class*="css"]  {
     font-family: 'Inter', sans-serif;
 }
 
-/* ===========================================
-   TIPOGRAFIA
-=========================================== */
-#app-root h1 {
+/* ===== Título Principal ===== */
+h1 {
     font-size: 46px !important;
     font-weight: 900 !important;
 }
 
-#app-root h3 {
+/* ===== Subheader ===== */
+h3 {
     font-size: 28px !important;
     font-weight: 800 !important;
 }
 
-/* ===========================================
-   METRICAS
-=========================================== */
-#app-root div[data-testid="metric-container"] label {
+/* ===== MÉTRICAS ===== */
+div[data-testid="metric-container"] label {
     font-size: 13px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    opacity: 0.6 !important;
     font-weight: 700 !important;
 }
 
-#app-root div[data-testid="metric-container"] > div {
-    font-size: 42px !important;
+div[data-testid="metric-container"] > div {
+    font-size: 48px !important;
     font-weight: 900 !important;
 }
 
-/* ===========================================
-   ALERTAS
-=========================================== */
-#app-root div[data-testid="stAlert"] {
-    font-size: 18px !important;
+/* ===== ALERT CARDS ===== */
+div[data-testid="stAlert"] {
+    font-size: 20px !important;
     font-weight: 700 !important;
     border-radius: 12px !important;
     padding: 12px 16px !important;
-    color: white !important;
 }
 
-/* ===========================================
-   TABS
-=========================================== */
-#app-root button[data-baseweb="tab"] {
+/* mantém cores originais do Streamlit */
+div[data-testid="stAlert"] p {
+    font-size: 20px !important;
+}
+
+/* ===== TABS ===== */
+button[data-baseweb="tab"] {
     font-size: 18px !important;
     font-weight: 700 !important;
 }
 
-#app-root button[data-baseweb="tab"][aria-selected="true"] {
-    color: #00E5FF !important;
-}
-
-#app-root button[data-baseweb="tab"][aria-selected="true"] * {
-    font-size: 24px !important;
-    color: #00E5FF !important;
-}
-
-/* ===========================================
-   SELECTBOX
-=========================================== */
-#app-root div[data-baseweb="select"] {
-    min-height: 55px !important;
+/* ===== SELECTBOX ===== */
+div[data-baseweb="select"] {
     font-size: 20px !important;
     font-weight: 700 !important;
 }
 
-#app-root div[data-baseweb="select"] > div {
+/* ===== DATAFRAME ===== */
+div[data-testid="stDataFrame"] table {
+    font-size: 17px !important;
+}
+
+div[data-testid="stDataFrame"] th {
+    font-size: 17px !important;
+    font-weight: 700 !important;
+}
+
+div[data-testid="stDataFrame"] td {
+    font-size: 17px !important;
+}
+
+/* texto dos cards st.info */
+div[data-testid="stAlert"] {
+    color: white !important;
+}
+
+div[data-testid="stAlert"] p {
+    color: white !important;
+}
+
+
+/* ===== TABELAS DATAFRAME ===== */
+
+div[data-testid="stDataFrame"] table {
+    font-size: 22px !important;
+}
+div[data-testid="stDataFrame"] th {
+    font-size: 20px !important;
+}
+
+/* ===== TABELAS DATAFRAME ===== */
+
+div[data-testid="stDataFrame"] table {
+    font-size: 22px !important;
+}
+div[data-testid="stDataFrame"] th {
+    font-size: 20px !important;
+}
+
+/* texto do valor selecionado */
+div[data-baseweb="select"] div {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+}
+
+/* opções dentro da lista */
+ul[role="listbox"] li {
+    font-size: 16px !important;
+}
+
+button[aria-selected="true"] {
+    font-size: 22px !important;
+    color: #00E5FF !important;
+}
+
+button[data-baseweb="tab"][aria-selected="true"] * {
+    font-size: 26px !important;
+    color: #00E5FF !important;
+}
+/* ===== SELECTBOX TAMANHO ===== */
+
+/* caixa externa */
+div[data-baseweb="select"] {
+    min-height: 55px !important;
+}
+
+/* área clicável */
+div[data-baseweb="select"] > div {
     min-height: 55px !important;
     display: flex;
     align-items: center;
 }
 
-#app-root div[data-baseweb="select"] span {
-    font-size: 20px !important;
+/* texto selecionado */
+div[data-baseweb="select"] span {
+    font-size: 22px !important;
     font-weight: 700 !important;
 }
 
-#app-root ul[role="listbox"] li {
-    font-size: 16px !important;
+/* itens do dropdown */
+ul[role="listbox"] li {
+    font-size: 18px !important;
     padding: 10px !important;
 }
 
-/* ===========================================
-   DATAFRAME
-=========================================== */
-#app-root div[data-testid="stDataFrame"] table {
-    font-size: 18px !important;
+===========================================
+# BARRA DE ROLAGEM
+===========================================
+
+/* largura da barra */
+::-webkit-scrollbar {
+    width: 30px;
 }
 
-#app-root div[data-testid="stDataFrame"] th {
-    font-size: 18px !important;
-    font-weight: 700 !important;
-}
-
-#app-root div[data-testid="stDataFrame"] td {
-    font-size: 17px !important;
-}
-
-/* ===========================================
-   SCROLLBAR
-=========================================== */
-#app-root ::-webkit-scrollbar {
-    width: 12px;
-}
-
-#app-root ::-webkit-scrollbar-track {
+/* fundo da barra */
+::-webkit-scrollbar-track {
     background: #0e1117;
 }
 
-#app-root ::-webkit-scrollbar-thumb {
+/* parte que move */
+::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 18px;
+}
+
+/* hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+::-webkit-scrollbar-thumb {
     background: linear-gradient(180deg,#3b82f6,#2563eb);
-    border-radius: 10px;
-}
-
-/* ===========================================
-   CARDS
-=========================================== */
-#app-root .card {
-    border-radius: 14px;
-    padding: 16px;
-    background: #1a1f2b;
-    box-shadow: 0 0 12px rgba(0,0,0,0.4);
-    margin-bottom: 12px;
-}
-
-/* ===========================================
-   POISSON BOX
-=========================================== */
-#app-root .poisson-box {
-    background: linear-gradient(135deg, #3a1414, #1a0000);
-    padding: 16px;
-    border-radius: 14px;
-    font-size: 18px;
-    font-weight: 700;
-}
-
-/* ===========================================
-   ANTI VAZAMENTO
-=========================================== */
-#app-root * {
-    box-sizing: border-box;
+    border-radius: 18px;
 }
 
 </style>
 """, unsafe_allow_html=True)
-
-# =========================================
-# WRAPPER GLOBAL (OBRIGATÓRIO)
-# =========================================
-st.markdown('<div id="app-root">', unsafe_allow_html=True)
 
 
 # =========================================
@@ -3024,14 +3051,10 @@ def gerar_ranking_ia(df):
 # =========================================
 # 🚀 ABA IA FINAL
 # =========================================
-
 with tab7:
 
     st.markdown("## 🤖 Central de Decisão IA")
 
-    # =========================================
-    # 📊 LÊ DIRETO DO XLS (IGUAL ESCANTEIOS)
-    # =========================================
     try:
         base_df = pd.read_excel(xls)
         base_df["HA_Value"] = base_df.apply(detectar_handicap_value_profissional, axis=1)
@@ -3039,27 +3062,27 @@ with tab7:
         st.error("Erro ao ler arquivo")
         st.stop()
 
-# =========================================
-# 🎯 JOGO ATUAL
-# =========================================
-if not base_df.empty:
-    linha = base_df.iloc[0]
-    resultado = classificar_jogo(linha_mgf)
+    # =========================================
+    # 🎯 JOGO ATUAL
+    # =========================================
+    if not base_df.empty:
+        linha = base_df.iloc[0]
+        resultado = classificar_jogo(linha_mgf)
 
-    if resultado:
+        if resultado:
 
-        detalhes = ""
+            detalhes = ""
 
-        if resultado.get("Principal"):
-            detalhes += f"🥇 Principal: {resultado['Principal']}\n"
+            if resultado.get("Principal"):
+                detalhes += f"🥇 Principal: {resultado['Principal']}\n"
 
-        if resultado.get("Secundario"):
-            detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
+            if resultado.get("Secundario"):
+                detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
 
-        if resultado.get("Risco"):
-            detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
+            if resultado.get("Risco"):
+                detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
 
-        texto = f"""
+            texto = f"""
 🧠 Tipo: {resultado['Tipo']}
 🎯 Entrada: {resultado['Entrada']}
 ⏱️ Momento: {resultado['Momento']}
@@ -3069,56 +3092,54 @@ if not base_df.empty:
 {resultado['Motivo']}
 """
 
-        if resultado["Classe"] == "A+":
-            st.success(texto)
-        elif resultado["Classe"] == "A":
-            st.success(texto)
-        elif resultado["Classe"] == "B":
-            st.warning(texto)
+            if resultado["Classe"] == "A+":
+                st.success(texto)
+            elif resultado["Classe"] == "A":
+                st.success(texto)
+            elif resultado["Classe"] == "B":
+                st.warning(texto)
+            else:
+                st.info(texto)
+
+        # =========================================
+        # 📊 RANKING IA
+        # =========================================
+        df_rank = gerar_ranking_ia(base_df)
+
+        st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
+
+        if not df_rank.empty:
+            st.dataframe(df_rank, use_container_width=True, hide_index=True)
         else:
-            st.info(texto)
-    # =========================================
-    # 📊 RANKING IA
-    # =========================================
-    df_rank = gerar_ranking_ia(base_df)
+            st.info("Nenhum jogo A+/A encontrado")
 
-    st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
+        # =========================================
+        # 📋 TABELA FINAL
+        # =========================================
+        st.markdown("### 📋 Todos os Jogos Filtrados")
 
-    if not df_rank.empty:
-        st.dataframe(df_rank, use_container_width=True, hide_index=True)
-    else:
-        st.info("Nenhum jogo A+/A encontrado")
+        df_clean = base_df[
+            (base_df["Odd_BTTS_YES"] > 0) &
+            (base_df["Odds_Over_2,5FT"] > 0) &
+            (base_df["Odds_Casa"] > 0) &
+            (base_df["Odds_Visitante"] > 0)
+        ]
 
-    # =========================================
-    # 📋 TABELA FINAL
-    # =========================================
-    st.markdown("### 📋 Todos os Jogos Filtrados")
+        lista = []
 
-    df_clean = base_df[
-        (base_df["Odd_BTTS_YES"] > 0) &
-        (base_df["Odds_Over_2,5FT"] > 0) &
-        (base_df["Odds_Casa"] > 0) &
-        (base_df["Odds_Visitante"] > 0)
-    ]
+        for _, row in df_clean.iterrows():
+            res = classificar_jogo(row)
 
-    lista = []
+            if res:
+                lista.append({
+                    "Jogo": f"{row.get('Home_Team','')} x {row.get('Visitor_Team','')}",
+                    "Tipo": res["Tipo"],
+                    "Entrada": res["Entrada"],
+                    "Classe": res["Classe"],
+                    "HA_Value": row.get("HA_Value", "")
+                })
 
-    for _, row in df_clean.iterrows():
-
-        res = classificar_jogo(row)
-
-        if res:
-            lista.append({
-                "Jogo": f"{row.get('Home_Team','')} x {row.get('Visitor_Team','')}",
-                "Tipo": res["Tipo"],
-                "Entrada": res["Entrada"],
-                "Classe": res["Classe"],
-                "HA_Value": row.get("HA_Value", "")
-            })
-
-    if lista:
-        st.dataframe(pd.DataFrame(lista), use_container_width=True, hide_index=True)
-    else:
-        st.info("Sem jogos válidos após filtro")
-        
-        st.markdown('</div>', unsafe_allow_html=True)
+        if lista:
+            st.dataframe(pd.DataFrame(lista), use_container_width=True, hide_index=True)
+        else:
+            st.info("Sem jogos válidos após filtro")
