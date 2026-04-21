@@ -1301,11 +1301,11 @@ with tab1:
                 unsafe_allow_html=True
             )
 
-  
-    st.markdown("---")
-
         with c4:
             pass  # espaço vazio
+            
+  
+    st.markdown("---")
 
     
 # ===== ODDS (RESTAURADAS) =====
