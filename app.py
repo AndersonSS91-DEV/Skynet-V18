@@ -3171,25 +3171,6 @@ with tab7:
         # 🔥 APLICA FILTRO VISUAL
         # =========================================
         df_clean["Home"] = df_clean.apply(
-            lambda x: classificar_filtro_duplo(
-                x["Media_CG_H_01"], x["CV_CG_H_01"],
-                x["Media_CG_H_02"], x["CV_CG_H_02"]
-            ),
-            axis=1
-        )
-
-        df_clean["Away"] = df_clean.apply(
-            lambda x: classificar_filtro_duplo(
-                x["Media_CG_A_01"], x["CV_CG_A_01"],
-                x["Media_CG_A_02"], x["CV_CG_A_02"]
-            ),
-            axis=1
-        )
-
-        # =========================================
-        # 🔥 APLICA FILTRO VISUAL
-        # =========================================
-        df_clean["Home"] = df_clean.apply(
             lambda x: classificar_filtrox["Media_CG_H_01"], x["CV_CG_H_01"],
             x["Media_CG_H_02"], x["CV_CG_H_02"]
         ),
