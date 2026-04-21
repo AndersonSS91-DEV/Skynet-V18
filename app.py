@@ -1275,6 +1275,47 @@ with tab1:
   
     st.markdown("---")
 
+    # =========================================
+# ⚽ CARD PLACAR CENTRAL
+# =========================================
+
+gols_home = int(float(linha_exg.get("Result Home", 0)))
+gols_away = int(float(linha_exg.get("Result Visitor", 0)))
+
+ht_home = int(float(linha_exg.get("HT Home", 0)))
+ht_away = int(float(linha_exg.get("HT Away", 0)))
+
+st.markdown(f"""
+<div style="
+    background: white;
+    border-radius: 16px;
+    padding: 20px 10px;
+    margin-top: 20px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+">
+
+    <!-- FT -->
+    <div style="
+        font-size:48px;
+        font-weight:900;
+        color:#111;
+    ">
+        {gols_home} <span style="opacity:0.5;">x</span> {gols_away}
+    </div>
+
+    <!-- HT -->
+    <div style="
+        font-size:20px;
+        margin-top:6px;
+        color:#555;
+    ">
+        {ht_home} x {ht_away}
+    </div>
+
+</div>
+""", unsafe_allow_html=True)
+
     
 # ===== ODDS (RESTAURADAS) =====
     st.markdown("### 🎯 Odds")
