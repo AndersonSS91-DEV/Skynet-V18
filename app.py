@@ -1224,7 +1224,7 @@ with tab1:
     header = st.container()
 
     with header:
-        c1, c2, c3, c4 = st.columns([1.2, 1, 1, 0.4])
+        c1, c2, c3 = st.columns(3)
 
         # ===============================
         # 🏠 CASA
@@ -1240,10 +1240,11 @@ with tab1:
             )
        
         # ===============================
-        # ⚽ PLACAR FT + HT (SEM HTML)
+        # ⚽ PLACAR FT + HT (ALINHADO E SEM HTML QUEBRADO)
         # ===============================
         with c2:
 
+            # pega valores
             gols_home = linha_exg.get("Result Home", 0)
             gols_away = linha_exg.get("Result Visitor", 0)
             ht_home   = linha_exg.get("HT Home", 0)
@@ -1258,37 +1259,32 @@ with tab1:
             except:
                 pass
 
-            # 👉 OFFSET PRA ESQUERDA (ajuste aqui)
-            left_pad, content = st.columns([0.3, 1])  # diminua 0.3 p/ ir mais à esquerda
+            # ---- FT (linha de cima) ----
+            ft_l, ft_x, ft_r = st.columns([0.4, 0.6, 1], vertical_alignment="center")
 
-            with content:
+            with ft_l:
+                st.markdown(f"<div style='text-align:center; font-size:64px; font-weight:900;'>{gols_home}</div>", unsafe_allow_html=True)
 
-                # FT
-                ft_l, ft_x, ft_r = st.columns([1, 0.6, 1], vertical_alignment="center")
+            with ft_x:
+                st.markdown("<div style='text-align:center; font-size:28px; opacity:0.5;'>x</div>", unsafe_allow_html=True)
 
-                with ft_l:
-                    st.markdown(f"## {gols_home}")
+            with ft_r:
+                st.markdown(f"<div style='text-align:center; font-size:64px; font-weight:900;'>{gols_away}</div>", unsafe_allow_html=True)
 
-                with ft_x:
-                    st.markdown("### x")
+            # espaço pequeno controlado
+            st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
 
-                with ft_r:
-                    st.markdown(f"## {gols_away}")
+            # ---- HT (linha de baixo, MESMO GRID) ----
+            ht_l, ht_x, ht_r = st.columns([0.4, 0.6, 1], vertical_alignment="center")
 
-                # espaço pequeno
-                st.write("")
+            with ht_l:
+                st.markdown(f"<div style='text-align:center; font-size:20px; opacity:0.6;'>{ht_home}</div>", unsafe_allow_html=True)
 
-                # HT
-                ht_l, ht_x, ht_r = st.columns([1, 0.6, 1], vertical_alignment="center")
+            with ht_x:
+                st.markdown("<div style='text-align:center; font-size:16px; opacity:0.4;'>x</div>", unsafe_allow_html=True)
 
-                with ht_l:
-                    st.markdown(f"{ht_home}")
-
-                with ht_x:
-                    st.markdown("x")
-
-                with ht_r:
-                    st.markdown(f"{ht_away}")
+            with ht_r:
+                st.markdown(f"<div style='text-align:center; font-size:20px; opacity:0.6;'>{ht_away}</div>", unsafe_allow_html=True)
                     
         # ===============================
         # 🛫 VISITANTE
@@ -1302,10 +1298,6 @@ with tab1:
                 f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>",
                 unsafe_allow_html=True
             )
-
-        with c4:
-            pass  # espaço vazio
-            
   
     st.markdown("---")
 
