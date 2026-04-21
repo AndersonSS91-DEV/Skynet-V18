@@ -1240,10 +1240,9 @@ with tab1:
             )
        
         # ===============================
-        # ⚽ PLACAR FT + HT (ALINHADO E SEM HTML QUEBRADO)
+        # ⚽ PLACAR FT + HT (AJUSTADO E CENTRALIZADO)
         # ===============================
         with c2:
-
             # pega valores
             gols_home = linha_exg.get("Result Home", 0)
             gols_away = linha_exg.get("Result Visitor", 0)
@@ -1259,32 +1258,36 @@ with tab1:
             except:
                 pass
 
-            # ---- FT (linha de cima) ----
-            ft_l, ft_x, ft_r = st.columns([0.10, 0.6, 0.6], vertical_alignment="center")
+            # ---- FT (Linha de cima) ----
+            # Usamos proporções iguais [1, 1, 1] para centralizar o 'x' no meio exato da coluna c2
+            ft_l, ft_x, ft_r = st.columns([1, 1, 1], vertical_alignment="center")
 
             with ft_l:
-                st.markdown(f"<div style='text-align:center; font-size:64px; font-weight:900;'>{gols_home}</div>", unsafe_allow_html=True)
+                # text-align: right para encostar no 'x'
+                st.markdown(f"<div style='text-align:right; font-size:64px; font-weight:900; line-height:1;'>{gols_home}</div>", unsafe_allow_html=True)
 
             with ft_x:
+                # text-align: center para ser o eixo
                 st.markdown("<div style='text-align:center; font-size:28px; opacity:0.5;'>x</div>", unsafe_allow_html=True)
 
             with ft_r:
-                st.markdown(f"<div style='text-align:center; font-size:64px; font-weight:900;'>{gols_away}</div>", unsafe_allow_html=True)
+                # text-align: left para encostar no 'x'
+                st.markdown(f"<div style='text-align:left; font-size:64px; font-weight:900; line-height:1;'>{gols_away}</div>", unsafe_allow_html=True)
 
             # espaço pequeno controlado
-            st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height:0px'></div>", unsafe_allow_html=True)
 
-            # ---- HT (linha de baixo, MESMO GRID) ----
-            ht_l, ht_x, ht_r = st.columns([0.10, 0.6, 0.6], vertical_alignment="center")
+            # ---- HT (Linha de baixo) ----
+            ht_l, ht_x, ht_r = st.columns([1, 1, 1], vertical_alignment="center")
 
             with ht_l:
-                st.markdown(f"<div style='text-align:center; font-size:28px; opacity:0.6;'>{ht_home}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='text-align:right; font-size:28px; opacity:0.6;'>{ht_home}</div>", unsafe_allow_html=True)
 
             with ht_x:
                 st.markdown("<div style='text-align:center; font-size:20px; opacity:0.4;'>x</div>", unsafe_allow_html=True)
 
             with ht_r:
-                st.markdown(f"<div style='text-align:center; font-size:28px; opacity:0.6;'>{ht_away}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='text-align:left; font-size:28px; opacity:0.6;'>{ht_away}</div>", unsafe_allow_html=True)
                     
         # ===============================
         # 🛫 VISITANTE
