@@ -1,5 +1,5 @@
 # =========================================
-# STREAMLIT — POISSON SKYNET (HÍBRIDO)🚀🛸🚥🌋🗻⭐⭐⭐⭐⭐🌠🌠🌠🌠🌠❄☃🌬🌊🌊🌊🔥🔥🔥🌬
+# STREAMLIT — POISSON SKYNET (HÍBRIDO)🚀🛸🚥🌋🗻⭐🌠❄☃🌬🌊🔥🌬🟨
 # =========================================
 import streamlit as st
 import pandas as pd
@@ -3128,43 +3128,78 @@ with tab7:
         # =========================================
         # 🎯 FUNÇÃO FILTRO VISUAL
         # =========================================
-        def classificar_filtro(media, cv):
+                # =========================================
+        # 🎯 FUNÇÃO FILTRO VISUAL (MULTI-EMOJI)
+        # =========================================
+        def classificar_filtro_duplo(media1, cv1, media2, cv2):
 
-            if media > 5.50:
-                return "🌊"
+            emojis = []
 
-            if media > 2.00 and cv > 0.80:
-                return "🌬"
+            # =========================
+            # 🔹 CG_01
+            # =========================
+            if media1 < 2.00:
+                emojis.append("☃")
 
-            if 2.80 <= media <= 5.50 and cv <= 0.80:
-                return "🌋"
+            elif 2.00 <= media1 < 2.70:
+                emojis.append("🟨")
 
-            if 2.70 <= media <= 3.00 and cv <= 0.90:
-                return "🚀"
+            elif 2.70 <= media1 <= 3.00 and cv1 <= 0.90:
+                emojis.append("🚀")
 
-            if 2.70 <= media <= 3.00:
-                return "❄"
+            elif 2.80 <= media1 <= 5.50 and cv1 <= 0.80:
+                emojis.append("🌋")
 
-            if 0.90 <= media <= 2.00 and cv <= 0.80:
-                return "🔥"
+            elif media1 > 5.50:
+                emojis.append("🌊")
 
-            if media < 2.70:
-                return "☃"
+            # =========================
+            # 🔹 CG_02
+            # =========================
+            if media2 < 0.90:
+                emojis.append("❄")
 
-            return "—"
+            elif 0.90 <= media2 <= 2.00 and cv2 <= 0.80:
+                emojis.append("🔥")
+
+            elif media2 > 2.00:
+                emojis.append("🌬")
+
+            return "".join(emojis) if emojis else "—"
 
         # =========================================
         # 🔥 APLICA FILTRO VISUAL
         # =========================================
         df_clean["Home"] = df_clean.apply(
-            lambda x: classificar_filtro(x["Media_CG_H_01"], x["CV_CG_H_01"]),
+            lambda x: classificar_filtro_duplo(
+                x["Media_CG_H_01"], x["CV_CG_H_01"],
+                x["Media_CG_H_02"], x["CV_CG_H_02"]
+            ),
             axis=1
         )
 
         df_clean["Away"] = df_clean.apply(
-            lambda x: classificar_filtro(x["Media_CG_A_01"], x["CV_CG_A_01"]),
+            lambda x: classificar_filtro_duplo(
+                x["Media_CG_A_01"], x["CV_CG_A_01"],
+                x["Media_CG_A_02"], x["CV_CG_A_02"]
+            ),
             axis=1
         )
+
+        # =========================================
+        # 🔥 APLICA FILTRO VISUAL
+        # =========================================
+        df_clean["Home"] = df_clean.apply(
+            lambda x: classificar_filtrox["Media_CG_H_01"], x["CV_CG_H_01"],
+            x["Media_CG_H_02"], x["CV_CG_H_02"]
+        ),
+        axis=1
+
+        df_clean["Away"] = df_clean.apply(
+            lambda x: classificar_filtrox["Media_CG_A_01"], x["CV_CG_A_01"],
+            x["Media_CG_A_02"], x["CV_CG_A_02"]
+        ),
+        axis=1
 
         # =========================================
         # 📊 MONTA LISTA ORIGINAL (SEM QUEBRAR NADA)
