@@ -38,11 +38,11 @@ st.markdown("""
     font-family: 'Inter', sans-serif;
 }
 
-</style>
-""", unsafe_allow_html=True)
+st.markdown("""
+<style>
 
 /* ===========================================
-   🧠 TIPOGRAFIA
+   TIPOGRAFIA
 =========================================== */
 #app-root h1 {
     font-size: 46px !important;
@@ -55,13 +55,10 @@ st.markdown("""
 }
 
 /* ===========================================
-   📊 MÉTRICAS
+   METRICAS
 =========================================== */
 #app-root div[data-testid="metric-container"] label {
     font-size: 13px !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-    opacity: 0.6 !important;
     font-weight: 700 !important;
 }
 
@@ -69,6 +66,9 @@ st.markdown("""
     font-size: 42px !important;
     font-weight: 900 !important;
 }
+
+</style>
+""", unsafe_allow_html=True)
 
 /* ===========================================
    🚨 ALERTAS
