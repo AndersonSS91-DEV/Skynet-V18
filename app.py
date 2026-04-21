@@ -3132,8 +3132,20 @@ with tab7:
 {resultado['Motivo']}
 
 ━━━━━━━━━━━━━━━━━━
-🏠Home {home_emoji}   ⚔️   ✈️Away {away_emoji}
+🏠 Home {home_emoji}   ⚔️   ✈️ Away {away_emoji}
 """
+
+            # =========================================
+            # 🎨 RENDER DO CARD (ESSENCIAL)
+            # =========================================
+            if resultado["Classe"] == "A+":
+                st.success(texto)
+            elif resultado["Classe"] == "A":
+                st.success(texto)
+            elif resultado["Classe"] == "B":
+                st.warning(texto)
+            else:
+                st.info(texto)
 
 
         # =========================================
