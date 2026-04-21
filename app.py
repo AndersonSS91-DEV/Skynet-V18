@@ -3131,7 +3131,6 @@ with tab7:
 {detalhes}📊 Motivo:
 {resultado['Motivo']}
 
-━━━━━━━━━━━━━━━━━━
 🏠 Home {home_emoji}   ⚔️   ✈️ Away {away_emoji}
 """
 
