@@ -1,5 +1,5 @@
 # =========================================
-# STREAMLIT — POISSON SKYNET (HÍBRIDO)🚀🛸🚥🌋🗻⭐⭐⭐⭐⭐🌠🌠🌠🌠🌠❄☃🌬🌊🌊🌊🔥🔥🔥
+# STREAMLIT — POISSON SKYNET (HÍBRIDO)🚀🛸🚥🌋🗻⭐⭐⭐⭐⭐🌠🌠🌠🌠🌠❄☃🌬🌊🌊🌊🔥🔥🔥🌬
 # =========================================
 import streamlit as st
 import pandas as pd
@@ -3125,6 +3125,50 @@ with tab7:
             (base_df["Odds_Visitante"] > 0)
         ]
 
+        # =========================================
+        # 🎯 FUNÇÃO FILTRO VISUAL
+        # =========================================
+        def classificar_filtro(media, cv):
+
+            if media > 5.50:
+                return "🌊"
+
+            if media > 2.00 and cv > 0.80:
+                return "🌬"
+
+            if 2.80 <= media <= 5.50 and cv <= 0.80:
+                return "🌋"
+
+            if 2.70 <= media <= 3.00 and cv <= 0.90:
+                return "🚀"
+
+            if 2.70 <= media <= 3.00:
+                return "❄"
+
+            if 0.90 <= media <= 2.00 and cv <= 0.80:
+                return "🔥"
+
+            if media < 2.70:
+                return "☃"
+
+            return "—"
+
+        # =========================================
+        # 🔥 APLICA FILTRO VISUAL
+        # =========================================
+        df_clean["Home"] = df_clean.apply(
+            lambda x: classificar_filtro(x["Media_CG_H_01"], x["CV_CG_H_01"]),
+            axis=1
+        )
+
+        df_clean["Away"] = df_clean.apply(
+            lambda x: classificar_filtro(x["Media_CG_A_01"], x["CV_CG_A_01"]),
+            axis=1
+        )
+
+        # =========================================
+        # 📊 MONTA LISTA ORIGINAL (SEM QUEBRAR NADA)
+        # =========================================
         lista = []
 
         for _, row in df_clean.iterrows():
@@ -3132,6 +3176,8 @@ with tab7:
 
             if res:
                 lista.append({
+                    "Home": row["Home"],
+                    "Away": row["Away"],
                     "Jogo": f"{row.get('Home_Team','')} x {row.get('Visitor_Team','')}",
                     "Tipo": res["Tipo"],
                     "Entrada": res["Entrada"],
@@ -3139,7 +3185,18 @@ with tab7:
                     "HA_Value": row.get("HA_Value", "")
                 })
 
+        # =========================================
+        # 📈 OUTPUT FINAL
+        # =========================================
         if lista:
-            st.dataframe(pd.DataFrame(lista), use_container_width=True, hide_index=True)
+            df_final = pd.DataFrame(lista)
+
+            # joga Home/Away pra frente
+            cols = ["Home", "Away"] + [c for c in df_final.columns if c not in ["Home", "Away"]]
+            df_final = df_final[cols]
+
+            st.dataframe(df_final, use_container_width=True, hide_index=True)
         else:
             st.info("Sem jogos válidos após filtro")
+
+           
