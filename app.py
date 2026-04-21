@@ -1240,16 +1240,16 @@ with tab1:
             )
        
         # ===============================
-        # ⚽ PLACAR FT + HT (AJUSTADO E CENTRALIZADO)
+        # ⚽ PLACAR FT + HT (VERSÃO COMPACTA FLEXBOX)
         # ===============================
         with c2:
-            # pega valores
+            # Pega valores
             gols_home = linha_exg.get("Result Home", 0)
             gols_away = linha_exg.get("Result Visitor", 0)
             ht_home   = linha_exg.get("HT Home", 0)
             ht_away   = linha_exg.get("HT Away", 0)
 
-            # força inteiro
+            # Força inteiro
             try:
                 gols_home = int(float(gols_home))
                 gols_away = int(float(gols_away))
@@ -1258,36 +1258,24 @@ with tab1:
             except:
                 pass
 
-            # ---- FT (Linha de cima) ----
-            # Usamos proporções iguais [1, 1, 1] para centralizar o 'x' no meio exato da coluna c2
-            ft_l, ft_x, ft_r = st.columns([1, 1, 1], vertical_alignment="center")
-
-            with ft_l:
-                # text-align: right para encostar no 'x'
-                st.markdown(f"<div style='text-align:right; font-size:64px; font-weight:900; line-height:1;'>{gols_home}</div>", unsafe_allow_html=True)
-
-            with ft_x:
-                # text-align: center para ser o eixo
-                st.markdown("<div style='text-align:center; font-size:28px; opacity:0.5;'>x</div>", unsafe_allow_html=True)
-
-            with ft_r:
-                # text-align: left para encostar no 'x'
-                st.markdown(f"<div style='text-align:left; font-size:64px; font-weight:900; line-height:1;'>{gols_away}</div>", unsafe_allow_html=True)
-
-            # espaço pequeno controlado
-            st.markdown("<div style='height:0px'></div>", unsafe_allow_html=True)
-
-            # ---- HT (Linha de baixo) ----
-            ht_l, ht_x, ht_r = st.columns([1, 1, 1], vertical_alignment="center")
-
-            with ht_l:
-                st.markdown(f"<div style='text-align:right; font-size:28px; opacity:0.6;'>{ht_home}</div>", unsafe_allow_html=True)
-
-            with ht_x:
-                st.markdown("<div style='text-align:center; font-size:20px; opacity:0.4;'>x</div>", unsafe_allow_html=True)
-
-            with ht_r:
-                st.markdown(f"<div style='text-align:left; font-size:28px; opacity:0.6;'>{ht_away}</div>", unsafe_allow_html=True)
+            # HTML Único para Placar FT e HT
+            st.markdown(f"""
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                    <div style="display: flex; align-items: center; gap: 20px; line-height: 1;">
+                        <span style="font-size: 64px; font-weight: 900; min-width: 50px; text-align: right;">{gols_home}</span>
+                        <span style="font-size: 28px; opacity: 0.5;">x</span>
+                        <span style="font-size: 64px; font-weight: 900; min-width: 50px; text-align: left;">{gols_away}</span>
+                    </div>
+                    
+                    <div style="height: 5px;"></div>
+                    
+                    <div style="display: flex; align-items: center; gap: 15px; opacity: 0.6; line-height: 1;">
+                        <span style="font-size: 28px; min-width: 30px; text-align: right;">{ht_home}</span>
+                        <span style="font-size: 20px; opacity: 0.4;">x</span>
+                        <span style="font-size: 28px; min-width: 30px; text-align: left;">{ht_away}</span>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
                     
         # ===============================
         # 🛫 VISITANTE
