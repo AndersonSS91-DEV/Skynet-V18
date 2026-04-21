@@ -1239,35 +1239,54 @@ with tab1:
                 unsafe_allow_html=True
             )
 
-        # ===============================
-        # ⚽ PLACAR FT + HT (VISUAL LIMPO)
-        # ===============================
+
+       
                 # ===============================
-        # ⚽ PLACAR FT + HT (VERSÃO FINAL)
+        # ⚽ PLACAR FT + HT (ALINHADO E SEM HTML QUEBRADO)
         # ===============================
         with c2:
 
-            gols_home = int(float(linha_exg.get("Result Home", 0)))
-            gols_away = int(float(linha_exg.get("Result Visitor", 0)))
+            # pega valores
+            gols_home = linha_exg.get("Result Home", 0)
+            gols_away = linha_exg.get("Result Visitor", 0)
+            ht_home   = linha_exg.get("HT Home", 0)
+            ht_away   = linha_exg.get("HT Away", 0)
 
-            ht_home = int(float(linha_exg.get("HT Home", 0)))
-            ht_away = int(float(linha_exg.get("HT Away", 0)))
+            # força inteiro
+            try:
+                gols_home = int(float(gols_home))
+                gols_away = int(float(gols_away))
+                ht_home   = int(float(ht_home))
+                ht_away   = int(float(ht_away))
+            except:
+                pass
 
-            html = f"""
-<div style="text-align:center;">
+            # ---- FT (linha de cima) ----
+            ft_l, ft_x, ft_r = st.columns([1, 0.6, 1], vertical_alignment="center")
 
-    <div style="font-size:64px; font-weight:900; line-height:1;">
-        {gols_home} <span style="font-size:28px; opacity:0.5;">x</span> {gols_away}
-    </div>
+            with ft_l:
+                st.markdown(f"<div style='text-align:center; font-size:64px; font-weight:900;'>{gols_home}</div>", unsafe_allow_html=True)
 
-    <div style="font-size:20px; opacity:0.6; margin-top:4px;">
-        {ht_home} x {ht_away}
-    </div>
+            with ft_x:
+                st.markdown("<div style='text-align:center; font-size:28px; opacity:0.5;'>x</div>", unsafe_allow_html=True)
 
-</div>
-"""
+            with ft_r:
+                st.markdown(f"<div style='text-align:center; font-size:64px; font-weight:900;'>{gols_away}</div>", unsafe_allow_html=True)
 
-            st.markdown(html, unsafe_allow_html=True)
+            # espaço pequeno controlado
+            st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+
+            # ---- HT (linha de baixo, MESMO GRID) ----
+            ht_l, ht_x, ht_r = st.columns([1, 0.6, 1], vertical_alignment="center")
+
+            with ht_l:
+                st.markdown(f"<div style='text-align:center; font-size:20px; opacity:0.6;'>{ht_home}</div>", unsafe_allow_html=True)
+
+            with ht_x:
+                st.markdown("<div style='text-align:center; font-size:16px; opacity:0.4;'>x</div>", unsafe_allow_html=True)
+
+            with ht_r:
+                st.markdown(f"<div style='text-align:center; font-size:20px; opacity:0.6;'>{ht_away}</div>", unsafe_allow_html=True)
 
         # ===============================
         # 🛫 VISITANTE
