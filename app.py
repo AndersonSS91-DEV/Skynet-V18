@@ -1258,34 +1258,51 @@ with tab1:
             except:
                 pass
 
-            # container central
-            st.markdown("<div style='text-align:center; padding-top:10px;'>", unsafe_allow_html=True)
+            st.markdown(
+                f"""
+                <div style="
+                    display:flex;
+                    flex-direction:column;
+                    align-items:center;
+                    justify-content:center;
+                    height:140px;
+                ">
 
-            # ===== FT =====
-            col1, col2, col3 = st.columns([3,1,3])
+                    <!-- FT -->
+                    <div style="
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        gap:18px;
+                        font-size:64px;
+                        font-weight:900;
+                        line-height:1;
+                    ">
+                        <span>{gols_home}</span>
+                        <span style="font-size:28px; opacity:0.5; transform: translateY(6px);">x</span>
+                        <span>{gols_away}</span>
+                    </div>
 
-            with col1:
-                st.markdown(f"<div style='font-size:64px; font-weight:900;'>{gols_home}</div>", unsafe_allow_html=True)
+                    <!-- HT -->
+                    <div style="
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        gap:12px;
+                        font-size:20px;
+                        opacity:0.6;
+                        margin-top:4px;
+                        line-height:1;
+                    ">
+                        <span>{ht_home}</span>
+                        <span style="transform: translateY(-1px);">x</span>
+                        <span>{ht_away}</span>
+                    </div>
 
-            with col2:
-                st.markdown("<div style='font-size:26px; opacity:0.5; margin-top:20px;'>x</div>", unsafe_allow_html=True)
-
-            with col3:
-                st.markdown(f"<div style='font-size:64px; font-weight:900;'>{gols_away}</div>", unsafe_allow_html=True)
-
-            # ===== HT =====
-            col4, col5, col6 = st.columns([3,1,3])
-
-            with col4:
-                st.markdown(f"<div style='font-size:20px; opacity:0.6;'>{ht_home}</div>", unsafe_allow_html=True)
-
-            with col5:
-                st.markdown("<div style='font-size:16px; opacity:0.4;'>x</div>", unsafe_allow_html=True)
-
-            with col6:
-                st.markdown(f"<div style='font-size:20px; opacity:0.6;'>{ht_away}</div>", unsafe_allow_html=True)
-
-            st.markdown("</div>", unsafe_allow_html=True)
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
         # ===============================
         # 🛫 VISITANTE
