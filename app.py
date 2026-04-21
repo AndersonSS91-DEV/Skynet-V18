@@ -1271,45 +1271,47 @@ with tab1:
 
     st.markdown("---")
 
-    # =========================================
-    # ⚽ CARD PLACAR CENTRAL
-    # =========================================
-    gols_home = to_int_safe(linha_exg.get("Result Home"))
-    gols_away = to_int_safe(linha_exg.get("Result Visitor"))
+# =========================================
+# ⚽ CARD PLACAR (STREAMLIT PURO)
+# =========================================
 
-    ht_home = to_int_safe(linha_exg.get("HT Home"))
-    ht_away = to_int_safe(linha_exg.get("HT Away"))
+gols_home = to_int_safe(linha_exg.get("Result Home"))
+gols_away = to_int_safe(linha_exg.get("Result Visitor"))
 
-    st.markdown(f"""
-    <div style="
-        background: white;
-        border-radius: 16px;
-        padding: 20px 10px;
-        margin-top: 10px;
-        text-align: center;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-    ">
+ht_home = to_int_safe(linha_exg.get("HT Home"))
+ht_away = to_int_safe(linha_exg.get("HT Away"))
 
-        <!-- FT -->
-        <div style="
-            font-size:48px;
-            font-weight:900;
-            color:#111;
-        ">
-            {gols_home} <span style="opacity:0.5;">x</span> {gols_away}
-        </div>
+card = st.container()
 
-        <!-- HT -->
-        <div style="
-            font-size:20px;
-            margin-top:6px;
-            color:#555;
-        ">
-            {ht_home} x {ht_away}
-        </div>
+with card:
 
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("")
+
+    # ===== FT =====
+    c1, c2, c3 = st.columns([3,1,3])
+
+    with c1:
+        st.markdown(f"### {gols_home}")
+
+    with c2:
+        st.markdown("### x")
+
+    with c3:
+        st.markdown(f"### {gols_away}")
+
+    # ===== HT =====
+    c4, c5, c6 = st.columns([3,1,3])
+
+    with c4:
+        st.markdown(f"{ht_home}")
+
+    with c5:
+        st.markdown("x")
+
+    with c6:
+        st.markdown(f"{ht_away}")
+
+    st.markdown("---")
     
 # ===== ODDS (RESTAURADAS) =====
     st.markdown("### 🎯 Odds")
