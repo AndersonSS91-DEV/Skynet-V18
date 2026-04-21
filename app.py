@@ -1240,7 +1240,7 @@ with tab1:
             )
 
         # ===============================
-        # ⚽ PLACAR FT + HT
+        # ⚽ PLACAR FT + HT (SEM HTML)
         # ===============================
         with c2:
 
@@ -1250,7 +1250,7 @@ with tab1:
             ht_home = linha_exg.get("HT Home", 0)
             ht_away = linha_exg.get("HT Away", 0)
 
-            # garante inteiro (sem 2.0)
+            # força inteiro
             try:
                 gols_home = int(float(gols_home))
                 gols_away = int(float(gols_away))
@@ -1259,22 +1259,29 @@ with tab1:
             except:
                 pass
 
-            st.markdown(
-                f"""
-<div style="text-align:center; margin-top:10px;">
+            # ===== FT =====
+            col_a, col_x, col_b = st.columns([1,1,1])
 
-    <div style="font-size:52px; font-weight:900;">
-        {gols_home} <span style="opacity:0.5;">x</span> {gols_away}
-    </div>
+            with col_a:
+                st.markdown(f"<h1 style='text-align:center'>{gols_home}</h1>", unsafe_allow_html=True)
 
-    <div style="font-size:22px; opacity:0.7; margin-top:4px;">
-        {ht_home} x {ht_away}
-    </div>
+            with col_x:
+                st.markdown("<h3 style='text-align:center; opacity:0.6'>x</h3>", unsafe_allow_html=True)
 
-</div>
-""",
-                unsafe_allow_html=True
-            )
+            with col_b:
+                st.markdown(f"<h1 style='text-align:center'>{gols_away}</h1>", unsafe_allow_html=True)
+
+            # ===== HT =====
+            col_a2, col_x2, col_b2 = st.columns([1,1,1])
+
+            with col_a2:
+                st.markdown(f"<div style='text-align:center; opacity:0.7'>{ht_home}</div>", unsafe_allow_html=True)
+
+            with col_x2:
+                st.markdown("<div style='text-align:center; opacity:0.5'>x</div>", unsafe_allow_html=True)
+
+            with col_b2:
+                st.markdown(f"<div style='text-align:center; opacity:0.7'>{ht_away}</div>", unsafe_allow_html=True)
 
         # ===============================
         # 🛫 VISITANTE
