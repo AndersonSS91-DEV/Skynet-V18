@@ -21,8 +21,6 @@ import unicodedata
 # =========================================
 # CONFIG  
 # =========================================
-st.write("VERSAO TESTE 123")
-
 st.set_page_config(
     page_title="⚽🏆Poisson Skynet V30.1🏆⚽",
     layout="wide"
@@ -1211,7 +1209,19 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
 
 
 # =========================================
-# ABA 1 — RESUMO >>>>>>. ESCUDOS QUASE PERFEITOS >>>>> SALVAR ESSE CÓDIGO
+# 🔒 FUNÇÃO SEGURA (NÃO QUEBRA COM DADO SUJO)
+# =========================================
+def to_int_safe(v):
+    try:
+        if pd.isna(v) or str(v).strip() == "":
+            return "-"
+        return int(float(v))
+    except:
+        return "-"
+
+
+# =========================================
+# ABA 1 — RESUMO
 # =========================================
 with tab1:
 
@@ -1231,50 +1241,76 @@ with tab1:
         # ===============================
         with c1:
             st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-
             st.image(esc_home, width=105)
-
             st.markdown(
                 f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>",
                 unsafe_allow_html=True
             )
 
-        
         # ===============================
         # ⚔️ VS
         # ===============================
         with c2:
             st.markdown(
-                """
-                <div style='
-                    text-align: center; 
-                    font-size: 34px; 
-                    font-weight: 900; 
-                    margin-top: 55px; 
-                    margin-right: 240px;
-                '>
-                    VS
-                </div>
-                """,
+                "<div style='text-align:center;font-size:28px;font-weight:900;margin-top:55px;'>VS</div>",
                 unsafe_allow_html=True
             )
 
-                    
         # ===============================
         # 🛫 VISITANTE
         # ===============================
         with c3:
             st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-
             st.image(esc_away, width=105)
-
             st.markdown(
                 f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>",
                 unsafe_allow_html=True
             )
-  
+
     st.markdown("---")
 
+# =========================================
+# ⚽ CARD PLACAR (SIMPLES E ALINHADO)
+# =========================================
+
+gols_home = to_int_safe(linha_exg.get("Result Home"))
+gols_away = to_int_safe(linha_exg.get("Result Visitor"))
+
+ht_home = to_int_safe(linha_exg.get("HT Home"))
+ht_away = to_int_safe(linha_exg.get("HT Away"))
+
+with st.container():
+
+    st.markdown("")  # respiro
+
+    # CENTRALIZA O BLOCO
+    _, center, _ = st.columns([1,2,1])
+
+    with center:
+
+        # FT
+        col1, col2, col3 = st.columns([3,1,3])
+
+        with col1:
+            st.markdown(f"<h1 style='text-align:center'>{gols_home}</h1>", unsafe_allow_html=True)
+
+        with col2:
+            st.markdown("<h3 style='text-align:center; opacity:0.6'>x</h3>", unsafe_allow_html=True)
+
+        with col3:
+            st.markdown(f"<h1 style='text-align:center'>{gols_away}</h1>", unsafe_allow_html=True)
+
+        # HT
+        col4, col5, col6 = st.columns([3,1,3])
+
+        with col4:
+            st.markdown(f"<div style='text-align:center; opacity:0.6'>{ht_home}</div>", unsafe_allow_html=True)
+
+        with col5:
+            st.markdown("<div style='text-align:center; opacity:0.4'>x</div>", unsafe_allow_html=True)
+
+        with col6:
+            st.markdown(f"<div style='text-align:center; opacity:0.6'>{ht_away}</div>", unsafe_allow_html=True)
     
 # ===== ODDS (RESTAURADAS) =====
     st.markdown("### 🎯 Odds")
@@ -3112,28 +3148,6 @@ with tab7:
             if resultado.get("Risco"):
                 detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
 
-            texto = f"""
-🧠 Tipo: {resultado['Tipo']}
-🎯 Entrada: {resultado['Entrada']}
-⏱️ Momento: {resultado['Momento']}
-🏷️ Classe: {resultado['Classe']}
-
-{detalhes}📊 Motivo:
-{resultado['Motivo']}
-"""
-
-            if resultado["Classe"] == "A+":
-                st.success(texto)
-            elif resultado["Classe"] == "A":
-                st.success(texto)
-            elif resultado["Classe"] == "B":
-                st.warning(texto)
-            else:
-                st.info(texto)
-
-            # =========================================
-            # 🎯 EMOJIS VISUAIS (ABAIXO DO CARD)
-            # =========================================
             home_emoji = classificar_filtro_duplo(
                 linha_mgf["Media_CG_H_01"], linha_mgf["CV_CG_H_01"],
                 linha_mgf["Media_CG_H_02"], linha_mgf["CV_CG_H_02"]
@@ -3144,23 +3158,30 @@ with tab7:
                 linha_mgf["Media_CG_A_02"], linha_mgf["CV_CG_A_02"]
             )
 
-            st.markdown(f"""
-<div style="
-    margin-top:-10px;
-    padding:8px 12px;
-    border-radius:8px;
-    background: rgba(0,0,0,0.25);
-    display:flex;
-    justify-content:space-between;
-    font-size:18px;
-    font-weight:700;
-">
-    <span>🏠 {home_emoji}</span>
-    <span>⚔️</span>
-    <span>✈️ {away_emoji}</span>
-</div>
-""", unsafe_allow_html=True)
-                
+            texto = f"""
+🧠 Tipo: {resultado['Tipo']}
+🎯 Entrada: {resultado['Entrada']}
+⏱️ Momento: {resultado['Momento']}
+🏷️ Classe: {resultado['Classe']}
+
+{detalhes}📊 Motivo:
+{resultado['Motivo']}
+
+🏠 Home {home_emoji}   ⚔️   ✈️ Away {away_emoji}
+"""
+
+            # =========================================
+            # 🎨 RENDER DO CARD (ESSENCIAL)
+            # =========================================
+            if resultado["Classe"] == "A+":
+                st.success(texto)
+            elif resultado["Classe"] == "A":
+                st.success(texto)
+            elif resultado["Classe"] == "B":
+                st.warning(texto)
+            else:
+                st.info(texto)
+
 
         # =========================================
         # 📊 RANKING IA
