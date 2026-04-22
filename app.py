@@ -3125,7 +3125,7 @@ with tab7:
 {detalhes}📊 Motivo:
 {resultado['Motivo']}
 
-Home {home_emoji}   VS   Away {away_emoji}
+Home {home_emoji}   x   Away {away_emoji}
 """
 
             # =========================================
