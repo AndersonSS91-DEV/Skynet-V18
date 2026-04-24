@@ -3196,7 +3196,10 @@ Home {home_emoji}   x   Away {away_emoji}
                 lista.append({
                     "Home": row["Home"],
                     "Away": row["Away"],
-                    "Jogo": f"{row.get('Home_Team','')} x {row.get('Visitor_Team','')}",
+                    "Home_Team": row.get("Home_Team", ""),
+                    "Away_Team": row.get("Visitor_Team", ""),
+                    "Placar FT": f"{row.get('Result Home', 0)} x {row.get('Result Visitor', 0)}",
+                    "Placar HT": f"{row.get('Result_Home_HT', 0)} x {row.get('Result_Visitor_HT', 0)}",
                     "Tipo": res["Tipo"],
                     "Entrada": res["Entrada"],
                     "Classe": res["Classe"],
@@ -3210,7 +3213,7 @@ Home {home_emoji}   x   Away {away_emoji}
             df_final = pd.DataFrame(lista)
 
             # joga Home/Away pra frente
-            cols = ["Home", "Away"] + [c for c in df_final.columns if c not in ["Home", "Away"]]
+            cols = ["Home", "Away","Home_Team", "Away_Team","Placar", "HT","Tipo", "Entrada", "Classe", "HA_Value"]
             df_final = df_final[cols]
 
             st.dataframe(df_final, use_container_width=True, hide_index=True)
