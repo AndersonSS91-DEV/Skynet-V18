@@ -3198,8 +3198,10 @@ Home {home_emoji}   x   Away {away_emoji}
                     "Away": row["Away"],
                     "Home_Team": row.get("Home_Team", ""),
                     "Away_Team": row.get("Visitor_Team", ""),
-                    "Placar FT": f"{row.get('Result Home', 0)} x {row.get('Result Visitor', 0)}",
-                    "Placar HT": f"{row.get('Result_Home_HT', 0)} x {row.get('Result_Visitor_HT', 0)}",
+                    "Placar": ("-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
+                    else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"),
+                    "HT": ("-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
+                    else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"),
                     "Tipo": res["Tipo"],
                     "Entrada": res["Entrada"],
                     "Classe": res["Classe"],
