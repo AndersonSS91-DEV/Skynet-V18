@@ -3075,11 +3075,6 @@ def classificar_filtro_duplo(media1, cv1, media2, cv2):
 # =========================================
 # 🔥 FUNÇÕES AUXILIARES
 # =========================================
-
-# =========================================
-# 🔥 FUNÇÕES AUXILIARES
-# =========================================
-
 def definir_lay(row):
 
     odd_home = row.get("Odds_Casa", 0)
