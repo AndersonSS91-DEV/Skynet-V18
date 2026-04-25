@@ -3082,22 +3082,24 @@ def definir_lay(row):
     over = row.get("Odds_Over_2,5FT", 0)
     ha = str(row.get("HA_Value", ""))
 
-    # evita erro com NaN ou zero
     if odd_home == 0 or odd_away == 0 or over == 0:
         return "—"
 
     if "Ignorar" in ha:
         return "❌ Evitar"
 
-    # 🔥 Lay Away PRO (contra visitante)
+    # 🔴 REGRA PRINCIPAL (OBRIGATÓRIA)
+    if odd_home > 1.90:
+        return "❌ Fora padrão"   # 👈 ISSO RESOLVE SEU PROBLEMA
+
+    # 🔥 Lay Away PRO
     if (
-        odd_home <= 1.90 and
         over >= 1.60 and
         2.20 <= odd_away <= 5.00
     ):
         return "🔥 Lay Away PRO"
 
-    # 🟡 Lay Away padrão
+    # 🟡 Lay Away
     if odd_away <= 6.00:
         return "🟡 Lay Away"
 
