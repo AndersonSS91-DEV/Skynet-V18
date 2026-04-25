@@ -3091,12 +3091,12 @@ def definir_lay(row):
     if (
         odd_home <= 1.90 and
         over >= 1.60 and
-        2.20 <= odd_away <= 3.20
+        2.20 <= odd_away <= 5.00
     ):
         return "🔥 Lay Away PRO"
 
     # 🟡 aceitável
-    if odd_away <= 4.50:
+    if odd_away <= 6.00:
         return "🟡 Lay Away"
 
     return "⚠️ Fraco"
