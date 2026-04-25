@@ -3112,7 +3112,7 @@ def definir_lay(row):
     if 5.01 <= odd_away <= 6.00:
         return "🟡 Lay Away"
 
-    return "⚠️ Fraco"
+    return "⚠️Lay Away (Atenção)"
 
 # =========================================
 # 🚀 ABA IA FINAL
