@@ -3078,28 +3078,16 @@ def classificar_filtro_duplo(media1, cv1, media2, cv2):
 
 def definir_lay(row):
 
-    odd_home = row.get("Odds_Casa", 0)
-    odd_away = row.get("Odds_Visitante", 0)
-    over = row.get("Odds_Over_2,5FT", 0)
-    ha = str(row.get("HA_Value", ""))
-
-    # 🔴 ignorar extremos
-    if "Ignorar" in ha:
-        return "❌ Evitar"
-
-    # 🔥 cenário ideal Lay Away
-    if (
-        odd_home <= 1.90 and
+    "LAY_DECISAO": (
+    "❌ Evitar" if "Ignorar" in str(row.get("HA_Value", "")) else
+    "🔥 Lay contra " + favorito if (
+        min(odd_home, odd_away) <= 1.90 and
         over >= 1.60 and
-        2.20 <= odd_away <= 5.00
-    ):
-        return "🔥 Lay Away PRO"
-
-    # 🟡 aceitável
-    if odd_away <= 6.00:
-        return "🟡 Lay Away"
-
-    return "⚠️ Fraco"
+        2.20 <= zebra_odd <= 3.20
+    ) else
+    "🟡 Lay contra " + favorito if zebra_odd <= 4.50
+    else "⚠️ Fraco"
+),
 
 # =========================================
 # 🚀 ABA IA FINAL
