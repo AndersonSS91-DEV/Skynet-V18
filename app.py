@@ -3076,12 +3076,16 @@ def classificar_filtro_duplo(media1, cv1, media2, cv2):
 # 🔥 FUNÇÕES AUXILIARES
 # =========================================
 
-def definir_lay(row):
+def "LAY_DECISAO": definir_lay(row):
 
-    odd_home = row["Odds_Casa"]
-    odd_away = row["Odds_Visitante"]
-    over = row["Odds_Over_2,5FT"]
+    odd_home = row.get("Odds_Casa", 0)
+    odd_away = row.get("Odds_Visitante", 0)
+    over = row.get("Odds_Over_2,5FT", 0)
     ha = str(row.get("HA_Value", ""))
+
+    # evita erro com NaN ou zero
+    if odd_home == 0 or odd_away == 0 or over == 0:
+        return "—"
 
     if "Ignorar" in ha:
         return "❌ Evitar"
