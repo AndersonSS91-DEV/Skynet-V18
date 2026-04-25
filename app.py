@@ -3092,6 +3092,10 @@ def definir_lay(row):
     if "Ignorar" in ha:
         return "❌ Evitar"
 
+    # 🚫 visitante favorito (BUG PRINCIPAL)
+    if odd_away < odd_home:
+        return "❌ Away favorito"
+
     # 🚫 BLOQUEIO: AWAY forte (🌋)
     if (2.80 <= cg_away <= 5.50 and cv_away <= 0.80):
         return "❌ Away forte (🌋)"
@@ -3104,8 +3108,8 @@ def definir_lay(row):
     ):
         return "🔥 Lay Away PRO"
 
-    # 🟡 Lay Away
-    if odd_away <= 6.00:
+    # 🟡 Lay Away (AGORA SEGURO)
+    if 2.20 <= odd_away <= 6.00:
         return "🟡 Lay Away"
 
     return "⚠️ Fraco"
