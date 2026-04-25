@@ -3071,6 +3071,35 @@ def classificar_filtro_duplo(media1, cv1, media2, cv2):
         emojis.append("🌬")
 
     return "".join(emojis) if emojis else "—"
+    
+# =========================================
+# 🔥 FUNÇÕES AUXILIARES
+# =========================================
+
+def definir_lay(row):
+
+    odd_home = row.get("Odds_Casa", 0)
+    odd_away = row.get("Odds_Visitante", 0)
+    over = row.get("Odds_Over_2,5FT", 0)
+    ha = str(row.get("HA_Value", ""))
+
+    # 🔴 ignorar extremos
+    if "Ignorar" in ha:
+        return "❌ Evitar"
+
+    # 🔥 cenário ideal Lay Away
+    if (
+        odd_home <= 1.90 and
+        over >= 1.60 and
+        2.20 <= odd_away <= 3.20
+    ):
+        return "🔥 Lay Away PRO"
+
+    # 🟡 aceitável
+    if odd_away <= 4.50:
+        return "🟡 Lay Away"
+
+    return "⚠️ Fraco"
 
 # =========================================
 # 🚀 ABA IA FINAL
@@ -3205,6 +3234,7 @@ Home {home_emoji}   x   Away {away_emoji}
                     "Tipo": res["Tipo"],
                     "Entrada": res["Entrada"],
                     "Classe": res["Classe"],
+                    "LAY_DECISAO": definir_lay(row)
                     "HA_Value": row.get("HA_Value", "")
                 })
 
@@ -3215,7 +3245,7 @@ Home {home_emoji}   x   Away {away_emoji}
             df_final = pd.DataFrame(lista)
 
             # joga Home/Away pra frente
-            cols = ["Home", "Away","Home_Team", "Away_Team","Placar", "HT","Tipo", "Entrada", "Classe", "HA_Value"]
+            cols = ["Home", "Away","Home_Team", "Away_Team","Placar", "HT","Tipo", "Entrada", "Classe", "LAY_DECISAO", "HA_Value"]
             df_final = df_final[cols]
 
             st.dataframe(df_final, use_container_width=True, hide_index=True)
