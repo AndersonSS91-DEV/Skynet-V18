@@ -3082,18 +3082,23 @@ def definir_lay(row):
     over = row.get("Odds_Over_2,5FT", 0)
     ha = str(row.get("HA_Value", ""))
 
+    cg_away = row.get("Media_CG_A_01", 0)
+    cv_away = row.get("CV_CG_A_01", 1)
+
+    # dados inválidos
     if odd_home == 0 or odd_away == 0 or over == 0:
         return "—"
 
     if "Ignorar" in ha:
         return "❌ Evitar"
 
-    # 🔴 REGRA PRINCIPAL (OBRIGATÓRIA)
-    if odd_home > 1.90:
-        return "❌ Fora padrão"   # 👈 ISSO RESOLVE SEU PROBLEMA
+    # 🚫 BLOQUEIO: AWAY forte (🌋)
+    if (2.80 <= cg_away <= 5.50 and cv_away <= 0.80):
+        return "❌ Away forte (🌋)"
 
     # 🔥 Lay Away PRO
     if (
+        odd_home <= 1.90 and
         over >= 1.60 and
         2.20 <= odd_away <= 5.00
     ):
