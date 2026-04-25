@@ -3084,6 +3084,7 @@ def definir_lay(row):
 
     cg_away = row.get("Media_CG_A_01", 0)
     cv_away = row.get("CV_CG_A_01", 1)
+    FAH = row.get("FAH", 0)
 
     # dados inválidos
     if odd_home == 0 or odd_away == 0 or over == 0:
@@ -3092,13 +3093,17 @@ def definir_lay(row):
     if "Ignorar" in ha:
         return "❌ Evitar"
 
-    # 🚫 visitante favorito (BUG PRINCIPAL)
+    # 🚫 visitante favorito
     if odd_away < odd_home:
         return "❌ Away favorito"
 
     # 🚫 BLOQUEIO: AWAY forte (🌋)
     if (2.80 <= cg_away <= 5.50 and cv_away <= 0.80):
         return "❌ Away forte (🌋)"
+
+    # 🚫 FAA baixo (novo filtro)
+    if FAH < 50:
+        return "❌ FAA baixo"
 
     # 🔥 Lay Away PRO
     if (
@@ -3108,8 +3113,8 @@ def definir_lay(row):
     ):
         return "🔥 Lay Away PRO"
 
-    # 🟡 Lay Away (AGORA SEGURO)
-    if 2.20 <= odd_away <= 6.00:
+    # 🟡 Lay Away
+    if 5.01 <= odd_away <= 6.00:
         return "🟡 Lay Away"
 
     return "⚠️ Fraco"
