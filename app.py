@@ -3083,27 +3083,20 @@ def definir_lay(row):
     over = row["Odds_Over_2,5FT"]
     ha = str(row.get("HA_Value", ""))
 
-    # identificar favorito
-    if odd_home < odd_away:
-        favorito = "Casa"
-        zebra_odd = odd_away
-    else:
-        favorito = "Visitante"
-        zebra_odd = odd_home
-
-    # lógica
     if "Ignorar" in ha:
         return "❌ Evitar"
 
+    # 🔥 Lay Away PRO (contra visitante)
     if (
-        min(odd_home, odd_away) <= 1.90 and
+        odd_home <= 1.90 and
         over >= 1.60 and
-        2.20 <= zebra_odd <= 3.20
+        2.20 <= odd_away <= 5.00
     ):
-        return f"🔥 Lay contra {favorito}"
+        return "🔥 Lay Away PRO"
 
-    if zebra_odd <= 4.50:
-        return f"🟡 Lay contra {favorito}"
+    # 🟡 Lay Away padrão
+    if odd_away <= 6.00:
+        return "🟡 Lay Away"
 
     return "⚠️ Fraco"
 
