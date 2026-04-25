@@ -3234,7 +3234,7 @@ Home {home_emoji}   x   Away {away_emoji}
                     "Tipo": res["Tipo"],
                     "Entrada": res["Entrada"],
                     "Classe": res["Classe"],
-                    "LAY_DECISAO": definir_lay(row)
+                    "LAY_DECISAO": definir_lay(row),
                     "HA_Value": row.get("HA_Value", "")
                 })
 
