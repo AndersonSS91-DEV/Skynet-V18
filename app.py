@@ -1750,14 +1750,14 @@ with tab1:
         )
         
 # =========================================
-# 🧠💀 POISSON INTELLIGENCE CENTER
+# 🧠💀 POISSON INTELLIGENCE CENTER -MODELANDO
 # =========================================
 
 st.markdown("### 🧠💀 Consenso Poisson")
 
 try:
 
-    idx = linha_mgf.name  # 🔥 ESSENCIAL
+    idx = linha_mgf.name  # índice da linha no base_df
 
     matriz_mgf = calcular_matriz_poisson(
         linha_mgf["ExG_Home_MGF"],
@@ -1798,9 +1798,22 @@ try:
     direcao = list(set(direcao))
 
     # =============================
-    # SCORE POISSON
+    # SCORE POISSON (AGORA CORRETO)
     # =============================
 
+    lambda_home = np.mean([
+        linha_mgf["ExG_Home_MGF"],
+        linha_exg["ExG_Home_ATKxDEF"],
+        linha_vg["ExG_Home_VG"]
+    ])
+
+    lambda_away = np.mean([
+        linha_mgf["ExG_Away_MGF"],
+        linha_exg["ExG_Away_ATKxDEF"],
+        linha_vg["ExG_Away_VG"]
+    ])
+
+    matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
     score = poisson_score(matriz_consenso)
 
     if score > 75:
@@ -1810,21 +1823,32 @@ try:
     else:
         leitura_score = "⚔️ Jogo imprevisível"
 
-    # 🔥 SALVA NO DATAFRAME (AQUI É O PULO DO GATO)
-    base_df.loc[idx, "Score"] = round(score, 1)
-    base_df.loc[idx, "Leitura"] = leitura_score
-    base_df.loc[idx, "Estrutura"] = " | ".join(estrutura)
-    base_df.loc[idx, "Mercado"] = " | ".join(mercado)
-    base_df.loc[idx, "Direcao"] = " | ".join(direcao)
-    base_df.loc[idx, "Consenso"] = " | ".join(consenso)
+    # =============================
+    # 🔥 GARANTE COLUNAS
+    # =============================
+
+    for col in ["Score","Leitura","Estrutura","Mercado","Direcao","Consenso"]:
+        if col not in base_df.columns:
+            base_df[col] = ""
 
     # =============================
-    # UI
+    # 🔥 SALVA (SEM QUEBRAR)
+    # =============================
+
+    base_df.at[idx, "Score"] = round(score, 1)
+    base_df.at[idx, "Leitura"] = leitura_score
+    base_df.at[idx, "Estrutura"] = " | ".join(estrutura)
+    base_df.at[idx, "Mercado"] = " | ".join(mercado)
+    base_df.at[idx, "Direcao"] = " | ".join(direcao)
+    base_df.at[idx, "Consenso"] = " | ".join(consenso)
+
+    # =============================
+    # UI (INALTERADA)
     # =============================
 
     linhas = []
 
-    linhas.append(f"🎯 Score Poisson: {score} — {leitura_score}")
+    linhas.append(f"🎯 Score Poisson: {round(score,1)} — {leitura_score}")
 
     if estrutura:
         linhas.append("⚽ Estrutura de gols\n" + " | ".join(estrutura))
@@ -1841,9 +1865,10 @@ try:
     if linhas:
         st.error("\n\n".join(linhas))
 
-except:
-    pass
-        
+except Exception as e:
+    print("ERRO POISSON:", e)
+
+
 # =========================================
 # ABA 2 — DADOS COMPLETOS
 # =========================================
@@ -3213,7 +3238,7 @@ Home {home_emoji}   x   Away {away_emoji}
         # =========================================
         st.markdown("### 📋 Todos os Jogos Filtrados")
 
-        df_clean = base_df[
+        df_clean = base_df.copy[
             (base_df["Odd_BTTS_YES"] > 0) &
             (base_df["Odds_Over_2,5FT"] > 0) &
             (base_df["Odds_Casa"] > 0) &
@@ -3238,29 +3263,6 @@ Home {home_emoji}   x   Away {away_emoji}
             ),
             axis=1
         )
-
-        # =========================================
-        # 🧠 FUNÇÃO CARD POISSON (NÃO QUEBRA NADA)
-        # =========================================
-def gerar_card_linha(row):
-    try:
-        return {
-            "Score": "",
-            "Leitura": "",
-            "Estrutura": "",
-            "Mercado": "",
-            "Direcao": "",
-            "Consenso": ""
-        }
-    except:
-        return {
-            "Score": "",
-            "Leitura": "",
-            "Estrutura": "",
-            "Mercado": "",
-            "Direcao": "",
-            "Consenso": ""
-        }
 
         # =========================================
         # 📊 MONTA LISTA ORIGINAL (SEM QUEBRAR NADA)
