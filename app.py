@@ -3277,7 +3277,7 @@ with tab7:
     base_df["Direcao_Poisson"] = base_df.apply(calcular_direcao_row, axis=1)
 
     # =========================================
-    # 🔥 CONVERSÃO DAS ODDS (CORREÇÃO)
+    # 🔥 CONVERSÃO DAS ODDS (CORRETA)
     # =========================================
     cols_odds = [
         "Odd_BTTS_YES",
@@ -3287,10 +3287,15 @@ with tab7:
     ]
 
     for col in cols_odds:
+        base_df[col] = (
+            base_df[col]
+            .astype(str)
+            .str.replace(",", ".", regex=False)
+        )
         base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
 
     # =========================================
-    # 🔍 FILTRO BASE (AGORA FUNCIONA)
+    # 🔍 FILTRO BASE (AGORA IGUAL AO ORIGINAL)
     # =========================================
     df_clean = base_df[
         (base_df["Odd_BTTS_YES"] > 0) &
