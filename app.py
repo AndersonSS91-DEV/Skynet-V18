@@ -259,34 +259,6 @@ def direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg):
         return f"⚠️ {direcao_final} ({round(confianca*100)}%)"
 
     return ""
-# =========================================
-# 🎯 FUNÇÃO FILTRO VISUAL (MULTI-EMOJI)
-# =========================================
-def classificar_filtro_duplo(media1, cv1, media2, cv2):
-
-    emojis = []
-
-    # CG_01
-    if media1 < 2.00:
-        emojis.append("☃")
-    elif 2.00 <= media1 < 2.70:
-        emojis.append("🟨")
-    elif 2.70 <= media1 <= 3.00 and cv1 <= 0.90:
-        emojis.append("🚀")
-    elif 2.80 <= media1 <= 5.50 and cv1 <= 0.80:
-        emojis.append("🌋")
-    elif media1 > 5.50:
-        emojis.append("🌊")
-
-    # CG_02
-    if media2 < 0.90:
-        emojis.append("❄")
-    elif 0.90 <= media2 <= 2.00 and cv2 <= 0.80:
-        emojis.append("🔥")
-    elif media2 > 2.00:
-        emojis.append("🌬")
-
-    return "".join(emojis) if emojis else "—"
     
 # =========================================
 # 🎬 BANNER CARROSSEL (OFICIAL SKYNET)
