@@ -3251,36 +3251,36 @@ def gerar_card_linha(row):
 # =========================================
 st.markdown("### 📋 Todos os Jogos Filtrados")
 
-        df_clean = base_df[
-        (base_df["Odd_BTTS_YES"] > 0) &
-        (base_df["Odds_Over_2,5FT"] > 0) &
-        (base_df["Odds_Casa"] > 0) &
-        (base_df["Odds_Visitante"] > 0)
-        ].copy()
+df_clean = base_df[
+    (base_df["Odd_BTTS_YES"] > 0) &
+    (base_df["Odds_Over_2,5FT"] > 0) &
+    (base_df["Odds_Casa"] > 0) &
+    (base_df["Odds_Visitante"] > 0)
+].copy()
 
-        # =========================================
-        # 🔥 APLICA FILTRO VISUAL
-        # =========================================
-        df_clean["Home"] = df_clean.apply(
-            lambda x: classificar_filtro_duplo(
-                x["Media_CG_H_01"], x["CV_CG_H_01"],
-                x["Media_CG_H_02"], x["CV_CG_H_02"]
-            ),
-            axis=1
-        )
+# =========================================
+# 🔥 APLICA FILTRO VISUAL
+# =========================================
+df_clean["Home"] = df_clean.apply(
+    lambda x: classificar_filtro_duplo(
+        x["Media_CG_H_01"], x["CV_CG_H_01"],
+        x["Media_CG_H_02"], x["CV_CG_H_02"]
+    ),
+    axis=1
+)
 
-        df_clean["Away"] = df_clean.apply(
-            lambda x: classificar_filtro_duplo(
-                x["Media_CG_A_01"], x["CV_CG_A_01"],
-                x["Media_CG_A_02"], x["CV_CG_A_02"]
-            ),
-            axis=1
-        )
+df_clean["Away"] = df_clean.apply(
+    lambda x: classificar_filtro_duplo(
+        x["Media_CG_A_01"], x["CV_CG_A_01"],
+        x["Media_CG_A_02"], x["CV_CG_A_02"]
+    ),
+    axis=1
+)
 
-        # =========================================
-        # 📊 MONTA LISTA ORIGINAL (SEM QUEBRAR NADA)
-        # =========================================
-lista = []   # 🔴 ESSA LINHA É O QUE FALTAVA
+# =========================================
+# 📊 MONTA LISTA ORIGINAL (SEM QUEBRAR NADA)
+# =========================================
+lista = []
 
 for _, row in df_clean.iterrows():
     res = classificar_jogo(row)
@@ -3288,21 +3288,26 @@ for _, row in df_clean.iterrows():
     if res:
         card = gerar_card_linha(row)
 
-        lista.append({   # ✅ alinhado com "card"
+        lista.append({
             "Home": row["Home"],
             "Away": row["Away"],
             "Home_Team": row.get("Home_Team", ""),
             "Away_Team": row.get("Visitor_Team", ""),
-            "Placar": ("-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
-                else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"),
-            "HT": ("-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
-                else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"),
+            "Placar": (
+                "-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
+                else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"
+            ),
+            "HT": (
+                "-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
+                else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"
+            ),
             "Tipo": res["Tipo"],
             "Entrada": res["Entrada"],
             "Classe": res["Classe"],
             "LAY_DECISAO": definir_lay(row),
             "HA_Value": row.get("HA_Value", ""),
 
+            # 🔥 CARD
             "Score": card["Score"],
             "Leitura": card["Leitura"],
             "Estrutura": card["Estrutura"],
@@ -3310,29 +3315,26 @@ for _, row in df_clean.iterrows():
             "Direcao": card["Direcao"],
             "Consenso": card["Consenso"]
         })
-        # =========================================
-        # 📈 OUTPUT FINAL
-        # =========================================
-        if lista:
-            df_final = pd.DataFrame(lista)
 
-            # joga Home/Away pra frente
-            cols = [
-                "Home", "Away",
-                "Home_Team", "Away_Team",
-                "Placar", "HT",
-                "Tipo", "Entrada", "Classe",
-                "LAY_DECISAO", "HA_Value",
+# =========================================
+# 📈 OUTPUT FINAL
+# =========================================
+if lista:
+    df_final = pd.DataFrame(lista)
 
-                # 🔥 NOVAS COLUNAS
-                "Score", "Leitura",
-                "Estrutura", "Mercado",
-                "Direcao", "Consenso"
-            ]
+    cols = [
+        "Home", "Away",
+        "Home_Team", "Away_Team",
+        "Placar", "HT",
+        "Tipo", "Entrada", "Classe",
+        "LAY_DECISAO", "HA_Value",
+        "Score", "Leitura",
+        "Estrutura", "Mercado",
+        "Direcao", "Consenso"
+    ]
 
-            df_final = df_final[cols]
+    df_final = df_final[cols]
 
-            st.dataframe(df_final, use_container_width=True, hide_index=True)
-        else:
-            st.info("Sem jogos válidos após filtro")
-           
+    st.dataframe(df_final, use_container_width=True, hide_index=True)
+else:
+    st.info("Sem jogos válidos após filtro")
