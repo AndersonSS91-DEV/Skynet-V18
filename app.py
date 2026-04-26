@@ -3260,14 +3260,14 @@ with tab7:
     def calcular_direcao_row(row):
         try:
             matriz = calcular_matriz_poisson(
-                row["ExG_Home_MGF"],
-                row["ExG_Away_MGF"]
+                row.get("ExG_Home_MGF", 0),
+                row.get("ExG_Away_MGF", 0)
             )
 
             sinais = poisson_intelligence(matriz)
-            direcao = sinais[2]
+            direcao = sinais[2] if sinais and len(sinais) > 2 else []
 
-            return " | ".join(direcao)
+            return " | ".join(direcao) if direcao else ""
         except:
             return ""
 
@@ -3277,7 +3277,7 @@ with tab7:
     base_df["Direcao_Poisson"] = base_df.apply(calcular_direcao_row, axis=1)
 
     # =========================================
-    # 🔥 CONVERSÃO DAS ODDS (CORRETA)
+    # 🔥 CONVERSÃO DAS ODDS
     # =========================================
     cols_odds = [
         "Odd_BTTS_YES",
@@ -3305,7 +3305,7 @@ with tab7:
     ].copy()
 
     # =========================================
-    # 🔥 APLICA FILTRO VISUAL
+    # 🔥 FILTRO VISUAL
     # =========================================
     df_clean["Home"] = df_clean.apply(
         lambda x: classificar_filtro_duplo(
@@ -3324,7 +3324,7 @@ with tab7:
     )
 
     # =========================================
-    # 📊 MONTA LISTA
+    # 📊 LISTA FINAL
     # =========================================
     lista = []
 
@@ -3334,31 +3334,25 @@ with tab7:
         if res:
 
             # =========================================
-            # 🔥 IA CONSENSO (MGF + EXG + VG)
+            # 🔥 IA CONSENSO (MGF + EXG + VG) — FUNCIONAL
             # =========================================
             try:
-                # 🔹 MGF
-                matriz_mgf = calcular_matriz_poisson(
-                    row["ExG_Home_MGF"],
-                    row["ExG_Away_MGF"]
-                )
-                sinais_mgf = poisson_intelligence(matriz_mgf)
+                # 🔹 coleta segura
+                mgf_h = row.get("ExG_Home_MGF", 0)
+                mgf_a = row.get("ExG_Away_MGF", 0)
 
-                # 🔹 EXG
-                matriz_exg = calcular_matriz_poisson(
-                    row["ExG_Home"],
-                    row["ExG_Away"]
-                )
-                sinais_exg = poisson_intelligence(matriz_exg)
+                exg_h = row.get("ExG_Home", mgf_h)
+                exg_a = row.get("ExG_Away", mgf_a)
 
-                # 🔹 VG
-                matriz_vg = calcular_matriz_poisson(
-                    row["VG_Home"],
-                    row["VG_Away"]
-                )
-                sinais_vg = poisson_intelligence(matriz_vg)
+                vg_h  = row.get("VG_Home", mgf_h)
+                vg_a  = row.get("VG_Away", mgf_a)
 
-                # 🔥 NORMALIZA (SEM BACK)
+                # 🔹 gera sinais das 3 matrizes
+                sinais_mgf = poisson_intelligence(calcular_matriz_poisson(mgf_h, mgf_a))
+                sinais_exg = poisson_intelligence(calcular_matriz_poisson(exg_h, exg_a))
+                sinais_vg  = poisson_intelligence(calcular_matriz_poisson(vg_h, vg_a))
+
+                # 🔹 normaliza (remove BACK)
                 def norm(d):
                     if not d:
                         return None
@@ -3375,7 +3369,7 @@ with tab7:
 
                 def get_dir(s):
                     try:
-                        return norm(s[2][0]) if s and len(s) > 2 and len(s[2]) > 0 else None
+                        return norm(s[2][0]) if s and len(s) > 2 and s[2] else None
                     except:
                         return None
 
@@ -3384,10 +3378,9 @@ with tab7:
                 d_vg  = get_dir(sinais_vg)
 
                 pesos = [0.40, 0.35, 0.25]
-                dirs = [d_mgf, d_exg, d_vg]
+                dirs  = [d_mgf, d_exg, d_vg]
 
                 score = {}
-
                 for d, p in zip(dirs, pesos):
                     if d:
                         score[d] = score.get(d, 0) + p
@@ -3429,14 +3422,12 @@ with tab7:
                 "Classe": res["Classe"],
                 "LAY_DECISAO": definir_lay(row),
                 "HA_Value": row.get("HA_Value", ""),
-
-                # 🔥 DIREÇÕES
                 "Direcao": row.get("Direcao_Poisson", ""),
                 "Direcao_IA": Direcao_IA
             })
 
     # =========================================
-    # 📈 OUTPUT FINAL
+    # 📈 OUTPUT
     # =========================================
     if lista:
         df_final = pd.DataFrame(lista)
