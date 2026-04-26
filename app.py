@@ -741,7 +741,7 @@ def direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg):
     direcao_final = max(score, key=score.get)
     confianca = score[direcao_final]
 
-        if confianca >= 0.80:
+    if confianca >= 0.80:
         return f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
 
     elif confianca >= 0.60:
