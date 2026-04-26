@@ -3231,9 +3231,6 @@ Home {home_emoji}   x   Away {away_emoji}
         # =========================================
         def gerar_card_linha(row):
     try:
-        # =============================
-        # MATRIZES
-        # =============================
         matriz_mgf = calcular_matriz_poisson(
             row["ExG_Home_MGF"],
             row["ExG_Away_MGF"]
@@ -3272,9 +3269,6 @@ Home {home_emoji}   x   Away {away_emoji}
         mercado = list(set(mercado))
         direcao = list(set(direcao))
 
-        # =============================
-        # SCORE
-        # =============================
         lambda_home = np.mean([
             row["ExG_Home_MGF"],
             row["ExG_Home_ATKxDEF"],
@@ -3307,7 +3301,7 @@ Home {home_emoji}   x   Away {away_emoji}
             "Consenso": " | ".join(consenso)
         }
 
-    except:
+    except Exception as e:
         return {
             "Score": "",
             "Leitura": "",
@@ -3323,10 +3317,10 @@ Home {home_emoji}   x   Away {away_emoji}
         lista = []
 
         for _, row in df_clean.iterrows():
-            res = classificar_jogo(row)
+    res = classificar_jogo(row)
 
-            if res:
-                card = gerar_card_linha(row)
+    if res:
+        card = gerar_card_linha(row)
 
                 lista.append({
                     "Home": row["Home"],
