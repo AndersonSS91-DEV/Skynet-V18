@@ -1749,126 +1749,88 @@ with tab1:
             )
         )
         
-# =========================================
-# 🧠💀 POISSON INTELLIGENCE CENTER -MODELANDO
-# =========================================
+    # =========================================
+    # 🧠💀 POISSON INTELLIGENCE CENTER
+    # =========================================
 
-st.markdown("### 🧠💀 Consenso Poisson")
+    st.markdown("### 🧠💀 Consenso Poisson")
 
-try:
+    try:
 
-    idx = linha_mgf.name  # índice da linha no base_df
+        matriz_mgf = calcular_matriz_poisson(
+            linha_mgf["ExG_Home_MGF"],
+            linha_mgf["ExG_Away_MGF"]
+        )
 
-    matriz_mgf = calcular_matriz_poisson(
-        linha_mgf["ExG_Home_MGF"],
-        linha_mgf["ExG_Away_MGF"]
-    )
+        matriz_exg = calcular_matriz_poisson(
+            linha_exg["ExG_Home_ATKxDEF"],
+            linha_exg["ExG_Away_ATKxDEF"]
+        )
 
-    matriz_exg = calcular_matriz_poisson(
-        linha_exg["ExG_Home_ATKxDEF"],
-        linha_exg["ExG_Away_ATKxDEF"]
-    )
+        matriz_vg = calcular_matriz_poisson(
+            linha_vg["ExG_Home_VG"],
+            linha_vg["ExG_Away_VG"]
+        )
 
-    matriz_vg = calcular_matriz_poisson(
-        linha_vg["ExG_Home_VG"],
-        linha_vg["ExG_Away_VG"]
-    )
+        sinais_mgf = poisson_intelligence(matriz_mgf)
+        sinais_exg = poisson_intelligence(matriz_exg)
+        sinais_vg = poisson_intelligence(matriz_vg)
 
-    sinais_mgf = poisson_intelligence(matriz_mgf)
-    sinais_exg = poisson_intelligence(matriz_exg)
-    sinais_vg = poisson_intelligence(matriz_vg)
+        consenso = consenso_poisson(
+            sinais_mgf,
+            sinais_exg,
+            sinais_vg
+        )
 
-    consenso = consenso_poisson(
-        sinais_mgf,
-        sinais_exg,
-        sinais_vg
-    )
+        estrutura = []
+        mercado = []
+        direcao = []
 
-    estrutura = []
-    mercado = []
-    direcao = []
+        for s in [sinais_mgf, sinais_exg, sinais_vg]:
 
-    for s in [sinais_mgf, sinais_exg, sinais_vg]:
-        estrutura += s[0]
-        mercado += s[1]
-        direcao += s[2]
+            estrutura += s[0]
+            mercado += s[1]
+            direcao += s[2]
 
-    estrutura = list(set(estrutura))
-    mercado = list(set(mercado))
-    direcao = list(set(direcao))
+        estrutura = list(set(estrutura))
+        mercado = list(set(mercado))
+        direcao = list(set(direcao))
 
-    # =============================
-    # SCORE POISSON (AGORA CORRETO)
-    # =============================
+        # =============================
+        # SCORE POISSON
+        # =============================
 
-    lambda_home = np.mean([
-        linha_mgf["ExG_Home_MGF"],
-        linha_exg["ExG_Home_ATKxDEF"],
-        linha_vg["ExG_Home_VG"]
-    ])
+        score = poisson_score(matriz_consenso)
 
-    lambda_away = np.mean([
-        linha_mgf["ExG_Away_MGF"],
-        linha_exg["ExG_Away_ATKxDEF"],
-        linha_vg["ExG_Away_VG"]
-    ])
+        if score > 75:
+            leitura_score = "🔥 Alta previsibilidade"
+        elif score > 55:
+            leitura_score = "⚖️ Jogo equilibrado"
+        else:
+            leitura_score = "⚔️ Jogo imprevisível"
 
-    matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
-    score = poisson_score(matriz_consenso)
+        linhas = []
 
-    if score > 75:
-        leitura_score = "🔥 Alta previsibilidade"
-    elif score > 55:
-        leitura_score = "⚖️ Jogo equilibrado"
-    else:
-        leitura_score = "⚔️ Jogo imprevisível"
+        linhas.append(f"🎯 Score Poisson: {score} — {leitura_score}")
 
-    # =============================
-    # 🔥 GARANTE COLUNAS
-    # =============================
+        if estrutura:
+            linhas.append("⚽ Estrutura de gols\n" + " | ".join(estrutura))
 
-    for col in ["Score","Leitura","Estrutura","Mercado","Direcao","Consenso"]:
-        if col not in base_df.columns:
-            base_df[col] = ""
+        if mercado:
+            linhas.append("📈 Mercado\n" + " | ".join(mercado))
 
-    # =============================
-    # 🔥 SALVA (SEM QUEBRAR)
-    # =============================
+        if direcao:
+            linhas.append("🎯 Direção\n" + " | ".join(direcao))
 
-    base_df.at[idx, "Score"] = round(score, 1)
-    base_df.at[idx, "Leitura"] = leitura_score
-    base_df.at[idx, "Estrutura"] = " | ".join(estrutura)
-    base_df.at[idx, "Mercado"] = " | ".join(mercado)
-    base_df.at[idx, "Direcao"] = " | ".join(direcao)
-    base_df.at[idx, "Consenso"] = " | ".join(consenso)
+        if consenso:
+            linhas.append("🧠 Consenso\n" + " | ".join(consenso))
 
-    # =============================
-    # UI (INALTERADA)
-    # =============================
+        if linhas:
+            st.error("\n\n".join(linhas))
 
-    linhas = []
-
-    linhas.append(f"🎯 Score Poisson: {round(score,1)} — {leitura_score}")
-
-    if estrutura:
-        linhas.append("⚽ Estrutura de gols\n" + " | ".join(estrutura))
-
-    if mercado:
-        linhas.append("📈 Mercado\n" + " | ".join(mercado))
-
-    if direcao:
-        linhas.append("🎯 Direção\n" + " | ".join(direcao))
-
-    if consenso:
-        linhas.append("🧠 Consenso\n" + " | ".join(consenso))
-
-    if linhas:
-        st.error("\n\n".join(linhas))
-
-except Exception as e:
-    print("ERRO POISSON:", e)
-
-
+    except:
+        pass
+        
 # =========================================
 # ABA 2 — DADOS COMPLETOS
 # =========================================
@@ -2867,7 +2829,7 @@ def classificar_jogo(row):
     # =========================================
     # 🔵 UNDER INTELIGENTE
     # =========================================
-    elif coef_over < 1.90 and time_A["mgf"] < 2 and time_B["mgf"] < 2:
+    elif coef_over < 1.9 and time_A["mgf"] < 2 and time_B["mgf"] < 2:
         tipo = "🔵 Under Inteligente (Cerro / LDU)"
         entrada = "Under 2.5"
         classe = "A"
@@ -3233,108 +3195,74 @@ Home {home_emoji}   x   Away {away_emoji}
         else:
             st.info("Nenhum jogo A+/A encontrado")
 
-# =========================================
-# 📋 função card - final
-# =========================================
-def gerar_card_linha(row):
-    return {
-        "Score": row.get("Score", ""),
-        "Leitura": row.get("Leitura", ""),
-        "Estrutura": row.get("Estrutura", ""),
-        "Mercado": row.get("Mercado", ""),
-        "Direcao": row.get("Direcao", ""),
-        "Consenso": row.get("Consenso", "")
-    }
+        # =========================================
+        # 📋 TABELA FINAL
+        # =========================================
+        st.markdown("### 📋 Todos os Jogos Filtrados")
 
-# =========================================
-# 📋 TABELA FINAL
-# =========================================
-st.markdown("### 📋 Todos os Jogos Filtrados")
+        df_clean = base_df[
+            (base_df["Odd_BTTS_YES"] > 0) &
+            (base_df["Odds_Over_2,5FT"] > 0) &
+            (base_df["Odds_Casa"] > 0) &
+            (base_df["Odds_Visitante"] > 0)
+        ]
 
-df_clean = base_df[
-    (base_df["Odd_BTTS_YES"] > 0) &
-    (base_df["Odds_Over_2,5FT"] > 0) &
-    (base_df["Odds_Casa"] > 0) &
-    (base_df["Odds_Visitante"] > 0)
-].copy()
-
-# =========================================
-# 🔥 APLICA FILTRO VISUAL
-# =========================================
-df_clean["Home"] = df_clean.apply(
-    lambda x: classificar_filtro_duplo(
-        x["Media_CG_H_01"], x["CV_CG_H_01"],
-        x["Media_CG_H_02"], x["CV_CG_H_02"]
-    ),
-    axis=1
-)
-
-df_clean["Away"] = df_clean.apply(
-    lambda x: classificar_filtro_duplo(
-        x["Media_CG_A_01"], x["CV_CG_A_01"],
-        x["Media_CG_A_02"], x["CV_CG_A_02"]
-    ),
-    axis=1
-)
-
-# =========================================
-# 📊 MONTA LISTA ORIGINAL (SEM QUEBRAR NADA)
-# =========================================
-lista = []
-
-for _, row in df_clean.iterrows():
-    res = classificar_jogo(row)
-
-    if res:
-        card = gerar_card_linha(row)
-
-        lista.append({
-            "Home": row["Home"],
-            "Away": row["Away"],
-            "Home_Team": row.get("Home_Team", ""),
-            "Away_Team": row.get("Visitor_Team", ""),
-            "Placar": (
-                "-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
-                else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"
+       
+        # =========================================
+        # 🔥 APLICA FILTRO VISUAL
+        # =========================================
+        df_clean["Home"] = df_clean.apply(
+            lambda x: classificar_filtro_duplo(
+                x["Media_CG_H_01"], x["CV_CG_H_01"],
+                x["Media_CG_H_02"], x["CV_CG_H_02"]
             ),
-            "HT": (
-                "-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
-                else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"
+            axis=1
+        )
+
+        df_clean["Away"] = df_clean.apply(
+            lambda x: classificar_filtro_duplo(
+                x["Media_CG_A_01"], x["CV_CG_A_01"],
+                x["Media_CG_A_02"], x["CV_CG_A_02"]
             ),
-            "Tipo": res["Tipo"],
-            "Entrada": res["Entrada"],
-            "Classe": res["Classe"],
-            "LAY_DECISAO": definir_lay(row),
-            "HA_Value": row.get("HA_Value", ""),
+            axis=1
+        )
+        # =========================================
+        # 📊 MONTA LISTA ORIGINAL (SEM QUEBRAR NADA)
+        # =========================================
+        lista = []
 
-            # 🔥 CARD
-            "Score": card["Score"],
-            "Leitura": card["Leitura"],
-            "Estrutura": card["Estrutura"],
-            "Mercado": card["Mercado"],
-            "Direcao": card["Direcao"],
-            "Consenso": card["Consenso"]
-        })
+        for _, row in df_clean.iterrows():
+            res = classificar_jogo(row)
 
-# =========================================
-# 📈 OUTPUT FINAL
-# =========================================
-if lista:
-    df_final = pd.DataFrame(lista)
+            if res:
+                lista.append({
+                    "Home": row["Home"],
+                    "Away": row["Away"],
+                    "Home_Team": row.get("Home_Team", ""),
+                    "Away_Team": row.get("Visitor_Team", ""),
+                    "Placar": ("-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
+                    else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"),
+                    "HT": ("-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
+                    else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"),
+                    "Tipo": res["Tipo"],
+                    "Entrada": res["Entrada"],
+                    "Classe": res["Classe"],
+                    "LAY_DECISAO": definir_lay(row),
+                    "HA_Value": row.get("HA_Value", "")
+                })
 
-    cols = [
-        "Home", "Away",
-        "Home_Team", "Away_Team",
-        "Placar", "HT",
-        "Tipo", "Entrada", "Classe",
-        "LAY_DECISAO", "HA_Value",
-        "Score", "Leitura",
-        "Estrutura", "Mercado",
-        "Direcao", "Consenso"
-    ]
+        # =========================================
+        # 📈 OUTPUT FINAL
+        # =========================================
+        if lista:
+            df_final = pd.DataFrame(lista)
 
-    df_final = df_final[cols]
+            # joga Home/Away pra frente
+            cols = ["Home", "Away","Home_Team", "Away_Team","Placar", "HT","Tipo", "Entrada", "Classe", "LAY_DECISAO", "HA_Value"]
+            df_final = df_final[cols]
 
-    st.dataframe(df_final, use_container_width=True, hide_index=True)
-else:
-    st.info("Sem jogos válidos após filtro")
+            st.dataframe(df_final, use_container_width=True, hide_index=True)
+        else:
+            st.info("Sem jogos válidos após filtro")
+
+           
