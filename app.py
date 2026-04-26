@@ -3333,6 +3333,9 @@ with tab7:
 
         if res:
 
+            # 🔥 GARANTE VALOR SEMPRE
+            Direcao_IA = ""
+
             # =========================================
             # 🔥 IA CONSENSO (TRANSPLANTE ABA 1)
             # =========================================
@@ -3362,14 +3365,14 @@ with tab7:
                     )
                     sinais_mgf = poisson_intelligence(matriz_mgf)
 
-                    # 🔹 EXG (CORRIGIDO)
+                    # 🔹 EXG
                     matriz_exg = calcular_matriz_poisson(
                         exg_row["ExG_Home_ATKxDEF"],
                         exg_row["ExG_Away_ATKxDEF"]
                     )
                     sinais_exg = poisson_intelligence(matriz_exg)
 
-                    # 🔹 VG (CORRIGIDO)
+                    # 🔹 VG
                     matriz_vg = calcular_matriz_poisson(
                         vg_row["ExG_Home_VG"],
                         vg_row["ExG_Away_VG"]
@@ -3381,10 +3384,7 @@ with tab7:
                         sinais_mgf,
                         sinais_exg,
                         sinais_vg
-                    )
-
-                else:
-                    Direcao_IA = ""
+                    ) or ""
 
             except:
                 Direcao_IA = ""
@@ -3407,7 +3407,6 @@ with tab7:
                 "Classe": res["Classe"],
                 "LAY_DECISAO": definir_lay(row),
                 "HA_Value": row.get("HA_Value", ""),
-
                 "Direcao": row.get("Direcao_Poisson", ""),
                 "Direcao_IA": Direcao_IA
             })
