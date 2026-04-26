@@ -3233,6 +3233,19 @@ Home {home_emoji}   x   Away {away_emoji}
         else:
             st.info("Nenhum jogo A+/A encontrado")
 
+# =========================================
+# 📋 função card - final
+# =========================================
+            def gerar_card_linha(row):
+    return {
+        "Score": row.get("Score", ""),
+        "Leitura": row.get("Leitura", ""),
+        "Estrutura": row.get("Estrutura", ""),
+        "Mercado": row.get("Mercado", ""),
+        "Direcao": row.get("Direcao", ""),
+        "Consenso": row.get("Consenso", "")
+    }
+
         # =========================================
         # 📋 TABELA FINAL
         # =========================================
