@@ -712,7 +712,23 @@ def poisson_score(matriz):
 Direcao_IA = "TESTE OK"
 
     def get_dir(s):
-        return s[2][0] if len(s[2]) > 0 else None
+    try:
+        if s and len(s) > 2 and s[2]:
+            val = str(s[2][0]).lower()
+
+            if "home" in val:
+                return "Lay Home"
+            if "away" in val or "visit" in val:
+                return "Lay Away"
+            if "over" in val:
+                return "Over 2.5"
+            if "under" in val:
+                return "Under 2.5"
+
+    except:
+        return None
+
+    return None
 
     d_mgf = get_dir(sinais_mgf)
     d_exg = get_dir(sinais_exg)
