@@ -3323,70 +3323,81 @@ with tab7:
         axis=1
     )
 
-    # =========================================
-    # 📊 LISTA FINAL
-    # =========================================
-    lista = []
+# =========================================
+# 📊 LISTA FINAL
+# =========================================
+lista = []
 
-    for _, row in df_clean.iterrows():
-        res = classificar_jogo(row)
+for _, row in df_clean.iterrows():
+    res = classificar_jogo(row)
 
-        if res:
-            try:
-                # 🔹 dados base
-                mgf_h = row.get("ExG_Home_MGF", 0)
-                mgf_a = row.get("ExG_Away_MGF", 0)
+    if res:
+        try:
+            # 🔹 dados base
+            mgf_h = row.get("ExG_Home_MGF", 0)
+            mgf_a = row.get("ExG_Away_MGF", 0)
 
-                exg_h = row.get("ExG_Home", mgf_h)
-                exg_a = row.get("ExG_Away", mgf_a)
+            exg_h = row.get("ExG_Home", mgf_h)
+            exg_a = row.get("ExG_Away", mgf_a)
 
-                vg_h = row.get("VG_Home", mgf_h)
-                vg_a = row.get("VG_Away", mgf_a)
+            vg_h = row.get("VG_Home", mgf_h)
+            vg_a = row.get("VG_Away", mgf_a)
 
-                # 🔹 sinais
-                sinais_mgf = poisson_intelligence(calcular_matriz_poisson(mgf_h, mgf_a))
-                sinais_exg = poisson_intelligence(calcular_matriz_poisson(exg_h, exg_a))
-                sinais_vg  = poisson_intelligence(calcular_matriz_poisson(vg_h, vg_a))
+            # 🔹 sinais
+            sinais_mgf = poisson_intelligence(calcular_matriz_poisson(mgf_h, mgf_a))
+            sinais_exg = poisson_intelligence(calcular_matriz_poisson(exg_h, exg_a))
+            sinais_vg  = poisson_intelligence(calcular_matriz_poisson(vg_h, vg_a))
 
-                # 🔹 normalização
-                def norm(d):
-                    if not d:
-                        return None
-                    d = str(d).lower()
-                    if "home" in d:
-                        return "Lay Home"
-                    if "away" in d or "visit" in d:
-                        return "Lay Away"
-                    if "over" in d:
-                        return "Over 2.5"
-                    if "under" in d:
-                        return "Under 2.5"
+            # 🔹 normalização
+            def norm(d):
+                if not d:
+                    return None
+                d = str(d).lower()
+                if "home" in d:
+                    return "Lay Home"
+                if "away" in d or "visit" in d:
+                    return "Lay Away"
+                if "over" in d:
+                    return "Over 2.5"
+                if "under" in d:
+                    return "Under 2.5"
+                return None
+
+            def get_dir(s):
+                try:
+                    return norm(s[2][0]) if s and len(s) > 2 and s[2] else None
+                except:
                     return None
 
-                def get_dir(s):
-                    try:
-                        return norm(s[2][0]) if s and len(s) > 2 and s[2] else None
-                    except:
-                        return None
+            d_mgf = get_dir(sinais_mgf)
+            d_exg = get_dir(sinais_exg)
+            d_vg  = get_dir(sinais_vg)
 
-                d_mgf = get_dir(sinais_mgf)
-                d_exg = get_dir(sinais_exg)
-                d_vg  = get_dir(sinais_vg)
+            pesos = [0.40, 0.35, 0.25]
+            dirs  = [d_mgf, d_exg, d_vg]
 
-                pesos = [0.40, 0.35, 0.25]
-                dirs  = [d_mgf, d_exg, d_vg]
+            score = {}
+            for d, p in zip(dirs, pesos):
+                if d:
+                    score[d] = score.get(d, 0) + p
 
-                score = {}
-                for d, p in zip(dirs, pesos):
-                    if d:
-                        score[d] = score.get(d, 0) + p
+            # =========================================
+            # 🔥 DEFINIÇÃO DIREÇÃO + FILTRO
+            # =========================================
+            if score:
+                direcao_final = max(score, key=score.get)
+                confianca = score[direcao_final]
 
-                if score:
-                    direcao_final = max(score, key=score.get)
-                    confianca = score[direcao_final]
-                else:
+                # 🔥 só aceita Lay forte
+                if confianca < 0.60:
                     direcao_final = None
-                    confianca = 0
+            else:
+                direcao_final = None
+                confianca = 0
+
+        except:
+            direcao_final = None
+            confianca = 0
 
                 # =========================================
                 # 🔥 FALLBACK OVER / UNDER
