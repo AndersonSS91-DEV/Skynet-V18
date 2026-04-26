@@ -3209,11 +3209,10 @@ Home {home_emoji}   x   Away {away_emoji}
             st.info("Nenhum jogo A+/A encontrado")
 
 
- 
-    # =========================================
-    # 📋 TABELA FINAL
-    # =========================================
-    with tab6:
+ # =========================================
+# 📋 TABELA FINAL
+# =========================================
+with tab6:
 
     st.markdown("### 📋 Todos os Jogos Filtrados")
 
@@ -3223,6 +3222,7 @@ Home {home_emoji}   x   Away {away_emoji}
         (base_df["Odds_Casa"] > 0) &
         (base_df["Odds_Visitante"] > 0)
     ].copy()
+
     # =========================================
     # 🔥 APLICA FILTRO VISUAL
     # =========================================
