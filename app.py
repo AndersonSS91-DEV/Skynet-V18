@@ -1830,20 +1830,7 @@ with tab1:
 
     except:
         pass
-        
-# =========================================
-# 🔥 SALVAR RESULTADO NO DATAFRAME (ESSENCIAL)
-# =========================================
-
-idx = linha_mgf.name
-
-base_df.loc[idx, "Score_Poisson"] = ...
-base_df.loc[idx, "Leitura_Poisson"] = leitura_score
-base_df.loc[idx, "Estrutura_Poisson"] = " | ".join(estrutura)
-base_df.loc[idx, "Mercado_Poisson"] = " | ".join(mercado)
-base_df.loc[idx, "Direcao_Poisson"] = " | ".join(direcao)
-base_df.loc[idx, "Consenso_Poisson"] = " | ".join(consenso)
-        
+             
 # =========================================
 # ABA 2 — DADOS COMPLETOS
 # =========================================
