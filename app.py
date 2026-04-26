@@ -3243,67 +3243,6 @@ Home {home_emoji}   x   Away {away_emoji}
 
 
 # =========================================
-# 📋 TABELA FINAL (ABA CONTROLADA)
-# =========================================
-with tab7:
-
-    st.markdown("### 📋 Todos os Jogos Filtrados")
-
-    # =========================================
-    # 🔍 FILTRO BASE
-    # =========================================
-    df_clean = base_df[
-        (base_df["Odd_BTTS_YES"] > 0) &
-        (base_df["Odds_Over_2,5FT"] > 0) &
-        (base_df["Odds_Casa"] > 0) &
-        (base_df["Odds_Visitante"] > 0)
-    ].copy()
-
-    # =========================================
-    # 🔥 APLICA FILTRO VISUAL
-    # =========================================
-    df_clean["Home"] = df_clean.apply(
-        lambda x: classificar_filtro_duplo(
-            x["Media_CG_H_01"], x["CV_CG_H_01"],
-            x["Media_CG_H_02"], x["CV_CG_H_02"]
-        ),
-        axis=1
-    )
-
-    df_clean["Away"] = df_clean.apply(
-        lambda x: classificar_filtro_duplo(
-            x["Media_CG_A_01"], x["CV_CG_A_01"],
-            x["Media_CG_A_02"], x["CV_CG_A_02"]
-        ),
-        axis=1
-    )
-
-    # =========================================
-    # 📊 MONTA LISTA
-    # =========================================
-    lista = []
-
-    for _, row in df_clean.iterrows():
-        res = classificar_jogo(row)
-
-        if res:
-
-            # =========================================
-            # 🧠 DIREÇÃO (IGUAL AO CARD)
-            # =========================================
-            try:
-                matriz_dir = calcular_matriz_poisson(
-                    row["ExG_Home_MGF"],
-                    row["ExG_Away_MGF"]
-                )
-
-                sinais_dir = poisson_intelligence(matriz_dir)
-                direcao = " | ".join(sinais_dir[2])  # 🔥 EXATO DO CARD
-
-            except:
-                direcao = ""
-
-# =========================================
 # 🚀 ABA IA FINAL
 # =========================================
 with tab7:
