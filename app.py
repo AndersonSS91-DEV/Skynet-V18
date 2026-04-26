@@ -3257,7 +3257,7 @@ with tab7:
     # =========================================
     # 🤖 FUNÇÃO DIREÇÃO IA (ISOLADA)
     # =========================================
-    def calcular_direcao_ia(row):
+def calcular_direcao_ia(row):
     try:
         linha_mgf = df_mgf[
             (df_mgf["Home_Team"] == row["Home_Team"]) &
