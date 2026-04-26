@@ -213,8 +213,53 @@ ul[role="listbox"] li {
 
 </style>
 """, unsafe_allow_html=True)
+# =========================================
+# 🎬 IA - CONSENSO DIREÇÃO
+# =========================================
+def direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg):
 
+    def get_dir(s):
+        return s[2][0] if s and len(s) > 2 and s[2] else None
 
+    d_mgf = get_dir(sinais_mgf)
+    d_exg = get_dir(sinais_exg)
+    d_vg  = get_dir(sinais_vg)
+
+    pesos = {
+        "MGF": 0.40,
+        "EXG": 0.35,
+        "VG":  0.25
+    }
+
+    score = {}
+
+    if d_mgf:
+        score[d_mgf] = score.get(d_mgf, 0) + pesos["MGF"]
+
+    if d_exg:
+        score[d_exg] = score.get(d_exg, 0) + pesos["EXG"]
+
+    if d_vg:
+        score[d_vg] = score.get(d_vg, 0) + pesos["VG"]
+
+    if not score:
+        return ""
+
+    direcao_final = max(score, key=score.get)
+    confianca = score[direcao_final]
+
+    if len(score) > 1:
+        confianca *= 0.85
+
+    if confianca >= 0.80:
+        return f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
+    elif confianca >= 0.60:
+        return f"🔥 {direcao_final} ({round(confianca*100)}%)"
+    elif confianca > 0:
+        return f"⚠️ {direcao_final} ({round(confianca*100)}%)"
+
+    return ""
+    
 # =========================================
 # 🎬 BANNER CARROSSEL (OFICIAL SKYNET)
 # =========================================
@@ -3271,54 +3316,7 @@ with tab7:
     st.markdown("### 📋 Todos os Jogos Filtrados")
 
     # =========================================
-    # 🧠 DIREÇÃO POISSON (ISOLADO NA ABA)
-    # =========================================
-    def direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg):
-
-    def get_dir(s):
-        return s[2][0] if s and len(s) > 2 and s[2] else None
-
-    d_mgf = get_dir(sinais_mgf)
-    d_exg = get_dir(sinais_exg)
-    d_vg  = get_dir(sinais_vg)
-
-    pesos = {
-        "MGF": 0.40,
-        "EXG": 0.35,
-        "VG":  0.25
-    }
-
-    score = {}
-
-    if d_mgf:
-        score[d_mgf] = score.get(d_mgf, 0) + pesos["MGF"]
-
-    if d_exg:
-        score[d_exg] = score.get(d_exg, 0) + pesos["EXG"]
-
-    if d_vg:
-        score[d_vg] = score.get(d_vg, 0) + pesos["VG"]
-
-    if not score:
-        return ""
-
-    direcao_final = max(score, key=score.get)
-    confianca = score[direcao_final]
-
-    if len(score) > 1:
-        confianca *= 0.85
-
-    if confianca >= 0.80:
-        return f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
-    elif confianca >= 0.60:
-        return f"🔥 {direcao_final} ({round(confianca*100)}%)"
-    elif confianca > 0:
-        return f"⚠️ {direcao_final} ({round(confianca*100)}%)"
-
-    return ""
-
-    # =========================================
-    # 🔥 CONVERSÃO DAS ODDS (CORRETA)
+    # 🔥 CONVERSÃO DAS ODDS
     # =========================================
     cols_odds = [
         "Odd_BTTS_YES",
@@ -3346,7 +3344,7 @@ with tab7:
     ].copy()
 
     # =========================================
-    # 🔥 APLICA FILTRO VISUAL
+    # 🎨 FILTRO VISUAL
     # =========================================
     df_clean["Home"] = df_clean.apply(
         lambda x: classificar_filtro_duplo(
@@ -3365,21 +3363,17 @@ with tab7:
     )
 
     # =========================================
-    # 📊 MONTA LISTA
+    # 📊 LISTA FINAL
     # =========================================
     lista = []
 
     for _, row in df_clean.iterrows():
+
         res = classificar_jogo(row)
 
-        if res:
+        if not res:
+            continue
 
-            # 🔥 GARANTE VALOR SEMPRE
-            Direcao_IA = ""
-
-        # =========================================
-        # 🔥 IA CONSENSO (TRANSPLANTE ABA 1)
-        # =========================================
         Direcao_IA = ""
 
         try:
@@ -3401,66 +3395,57 @@ with tab7:
                 exg_row = exg_row.iloc[0]
                 vg_row  = vg_row.iloc[0]
 
-                # 🔹 MGF
                 matriz_mgf = calcular_matriz_poisson(
                     row["ExG_Home_MGF"],
                     row["ExG_Away_MGF"]
                 )
                 sinais_mgf = poisson_intelligence(matriz_mgf)
 
-                # 🔹 EXG
                 matriz_exg = calcular_matriz_poisson(
                     exg_row["ExG_Home_ATKxDEF"],
                     exg_row["ExG_Away_ATKxDEF"]
                 )
                 sinais_exg = poisson_intelligence(matriz_exg)
 
-                # 🔹 VG
                 matriz_vg = calcular_matriz_poisson(
                     vg_row["ExG_Home_VG"],
                     vg_row["ExG_Away_VG"]
                 )
                 sinais_vg = poisson_intelligence(matriz_vg)
 
-                # 🔥 IGUAL ABA 1
                 Direcao_IA = direcao_ia_peso(
                     sinais_mgf,
                     sinais_exg,
                     sinais_vg
                 )
 
-            else:
-                Direcao_IA = ""
-
         except:
             Direcao_IA = ""
 
-            
-
-            lista.append({
-                "Home": row["Home"],
-                "Away": row["Away"],
-                "Home_Team": row.get("Home_Team", ""),
-                "Away_Team": row.get("Visitor_Team", ""),
-                "Placar": (
-                    "-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
-                    else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"
-                ),
-                "HT": (
-                    "-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
-                    else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"
-                ),
-                "Tipo": res["Tipo"],
-                "Entrada": res["Entrada"],
-                "Classe": res["Classe"],
-                "LAY_DECISAO": definir_lay(row),
-                "HA_Value": row.get("HA_Value", ""),
-                "Direcao": row.get("Direcao_Poisson", ""),
-                "Direcao_IA": Direcao_IA
-            })
+        lista.append({
+            "Home": row["Home"],
+            "Away": row["Away"],
+            "Home_Team": row.get("Home_Team", ""),
+            "Away_Team": row.get("Visitor_Team", ""),
+            "Placar": (
+                "-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
+                else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"
+            ),
+            "HT": (
+                "-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
+                else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"
+            ),
+            "Tipo": res["Tipo"],
+            "Entrada": res["Entrada"],
+            "Classe": res["Classe"],
+            "LAY_DECISAO": definir_lay(row),
+            "HA_Value": row.get("HA_Value", ""),
+            "Direcao": row.get("Direcao_Poisson", ""),
+            "Direcao_IA": Direcao_IA
+        })
 
     # =========================================
-    # 📈 OUTPUT FINAL
+    # 📈 OUTPUT
     # =========================================
     if lista:
         df_final = pd.DataFrame(lista)
