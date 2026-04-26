@@ -3164,6 +3164,87 @@ def definir_lay(row):
 
     return "⚠️Lay Away (Atenção)"
 
+# =========================================
+# 🚀 ABA IA FINAL
+# =========================================
+with tab7:
+
+    st.markdown("## 🤖 Central de Decisão IA")
+
+    try:
+        base_df = pd.read_excel(xls)
+        base_df["HA_Value"] = base_df.apply(detectar_handicap_value_profissional, axis=1)
+    except:
+        st.error("Erro ao ler arquivo")
+        st.stop()
+
+    # =========================================
+    # 🎯 JOGO ATUAL
+    # =========================================
+    if not base_df.empty:
+        linha = base_df.iloc[0]
+        resultado = classificar_jogo(linha_mgf)
+
+        if resultado:
+
+            detalhes = ""
+
+            if resultado.get("Principal"):
+                detalhes += f"🥇 Principal: {resultado['Principal']}\n"
+
+            if resultado.get("Secundario"):
+                detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
+
+            if resultado.get("Risco"):
+                detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
+
+            home_emoji = classificar_filtro_duplo(
+                linha_mgf["Media_CG_H_01"], linha_mgf["CV_CG_H_01"],
+                linha_mgf["Media_CG_H_02"], linha_mgf["CV_CG_H_02"]
+            )
+
+            away_emoji = classificar_filtro_duplo(
+                linha_mgf["Media_CG_A_01"], linha_mgf["CV_CG_A_01"],
+                linha_mgf["Media_CG_A_02"], linha_mgf["CV_CG_A_02"]
+            )
+
+            texto = f"""
+🧠 Tipo: {resultado['Tipo']}
+🎯 Entrada: {resultado['Entrada']}
+⏱️ Momento: {resultado['Momento']}
+🏷️ Classe: {resultado['Classe']}
+
+{detalhes}📊 Motivo:
+{resultado['Motivo']}
+
+Home {home_emoji}   x   Away {away_emoji}
+"""
+
+            # =========================================
+            # 🎨 RENDER DO CARD (ESSENCIAL)
+            # =========================================
+            if resultado["Classe"] == "A+":
+                st.success(texto)
+            elif resultado["Classe"] == "A":
+                st.success(texto)
+            elif resultado["Classe"] == "B":
+                st.warning(texto)
+            else:
+                st.info(texto)
+
+
+        # =========================================
+        # 📊 RANKING IA
+        # =========================================
+        df_rank = gerar_ranking_ia(base_df)
+
+        st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
+
+        if not df_rank.empty:
+            st.dataframe(df_rank, use_container_width=True, hide_index=True)
+        else:
+            st.info("Nenhum jogo A+/A encontrado")
+
 
 # =========================================
 # 📋 TABELA FINAL (ABA CONTROLADA)
@@ -3172,21 +3253,20 @@ with tab7:
 
     st.markdown("### 📋 Todos os Jogos Filtrados")
 
-    # 🔥 GARANTE QUE base_df EXISTE
-    base_df = df_mgf.copy()
-
     # =========================================
-    # 🧠 DIREÇÃO POISSON
+    # 🧠 DIREÇÃO POISSON (ISOLADO NA ABA)
     # =========================================
     def calcular_direcao_row(row):
         try:
             matriz = calcular_matriz_poisson(
-                row.get("ExG_Home_MGF", 0),
-                row.get("ExG_Away_MGF", 0)
+                row["ExG_Home_MGF"],
+                row["ExG_Away_MGF"]
             )
+
             sinais = poisson_intelligence(matriz)
-            direcao = sinais[2] if sinais and len(sinais) > 2 else []
-            return " | ".join(direcao) if direcao else ""
+            direcao = sinais[2]
+
+            return " | ".join(direcao)
         except:
             return ""
 
@@ -3196,7 +3276,7 @@ with tab7:
     base_df["Direcao_Poisson"] = base_df.apply(calcular_direcao_row, axis=1)
 
     # =========================================
-    # 🔥 CONVERSÃO ODDS
+    # 🔥 CONVERSÃO DAS ODDS (CORRETA)
     # =========================================
     cols_odds = [
         "Odd_BTTS_YES",
@@ -3224,7 +3304,7 @@ with tab7:
     ].copy()
 
     # =========================================
-    # 🎨 FILTRO VISUAL
+    # 🔥 APLICA FILTRO VISUAL
     # =========================================
     df_clean["Home"] = df_clean.apply(
         lambda x: classificar_filtro_duplo(
@@ -3243,7 +3323,7 @@ with tab7:
     )
 
     # =========================================
-    # 📊 LISTA FINAL
+    # 📊 MONTA LISTA
     # =========================================
     lista = []
 
@@ -3251,26 +3331,33 @@ with tab7:
         res = classificar_jogo(row)
 
         if res:
+
+            # =========================================
+            # 🔥 IA CONSENSO (MGF + EXG + VG)
+            # =========================================
             try:
-                mgf_h = row.get("ExG_Home_MGF", 0)
-                mgf_a = row.get("ExG_Away_MGF", 0)
-
-                exg_h = row.get("ExG_Home", mgf_h)
-                exg_a = row.get("ExG_Away", mgf_a)
-
-                vg_h = row.get("VG_Home", mgf_h)
-                vg_a = row.get("VG_Away", mgf_a)
-
-                sinais_mgf = poisson_intelligence(
-                    calcular_matriz_poisson(mgf_h, mgf_a)
+                # 🔹 MGF
+                matriz_mgf = calcular_matriz_poisson(
+                    row["ExG_Home_MGF"],
+                    row["ExG_Away_MGF"]
                 )
-                sinais_exg = poisson_intelligence(
-                    calcular_matriz_poisson(exg_h, exg_a)
-                )
-                sinais_vg = poisson_intelligence(
-                    calcular_matriz_poisson(vg_h, vg_a)
-                )
+                sinais_mgf = poisson_intelligence(matriz_mgf)
 
+                # 🔹 EXG
+                matriz_exg = calcular_matriz_poisson(
+                    row["ExG_Home"],
+                    row["ExG_Away"]
+                )
+                sinais_exg = poisson_intelligence(matriz_exg)
+
+                # 🔹 VG
+                matriz_vg = calcular_matriz_poisson(
+                    row["VG_Home"],
+                    row["VG_Away"]
+                )
+                sinais_vg = poisson_intelligence(matriz_vg)
+
+                # 🔥 NORMALIZA (SEM BACK)
                 def norm(d):
                     if not d:
                         return None
@@ -3287,16 +3374,20 @@ with tab7:
 
                 def get_dir(s):
                     try:
-                        return norm(s[2][0]) if s and len(s) > 2 and s[2] else None
+                        return norm(s[2][0]) if s and len(s) > 2 and len(s[2]) > 0 else None
                     except:
                         return None
 
                 d_mgf = get_dir(sinais_mgf)
                 d_exg = get_dir(sinais_exg)
-                d_vg = get_dir(sinais_vg)
+                d_vg  = get_dir(sinais_vg)
+
+                pesos = [0.40, 0.35, 0.25]
+                dirs = [d_mgf, d_exg, d_vg]
 
                 score = {}
-                for d, p in zip([d_mgf, d_exg, d_vg], [0.40, 0.35, 0.25]):
+
+                for d, p in zip(dirs, pesos):
                     if d:
                         score[d] = score.get(d, 0) + p
 
@@ -3304,32 +3395,6 @@ with tab7:
                     direcao_final = max(score, key=score.get)
                     confianca = score[direcao_final]
 
-                    if confianca < 0.60:
-                        direcao_final = None
-                else:
-                    direcao_final = None
-                    confianca = 0
-
-                # =========================================
-                # 🔥 FALLBACK OVER / UNDER
-                # =========================================
-                if not direcao_final:
-                    matriz_gols = calcular_matriz_poisson(mgf_h, mgf_a)
-                    sinais_gols = poisson_intelligence(matriz_gols)
-
-                    d_gols = None
-                    if sinais_gols and len(sinais_gols) > 2 and sinais_gols[2]:
-                        txt = str(sinais_gols[2][0]).lower()
-                        if "over" in txt:
-                            d_gols = "Over 2.5"
-                        elif "under" in txt:
-                            d_gols = "Under 2.5"
-
-                    if d_gols:
-                        Direcao_IA = f"⚠️ {d_gols} (55%)"
-                    else:
-                        Direcao_IA = ""
-                else:
                     if len(score) > 1:
                         confianca *= 0.85
 
@@ -3339,6 +3404,8 @@ with tab7:
                         Direcao_IA = f"🔥 {direcao_final} ({round(confianca*100)}%)"
                     else:
                         Direcao_IA = f"⚠️ {direcao_final} ({round(confianca*100)}%)"
+                else:
+                    Direcao_IA = ""
 
             except:
                 Direcao_IA = ""
@@ -3361,12 +3428,14 @@ with tab7:
                 "Classe": res["Classe"],
                 "LAY_DECISAO": definir_lay(row),
                 "HA_Value": row.get("HA_Value", ""),
+
+                # 🔥 DIREÇÕES
                 "Direcao": row.get("Direcao_Poisson", ""),
                 "Direcao_IA": Direcao_IA
             })
 
     # =========================================
-    # 📈 OUTPUT
+    # 📈 OUTPUT FINAL
     # =========================================
     if lista:
         df_final = pd.DataFrame(lista)
