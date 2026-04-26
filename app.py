@@ -3292,39 +3292,61 @@ with tab7:
         if res:
 
             # =========================================
-            # 🧠 DIREÇÃO POISSON (NO LOOP - GARANTIDO)
+            # 🧠 DIREÇÃO POISSON (FORÇADA)
             # =========================================
             try:
-                matriz_dir = calcular_matriz_poisson(
-                    row["ExG_Home_MGF"],
-                    row["ExG_Away_MGF"]
-                )
-                sinais_dir = poisson_intelligence(matriz_dir)
-                direcao = " | ".join(sinais_dir[2])
+                if pd.notna(row["ExG_Home_MGF"]) and pd.notna(row["ExG_Away_MGF"]):
+                    matriz_dir = calcular_matriz_poisson(
+                        row["ExG_Home_MGF"],
+                        row["ExG_Away_MGF"]
+                    )
+                    sinais_dir = poisson_intelligence(matriz_dir)
+
+                    if sinais_dir and len(sinais_dir) > 2:
+                        direcao = " | ".join(sinais_dir[2]) if sinais_dir[2] else "⚠️ sem direção"
+                    else:
+                        direcao = "⚠️ erro sinais"
+                else:
+                    direcao = "⚠️ sem ExG"
             except:
-                direcao = ""
+                direcao = "⚠️ erro"
 
             # =========================================
-            # 🤖 DIREÇÃO IA (NO LOOP - GARANTIDO)
+            # 🤖 DIREÇÃO IA (FORÇADA)
             # =========================================
             try:
-                matriz_mgf = calcular_matriz_poisson(
-                    row["ExG_Home_MGF"], row["ExG_Away_MGF"]
-                )
-                matriz_exg = calcular_matriz_poisson(
-                    row["ExG_Home_ATKxDEF"], row["ExG_Away_ATKxDEF"]
-                )
-                matriz_vg = calcular_matriz_poisson(
-                    row["ExG_Home_VG"], row["ExG_Away_VG"]
-                )
+                if (
+                    pd.notna(row["ExG_Home_MGF"]) and
+                    pd.notna(row["ExG_Away_MGF"]) and
+                    pd.notna(row["ExG_Home_ATKxDEF"]) and
+                    pd.notna(row["ExG_Away_ATKxDEF"]) and
+                    pd.notna(row["ExG_Home_VG"]) and
+                    pd.notna(row["ExG_Away_VG"])
+                ):
+                    matriz_mgf = calcular_matriz_poisson(
+                        row["ExG_Home_MGF"], row["ExG_Away_MGF"]
+                    )
+                    matriz_exg = calcular_matriz_poisson(
+                        row["ExG_Home_ATKxDEF"], row["ExG_Away_ATKxDEF"]
+                    )
+                    matriz_vg = calcular_matriz_poisson(
+                        row["ExG_Home_VG"], row["ExG_Away_VG"]
+                    )
 
-                sinais_mgf = poisson_intelligence(matriz_mgf)
-                sinais_exg = poisson_intelligence(matriz_exg)
-                sinais_vg = poisson_intelligence(matriz_vg)
+                    sinais_mgf = poisson_intelligence(matriz_mgf)
+                    sinais_exg = poisson_intelligence(matriz_exg)
+                    sinais_vg = poisson_intelligence(matriz_vg)
 
-                Direcao_IA = direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg)
+                    Direcao_IA = direcao_ia_peso(
+                        sinais_mgf, sinais_exg, sinais_vg
+                    )
+
+                    if not Direcao_IA:
+                        Direcao_IA = "⚠️ sem edge"
+                else:
+                    Direcao_IA = "⚠️ sem ExG"
             except:
-                Direcao_IA = ""
+                Direcao_IA = "⚠️ erro IA"
 
             lista.append({
                 "Home": row["Home"],
@@ -3345,7 +3367,7 @@ with tab7:
                 "LAY_DECISAO": definir_lay(row),
                 "HA_Value": row.get("HA_Value", ""),
 
-                # 🔥 DIREÇÕES (AGORA SEM DEPENDER DE base_df)
+                # 🔥 AGORA SEMPRE PREENCHE
                 "Direcao": direcao,
                 "Direcao_IA": Direcao_IA
             })
