@@ -3299,7 +3299,7 @@ Home {home_emoji}   x   Away {away_emoji}
             leitura_score = "⚔️ Jogo imprevisível"
 
         return {
-            "Score": round(score,1),
+            "Score": round(score, 1),
             "Leitura": leitura_score,
             "Estrutura": " | ".join(estrutura),
             "Mercado": " | ".join(mercado),
