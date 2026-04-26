@@ -3207,7 +3207,6 @@ Home {home_emoji}   x   Away {away_emoji}
             (base_df["Odds_Visitante"] > 0)
         ]
 
-       
         # =========================================
         # 🔥 APLICA FILTRO VISUAL
         # =========================================
@@ -3226,6 +3225,46 @@ Home {home_emoji}   x   Away {away_emoji}
             ),
             axis=1
         )
+
+        # =========================================
+        # 🧠 FUNÇÃO CARD POISSON (NÃO QUEBRA NADA)
+        # =========================================
+        def gerar_card_linha(row):
+            try:
+                matriz_consenso = row.get("matriz_consenso", None)
+                score = poisson_score(matriz_consenso)
+
+                if score > 75:
+                    leitura_score = "🔥 Alta previsibilidade"
+                elif score > 55:
+                    leitura_score = "⚖️ Jogo equilibrado"
+                else:
+                    leitura_score = "⚔️ Jogo imprevisível"
+
+                estrutura = row.get("estrutura", [])
+                mercado = row.get("mercado", [])
+                direcao = row.get("direcao", [])
+                consenso = row.get("consenso", [])
+
+                return {
+                    "Score": round(score, 1),
+                    "Leitura": leitura_score,
+                    "Estrutura": " | ".join(estrutura) if estrutura else "",
+                    "Mercado": " | ".join(mercado) if mercado else "",
+                    "Direcao": " | ".join(direcao) if direcao else "",
+                    "Consenso": " | ".join(consenso) if consenso else ""
+                }
+
+            except:
+                return {
+                    "Score": "",
+                    "Leitura": "",
+                    "Estrutura": "",
+                    "Mercado": "",
+                    "Direcao": "",
+                    "Consenso": ""
+                }
+
         # =========================================
         # 📊 MONTA LISTA ORIGINAL (SEM QUEBRAR NADA)
         # =========================================
@@ -3235,6 +3274,8 @@ Home {home_emoji}   x   Away {away_emoji}
             res = classificar_jogo(row)
 
             if res:
+                card = gerar_card_linha(row)
+
                 lista.append({
                     "Home": row["Home"],
                     "Away": row["Away"],
@@ -3248,7 +3289,15 @@ Home {home_emoji}   x   Away {away_emoji}
                     "Entrada": res["Entrada"],
                     "Classe": res["Classe"],
                     "LAY_DECISAO": definir_lay(row),
-                    "HA_Value": row.get("HA_Value", "")
+                    "HA_Value": row.get("HA_Value", ""),
+
+                    # 🔥 CARD (ADICIONADO SEM QUEBRAR)
+                    "Score": card["Score"],
+                    "Leitura": card["Leitura"],
+                    "Estrutura": card["Estrutura"],
+                    "Mercado": card["Mercado"],
+                    "Direcao": card["Direcao"],
+                    "Consenso": card["Consenso"]
                 })
 
         # =========================================
@@ -3258,11 +3307,22 @@ Home {home_emoji}   x   Away {away_emoji}
             df_final = pd.DataFrame(lista)
 
             # joga Home/Away pra frente
-            cols = ["Home", "Away","Home_Team", "Away_Team","Placar", "HT","Tipo", "Entrada", "Classe", "LAY_DECISAO", "HA_Value"]
+            cols = [
+                "Home", "Away",
+                "Home_Team", "Away_Team",
+                "Placar", "HT",
+                "Tipo", "Entrada", "Classe",
+                "LAY_DECISAO", "HA_Value",
+
+                # 🔥 NOVAS COLUNAS
+                "Score", "Leitura",
+                "Estrutura", "Mercado",
+                "Direcao", "Consenso"
+            ]
+
             df_final = df_final[cols]
 
             st.dataframe(df_final, use_container_width=True, hide_index=True)
         else:
             st.info("Sem jogos válidos após filtro")
-
            
