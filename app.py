@@ -777,72 +777,7 @@ def poisson_score(matriz):
     score = (top3 * 0.6) + (top5 * 0.4)
 
     return round(score * 100, 1)
-
-
-# =========================================
-# 🔥🔥 POISSON IA DIREÇÃO 
-# =========================================
-Direcao_IA = "TESTE OK"
-
-    def get_dir(s):
-    try:
-        if s and len(s) > 2 and s[2]:
-            val = str(s[2][0]).lower()
-
-            if "home" in val:
-                return "Lay Home"
-            if "away" in val or "visit" in val:
-                return "Lay Away"
-            if "over" in val:
-                return "Over 2.5"
-            if "under" in val:
-                return "Under 2.5"
-
-    except:
-        return None
-
-    return None
-
-    d_mgf = get_dir(sinais_mgf)
-    d_exg = get_dir(sinais_exg)
-    d_vg  = get_dir(sinais_vg)
-
-    pesos = {
-        "MGF": 0.40,
-        "EXG": 0.35,
-        "VG":  0.25
-    }
-
-    score = {}
-
-    if d_mgf:
-        score[d_mgf] = score.get(d_mgf, 0) + pesos["MGF"]
-
-    if d_exg:
-        score[d_exg] = score.get(d_exg, 0) + pesos["EXG"]
-
-    if d_vg:
-        score[d_vg] = score.get(d_vg, 0) + pesos["VG"]
-
-    if not score:
-        return ""
-
-    direcao_final = max(score, key=score.get)
-    confianca = score[direcao_final]
-
-    if confianca >= 0.80:
-        return f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
-
-    elif confianca >= 0.60:
-        return f"🔥 {direcao_final} ({round(confianca*100)}%)"
-
-    # 🔥 NOVO COMPORTAMENTO
-    elif confianca > 0:
-        return f"⚠️ {direcao_final} ({round(confianca*100)}%)"
-
-    return "⚠️ Sem direção"
-
-    
+  
 # =========================================
 # ⚽ MÉTRICAS OFENSIVAS SKYNET
 # =========================================
@@ -1966,10 +1901,6 @@ with tab1:
 
     except Exception as e:
         st.error(f"ERRO POISSON: {e}")
-
-with tab1:
-
-    # ... todo seu código ...
 
     # =========================================
     # 📋 TABELA SIMPLES (COM EMOJIS)
