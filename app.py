@@ -3253,28 +3253,6 @@ with tab7:
     st.markdown("### 📋 Todos os Jogos Filtrados")
 
     # =========================================
-    # 🧠 DIREÇÃO POISSON (ISOLADO NA ABA)
-    # =========================================
-    def calcular_direcao_row(row):
-        try:
-            matriz = calcular_matriz_poisson(
-                row["ExG_Home_MGF"],
-                row["ExG_Away_MGF"]
-            )
-
-            sinais = poisson_intelligence(matriz)
-            direcao = sinais[2]
-
-            return " | ".join(direcao)
-        except:
-            return ""
-
-    if "Direcao_Poisson" not in base_df.columns:
-        base_df["Direcao_Poisson"] = ""
-
-    base_df["Direcao_Poisson"] = base_df.apply(calcular_direcao_row, axis=1)
-
-    # =========================================
     # 🔍 FILTRO BASE
     # =========================================
     df_clean = base_df[
@@ -3314,7 +3292,20 @@ with tab7:
         if res:
 
             # =========================================
-            # 🤖 DIREÇÃO IA (CORRETO - DENTRO DO LOOP)
+            # 🧠 DIREÇÃO POISSON (NO LOOP - GARANTIDO)
+            # =========================================
+            try:
+                matriz_dir = calcular_matriz_poisson(
+                    row["ExG_Home_MGF"],
+                    row["ExG_Away_MGF"]
+                )
+                sinais_dir = poisson_intelligence(matriz_dir)
+                direcao = " | ".join(sinais_dir[2])
+            except:
+                direcao = ""
+
+            # =========================================
+            # 🤖 DIREÇÃO IA (NO LOOP - GARANTIDO)
             # =========================================
             try:
                 matriz_mgf = calcular_matriz_poisson(
@@ -3332,7 +3323,6 @@ with tab7:
                 sinais_vg = poisson_intelligence(matriz_vg)
 
                 Direcao_IA = direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg)
-
             except:
                 Direcao_IA = ""
 
@@ -3355,8 +3345,8 @@ with tab7:
                 "LAY_DECISAO": definir_lay(row),
                 "HA_Value": row.get("HA_Value", ""),
 
-                # 🔥 DIREÇÕES
-                "Direcao": row.get("Direcao_Poisson", ""),
+                # 🔥 DIREÇÕES (AGORA SEM DEPENDER DE base_df)
+                "Direcao": direcao,
                 "Direcao_IA": Direcao_IA
             })
 
