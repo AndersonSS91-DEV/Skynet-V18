@@ -3230,40 +3230,92 @@ Home {home_emoji}   x   Away {away_emoji}
         # 🧠 FUNÇÃO CARD POISSON (NÃO QUEBRA NADA)
         # =========================================
         def gerar_card_linha(row):
-            try:
-                matriz_consenso = row.get("matriz_consenso", None)
-                score = poisson_score(matriz_consenso)
+    try:
+        # =============================
+        # MATRIZES
+        # =============================
+        matriz_mgf = calcular_matriz_poisson(
+            row["ExG_Home_MGF"],
+            row["ExG_Away_MGF"]
+        )
 
-                if score > 75:
-                    leitura_score = "🔥 Alta previsibilidade"
-                elif score > 55:
-                    leitura_score = "⚖️ Jogo equilibrado"
-                else:
-                    leitura_score = "⚔️ Jogo imprevisível"
+        matriz_exg = calcular_matriz_poisson(
+            row["ExG_Home_ATKxDEF"],
+            row["ExG_Away_ATKxDEF"]
+        )
 
-                estrutura = row.get("estrutura", [])
-                mercado = row.get("mercado", [])
-                direcao = row.get("direcao", [])
-                consenso = row.get("consenso", [])
+        matriz_vg = calcular_matriz_poisson(
+            row["ExG_Home_VG"],
+            row["ExG_Away_VG"]
+        )
 
-                return {
-                    "Score": round(score, 1),
-                    "Leitura": leitura_score,
-                    "Estrutura": " | ".join(estrutura) if estrutura else "",
-                    "Mercado": " | ".join(mercado) if mercado else "",
-                    "Direcao": " | ".join(direcao) if direcao else "",
-                    "Consenso": " | ".join(consenso) if consenso else ""
-                }
+        sinais_mgf = poisson_intelligence(matriz_mgf)
+        sinais_exg = poisson_intelligence(matriz_exg)
+        sinais_vg = poisson_intelligence(matriz_vg)
 
-            except:
-                return {
-                    "Score": "",
-                    "Leitura": "",
-                    "Estrutura": "",
-                    "Mercado": "",
-                    "Direcao": "",
-                    "Consenso": ""
-                }
+        consenso = consenso_poisson(
+            sinais_mgf,
+            sinais_exg,
+            sinais_vg
+        )
+
+        estrutura = []
+        mercado = []
+        direcao = []
+
+        for s in [sinais_mgf, sinais_exg, sinais_vg]:
+            estrutura += s[0]
+            mercado += s[1]
+            direcao += s[2]
+
+        estrutura = list(set(estrutura))
+        mercado = list(set(mercado))
+        direcao = list(set(direcao))
+
+        # =============================
+        # SCORE
+        # =============================
+        lambda_home = np.mean([
+            row["ExG_Home_MGF"],
+            row["ExG_Home_ATKxDEF"],
+            row["ExG_Home_VG"]
+        ])
+
+        lambda_away = np.mean([
+            row["ExG_Away_MGF"],
+            row["ExG_Away_ATKxDEF"],
+            row["ExG_Away_VG"]
+        ])
+
+        matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
+
+        score = poisson_score(matriz_consenso)
+
+        if score > 75:
+            leitura_score = "🔥 Alta previsibilidade"
+        elif score > 55:
+            leitura_score = "⚖️ Jogo equilibrado"
+        else:
+            leitura_score = "⚔️ Jogo imprevisível"
+
+        return {
+            "Score": round(score,1),
+            "Leitura": leitura_score,
+            "Estrutura": " | ".join(estrutura),
+            "Mercado": " | ".join(mercado),
+            "Direcao": " | ".join(direcao),
+            "Consenso": " | ".join(consenso)
+        }
+
+    except:
+        return {
+            "Score": "",
+            "Leitura": "",
+            "Estrutura": "",
+            "Mercado": "",
+            "Direcao": "",
+            "Consenso": ""
+        }
 
         # =========================================
         # 📊 MONTA LISTA ORIGINAL (SEM QUEBRAR NADA)
