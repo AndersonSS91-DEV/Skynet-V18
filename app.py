@@ -3257,51 +3257,59 @@ with tab7:
     # =========================================
     # 🤖 FUNÇÃO DIREÇÃO IA (ISOLADA)
     # =========================================
-    def calcular_direcao_ia(row):
-        try:
-            linha_mgf = df_mgf[
-                (df_mgf["Home_Team"] == row["Home_Team"]) &
-                (df_mgf["Away_Team"] == row["Away_Team"])
-            ].iloc[0]
+    def direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg):
 
-            linha_exg = df_exg[
-                (df_exg["Home_Team"] == row["Home_Team"]) &
-                (df_exg["Away_Team"] == row["Away_Team"])
-            ].iloc[0]
+        def get_dir(s):
+            try:
+                return s[2][0] if s and len(s) > 2 and len(s[2]) > 0 else None
+            except:
+                return None
 
-            linha_vg = df_vg[
-                (df_vg["Home_Team"] == row["Home_Team"]) &
-                (df_vg["Away_Team"] == row["Away_Team"])
-            ].iloc[0]
+        d_mgf = get_dir(sinais_mgf)
+        d_exg = get_dir(sinais_exg)
+        d_vg  = get_dir(sinais_vg)
 
-            matriz_mgf = calcular_matriz_poisson(
-                linha_mgf["ExG_Home_MGF"],
-                linha_mgf["ExG_Away_MGF"]
-            )
+        pesos = {
+            "MGF": 0.40,
+            "EXG": 0.35,
+            "VG":  0.25
+        }
 
-            matriz_exg = calcular_matriz_poisson(
-                linha_exg["ExG_Home_ATKxDEF"],
-                linha_exg["ExG_Away_ATKxDEF"]
-            )
+        score = {}
 
-            matriz_vg = calcular_matriz_poisson(
-                linha_vg["ExG_Home_VG"],
-                linha_vg["ExG_Away_VG"]
-            )
+        if d_mgf:
+            score[d_mgf] = score.get(d_mgf, 0) + pesos["MGF"]
 
-            sinais_mgf = poisson_intelligence(matriz_mgf)
-            sinais_exg = poisson_intelligence(matriz_exg)
-            sinais_vg = poisson_intelligence(matriz_vg)
+        if d_exg:
+            score[d_exg] = score.get(d_exg, 0) + pesos["EXG"]
 
-            return direcao_ia_peso(
-                sinais_mgf,
-                sinais_exg,
-                sinais_vg
-            )
+        if d_vg:
+            score[d_vg] = score.get(d_vg, 0) + pesos["VG"]
 
-        except:
+        if not score:
             return ""
 
+        direcao_final = max(score, key=score.get)
+        confianca = score[direcao_final]
+
+        if confianca >= 0.80:
+            return f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
+        elif confianca >= 0.60:
+            return f"🔥 {direcao_final} ({round(confianca*100)}%)"
+        elif confianca > 0:
+            return f"⚠️ {direcao_final} ({round(confianca*100)}%)"
+
+        return "⚠️ Sem direção"
+
+    # =========================================
+    # 🧠 WRAPPER DA IA (GARANTE USO)
+    # =========================================
+    def calcular_direcao_ia(row):
+        return direcao_ia_peso(
+            row.get("Sinais_MGF"),
+            row.get("Sinais_EXG"),
+            row.get("Sinais_VG")
+        )
     # =========================================
     # 🧠 DIREÇÃO POISSON (ISOLADO NA ABA)
     # =========================================
