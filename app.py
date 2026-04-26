@@ -3392,42 +3392,64 @@ with tab7:
                     direcao_final = None
                     confianca = 0
                     
-# =========================================
-# 🔥 IA + FALLBACK OVER / UNDER
-# =========================================
-try:
-    if score:
-        direcao_final = max(score, key=score.get)
-        confianca = score[direcao_final]
-    else:
-        direcao_final = None
-        confianca = 0
+for _, row in df_clean.iterrows():
+    res = classificar_jogo(row)
 
-    # =========================================
-    # 🔥 FALLBACK OVER / UNDER (SÓ SE VAZIO)
-    # =========================================
-    if not direcao_final:
+    if res:
 
         try:
-            matriz_gols = calcular_matriz_poisson(mgf_h, mgf_a)
-            sinais_gols = poisson_intelligence(matriz_gols)
+            # =========================
+            # SUA IA AQUI
+            # =========================
 
-            d_gols = None
-            if sinais_gols and len(sinais_gols) > 2 and sinais_gols[2]:
-                txt = str(sinais_gols[2][0]).lower()
-
-                if "over" in txt:
-                    d_gols = "Over 2.5"
-                elif "under" in txt:
-                    d_gols = "Under 2.5"
-
-            if d_gols:
-                Direcao_IA = f"⚠️ {d_gols} (55%)"
+            if score:
+                direcao_final = max(score, key=score.get)
+                confianca = score[direcao_final]
             else:
-                Direcao_IA = ""
+                direcao_final = None
+                confianca = 0
+
+            if not direcao_final:
+                try:
+                    matriz_gols = calcular_matriz_poisson(mgf_h, mgf_a)
+                    sinais_gols = poisson_intelligence(matriz_gols)
+
+                    d_gols = None
+                    if sinais_gols and len(sinais_gols) > 2 and sinais_gols[2]:
+                        txt = str(sinais_gols[2][0]).lower()
+
+                        if "over" in txt:
+                            d_gols = "Over 2.5"
+                        elif "under" in txt:
+                            d_gols = "Under 2.5"
+
+                    if d_gols:
+                        Direcao_IA = f"⚠️ {d_gols} (55%)"
+                    else:
+                        Direcao_IA = ""
+
+                except:
+                    Direcao_IA = ""
+
+            else:
+                if len(score) > 1:
+                    confianca *= 0.85
+
+                if confianca >= 0.80:
+                    Direcao_IA = f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
+                elif confianca >= 0.60:
+                    Direcao_IA = f"🔥 {direcao_final} ({round(confianca*100)}%)"
+                else:
+                    Direcao_IA = f"⚠️ {direcao_final} ({round(confianca*100)}%)"
 
         except:
             Direcao_IA = ""
+
+        lista.append({
+            "Home": row["Home"],
+            "Away": row["Away"],
+            "Direcao_IA": Direcao_IA
+        })
 
     # =========================================
     # 🔥 CASO TENHA DIREÇÃO NORMAL (LAY)
