@@ -709,7 +709,7 @@ def poisson_score(matriz):
 # =========================================
 # 🔥🔥 POISSON IA DIREÇÃO 
 # =========================================
-def direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg):
+Direcao_IA = "TESTE OK"
 
     def get_dir(s):
         return s[2][0] if len(s[2]) > 0 else None
