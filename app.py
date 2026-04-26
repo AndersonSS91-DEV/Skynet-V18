@@ -3391,6 +3391,9 @@ with tab7:
 
             # 👇 CALCULA IA (ALINHADO COM O APPEND)
             Direcao_IA = calcular_direcao_ia(row)
+            
+            if not Direcao_IA:
+                Direcao_IA = "SEM DADO"
 
             lista.append({
                 "Home": row["Home"],
