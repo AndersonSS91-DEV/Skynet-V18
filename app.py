@@ -2963,7 +2963,7 @@ def detectar_handicap_value_profissional(row):
     # =========================
 
     if g("CV_GF_H") > 0.90 or g("CV_GF_A") > 0.90:
-        return "🔴 Ignorar (Alta variância extrema)"
+        return "🔴 Ignorar (Alta variância)"
 
     if g("MGF_H") < 0.5 and g("MGF_A") < 0.5:
         return "🔴 Ignorar (Ataques inexistentes)"
