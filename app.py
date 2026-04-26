@@ -3334,77 +3334,55 @@ with tab7:
         if res:
 
             # =========================================
-            # 🔥 IA CONSENSO (MGF + EXG + VG)
+            # 🔥 IA CONSENSO (TRANSPLANTE ABA 1)
             # =========================================
             try:
-                # 🔹 MGF
-                matriz_mgf = calcular_matriz_poisson(
-                    row["ExG_Home_MGF"],
-                    row["ExG_Away_MGF"]
-                )
-                sinais_mgf = poisson_intelligence(matriz_mgf)
+                home = row["Home_Team"]
+                away = row["Visitor_Team"]
 
-                # 🔹 EXG
-                matriz_exg = calcular_matriz_poisson(
-                    row["ExG_Home"],
-                    row["ExG_Away"]
-                )
-                sinais_exg = poisson_intelligence(matriz_exg)
+                exg_row = df_exg[
+                    (df_exg["Home_Team"] == home) &
+                    (df_exg["Visitor_Team"] == away)
+                ]
 
-                # 🔹 VG
-                matriz_vg = calcular_matriz_poisson(
-                    row["VG_Home"],
-                    row["VG_Away"]
-                )
-                sinais_vg = poisson_intelligence(matriz_vg)
+                vg_row = df_vg[
+                    (df_vg["Home_Team"] == home) &
+                    (df_vg["Visitor_Team"] == away)
+                ]
 
-                # 🔥 NORMALIZA (SEM BACK)
-                def norm(d):
-                    if not d:
-                        return None
-                    d = str(d).lower()
-                    if "home" in d:
-                        return "Lay Home"
-                    if "away" in d or "visit" in d:
-                        return "Lay Away"
-                    if "over" in d:
-                        return "Over 2.5"
-                    if "under" in d:
-                        return "Under 2.5"
-                    return None
+                if not exg_row.empty and not vg_row.empty:
 
-                def get_dir(s):
-                    try:
-                        return norm(s[2][0]) if s and len(s) > 2 and len(s[2]) > 0 else None
-                    except:
-                        return None
+                    exg_row = exg_row.iloc[0]
+                    vg_row  = vg_row.iloc[0]
 
-                d_mgf = get_dir(sinais_mgf)
-                d_exg = get_dir(sinais_exg)
-                d_vg  = get_dir(sinais_vg)
+                    # 🔹 MGF
+                    matriz_mgf = calcular_matriz_poisson(
+                        row["ExG_Home_MGF"],
+                        row["ExG_Away_MGF"]
+                    )
+                    sinais_mgf = poisson_intelligence(matriz_mgf)
 
-                pesos = [0.40, 0.35, 0.25]
-                dirs = [d_mgf, d_exg, d_vg]
+                    # 🔹 EXG (CORRIGIDO)
+                    matriz_exg = calcular_matriz_poisson(
+                        exg_row["ExG_Home_ATKxDEF"],
+                        exg_row["ExG_Away_ATKxDEF"]
+                    )
+                    sinais_exg = poisson_intelligence(matriz_exg)
 
-                score = {}
+                    # 🔹 VG (CORRIGIDO)
+                    matriz_vg = calcular_matriz_poisson(
+                        vg_row["ExG_Home_VG"],
+                        vg_row["ExG_Away_VG"]
+                    )
+                    sinais_vg = poisson_intelligence(matriz_vg)
 
-                for d, p in zip(dirs, pesos):
-                    if d:
-                        score[d] = score.get(d, 0) + p
+                    # 🔥 MESMA FUNÇÃO DA ABA 1
+                    Direcao_IA = direcao_ia_peso(
+                        sinais_mgf,
+                        sinais_exg,
+                        sinais_vg
+                    )
 
-                if score:
-                    direcao_final = max(score, key=score.get)
-                    confianca = score[direcao_final]
-
-                    if len(score) > 1:
-                        confianca *= 0.85
-
-                    if confianca >= 0.80:
-                        Direcao_IA = f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
-                    elif confianca >= 0.60:
-                        Direcao_IA = f"🔥 {direcao_final} ({round(confianca*100)}%)"
-                    else:
-                        Direcao_IA = f"⚠️ {direcao_final} ({round(confianca*100)}%)"
                 else:
                     Direcao_IA = ""
 
@@ -3430,7 +3408,6 @@ with tab7:
                 "LAY_DECISAO": definir_lay(row),
                 "HA_Value": row.get("HA_Value", ""),
 
-                # 🔥 DIREÇÕES
                 "Direcao": row.get("Direcao_Poisson", ""),
                 "Direcao_IA": Direcao_IA
             })
