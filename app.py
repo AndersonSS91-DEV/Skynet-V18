@@ -1904,89 +1904,31 @@ with tab1:
 
 
 # =========================================
-# 📋 TABELA SIMPLES (COM EMOJIS)
+# 🚨 TABELA FORÇADA (NÃO DEPENDE DE NADA)
 # =========================================
-
-st.markdown("### 📋 Jogos do Dia")
+st.markdown("### 📋 TESTE TABELA FORÇADA")
 
 import pandas as pd
 
-# segurança: garante que df_mgf existe
-if "df_mgf" not in locals() and "df_mgf" not in globals():
-    st.error("df_mgf não encontrado")
-else:
-
-    lista = []
+try:
+    linhas = []
 
     for i in range(len(df_mgf)):
-
         linha = df_mgf.iloc[i]
 
-        # -----------------------------
-        # EMOJIS (COM PROTEÇÃO)
-        # -----------------------------
-        try:
-            home = classificar_filtro_duplo(
-                float(linha.get("Media_CG_H_01", 0) or 0),
-                float(linha.get("CV_CG_H_01", 0) or 0),
-                float(linha.get("Media_CG_H_02", 0) or 0),
-                float(linha.get("CV_CG_H_02", 0) or 0)
-            )
-        except:
-            home = "—"
-
-        try:
-            away = classificar_filtro_duplo(
-                float(linha.get("Media_CG_A_01", 0) or 0),
-                float(linha.get("CV_CG_A_01", 0) or 0),
-                float(linha.get("Media_CG_A_02", 0) or 0),
-                float(linha.get("CV_CG_A_02", 0) or 0)
-            )
-        except:
-            away = "—"
-
-        # -----------------------------
-        # DIREÇÃO SIMPLES
-        # -----------------------------
-        try:
-            if float(linha.get("Odds_Casa", 0) or 0) < float(linha.get("Odds_Visitante", 0) or 0):
-                direcao = "💀 Lay Away"
-            else:
-                direcao = "💀 Lay Home"
-        except:
-            direcao = ""
-
-        # -----------------------------
-        # MONTA LINHA
-        # -----------------------------
-        lista.append({
-            "Home": home,
-            "Away": away,
+        linhas.append({
+            "Home": "OK",
+            "Away": "OK",
             "Home_Team": linha.get("Home_Team", ""),
-            "Result Home": linha.get("Result Home", ""),
-            "Result Visitor": linha.get("Result Visitor", ""),
-            "Visitor_Team": linha.get("Visitor_Team", ""),
-            "Result_Home_HT": linha.get("Result_Home_HT", ""),
-            "Result_Visitor_HT": linha.get("Result_Visitor_HT", ""),
-            "Odds_Casa": linha.get("Odds_Casa", ""),
-            "Odds_Empate": linha.get("Odds_Empate", ""),
-            "Odds_Visitante": linha.get("Odds_Visitante", ""),
-            "Time_Letal": linha.get("Time_Letal", ""),
-            "Score_Ofensivo": linha.get("Score_Ofensivo", ""),
-            "Direção": direcao,
-            "Direção_IA": linha.get("Direcao_IA", "")
+            "Visitor_Team": linha.get("Visitor_Team", "")
         })
 
-    # -----------------------------
-    # DATAFRAME FINAL
-    # -----------------------------
-    df_simples = pd.DataFrame(lista)
+    df_teste = pd.DataFrame(linhas)
 
-    if len(df_simples) == 0:
-        st.warning("Sem dados na tabela")
-    else:
-        st.dataframe(df_simples, use_container_width=True, hide_index=True)
+    st.dataframe(df_teste, use_container_width=True)
 
+except Exception as e:
+    st.error(f"ERRO REAL: {e}")
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
