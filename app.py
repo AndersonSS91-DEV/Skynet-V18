@@ -1749,87 +1749,100 @@ with tab1:
             )
         )
         
-    # =========================================
-    # 🧠💀 POISSON INTELLIGENCE CENTER
-    # =========================================
+# =========================================
+# 🧠💀 POISSON INTELLIGENCE CENTER
+# =========================================
 
-    st.markdown("### 🧠💀 Consenso Poisson")
+st.markdown("### 🧠💀 Consenso Poisson")
 
-    try:
+try:
 
-        matriz_mgf = calcular_matriz_poisson(
-            linha_mgf["ExG_Home_MGF"],
-            linha_mgf["ExG_Away_MGF"]
-        )
+    idx = linha_mgf.name  # 🔥 ESSENCIAL
 
-        matriz_exg = calcular_matriz_poisson(
-            linha_exg["ExG_Home_ATKxDEF"],
-            linha_exg["ExG_Away_ATKxDEF"]
-        )
+    matriz_mgf = calcular_matriz_poisson(
+        linha_mgf["ExG_Home_MGF"],
+        linha_mgf["ExG_Away_MGF"]
+    )
 
-        matriz_vg = calcular_matriz_poisson(
-            linha_vg["ExG_Home_VG"],
-            linha_vg["ExG_Away_VG"]
-        )
+    matriz_exg = calcular_matriz_poisson(
+        linha_exg["ExG_Home_ATKxDEF"],
+        linha_exg["ExG_Away_ATKxDEF"]
+    )
 
-        sinais_mgf = poisson_intelligence(matriz_mgf)
-        sinais_exg = poisson_intelligence(matriz_exg)
-        sinais_vg = poisson_intelligence(matriz_vg)
+    matriz_vg = calcular_matriz_poisson(
+        linha_vg["ExG_Home_VG"],
+        linha_vg["ExG_Away_VG"]
+    )
 
-        consenso = consenso_poisson(
-            sinais_mgf,
-            sinais_exg,
-            sinais_vg
-        )
+    sinais_mgf = poisson_intelligence(matriz_mgf)
+    sinais_exg = poisson_intelligence(matriz_exg)
+    sinais_vg = poisson_intelligence(matriz_vg)
 
-        estrutura = []
-        mercado = []
-        direcao = []
+    consenso = consenso_poisson(
+        sinais_mgf,
+        sinais_exg,
+        sinais_vg
+    )
 
-        for s in [sinais_mgf, sinais_exg, sinais_vg]:
+    estrutura = []
+    mercado = []
+    direcao = []
 
-            estrutura += s[0]
-            mercado += s[1]
-            direcao += s[2]
+    for s in [sinais_mgf, sinais_exg, sinais_vg]:
+        estrutura += s[0]
+        mercado += s[1]
+        direcao += s[2]
 
-        estrutura = list(set(estrutura))
-        mercado = list(set(mercado))
-        direcao = list(set(direcao))
+    estrutura = list(set(estrutura))
+    mercado = list(set(mercado))
+    direcao = list(set(direcao))
 
-        # =============================
-        # SCORE POISSON
-        # =============================
+    # =============================
+    # SCORE POISSON
+    # =============================
 
-        score = poisson_score(matriz_consenso)
+    score = poisson_score(matriz_consenso)
 
-        if score > 75:
-            leitura_score = "🔥 Alta previsibilidade"
-        elif score > 55:
-            leitura_score = "⚖️ Jogo equilibrado"
-        else:
-            leitura_score = "⚔️ Jogo imprevisível"
+    if score > 75:
+        leitura_score = "🔥 Alta previsibilidade"
+    elif score > 55:
+        leitura_score = "⚖️ Jogo equilibrado"
+    else:
+        leitura_score = "⚔️ Jogo imprevisível"
 
-        linhas = []
+    # 🔥 SALVA NO DATAFRAME (AQUI É O PULO DO GATO)
+    base_df.loc[idx, "Score"] = round(score, 1)
+    base_df.loc[idx, "Leitura"] = leitura_score
+    base_df.loc[idx, "Estrutura"] = " | ".join(estrutura)
+    base_df.loc[idx, "Mercado"] = " | ".join(mercado)
+    base_df.loc[idx, "Direcao"] = " | ".join(direcao)
+    base_df.loc[idx, "Consenso"] = " | ".join(consenso)
 
-        linhas.append(f"🎯 Score Poisson: {score} — {leitura_score}")
+    # =============================
+    # UI
+    # =============================
 
-        if estrutura:
-            linhas.append("⚽ Estrutura de gols\n" + " | ".join(estrutura))
+    linhas = []
 
-        if mercado:
-            linhas.append("📈 Mercado\n" + " | ".join(mercado))
+    linhas.append(f"🎯 Score Poisson: {score} — {leitura_score}")
 
-        if direcao:
-            linhas.append("🎯 Direção\n" + " | ".join(direcao))
+    if estrutura:
+        linhas.append("⚽ Estrutura de gols\n" + " | ".join(estrutura))
 
-        if consenso:
-            linhas.append("🧠 Consenso\n" + " | ".join(consenso))
+    if mercado:
+        linhas.append("📈 Mercado\n" + " | ".join(mercado))
 
-        if linhas:
-            st.error("\n\n".join(linhas))
+    if direcao:
+        linhas.append("🎯 Direção\n" + " | ".join(direcao))
 
-    except:
-        pass
+    if consenso:
+        linhas.append("🧠 Consenso\n" + " | ".join(consenso))
+
+    if linhas:
+        st.error("\n\n".join(linhas))
+
+except:
+    pass
         
 # =========================================
 # ABA 2 — DADOS COMPLETOS
