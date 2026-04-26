@@ -704,6 +704,55 @@ def poisson_score(matriz):
     score = (top3 * 0.6) + (top5 * 0.4)
 
     return round(score * 100, 1)
+
+
+# =========================================
+# 🔥🔥 POISSON IA DIREÇÃO 
+# =========================================
+def direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg):
+
+    def get_dir(s):
+        return s[2][0] if len(s[2]) > 0 else None
+
+    d_mgf = get_dir(sinais_mgf)
+    d_exg = get_dir(sinais_exg)
+    d_vg  = get_dir(sinais_vg)
+
+    pesos = {
+        "MGF": 0.40,
+        "EXG": 0.35,
+        "VG":  0.25
+    }
+
+    score = {}
+
+    if d_mgf:
+        score[d_mgf] = score.get(d_mgf, 0) + pesos["MGF"]
+
+    if d_exg:
+        score[d_exg] = score.get(d_exg, 0) + pesos["EXG"]
+
+    if d_vg:
+        score[d_vg] = score.get(d_vg, 0) + pesos["VG"]
+
+    if not score:
+        return ""
+
+    direcao_final = max(score, key=score.get)
+    confianca = score[direcao_final]
+
+    if confianca >= 0.80:
+        return f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
+
+    elif confianca >= 0.60:
+        return f"🔥 {direcao_final} ({round(confianca*100)}%)"
+
+    # 🔥 NOVO COMPORTAMENTO
+    elif confianca > 0:
+        return f"⚠️ {direcao_final} ({round(confianca*100)}%)"
+
+    return "⚠️ Sem direção"
+
     
 # =========================================
 # ⚽ MÉTRICAS OFENSIVAS SKYNET
@@ -1748,11 +1797,9 @@ with tab1:
                 radar_away_consenso
             )
         )
-        
     # =========================================
     # 🧠💀 POISSON INTELLIGENCE CENTER
     # =========================================
-
     st.markdown("### 🧠💀 Consenso Poisson")
 
     try:
@@ -1776,6 +1823,8 @@ with tab1:
         sinais_exg = poisson_intelligence(matriz_exg)
         sinais_vg = poisson_intelligence(matriz_vg)
 
+        Direcao_IA = direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg)
+
         consenso = consenso_poisson(
             sinais_mgf,
             sinais_exg,
@@ -1787,7 +1836,6 @@ with tab1:
         direcao = []
 
         for s in [sinais_mgf, sinais_exg, sinais_vg]:
-
             estrutura += s[0]
             mercado += s[1]
             direcao += s[2]
@@ -1795,10 +1843,6 @@ with tab1:
         estrutura = list(set(estrutura))
         mercado = list(set(mercado))
         direcao = list(set(direcao))
-
-        # =============================
-        # SCORE POISSON
-        # =============================
 
         score = poisson_score(matriz_consenso)
 
@@ -1822,15 +1866,19 @@ with tab1:
         if direcao:
             linhas.append("🎯 Direção\n" + " | ".join(direcao))
 
+        if Direcao_IA:
+            linhas.append(f"🤖 Direção IA {Direcao_IA}")
+
         if consenso:
             linhas.append("🧠 Consenso\n" + " | ".join(consenso))
 
         if linhas:
             st.error("\n\n".join(linhas))
 
-    except:
-        pass
-        
+    except Exception as e:
+        st.error(f"ERRO POISSON: {e}")
+
+
 # =========================================
 # ABA 2 — DADOS COMPLETOS
 # =========================================
@@ -2012,6 +2060,8 @@ with tab3:
         sinais_exg = poisson_intelligence(matriz_exg)
         sinais_vg = poisson_intelligence(matriz_vg)
 
+        Direcao_IA = direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg)
+
         consenso = consenso_poisson(
             sinais_mgf,
             sinais_exg,
@@ -2036,8 +2086,8 @@ with tab3:
         else:
             st.info("Sem consenso forte")
 
-    except:
-        pass
+    except Exception as e:
+        st.error(f"ERRO POISSON: {e}")
 
 # =========================================
     # ===== RADAR ATK x DEF =====
@@ -2829,7 +2879,7 @@ def classificar_jogo(row):
     # =========================================
     # 🔵 UNDER INTELIGENTE
     # =========================================
-    elif coef_over < 2.2 and time_A["mgf"] < 2 and time_B["mgf"] < 2:
+    elif coef_over < 1.9 and time_A["mgf"] < 2 and time_B["mgf"] < 2:
         tipo = "🔵 Under Inteligente (Cerro / LDU)"
         entrada = "Under 2.5"
         classe = "A"
@@ -2913,7 +2963,7 @@ def detectar_handicap_value_profissional(row):
     # =========================
 
     if g("CV_GF_H") > 0.90 or g("CV_GF_A") > 0.90:
-        return "🔴 Ignorar (Alta variância extrema)"
+        return "🔴 Ignorar (Alta variância)"
 
     if g("MGF_H") < 0.5 and g("MGF_A") < 0.5:
         return "🔴 Ignorar (Ataques inexistentes)"
@@ -3082,28 +3132,38 @@ def definir_lay(row):
     over = row.get("Odds_Over_2,5FT", 0)
     ha = str(row.get("HA_Value", ""))
 
+    cg_away = row.get("Media_CG_A_01", 0)
+    cv_away = row.get("CV_CG_A_01", 1)
+
+    # dados inválidos
     if odd_home == 0 or odd_away == 0 or over == 0:
         return "—"
 
     if "Ignorar" in ha:
         return "❌ Evitar"
 
-    # 🔴 REGRA PRINCIPAL (OBRIGATÓRIA)
-    if odd_home > 1.90:
-        return "❌ Fora padrão"   # 👈 ISSO RESOLVE SEU PROBLEMA
+    # 🚫 visitante favorito
+    if odd_away < odd_home:
+        return "🔘 Away favorito"
+
+    # 🚫 BLOQUEIO: AWAY forte (🌋)
+    if (2.80 <= cg_away <= 5.50 and cv_away <= 0.80):
+        return "💥 Away forte (🌋)"
 
     # 🔥 Lay Away PRO
     if (
+        odd_home <= 1.90 and
         over >= 1.60 and
         2.20 <= odd_away <= 5.00
     ):
         return "🔥 Lay Away PRO"
 
     # 🟡 Lay Away
-    if odd_away <= 6.00:
+    if 5.01 <= odd_away <= 6.00:
         return "🟡 Lay Away"
 
-    return "⚠️ Fraco"
+    return "⚠️Lay Away (Atenção)"
+
 
 # =========================================
 # 🚀 ABA IA FINAL
@@ -3186,74 +3246,131 @@ Home {home_emoji}   x   Away {away_emoji}
         else:
             st.info("Nenhum jogo A+/A encontrado")
 
-        # =========================================
-        # 📋 TABELA FINAL
-        # =========================================
-        st.markdown("### 📋 Todos os Jogos Filtrados")
 
-        df_clean = base_df[
-            (base_df["Odd_BTTS_YES"] > 0) &
-            (base_df["Odds_Over_2,5FT"] > 0) &
-            (base_df["Odds_Casa"] > 0) &
-            (base_df["Odds_Visitante"] > 0)
+# =========================================
+# 📋 TABELA FINAL (ABA CONTROLADA)
+# =========================================
+with tab7:
+
+    st.markdown("### 📋 Todos os Jogos Filtrados")
+
+    # =========================================
+    # 🧠 DIREÇÃO POISSON (ISOLADO NA ABA)
+    # =========================================
+    def calcular_direcao_row(row):
+        try:
+            matriz = calcular_matriz_poisson(
+                row["ExG_Home_MGF"],
+                row["ExG_Away_MGF"]
+            )
+
+            sinais = poisson_intelligence(matriz)
+            direcao = sinais[2]
+
+            return " | ".join(direcao)
+        except:
+            return ""
+
+    if "Direcao_Poisson" not in base_df.columns:
+        base_df["Direcao_Poisson"] = ""
+
+    base_df["Direcao_Poisson"] = base_df.apply(calcular_direcao_row, axis=1)
+
+    # =========================================
+    # 🔥 CONVERSÃO DAS ODDS (CORRETA)
+    # =========================================
+    cols_odds = [
+        "Odd_BTTS_YES",
+        "Odds_Over_2,5FT",
+        "Odds_Casa",
+        "Odds_Visitante"
+    ]
+
+    for col in cols_odds:
+        base_df[col] = (
+            base_df[col]
+            .astype(str)
+            .str.replace(",", ".", regex=False)
+        )
+        base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
+
+    # =========================================
+    # 🔍 FILTRO BASE
+    # =========================================
+    df_clean = base_df[
+        (base_df["Odd_BTTS_YES"] > 0) &
+        (base_df["Odds_Over_2,5FT"] > 0) &
+        (base_df["Odds_Casa"] > 0) &
+        (base_df["Odds_Visitante"] > 0)
+    ].copy()
+
+    # =========================================
+    # 🔥 APLICA FILTRO VISUAL
+    # =========================================
+    df_clean["Home"] = df_clean.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_H_01"], x["CV_CG_H_01"],
+            x["Media_CG_H_02"], x["CV_CG_H_02"]
+        ),
+        axis=1
+    )
+
+    df_clean["Away"] = df_clean.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_A_01"], x["CV_CG_A_01"],
+            x["Media_CG_A_02"], x["CV_CG_A_02"]
+        ),
+        axis=1
+    )
+
+    # =========================================
+    # 📊 MONTA LISTA
+    # =========================================
+    lista = []
+
+    for _, row in df_clean.iterrows():
+        res = classificar_jogo(row)
+
+        if res:
+            lista.append({
+                "Home": row["Home"],
+                "Away": row["Away"],
+                "Home_Team": row.get("Home_Team", ""),
+                "Away_Team": row.get("Visitor_Team", ""),
+                "Placar": (
+                    "-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
+                    else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"
+                ),
+                "HT": (
+                    "-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
+                    else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"
+                ),
+                "Tipo": res["Tipo"],
+                "Entrada": res["Entrada"],
+                "Classe": res["Classe"],
+                "LAY_DECISAO": definir_lay(row),
+                "HA_Value": row.get("HA_Value", ""),
+
+                # 🔥 DIREÇÃO
+                "Direcao": row.get("Direcao_Poisson", "")
+            })
+
+    # =========================================
+    # 📈 OUTPUT FINAL
+    # =========================================
+    if lista:
+        df_final = pd.DataFrame(lista)
+
+        cols = [
+            "Home", "Away", "Home_Team", "Away_Team",
+            "Placar", "HT",
+            "Tipo", "Entrada", "Classe",
+            "LAY_DECISAO", "HA_Value",
+            "Direcao"
         ]
 
-       
-        # =========================================
-        # 🔥 APLICA FILTRO VISUAL
-        # =========================================
-        df_clean["Home"] = df_clean.apply(
-            lambda x: classificar_filtro_duplo(
-                x["Media_CG_H_01"], x["CV_CG_H_01"],
-                x["Media_CG_H_02"], x["CV_CG_H_02"]
-            ),
-            axis=1
-        )
+        df_final = df_final[cols]
 
-        df_clean["Away"] = df_clean.apply(
-            lambda x: classificar_filtro_duplo(
-                x["Media_CG_A_01"], x["CV_CG_A_01"],
-                x["Media_CG_A_02"], x["CV_CG_A_02"]
-            ),
-            axis=1
-        )
-        # =========================================
-        # 📊 MONTA LISTA ORIGINAL (SEM QUEBRAR NADA)
-        # =========================================
-        lista = []
-
-        for _, row in df_clean.iterrows():
-            res = classificar_jogo(row)
-
-            if res:
-                lista.append({
-                    "Home": row["Home"],
-                    "Away": row["Away"],
-                    "Home_Team": row.get("Home_Team", ""),
-                    "Away_Team": row.get("Visitor_Team", ""),
-                    "Placar": ("-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
-                    else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"),
-                    "HT": ("-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
-                    else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"),
-                    "Tipo": res["Tipo"],
-                    "Entrada": res["Entrada"],
-                    "Classe": res["Classe"],
-                    "LAY_DECISAO": definir_lay(row),
-                    "HA_Value": row.get("HA_Value", "")
-                })
-
-        # =========================================
-        # 📈 OUTPUT FINAL
-        # =========================================
-        if lista:
-            df_final = pd.DataFrame(lista)
-
-            # joga Home/Away pra frente
-            cols = ["Home", "Away","Home_Team", "Away_Team","Placar", "HT","Tipo", "Entrada", "Classe", "LAY_DECISAO", "HA_Value"]
-            df_final = df_final[cols]
-
-            st.dataframe(df_final, use_container_width=True, hide_index=True)
-        else:
-            st.info("Sem jogos válidos após filtro")
-
-           
+        st.dataframe(df_final, use_container_width=True, hide_index=True)
+    else:
+        st.info("Sem jogos válidos após filtro")
