@@ -3252,7 +3252,7 @@ def gerar_card_linha(row):
         # =========================================
         # 📊 MONTA LISTA ORIGINAL (SEM QUEBRAR NADA)
         # =========================================
-        lista = []
+lista = []   # 🔴 ESSA LINHA É O QUE FALTAVA
 
 for _, row in df_clean.iterrows():
     res = classificar_jogo(row)
