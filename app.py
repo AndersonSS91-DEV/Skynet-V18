@@ -3253,6 +3253,39 @@ Home {home_emoji}   x   Away {away_emoji}
 with tab7:
 
     st.markdown("### 📋 Todos os Jogos Filtrados")
+    
+    # =========================================
+    # 🤖 FUNÇÃO DIREÇÃO IA (ISOLADA)
+    # =========================================
+    def calcular_direcao_ia(row):
+        try:
+            matriz_mgf = calcular_matriz_poisson(
+                row["ExG_Home_MGF"],
+                row["ExG_Away_MGF"]
+            )
+
+            matriz_exg = calcular_matriz_poisson(
+                row["ExG_Home_ATKxDEF"],
+                row["ExG_Away_ATKxDEF"]
+            )
+
+            matriz_vg = calcular_matriz_poisson(
+                row["ExG_Home_VG"],
+                row["ExG_Away_VG"]
+            )
+
+            sinais_mgf = poisson_intelligence(matriz_mgf)
+            sinais_exg = poisson_intelligence(matriz_exg)
+            sinais_vg = poisson_intelligence(matriz_vg)
+
+            return direcao_ia_peso(
+                sinais_mgf,
+                sinais_exg,
+                sinais_vg
+            )
+
+        except:
+            return ""
 
     # =========================================
     # 🧠 DIREÇÃO POISSON (ISOLADO NA ABA)
@@ -3332,6 +3365,10 @@ with tab7:
         res = classificar_jogo(row)
 
         if res:
+
+            # 👇 CALCULA IA (ALINHADO COM O APPEND)
+            Direcao_IA = calcular_direcao_ia(row)
+
             lista.append({
                 "Home": row["Home"],
                 "Away": row["Away"],
@@ -3351,10 +3388,11 @@ with tab7:
                 "LAY_DECISAO": definir_lay(row),
                 "HA_Value": row.get("HA_Value", ""),
 
-                # 🔥 DIREÇÃO
-                "Direcao": row.get("Direcao_Poisson", "")
+                # 🔥 DIREÇÕES
+                "Direcao": row.get("Direcao_Poisson", ""),
+                "Direcao_IA": Direcao_IA
             })
-
+            
     # =========================================
     # 📈 OUTPUT FINAL
     # =========================================
@@ -3366,7 +3404,8 @@ with tab7:
             "Placar", "HT",
             "Tipo", "Entrada", "Classe",
             "LAY_DECISAO", "HA_Value",
-            "Direcao"
+            "Direcao",
+            "Direcao_IA"
         ]
 
         df_final = df_final[cols]
