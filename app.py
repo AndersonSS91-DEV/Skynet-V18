@@ -704,6 +704,50 @@ def poisson_score(matriz):
     score = (top3 * 0.6) + (top5 * 0.4)
 
     return round(score * 100, 1)
+
+
+# =========================================
+# 🔥🔥 POISSON IA DIREÇÃO 
+# =========================================
+def direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg):
+
+    def get_dir(s):
+        return s[2][0] if len(s[2]) > 0 else None
+
+    d_mgf = get_dir(sinais_mgf)
+    d_exg = get_dir(sinais_exg)
+    d_vg  = get_dir(sinais_vg)
+
+    pesos = {
+        "MGF": 0.40,
+        "EXG": 0.35,
+        "VG":  0.25
+    }
+
+    score = {}
+
+    if d_mgf:
+        score[d_mgf] = score.get(d_mgf, 0) + pesos["MGF"]
+
+    if d_exg:
+        score[d_exg] = score.get(d_exg, 0) + pesos["EXG"]
+
+    if d_vg:
+        score[d_vg] = score.get(d_vg, 0) + pesos["VG"]
+
+    if not score:
+        return ""
+
+    direcao_final = max(score, key=score.get)
+    confianca = score[direcao_final]
+
+    if confianca >= 0.80:
+        return f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
+    elif confianca >= 0.60:
+        return f"🔥 {direcao_final} ({round(confianca*100)}%)"
+
+    return ""
+
     
 # =========================================
 # ⚽ MÉTRICAS OFENSIVAS SKYNET
@@ -1821,7 +1865,10 @@ with tab1:
 
         if direcao:
             linhas.append("🎯 Direção\n" + " | ".join(direcao))
-
+            
+        if Direcao_IA:
+            linhas.append(f"🤖 Análise IA {Direcao_IA}")
+            
         if consenso:
             linhas.append("🧠 Consenso\n" + " | ".join(consenso))
 
@@ -2011,6 +2058,8 @@ with tab3:
         sinais_mgf = poisson_intelligence(matriz_mgf)
         sinais_exg = poisson_intelligence(matriz_exg)
         sinais_vg = poisson_intelligence(matriz_vg)
+
+        Direcao_IA = direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg)
 
         consenso = consenso_poisson(
             sinais_mgf,
