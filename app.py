@@ -3255,62 +3255,6 @@ with tab7:
     st.markdown("### 📋 Todos os Jogos Filtrados")
 
     # =========================================
-    # 🤖 FUNÇÃO DIREÇÃO IA (ISOLADA)
-    # =========================================
-    def direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg):
-
-        def get_dir(s):
-            try:
-                return s[2][0] if s and len(s) > 2 and len(s[2]) > 0 else None
-            except:
-                return None
-
-        d_mgf = get_dir(sinais_mgf)
-        d_exg = get_dir(sinais_exg)
-        d_vg  = get_dir(sinais_vg)
-
-        pesos = {
-            "MGF": 0.40,
-            "EXG": 0.35,
-            "VG":  0.25
-        }
-
-        score = {}
-
-        if d_mgf:
-            score[d_mgf] = score.get(d_mgf, 0) + pesos["MGF"]
-
-        if d_exg:
-            score[d_exg] = score.get(d_exg, 0) + pesos["EXG"]
-
-        if d_vg:
-            score[d_vg] = score.get(d_vg, 0) + pesos["VG"]
-
-        if not score:
-            return ""
-
-        direcao_final = max(score, key=score.get)
-        confianca = score[direcao_final]
-
-        if confianca >= 0.80:
-            return f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
-        elif confianca >= 0.60:
-            return f"🔥 {direcao_final} ({round(confianca*100)}%)"
-        elif confianca > 0:
-            return f"⚠️ {direcao_final} ({round(confianca*100)}%)"
-
-        return "⚠️ Sem direção"
-
-    # =========================================
-    # 🧠 WRAPPER DA IA (GARANTE USO)
-    # =========================================
-    def calcular_direcao_ia(row):
-        return direcao_ia_peso(
-            row.get("Sinais_MGF"),
-            row.get("Sinais_EXG"),
-            row.get("Sinais_VG")
-        )
-    # =========================================
     # 🧠 DIREÇÃO POISSON (ISOLADO NA ABA)
     # =========================================
     def calcular_direcao_row(row):
@@ -3389,11 +3333,83 @@ with tab7:
 
         if res:
 
-            # 👇 CALCULA IA (ALINHADO COM O APPEND)
-            Direcao_IA = calcular_direcao_ia(row)
-            
-            if not Direcao_IA:
-                Direcao_IA = "SEM DADO"
+            # =========================================
+            # 🔥 IA CONSENSO (MGF + EXG + VG)
+            # =========================================
+            try:
+                # 🔹 MGF
+                matriz_mgf = calcular_matriz_poisson(
+                    row["ExG_Home_MGF"],
+                    row["ExG_Away_MGF"]
+                )
+                sinais_mgf = poisson_intelligence(matriz_mgf)
+
+                # 🔹 EXG
+                matriz_exg = calcular_matriz_poisson(
+                    row["ExG_Home"],
+                    row["ExG_Away"]
+                )
+                sinais_exg = poisson_intelligence(matriz_exg)
+
+                # 🔹 VG
+                matriz_vg = calcular_matriz_poisson(
+                    row["VG_Home"],
+                    row["VG_Away"]
+                )
+                sinais_vg = poisson_intelligence(matriz_vg)
+
+                # 🔥 NORMALIZA (SEM BACK)
+                def norm(d):
+                    if not d:
+                        return None
+                    d = str(d).lower()
+                    if "home" in d:
+                        return "Lay Home"
+                    if "away" in d or "visit" in d:
+                        return "Lay Away"
+                    if "over" in d:
+                        return "Over 2.5"
+                    if "under" in d:
+                        return "Under 2.5"
+                    return None
+
+                def get_dir(s):
+                    try:
+                        return norm(s[2][0]) if s and len(s) > 2 and len(s[2]) > 0 else None
+                    except:
+                        return None
+
+                d_mgf = get_dir(sinais_mgf)
+                d_exg = get_dir(sinais_exg)
+                d_vg  = get_dir(sinais_vg)
+
+                pesos = [0.40, 0.35, 0.25]
+                dirs = [d_mgf, d_exg, d_vg]
+
+                score = {}
+
+                for d, p in zip(dirs, pesos):
+                    if d:
+                        score[d] = score.get(d, 0) + p
+
+                if score:
+                    direcao_final = max(score, key=score.get)
+                    confianca = score[direcao_final]
+
+                    if len(score) > 1:
+                        confianca *= 0.85
+
+                    if confianca >= 0.80:
+                        Direcao_IA = f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
+                    elif confianca >= 0.60:
+                        Direcao_IA = f"🔥 {direcao_final} ({round(confianca*100)}%)"
+                    else:
+                        Direcao_IA = f"⚠️ {direcao_final} ({round(confianca*100)}%)"
+                else:
+                    Direcao_IA = ""
+
+            except:
+                Direcao_IA = ""
 
             lista.append({
                 "Home": row["Home"],
@@ -3418,7 +3434,7 @@ with tab7:
                 "Direcao": row.get("Direcao_Poisson", ""),
                 "Direcao_IA": Direcao_IA
             })
-            
+
     # =========================================
     # 📈 OUTPUT FINAL
     # =========================================
