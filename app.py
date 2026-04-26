@@ -3258,34 +3258,49 @@ with tab7:
     # 🤖 FUNÇÃO DIREÇÃO IA (ISOLADA)
     # =========================================
     def calcular_direcao_ia(row):
-        try:
-            matriz_mgf = calcular_matriz_poisson(
-                row["ExG_Home_MGF"],
-                row["ExG_Away_MGF"]
-            )
+    try:
+        linha_mgf = df_mgf[
+            (df_mgf["Home_Team"] == row["Home_Team"]) &
+            (df_mgf["Away_Team"] == row["Away_Team"])
+        ].iloc[0]
 
-            matriz_exg = calcular_matriz_poisson(
-                row["ExG_Home_ATKxDEF"],
-                row["ExG_Away_ATKxDEF"]
-            )
+        linha_exg = df_exg[
+            (df_exg["Home_Team"] == row["Home_Team"]) &
+            (df_exg["Away_Team"] == row["Away_Team"])
+        ].iloc[0]
 
-            matriz_vg = calcular_matriz_poisson(
-                row["ExG_Home_VG"],
-                row["ExG_Away_VG"]
-            )
+        linha_vg = df_vg[
+            (df_vg["Home_Team"] == row["Home_Team"]) &
+            (df_vg["Away_Team"] == row["Away_Team"])
+        ].iloc[0]
 
-            sinais_mgf = poisson_intelligence(matriz_mgf)
-            sinais_exg = poisson_intelligence(matriz_exg)
-            sinais_vg = poisson_intelligence(matriz_vg)
+        matriz_mgf = calcular_matriz_poisson(
+            linha_mgf["ExG_Home_MGF"],
+            linha_mgf["ExG_Away_MGF"]
+        )
 
-            return direcao_ia_peso(
-                sinais_mgf,
-                sinais_exg,
-                sinais_vg
-            )
+        matriz_exg = calcular_matriz_poisson(
+            linha_exg["ExG_Home_ATKxDEF"],
+            linha_exg["ExG_Away_ATKxDEF"]
+        )
 
-        except:
-            return ""
+        matriz_vg = calcular_matriz_poisson(
+            linha_vg["ExG_Home_VG"],
+            linha_vg["ExG_Away_VG"]
+        )
+
+        sinais_mgf = poisson_intelligence(matriz_mgf)
+        sinais_exg = poisson_intelligence(matriz_exg)
+        sinais_vg = poisson_intelligence(matriz_vg)
+
+        return direcao_ia_peso(
+            sinais_mgf,
+            sinais_exg,
+            sinais_vg
+        )
+
+    except:
+        return ""
 
     # =========================================
     # 🧠 DIREÇÃO POISSON (ISOLADO NA ABA)
