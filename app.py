@@ -3253,54 +3253,54 @@ Home {home_emoji}   x   Away {away_emoji}
 with tab7:
 
     st.markdown("### 📋 Todos os Jogos Filtrados")
-    
+
     # =========================================
     # 🤖 FUNÇÃO DIREÇÃO IA (ISOLADA)
     # =========================================
-def calcular_direcao_ia(row):
-    try:
-        linha_mgf = df_mgf[
-            (df_mgf["Home_Team"] == row["Home_Team"]) &
-            (df_mgf["Away_Team"] == row["Away_Team"])
-        ].iloc[0]
+    def calcular_direcao_ia(row):
+        try:
+            linha_mgf = df_mgf[
+                (df_mgf["Home_Team"] == row["Home_Team"]) &
+                (df_mgf["Away_Team"] == row["Away_Team"])
+            ].iloc[0]
 
-        linha_exg = df_exg[
-            (df_exg["Home_Team"] == row["Home_Team"]) &
-            (df_exg["Away_Team"] == row["Away_Team"])
-        ].iloc[0]
+            linha_exg = df_exg[
+                (df_exg["Home_Team"] == row["Home_Team"]) &
+                (df_exg["Away_Team"] == row["Away_Team"])
+            ].iloc[0]
 
-        linha_vg = df_vg[
-            (df_vg["Home_Team"] == row["Home_Team"]) &
-            (df_vg["Away_Team"] == row["Away_Team"])
-        ].iloc[0]
+            linha_vg = df_vg[
+                (df_vg["Home_Team"] == row["Home_Team"]) &
+                (df_vg["Away_Team"] == row["Away_Team"])
+            ].iloc[0]
 
-        matriz_mgf = calcular_matriz_poisson(
-            linha_mgf["ExG_Home_MGF"],
-            linha_mgf["ExG_Away_MGF"]
-        )
+            matriz_mgf = calcular_matriz_poisson(
+                linha_mgf["ExG_Home_MGF"],
+                linha_mgf["ExG_Away_MGF"]
+            )
 
-        matriz_exg = calcular_matriz_poisson(
-            linha_exg["ExG_Home_ATKxDEF"],
-            linha_exg["ExG_Away_ATKxDEF"]
-        )
+            matriz_exg = calcular_matriz_poisson(
+                linha_exg["ExG_Home_ATKxDEF"],
+                linha_exg["ExG_Away_ATKxDEF"]
+            )
 
-        matriz_vg = calcular_matriz_poisson(
-            linha_vg["ExG_Home_VG"],
-            linha_vg["ExG_Away_VG"]
-        )
+            matriz_vg = calcular_matriz_poisson(
+                linha_vg["ExG_Home_VG"],
+                linha_vg["ExG_Away_VG"]
+            )
 
-        sinais_mgf = poisson_intelligence(matriz_mgf)
-        sinais_exg = poisson_intelligence(matriz_exg)
-        sinais_vg = poisson_intelligence(matriz_vg)
+            sinais_mgf = poisson_intelligence(matriz_mgf)
+            sinais_exg = poisson_intelligence(matriz_exg)
+            sinais_vg = poisson_intelligence(matriz_vg)
 
-        return direcao_ia_peso(
-            sinais_mgf,
-            sinais_exg,
-            sinais_vg
-        )
+            return direcao_ia_peso(
+                sinais_mgf,
+                sinais_exg,
+                sinais_vg
+            )
 
-    except:
-        return ""
+        except:
+            return ""
 
     # =========================================
     # 🧠 DIREÇÃO POISSON (ISOLADO NA ABA)
