@@ -259,7 +259,7 @@ def direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg):
         return f"⚠️ {direcao_final} ({round(confianca*100)}%)"
 
     return ""
-    
+
 # =========================================
 # 🎬 BANNER CARROSSEL (OFICIAL SKYNET)
 # =========================================
@@ -1938,6 +1938,83 @@ with tab1:
 
     except Exception as e:
         st.error(f"ERRO POISSON: {e}")
+
+# =========================================
+# 📋 TABELA SIMPLES (COM EMOJIS)
+# =========================================
+
+st.markdown("### 📋 Jogos do Dia")
+
+df_simples = base_df.copy()
+
+# =========================================
+# 🎨 COLUNA HOME (EMOJI)
+# =========================================
+df_simples["Home"] = df_simples.apply(
+    lambda x: classificar_filtro_duplo(
+        x["Media_CG_H_01"], x["CV_CG_H_01"],
+        x["Media_CG_H_02"], x["CV_CG_H_02"]
+    ),
+    axis=1
+)
+
+# =========================================
+# 🎨 COLUNA AWAY (EMOJI)
+# =========================================
+df_simples["Away"] = df_simples.apply(
+    lambda x: classificar_filtro_duplo(
+        x["Media_CG_A_01"], x["CV_CG_A_01"],
+        x["Media_CG_A_02"], x["CV_CG_A_02"]
+    ),
+    axis=1
+)
+
+# =========================================
+# 🎯 DIREÇÃO (SIMPLES)
+# =========================================
+def direcao_simples(row):
+    try:
+        if row["Odds_Casa"] < row["Odds_Visitante"]:
+            return "💀 Lay Away"
+        else:
+            return "💀 Lay Home"
+    except:
+        return ""
+
+df_simples["Direção"] = df_simples.apply(direcao_simples, axis=1)
+
+# =========================================
+# 🤖 DIREÇÃO IA (SÓ COPIA OU DEIXA VAZIO)
+# =========================================
+df_simples["Direção_IA"] = df_simples.get("Direcao_IA", "")
+
+# =========================================
+# 📊 COLUNAS FINAIS
+# =========================================
+cols = [
+    "Home",
+    "Away",
+    "Home_Team",
+    "Result Home",
+    "Result Visitor",
+    "Visitor_Team",
+    "Result_Home_HT",
+    "Result_Visitor_HT",
+    "Odds_Casa",
+    "Odds_Empate",
+    "Odds_Visitante",
+    "Time_Letal",
+    "Score_Ofensivo",
+    "Direção",
+    "Direção_IA"
+]
+
+df_simples = df_simples[cols]
+
+# =========================================
+# 🚀 OUTPUT
+# =========================================
+st.dataframe(df_simples, use_container_width=True, hide_index=True)
 
 
 # =========================================
