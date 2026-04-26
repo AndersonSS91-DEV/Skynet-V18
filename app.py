@@ -3257,24 +3257,49 @@ with tab7:
     # =========================================
     # 🧠 DIREÇÃO POISSON (ISOLADO NA ABA)
     # =========================================
-    def calcular_direcao_row(row):
-        try:
-            matriz = calcular_matriz_poisson(
-                row["ExG_Home_MGF"],
-                row["ExG_Away_MGF"]
-            )
+    def direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg):
 
-            sinais = poisson_intelligence(matriz)
-            direcao = sinais[2]
+    def get_dir(s):
+        return s[2][0] if s and len(s) > 2 and s[2] else None
 
-            return " | ".join(direcao)
-        except:
-            return ""
+    d_mgf = get_dir(sinais_mgf)
+    d_exg = get_dir(sinais_exg)
+    d_vg  = get_dir(sinais_vg)
 
-    if "Direcao_Poisson" not in base_df.columns:
-        base_df["Direcao_Poisson"] = ""
+    pesos = {
+        "MGF": 0.40,
+        "EXG": 0.35,
+        "VG":  0.25
+    }
 
-    base_df["Direcao_Poisson"] = base_df.apply(calcular_direcao_row, axis=1)
+    score = {}
+
+    if d_mgf:
+        score[d_mgf] = score.get(d_mgf, 0) + pesos["MGF"]
+
+    if d_exg:
+        score[d_exg] = score.get(d_exg, 0) + pesos["EXG"]
+
+    if d_vg:
+        score[d_vg] = score.get(d_vg, 0) + pesos["VG"]
+
+    if not score:
+        return ""
+
+    direcao_final = max(score, key=score.get)
+    confianca = score[direcao_final]
+
+    if len(score) > 1:
+        confianca *= 0.85
+
+    if confianca >= 0.80:
+        return f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
+    elif confianca >= 0.60:
+        return f"🔥 {direcao_final} ({round(confianca*100)}%)"
+    elif confianca > 0:
+        return f"⚠️ {direcao_final} ({round(confianca*100)}%)"
+
+    return ""
 
     # =========================================
     # 🔥 CONVERSÃO DAS ODDS (CORRETA)
@@ -3336,58 +3361,65 @@ with tab7:
             # 🔥 GARANTE VALOR SEMPRE
             Direcao_IA = ""
 
-            # =========================================
-            # 🔥 IA CONSENSO (TRANSPLANTE ABA 1)
-            # =========================================
-            try:
-                home = row["Home_Team"]
-                away = row["Visitor_Team"]
+        # =========================================
+        # 🔥 IA CONSENSO (TRANSPLANTE ABA 1)
+        # =========================================
+        Direcao_IA = ""
 
-                exg_row = df_exg[
-                    (df_exg["Home_Team"] == home) &
-                    (df_exg["Visitor_Team"] == away)
-                ]
+        try:
+            home = row["Home_Team"]
+            away = row["Visitor_Team"]
 
-                vg_row = df_vg[
-                    (df_vg["Home_Team"] == home) &
-                    (df_vg["Visitor_Team"] == away)
-                ]
+            exg_row = df_exg[
+                (df_exg["Home_Team"] == home) &
+                (df_exg["Visitor_Team"] == away)
+            ]
 
-                if not exg_row.empty and not vg_row.empty:
+            vg_row = df_vg[
+                (df_vg["Home_Team"] == home) &
+                (df_vg["Visitor_Team"] == away)
+            ]
 
-                    exg_row = exg_row.iloc[0]
-                    vg_row  = vg_row.iloc[0]
+            if not exg_row.empty and not vg_row.empty:
 
-                    # 🔹 MGF
-                    matriz_mgf = calcular_matriz_poisson(
-                        row["ExG_Home_MGF"],
-                        row["ExG_Away_MGF"]
-                    )
-                    sinais_mgf = poisson_intelligence(matriz_mgf)
+                exg_row = exg_row.iloc[0]
+                vg_row  = vg_row.iloc[0]
 
-                    # 🔹 EXG
-                    matriz_exg = calcular_matriz_poisson(
-                        exg_row["ExG_Home_ATKxDEF"],
-                        exg_row["ExG_Away_ATKxDEF"]
-                    )
-                    sinais_exg = poisson_intelligence(matriz_exg)
+                # 🔹 MGF
+                matriz_mgf = calcular_matriz_poisson(
+                    row["ExG_Home_MGF"],
+                    row["ExG_Away_MGF"]
+                )
+                sinais_mgf = poisson_intelligence(matriz_mgf)
 
-                    # 🔹 VG
-                    matriz_vg = calcular_matriz_poisson(
-                        vg_row["ExG_Home_VG"],
-                        vg_row["ExG_Away_VG"]
-                    )
-                    sinais_vg = poisson_intelligence(matriz_vg)
+                # 🔹 EXG
+                matriz_exg = calcular_matriz_poisson(
+                    exg_row["ExG_Home_ATKxDEF"],
+                    exg_row["ExG_Away_ATKxDEF"]
+                )
+                sinais_exg = poisson_intelligence(matriz_exg)
 
-                    # 🔥 MESMA FUNÇÃO DA ABA 1
-                    Direcao_IA = direcao_ia_peso(
-                        sinais_mgf,
-                        sinais_exg,
-                        sinais_vg
-                    ) or ""
+                # 🔹 VG
+                matriz_vg = calcular_matriz_poisson(
+                    vg_row["ExG_Home_VG"],
+                    vg_row["ExG_Away_VG"]
+                )
+                sinais_vg = poisson_intelligence(matriz_vg)
 
-            except:
+                # 🔥 IGUAL ABA 1
+                Direcao_IA = direcao_ia_peso(
+                    sinais_mgf,
+                    sinais_exg,
+                    sinais_vg
+                )
+
+            else:
                 Direcao_IA = ""
+
+        except:
+            Direcao_IA = ""
+
+            
 
             lista.append({
                 "Home": row["Home"],
