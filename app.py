@@ -3238,12 +3238,12 @@ Home {home_emoji}   x   Away {away_emoji}
         # =========================================
         st.markdown("### 📋 Todos os Jogos Filtrados")
 
-        df_clean = base_df.copy[
-            (base_df["Odd_BTTS_YES"] > 0) &
-            (base_df["Odds_Over_2,5FT"] > 0) &
-            (base_df["Odds_Casa"] > 0) &
-            (base_df["Odds_Visitante"] > 0)
-        ]
+        df_clean = base_df[
+        (base_df["Odd_BTTS_YES"] > 0) &
+        (base_df["Odds_Over_2,5FT"] > 0) &
+        (base_df["Odds_Casa"] > 0) &
+        (base_df["Odds_Visitante"] > 0)
+        ].copy()
 
         # =========================================
         # 🔥 APLICA FILTRO VISUAL
