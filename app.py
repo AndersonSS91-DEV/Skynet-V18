@@ -3229,10 +3229,10 @@ Home {home_emoji}   x   Away {away_emoji}
         # =========================================
         # 🧠 FUNÇÃO CARD POISSON (NÃO QUEBRA NADA)
         # =========================================
-        def gerar_card_linha(row):
+def gerar_card_linha(row):
     try:
         return {
-            "Score": 0,
+            "Score": "",
             "Leitura": "",
             "Estrutura": "",
             "Mercado": "",
