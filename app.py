@@ -3292,61 +3292,53 @@ with tab7:
         if res:
 
             # =========================================
-            # 🧠 DIREÇÃO POISSON (FORÇADA)
+            # 🧠 DIREÇÃO (IGUAL ABA 1)
             # =========================================
             try:
-                if pd.notna(row["ExG_Home_MGF"]) and pd.notna(row["ExG_Away_MGF"]):
-                    matriz_dir = calcular_matriz_poisson(
-                        row["ExG_Home_MGF"],
-                        row["ExG_Away_MGF"]
-                    )
-                    sinais_dir = poisson_intelligence(matriz_dir)
+                matriz_dir = calcular_matriz_poisson(
+                    row["ExG_Home_MGF"],
+                    row["ExG_Away_MGF"]
+                )
 
-                    if sinais_dir and len(sinais_dir) > 2:
-                        direcao = " | ".join(sinais_dir[2]) if sinais_dir[2] else "⚠️ sem direção"
-                    else:
-                        direcao = "⚠️ erro sinais"
+                sinais_dir = poisson_intelligence(matriz_dir)
+
+                direcoes = sinais_dir[2]
+
+                # 🔥 GARANTE PADRÃO LIMPO
+                if "💀 Lay Away" in direcoes:
+                    direcao = "💀 Lay Away"
+                elif "💀 Lay Home" in direcoes:
+                    direcao = "💀 Lay Home"
                 else:
-                    direcao = "⚠️ sem ExG"
+                    direcao = ""  # ← NÃO INVENTA TEXTO
+
             except:
-                direcao = "⚠️ erro"
+                direcao = ""
 
             # =========================================
-            # 🤖 DIREÇÃO IA (FORÇADA)
+            # 🤖 DIREÇÃO IA (MANTIDA)
             # =========================================
             try:
-                if (
-                    pd.notna(row["ExG_Home_MGF"]) and
-                    pd.notna(row["ExG_Away_MGF"]) and
-                    pd.notna(row["ExG_Home_ATKxDEF"]) and
-                    pd.notna(row["ExG_Away_ATKxDEF"]) and
-                    pd.notna(row["ExG_Home_VG"]) and
-                    pd.notna(row["ExG_Away_VG"])
-                ):
-                    matriz_mgf = calcular_matriz_poisson(
-                        row["ExG_Home_MGF"], row["ExG_Away_MGF"]
-                    )
-                    matriz_exg = calcular_matriz_poisson(
-                        row["ExG_Home_ATKxDEF"], row["ExG_Away_ATKxDEF"]
-                    )
-                    matriz_vg = calcular_matriz_poisson(
-                        row["ExG_Home_VG"], row["ExG_Away_VG"]
-                    )
+                matriz_mgf = calcular_matriz_poisson(
+                    row["ExG_Home_MGF"], row["ExG_Away_MGF"]
+                )
+                matriz_exg = calcular_matriz_poisson(
+                    row["ExG_Home_ATKxDEF"], row["ExG_Away_ATKxDEF"]
+                )
+                matriz_vg = calcular_matriz_poisson(
+                    row["ExG_Home_VG"], row["ExG_Away_VG"]
+                )
 
-                    sinais_mgf = poisson_intelligence(matriz_mgf)
-                    sinais_exg = poisson_intelligence(matriz_exg)
-                    sinais_vg = poisson_intelligence(matriz_vg)
+                sinais_mgf = poisson_intelligence(matriz_mgf)
+                sinais_exg = poisson_intelligence(matriz_exg)
+                sinais_vg = poisson_intelligence(matriz_vg)
 
-                    Direcao_IA = direcao_ia_peso(
-                        sinais_mgf, sinais_exg, sinais_vg
-                    )
+                Direcao_IA = direcao_ia_peso(
+                    sinais_mgf, sinais_exg, sinais_vg
+                )
 
-                    if not Direcao_IA:
-                        Direcao_IA = "⚠️ sem edge"
-                else:
-                    Direcao_IA = "⚠️ sem ExG"
             except:
-                Direcao_IA = "⚠️ erro IA"
+                Direcao_IA = ""
 
             lista.append({
                 "Home": row["Home"],
@@ -3367,7 +3359,7 @@ with tab7:
                 "LAY_DECISAO": definir_lay(row),
                 "HA_Value": row.get("HA_Value", ""),
 
-                # 🔥 AGORA SEMPRE PREENCHE
+                # 🔥 PADRÃO LIMPO
                 "Direcao": direcao,
                 "Direcao_IA": Direcao_IA
             })
