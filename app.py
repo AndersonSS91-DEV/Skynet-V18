@@ -3246,10 +3246,10 @@ def gerar_card_linha(row):
         "Consenso": row.get("Consenso", "")
     }
 
-        # =========================================
-        # 📋 TABELA FINAL
-        # =========================================
-        st.markdown("### 📋 Todos os Jogos Filtrados")
+# =========================================
+# 📋 TABELA FINAL
+# =========================================
+st.markdown("### 📋 Todos os Jogos Filtrados")
 
         df_clean = base_df[
         (base_df["Odd_BTTS_YES"] > 0) &
