@@ -2829,7 +2829,7 @@ def classificar_jogo(row):
     # =========================================
     # 🔵 UNDER INTELIGENTE
     # =========================================
-    elif coef_over < 2.2 and time_A["mgf"] < 2 and time_B["mgf"] < 2:
+    elif coef_over < 1.90 and time_A["mgf"] < 2 and time_B["mgf"] < 2:
         tipo = "🔵 Under Inteligente (Cerro / LDU)"
         entrada = "Under 2.5"
         classe = "A"
