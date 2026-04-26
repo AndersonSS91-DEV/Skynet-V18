@@ -3172,6 +3172,9 @@ with tab7:
 
     st.markdown("### 📋 Todos os Jogos Filtrados")
 
+    # 🔥 GARANTE QUE base_df EXISTE
+    base_df = df_mgf.copy()
+
     # =========================================
     # 🧠 DIREÇÃO POISSON
     # =========================================
@@ -3203,7 +3206,11 @@ with tab7:
     ]
 
     for col in cols_odds:
-        base_df[col] = base_df[col].astype(str).str.replace(",", ".", regex=False)
+        base_df[col] = (
+            base_df[col]
+            .astype(str)
+            .str.replace(",", ".", regex=False)
+        )
         base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
 
     # =========================================
@@ -3254,9 +3261,15 @@ with tab7:
                 vg_h = row.get("VG_Home", mgf_h)
                 vg_a = row.get("VG_Away", mgf_a)
 
-                sinais_mgf = poisson_intelligence(calcular_matriz_poisson(mgf_h, mgf_a))
-                sinais_exg = poisson_intelligence(calcular_matriz_poisson(exg_h, exg_a))
-                sinais_vg  = poisson_intelligence(calcular_matriz_poisson(vg_h, vg_a))
+                sinais_mgf = poisson_intelligence(
+                    calcular_matriz_poisson(mgf_h, mgf_a)
+                )
+                sinais_exg = poisson_intelligence(
+                    calcular_matriz_poisson(exg_h, exg_a)
+                )
+                sinais_vg = poisson_intelligence(
+                    calcular_matriz_poisson(vg_h, vg_a)
+                )
 
                 def norm(d):
                     if not d:
@@ -3280,7 +3293,7 @@ with tab7:
 
                 d_mgf = get_dir(sinais_mgf)
                 d_exg = get_dir(sinais_exg)
-                d_vg  = get_dir(sinais_vg)
+                d_vg = get_dir(sinais_vg)
 
                 score = {}
                 for d, p in zip([d_mgf, d_exg, d_vg], [0.40, 0.35, 0.25]):
@@ -3297,7 +3310,9 @@ with tab7:
                     direcao_final = None
                     confianca = 0
 
-                # FALLBACK
+                # =========================================
+                # 🔥 FALLBACK OVER / UNDER
+                # =========================================
                 if not direcao_final:
                     matriz_gols = calcular_matriz_poisson(mgf_h, mgf_a)
                     sinais_gols = poisson_intelligence(matriz_gols)
@@ -3310,7 +3325,10 @@ with tab7:
                         elif "under" in txt:
                             d_gols = "Under 2.5"
 
-                    Direcao_IA = f"⚠️ {d_gols} (55%)" if d_gols else ""
+                    if d_gols:
+                        Direcao_IA = f"⚠️ {d_gols} (55%)"
+                    else:
+                        Direcao_IA = ""
                 else:
                     if len(score) > 1:
                         confianca *= 0.85
