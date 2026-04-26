@@ -741,12 +741,17 @@ def direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg):
     direcao_final = max(score, key=score.get)
     confianca = score[direcao_final]
 
-    if confianca >= 0.80:
+        if confianca >= 0.80:
         return f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
+
     elif confianca >= 0.60:
         return f"🔥 {direcao_final} ({round(confianca*100)}%)"
 
-    return ""
+    # 🔥 NOVO COMPORTAMENTO
+    elif confianca > 0:
+        return f"⚠️ {direcao_final} ({round(confianca*100)}%)"
+
+    return "⚠️ Sem direção"
 
     
 # =========================================
@@ -1796,17 +1801,10 @@ with tab1:
     # =========================================
     # 🧠💀 POISSON INTELLIGENCE CENTER
     # =========================================
-
-        # =========================================
-    # 🧠💀 CONSENSO POISSON
-    # =========================================
-
     st.markdown("### 🧠💀 Consenso Poisson")
 
-    # 🔴 DEBUG VISUAL
-    st.write("ENTROU NO BLOCO POISSON")
-
-    try:
+    
+            try:
 
         matriz_mgf = calcular_matriz_poisson(
             linha_mgf["ExG_Home_MGF"],
@@ -1835,22 +1833,53 @@ with tab1:
             sinais_vg
         )
 
+        estrutura = []
+        mercado = []
+        direcao = []
+
+        for s in [sinais_mgf, sinais_exg, sinais_vg]:
+            estrutura += s[0]
+            mercado += s[1]
+            direcao += s[2]
+
+        estrutura = list(set(estrutura))
+        mercado = list(set(mercado))
+        direcao = list(set(direcao))
+
+        score = poisson_score(matriz_consenso)
+
+        if score > 75:
+            leitura_score = "🔥 Alta previsibilidade"
+        elif score > 55:
+            leitura_score = "⚖️ Jogo equilibrado"
+        else:
+            leitura_score = "⚔️ Jogo imprevisível"
+
         linhas = []
 
-        linhas.append("✅ BLOCO EXECUTADO")
+        linhas.append(f"🎯 Score Poisson: {score} — {leitura_score}")
 
+        if estrutura:
+            linhas.append("⚽ Estrutura de gols\n" + " | ".join(estrutura))
+
+        if mercado:
+            linhas.append("📈 Mercado\n" + " | ".join(mercado))
+
+        if direcao:
+            linhas.append("🎯 Direção\n" + " | ".join(direcao))
+
+        # 🔥 AQUI É A ÚNICA ADIÇÃO
         if Direcao_IA:
             linhas.append(f"🤖 Direção IA {Direcao_IA}")
-        else:
-            linhas.append("⚠️ Direcao_IA vazia")
 
         if consenso:
-            linhas.append("🧠 Consenso OK")
+            linhas.append("🧠 Consenso\n" + " | ".join(consenso))
 
-        st.error("\n\n".join(linhas))
+        if linhas:
+            st.error("\n\n".join(linhas))
 
     except Exception as e:
-        st.error(f"ERRO REAL: {e}")
+        st.error(f"ERRO POISSON: {e}")
              
 # =========================================
 # ABA 2 — DADOS COMPLETOS
