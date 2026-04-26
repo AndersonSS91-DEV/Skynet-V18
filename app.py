@@ -3303,36 +3303,73 @@ with tab7:
             except:
                 direcao = ""
 
-            # =========================================
-            # 🤖 DIREÇÃO IA (IGUAL AO CARD)
-            # =========================================
-            try:
-                matriz_mgf = calcular_matriz_poisson(
-                    row["ExG_Home_MGF"], row["ExG_Away_MGF"]
-                )
-                matriz_exg = calcular_matriz_poisson(
-                    row["ExG_Home_ATKxDEF"], row["ExG_Away_ATKxDEF"]
-                )
-                matriz_vg = calcular_matriz_poisson(
-                    row["ExG_Home_VG"], row["ExG_Away_VG"]
-                )
+# =========================================
+# 📋 TABELA FINAL (ABA CONTROLADA)
+# =========================================
+with tab7:
 
-                sinais_mgf = poisson_intelligence(matriz_mgf)
-                sinais_exg = poisson_intelligence(matriz_exg)
-                sinais_vg = poisson_intelligence(matriz_vg)
+    st.markdown("### 📋 Todos os Jogos Filtrados")
 
-                raw_ia = direcao_ia_peso(
-                    sinais_mgf, sinais_exg, sinais_vg
-                )
+    # =========================================
+    # 🧠 DIREÇÃO POISSON (ISOLADO NA ABA)
+    # =========================================
+    def calcular_direcao_row(row):
+        try:
+            matriz = calcular_matriz_poisson(
+                row["ExG_Home_MGF"],
+                row["ExG_Away_MGF"]
+            )
 
-                if isinstance(raw_ia, list):
-                    raw_ia = " | ".join(raw_ia)
+            sinais = poisson_intelligence(matriz)
+            direcao = sinais[2]
 
-                Direcao_IA = f"⚠️ {raw_ia}" if raw_ia else ""
+            return " | ".join(direcao)
+        except:
+            return ""
 
-            except:
-                Direcao_IA = ""
+    if "Direcao_Poisson" not in base_df.columns:
+        base_df["Direcao_Poisson"] = ""
 
+    base_df["Direcao_Poisson"] = base_df.apply(calcular_direcao_row, axis=1)
+
+    # =========================================
+    # 🔍 FILTRO BASE
+    # =========================================
+    df_clean = base_df[
+        (base_df["Odd_BTTS_YES"] > 0) &
+        (base_df["Odds_Over_2,5FT"] > 0) &
+        (base_df["Odds_Casa"] > 0) &
+        (base_df["Odds_Visitante"] > 0)
+    ].copy()
+
+    # =========================================
+    # 🔥 APLICA FILTRO VISUAL
+    # =========================================
+    df_clean["Home"] = df_clean.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_H_01"], x["CV_CG_H_01"],
+            x["Media_CG_H_02"], x["CV_CG_H_02"]
+        ),
+        axis=1
+    )
+
+    df_clean["Away"] = df_clean.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_A_01"], x["CV_CG_A_01"],
+            x["Media_CG_A_02"], x["CV_CG_A_02"]
+        ),
+        axis=1
+    )
+
+    # =========================================
+    # 📊 MONTA LISTA
+    # =========================================
+    lista = []
+
+    for _, row in df_clean.iterrows():
+        res = classificar_jogo(row)
+
+        if res:
             lista.append({
                 "Home": row["Home"],
                 "Away": row["Away"],
@@ -3352,9 +3389,8 @@ with tab7:
                 "LAY_DECISAO": definir_lay(row),
                 "HA_Value": row.get("HA_Value", ""),
 
-                # 🔥 PADRÃO IGUAL AO CARD
-                "Direcao": direcao,
-                "Direcao_IA": Direcao_IA
+                # 🔥 SOMENTE DIREÇÃO
+                "Direcao": row.get("Direcao_Poisson", "")
             })
 
     # =========================================
@@ -3368,8 +3404,7 @@ with tab7:
             "Placar", "HT",
             "Tipo", "Entrada", "Classe",
             "LAY_DECISAO", "HA_Value",
-            "Direcao",
-            "Direcao_IA"
+            "Direcao"
         ]
 
         df_final = df_final[cols]
