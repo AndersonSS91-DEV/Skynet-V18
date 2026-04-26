@@ -3295,7 +3295,7 @@ with tab7:
         base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
 
     # =========================================
-    # 🔍 FILTRO BASE (AGORA IGUAL AO ORIGINAL)
+    # 🔍 FILTRO BASE
     # =========================================
     df_clean = base_df[
         (base_df["Odd_BTTS_YES"] > 0) &
@@ -3351,7 +3351,7 @@ with tab7:
                 "LAY_DECISAO": definir_lay(row),
                 "HA_Value": row.get("HA_Value", ""),
 
-                # 🔥 SOMENTE DIREÇÃO
+                # 🔥 DIREÇÃO
                 "Direcao": row.get("Direcao_Poisson", "")
             })
 
