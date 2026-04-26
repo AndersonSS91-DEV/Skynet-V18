@@ -1837,12 +1837,12 @@ with tab1:
 
 idx = linha_mgf.name
 
-df_mgf.loc[idx, "Score_Poisson"] = round(score, 1)
-df_mgf.loc[idx, "Leitura_Poisson"] = leitura_score
-df_mgf.loc[idx, "Estrutura_Poisson"] = " | ".join(estrutura)
-df_mgf.loc[idx, "Mercado_Poisson"] = " | ".join(mercado)
-df_mgf.loc[idx, "Direcao_Poisson"] = " | ".join(direcao)
-df_mgf.loc[idx, "Consenso_Poisson"] = " | ".join(consenso)
+base_df.loc[idx, "Score_Poisson"] = ...
+base_df.loc[idx, "Leitura_Poisson"] = leitura_score
+base_df.loc[idx, "Estrutura_Poisson"] = " | ".join(estrutura)
+base_df.loc[idx, "Mercado_Poisson"] = " | ".join(mercado)
+base_df.loc[idx, "Direcao_Poisson"] = " | ".join(direcao)
+base_df.loc[idx, "Consenso_Poisson"] = " | ".join(consenso)
         
 # =========================================
 # ABA 2 — DADOS COMPLETOS
@@ -3210,90 +3210,111 @@ Home {home_emoji}   x   Away {away_emoji}
 
 
 # =========================================
-# 📋 TABELA FINAL
+# 📋 TABELA FINAL (ABA CONTROLADA)
 # =========================================
-st.markdown("### 📋 Todos os Jogos Filtrados")
+with tab7:
 
-df_clean = base_df[
-    (base_df["Odd_BTTS_YES"] > 0) &
-    (base_df["Odds_Over_2,5FT"] > 0) &
-    (base_df["Odds_Casa"] > 0) &
-    (base_df["Odds_Visitante"] > 0)
-].copy()
+    st.markdown("### 📋 Todos os Jogos Filtrados")
 
-# =========================================
-# 🔥 APLICA FILTRO VISUAL
-# =========================================
-df_clean["Home"] = df_clean.apply(
-    lambda x: classificar_filtro_duplo(
-        x["Media_CG_H_01"], x["CV_CG_H_01"],
-        x["Media_CG_H_02"], x["CV_CG_H_02"]
-    ),
-    axis=1
-)
+    # =========================================
+    # 🧠 DIREÇÃO POISSON (ISOLADO NA ABA)
+    # =========================================
+    def calcular_direcao_row(row):
+        try:
+            matriz = calcular_matriz_poisson(
+                row["ExG_Home_MGF"],
+                row["ExG_Away_MGF"]
+            )
 
-df_clean["Away"] = df_clean.apply(
-    lambda x: classificar_filtro_duplo(
-        x["Media_CG_A_01"], x["CV_CG_A_01"],
-        x["Media_CG_A_02"], x["CV_CG_A_02"]
-    ),
-    axis=1
-)
+            sinais = poisson_intelligence(matriz)
+            direcao = sinais[2]
 
-# =========================================
-# 📊 MONTA LISTA ORIGINAL
-# =========================================
-lista = []
+            return " | ".join(direcao)
+        except:
+            return ""
 
-for _, row in df_clean.iterrows():
-    res = classificar_jogo(row)
+    if "Direcao_Poisson" not in base_df.columns:
+        base_df["Direcao_Poisson"] = ""
 
-    if res:
-        lista.append({
-            "Home": row["Home"],
-            "Away": row["Away"],
-            "Home_Team": row.get("Home_Team", ""),
-            "Away_Team": row.get("Visitor_Team", ""),
-            "Placar": (
-                "-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
-                else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"
-            ),
-            "HT": (
-                "-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
-                else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"
-            ),
-            "Tipo": res["Tipo"],
-            "Entrada": res["Entrada"],
-            "Classe": res["Classe"],
-            "LAY_DECISAO": definir_lay(row),
-            "HA_Value": row.get("HA_Value", ""),
+    base_df["Direcao_Poisson"] = base_df.apply(calcular_direcao_row, axis=1)
 
-            # 🔥 POISSON (AGORA VAI APARECER)
-            "Score": row.get("Score_Poisson", ""),
-            "Leitura": row.get("Leitura_Poisson", ""),
-            "Estrutura": row.get("Estrutura_Poisson", ""),
-            "Mercado": row.get("Mercado_Poisson", ""),
-            "Direcao": row.get("Direcao_Poisson", ""),
-            "Consenso": row.get("Consenso_Poisson", "")
-        })
+    # =========================================
+    # 🔍 FILTRO BASE
+    # =========================================
+    df_clean = base_df[
+        (base_df["Odd_BTTS_YES"] > 0) &
+        (base_df["Odds_Over_2,5FT"] > 0) &
+        (base_df["Odds_Casa"] > 0) &
+        (base_df["Odds_Visitante"] > 0)
+    ].copy()
 
-# =========================================
-# 📈 OUTPUT FINAL
-# =========================================
-if lista:
-    df_final = pd.DataFrame(lista)
+    # =========================================
+    # 🔥 APLICA FILTRO VISUAL
+    # =========================================
+    df_clean["Home"] = df_clean.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_H_01"], x["CV_CG_H_01"],
+            x["Media_CG_H_02"], x["CV_CG_H_02"]
+        ),
+        axis=1
+    )
 
-    cols = [
-        "Home", "Away", "Home_Team", "Away_Team",
-        "Placar", "HT",
-        "Tipo", "Entrada", "Classe",
-        "LAY_DECISAO", "HA_Value",
-        "Score", "Leitura", "Estrutura",
-        "Mercado", "Direcao", "Consenso"
-    ]
+    df_clean["Away"] = df_clean.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_A_01"], x["CV_CG_A_01"],
+            x["Media_CG_A_02"], x["CV_CG_A_02"]
+        ),
+        axis=1
+    )
 
-    df_final = df_final[cols]
+    # =========================================
+    # 📊 MONTA LISTA
+    # =========================================
+    lista = []
 
-    st.dataframe(df_final, use_container_width=True, hide_index=True)
-else:
-    st.info("Sem jogos válidos após filtro")
+    for _, row in df_clean.iterrows():
+        res = classificar_jogo(row)
+
+        if res:
+            lista.append({
+                "Home": row["Home"],
+                "Away": row["Away"],
+                "Home_Team": row.get("Home_Team", ""),
+                "Away_Team": row.get("Visitor_Team", ""),
+                "Placar": (
+                    "-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
+                    else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"
+                ),
+                "HT": (
+                    "-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
+                    else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"
+                ),
+                "Tipo": res["Tipo"],
+                "Entrada": res["Entrada"],
+                "Classe": res["Classe"],
+                "LAY_DECISAO": definir_lay(row),
+                "HA_Value": row.get("HA_Value", ""),
+
+                # 🔥 SOMENTE DIREÇÃO
+                "Direcao": row.get("Direcao_Poisson", "")
+            })
+
+    # =========================================
+    # 📈 OUTPUT FINAL
+    # =========================================
+    if lista:
+        df_final = pd.DataFrame(lista)
+
+        cols = [
+            "Home", "Away", "Home_Team", "Away_Team",
+            "Placar", "HT",
+            "Tipo", "Entrada", "Classe",
+            "LAY_DECISAO", "HA_Value",
+            "Direcao"
+        ]
+
+        df_final = df_final[cols]
+
+        st.dataframe(df_final, use_container_width=True, hide_index=True)
+    else:
+        st.info("Sem jogos válidos após filtro")
