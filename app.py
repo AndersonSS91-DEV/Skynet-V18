@@ -1797,14 +1797,12 @@ with tab1:
                 radar_away_consenso
             )
         )
-        
     # =========================================
     # 🧠💀 POISSON INTELLIGENCE CENTER
     # =========================================
     st.markdown("### 🧠💀 Consenso Poisson")
 
-    
-            try:
+    try:
 
         matriz_mgf = calcular_matriz_poisson(
             linha_mgf["ExG_Home_MGF"],
@@ -1868,7 +1866,6 @@ with tab1:
         if direcao:
             linhas.append("🎯 Direção\n" + " | ".join(direcao))
 
-        # 🔥 AQUI É A ÚNICA ADIÇÃO
         if Direcao_IA:
             linhas.append(f"🤖 Direção IA {Direcao_IA}")
 
@@ -1880,7 +1877,8 @@ with tab1:
 
     except Exception as e:
         st.error(f"ERRO POISSON: {e}")
-             
+
+
 # =========================================
 # ABA 2 — DADOS COMPLETOS
 # =========================================
