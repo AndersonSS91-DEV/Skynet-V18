@@ -3332,27 +3332,23 @@ with tab7:
         res = classificar_jogo(row)
 
         if res:
-
-            # =========================================
-            # 🔥 IA CONSENSO (MGF + EXG + VG) — FUNCIONAL
-            # =========================================
             try:
-                # 🔹 coleta segura
+                # 🔹 dados base
                 mgf_h = row.get("ExG_Home_MGF", 0)
                 mgf_a = row.get("ExG_Away_MGF", 0)
 
                 exg_h = row.get("ExG_Home", mgf_h)
                 exg_a = row.get("ExG_Away", mgf_a)
 
-                vg_h  = row.get("VG_Home", mgf_h)
-                vg_a  = row.get("VG_Away", mgf_a)
+                vg_h = row.get("VG_Home", mgf_h)
+                vg_a = row.get("VG_Away", mgf_a)
 
-                # 🔹 gera sinais das 3 matrizes
+                # 🔹 sinais
                 sinais_mgf = poisson_intelligence(calcular_matriz_poisson(mgf_h, mgf_a))
                 sinais_exg = poisson_intelligence(calcular_matriz_poisson(exg_h, exg_a))
                 sinais_vg  = poisson_intelligence(calcular_matriz_poisson(vg_h, vg_a))
 
-                # 🔹 normaliza (remove BACK)
+                # 🔹 normalização
                 def norm(d):
                     if not d:
                         return None
@@ -3391,33 +3387,17 @@ with tab7:
                 else:
                     direcao_final = None
                     confianca = 0
-                    
-for _, row in df_clean.iterrows():
-    res = classificar_jogo(row)
 
-    if res:
-
-        try:
-            # =========================
-            # SUA IA AQUI
-            # =========================
-
-            if score:
-                direcao_final = max(score, key=score.get)
-                confianca = score[direcao_final]
-            else:
-                direcao_final = None
-                confianca = 0
-
-            if not direcao_final:
-                try:
+                # =========================================
+                # 🔥 FALLBACK OVER / UNDER
+                # =========================================
+                if not direcao_final:
                     matriz_gols = calcular_matriz_poisson(mgf_h, mgf_a)
                     sinais_gols = poisson_intelligence(matriz_gols)
 
                     d_gols = None
                     if sinais_gols and len(sinais_gols) > 2 and sinais_gols[2]:
                         txt = str(sinais_gols[2][0]).lower()
-
                         if "over" in txt:
                             d_gols = "Over 2.5"
                         elif "under" in txt:
@@ -3427,71 +3407,42 @@ for _, row in df_clean.iterrows():
                         Direcao_IA = f"⚠️ {d_gols} (55%)"
                     else:
                         Direcao_IA = ""
-
-                except:
-                    Direcao_IA = ""
-
-            else:
-                if len(score) > 1:
-                    confianca *= 0.85
-
-                if confianca >= 0.80:
-                    Direcao_IA = f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
-                elif confianca >= 0.60:
-                    Direcao_IA = f"🔥 {direcao_final} ({round(confianca*100)}%)"
                 else:
-                    Direcao_IA = f"⚠️ {direcao_final} ({round(confianca*100)}%)"
+                    if len(score) > 1:
+                        confianca *= 0.85
 
-        except:
-            Direcao_IA = ""
+                    if confianca >= 0.80:
+                        Direcao_IA = f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
+                    elif confianca >= 0.60:
+                        Direcao_IA = f"🔥 {direcao_final} ({round(confianca*100)}%)"
+                    else:
+                        Direcao_IA = f"⚠️ {direcao_final} ({round(confianca*100)}%)"
 
-        lista.append({
-            "Home": row["Home"],
-            "Away": row["Away"],
-            "Direcao_IA": Direcao_IA
-        })
+            except:
+                Direcao_IA = ""
 
-    # =========================================
-    # 🔥 CASO TENHA DIREÇÃO NORMAL (LAY)
-    # =========================================
-    else:
-        if len(score) > 1:
-            confianca *= 0.85
+            lista.append({
+                "Home": row["Home"],
+                "Away": row["Away"],
+                "Home_Team": row.get("Home_Team", ""),
+                "Away_Team": row.get("Visitor_Team", ""),
+                "Placar": (
+                    "-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
+                    else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"
+                ),
+                "HT": (
+                    "-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
+                    else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"
+                ),
+                "Tipo": res["Tipo"],
+                "Entrada": res["Entrada"],
+                "Classe": res["Classe"],
+                "LAY_DECISAO": definir_lay(row),
+                "HA_Value": row.get("HA_Value", ""),
+                "Direcao": row.get("Direcao_Poisson", ""),
+                "Direcao_IA": Direcao_IA
+            })
 
-        if confianca >= 0.80:
-            Direcao_IA = f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
-        elif confianca >= 0.60:
-            Direcao_IA = f"🔥 {direcao_final} ({round(confianca*100)}%)"
-        else:
-            Direcao_IA = f"⚠️ {direcao_final} ({round(confianca*100)}%)"
-
-except:
-    Direcao_IA = ""
-
-# =========================================
-# 📊 APPEND FINAL
-# =========================================
-lista.append({
-    "Home": row["Home"],
-    "Away": row["Away"],
-    "Home_Team": row.get("Home_Team", ""),
-    "Away_Team": row.get("Visitor_Team", ""),
-    "Placar": (
-        "-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
-        else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"
-    ),
-    "HT": (
-        "-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
-        else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"
-    ),
-    "Tipo": res["Tipo"],
-    "Entrada": res["Entrada"],
-    "Classe": res["Classe"],
-    "LAY_DECISAO": definir_lay(row),
-    "HA_Value": row.get("HA_Value", ""),
-    "Direcao": row.get("Direcao_Poisson", ""),
-    "Direcao_IA": Direcao_IA
-})
     # =========================================
     # 📈 OUTPUT
     # =========================================
