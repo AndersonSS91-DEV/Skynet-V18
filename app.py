@@ -2085,8 +2085,8 @@ with tab3:
         else:
             st.info("Sem consenso forte")
 
-except Exception as e:
-    st.error(f"ERRO POISSON: {e}")
+    except Exception as e:
+        st.error(f"ERRO POISSON: {e}")
 
 # =========================================
     # ===== RADAR ATK x DEF =====
