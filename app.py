@@ -1797,7 +1797,14 @@ with tab1:
     # 🧠💀 POISSON INTELLIGENCE CENTER
     # =========================================
 
+        # =========================================
+    # 🧠💀 CONSENSO POISSON
+    # =========================================
+
     st.markdown("### 🧠💀 Consenso Poisson")
+
+    # 🔴 DEBUG VISUAL
+    st.write("ENTROU NO BLOCO POISSON")
 
     try:
 
@@ -1820,63 +1827,30 @@ with tab1:
         sinais_exg = poisson_intelligence(matriz_exg)
         sinais_vg = poisson_intelligence(matriz_vg)
 
+        Direcao_IA = direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg)
+
         consenso = consenso_poisson(
             sinais_mgf,
             sinais_exg,
             sinais_vg
         )
 
-        estrutura = []
-        mercado = []
-        direcao = []
-
-        for s in [sinais_mgf, sinais_exg, sinais_vg]:
-
-            estrutura += s[0]
-            mercado += s[1]
-            direcao += s[2]
-
-        estrutura = list(set(estrutura))
-        mercado = list(set(mercado))
-        direcao = list(set(direcao))
-
-        # =============================
-        # SCORE POISSON
-        # =============================
-
-        score = poisson_score(matriz_consenso)
-
-        if score > 75:
-            leitura_score = "🔥 Alta previsibilidade"
-        elif score > 55:
-            leitura_score = "⚖️ Jogo equilibrado"
-        else:
-            leitura_score = "⚔️ Jogo imprevisível"
-
         linhas = []
 
-        linhas.append(f"🎯 Score Poisson: {score} — {leitura_score}")
+        linhas.append("✅ BLOCO EXECUTADO")
 
-        if estrutura:
-            linhas.append("⚽ Estrutura de gols\n" + " | ".join(estrutura))
-
-        if mercado:
-            linhas.append("📈 Mercado\n" + " | ".join(mercado))
-
-        if direcao:
-            linhas.append("🎯 Direção\n" + " | ".join(direcao))
-            
         if Direcao_IA:
-            linhas.append(f"🤖 Análise IA {Direcao_IA}")
-            
+            linhas.append(f"🤖 Direção IA {Direcao_IA}")
+        else:
+            linhas.append("⚠️ Direcao_IA vazia")
+
         if consenso:
-            linhas.append("🧠 Consenso\n" + " | ".join(consenso))
+            linhas.append("🧠 Consenso OK")
 
-        if linhas:
-            st.error("\n\n".join(linhas))
+        st.error("\n\n".join(linhas))
 
-    except:
-        pass
+    except Exception as e:
+        st.error(f"ERRO REAL: {e}")
              
 # =========================================
 # ABA 2 — DADOS COMPLETOS
