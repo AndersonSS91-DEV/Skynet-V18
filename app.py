@@ -1916,84 +1916,74 @@ for i in range(len(df_mgf)):
         linha = df_mgf.iloc[i]
 
         home = classificar_filtro_duplo(
-            linha["Media_CG_H_01"],
-            linha["CV_CG_H_01"],
-            linha["Media_CG_H_02"],
-            linha["CV_CG_H_02"]
+            linha.get("Media_CG_H_01", 0),
+            linha.get("CV_CG_H_01", 0),
+            linha.get("Media_CG_H_02", 0),
+            linha.get("CV_CG_H_02", 0)
         )
 
         away = classificar_filtro_duplo(
-            linha["Media_CG_A_01"],
-            linha["CV_CG_A_01"],
-            linha["Media_CG_A_02"],
-            linha["CV_CG_A_02"]
+            linha.get("Media_CG_A_01", 0),
+            linha.get("CV_CG_A_01", 0),
+            linha.get("Media_CG_A_02", 0),
+            linha.get("CV_CG_A_02", 0)
         )
+
+        # 🔹 Direção simples (SEM apply)
+        try:
+            if linha.get("Odds_Casa", 0) < linha.get("Odds_Visitante", 0):
+                direcao = "💀 Lay Away"
+            else:
+                direcao = "💀 Lay Home"
+        except:
+            direcao = ""
 
         lista.append({
             "Home": home,
             "Away": away,
             "Home_Team": linha.get("Home_Team", ""),
-            "Visitor_Team": linha.get("Visitor_Team", "")
+            "Result Home": linha.get("Result Home", ""),
+            "Result Visitor": linha.get("Result Visitor", ""),
+            "Visitor_Team": linha.get("Visitor_Team", ""),
+            "Result_Home_HT": linha.get("Result_Home_HT", ""),
+            "Result_Visitor_HT": linha.get("Result_Visitor_HT", ""),
+            "Odds_Casa": linha.get("Odds_Casa", ""),
+            "Odds_Empate": linha.get("Odds_Empate", ""),
+            "Odds_Visitante": linha.get("Odds_Visitante", ""),
+            "Time_Letal": linha.get("Time_Letal", ""),
+            "Score_Ofensivo": linha.get("Score_Ofensivo", ""),
+            "Direção": direcao,
+            "Direção_IA": linha.get("Direcao_IA", "")
         })
 
     except:
-        lista.append({
-            "Home": "",
-            "Away": "",
-            "Home_Team": "",
-            "Visitor_Team": ""
-        })
+        continue
 
+# =========================================
+# 📊 DATAFRAME FINAL
+# =========================================
 df_simples = pd.DataFrame(lista)
 
-st.dataframe(df_simples, use_container_width=True)
-
-# =========================================
-# 🎯 DIREÇÃO (SIMPLES)
-# =========================================
-def direcao_simples(row):
-    try:
-        if row["Odds_Casa"] < row["Odds_Visitante"]:
-            return "💀 Lay Away"
-        else:
-            return "💀 Lay Home"
-    except:
-        return ""
-
-df_simples["Direção"] = df_simples.apply(direcao_simples, axis=1)
-
-# =========================================
-# 🤖 DIREÇÃO IA (SÓ COPIA OU DEIXA VAZIO)
-# =========================================
-df_simples["Direção_IA"] = df_simples.get("Direcao_IA", "")
-
-# =========================================
-# 📊 COLUNAS FINAIS
-# =========================================
+# garante que só seleciona colunas existentes
 cols = [
-    "Home",
-    "Away",
-    "Home_Team",
-    "Result Home",
-    "Result Visitor",
-    "Visitor_Team",
-    "Result_Home_HT",
-    "Result_Visitor_HT",
-    "Odds_Casa",
-    "Odds_Empate",
-    "Odds_Visitante",
-    "Time_Letal",
-    "Score_Ofensivo",
-    "Direção",
-    "Direção_IA"
+    "Home", "Away", "Home_Team",
+    "Result Home", "Result Visitor", "Visitor_Team",
+    "Result_Home_HT", "Result_Visitor_HT",
+    "Odds_Casa", "Odds_Empate", "Odds_Visitante",
+    "Time_Letal", "Score_Ofensivo",
+    "Direção", "Direção_IA"
 ]
 
-df_simples = df_simples[cols]
+cols_existentes = [c for c in cols if c in df_simples.columns]
+df_simples = df_simples[cols_existentes]
 
 # =========================================
 # 🚀 OUTPUT
 # =========================================
-st.dataframe(df_simples, use_container_width=True, hide_index=True)
+if len(df_simples) > 0:
+    st.dataframe(df_simples, use_container_width=True, hide_index=True)
+else:
+    st.warning("Tabela vazia — verifique df_mgf")
 
 
 # =========================================
