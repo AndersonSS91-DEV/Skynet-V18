@@ -1902,88 +1902,19 @@ with tab1:
     except Exception as e:
         st.error(f"ERRO POISSON: {e}")
 
-# =========================================
-# 📋 TABELA SIMPLES (COM EMOJIS)
-# =========================================
+st.markdown("### 🚨 TESTE")
 
-st.markdown("### 📋 Jogos do Dia")
+st.write("PASSOU AQUI")
 
-lista = []
+import pandas as pd
 
-for i in range(len(df_mgf)):
+df_teste = pd.DataFrame({
+    "A": [1, 2],
+    "B": [3, 4]
+})
 
-    try:
-        linha = df_mgf.iloc[i]
+st.dataframe(df_teste)
 
-        home = classificar_filtro_duplo(
-            linha.get("Media_CG_H_01", 0),
-            linha.get("CV_CG_H_01", 0),
-            linha.get("Media_CG_H_02", 0),
-            linha.get("CV_CG_H_02", 0)
-        )
-
-        away = classificar_filtro_duplo(
-            linha.get("Media_CG_A_01", 0),
-            linha.get("CV_CG_A_01", 0),
-            linha.get("Media_CG_A_02", 0),
-            linha.get("CV_CG_A_02", 0)
-        )
-
-        # 🔹 Direção simples (SEM apply)
-        try:
-            if linha.get("Odds_Casa", 0) < linha.get("Odds_Visitante", 0):
-                direcao = "💀 Lay Away"
-            else:
-                direcao = "💀 Lay Home"
-        except:
-            direcao = ""
-
-        lista.append({
-            "Home": home,
-            "Away": away,
-            "Home_Team": linha.get("Home_Team", ""),
-            "Result Home": linha.get("Result Home", ""),
-            "Result Visitor": linha.get("Result Visitor", ""),
-            "Visitor_Team": linha.get("Visitor_Team", ""),
-            "Result_Home_HT": linha.get("Result_Home_HT", ""),
-            "Result_Visitor_HT": linha.get("Result_Visitor_HT", ""),
-            "Odds_Casa": linha.get("Odds_Casa", ""),
-            "Odds_Empate": linha.get("Odds_Empate", ""),
-            "Odds_Visitante": linha.get("Odds_Visitante", ""),
-            "Time_Letal": linha.get("Time_Letal", ""),
-            "Score_Ofensivo": linha.get("Score_Ofensivo", ""),
-            "Direção": direcao,
-            "Direção_IA": linha.get("Direcao_IA", "")
-        })
-
-    except:
-        continue
-
-# =========================================
-# 📊 DATAFRAME FINAL
-# =========================================
-df_simples = pd.DataFrame(lista)
-
-# garante que só seleciona colunas existentes
-cols = [
-    "Home", "Away", "Home_Team",
-    "Result Home", "Result Visitor", "Visitor_Team",
-    "Result_Home_HT", "Result_Visitor_HT",
-    "Odds_Casa", "Odds_Empate", "Odds_Visitante",
-    "Time_Letal", "Score_Ofensivo",
-    "Direção", "Direção_IA"
-]
-
-cols_existentes = [c for c in cols if c in df_simples.columns]
-df_simples = df_simples[cols_existentes]
-
-# =========================================
-# 🚀 OUTPUT
-# =========================================
-if len(df_simples) > 0:
-    st.dataframe(df_simples, use_container_width=True, hide_index=True)
-else:
-    st.warning("Tabela vazia — verifique df_mgf")
 
 
 # =========================================
