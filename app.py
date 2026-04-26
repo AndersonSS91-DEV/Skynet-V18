@@ -3254,7 +3254,7 @@ def gerar_card_linha(row):
         # =========================================
         lista = []
 
-        for _, row in df_clean.iterrows():
+for _, row in df_clean.iterrows():
     res = classificar_jogo(row)
 
     if res:
