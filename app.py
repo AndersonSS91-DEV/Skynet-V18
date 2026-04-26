@@ -3382,55 +3382,73 @@ for _, row in df_clean.iterrows():
                     score[d] = score.get(d, 0) + p
 
             # =========================================
-            # 🔥 DEFINIÇÃO DIREÇÃO + FILTRO
+            # 🔥 DIREÇÃO + FILTRO
             # =========================================
             if score:
                 direcao_final = max(score, key=score.get)
                 confianca = score[direcao_final]
 
-                # 🔥 só aceita Lay forte
+                # só aceita Lay forte
                 if confianca < 0.60:
                     direcao_final = None
             else:
                 direcao_final = None
                 confianca = 0
 
-        except:
-            direcao_final = None
-            confianca = 0
+            # =========================================
+            # 🔥 FALLBACK OVER / UNDER
+            # =========================================
+            if not direcao_final:
+                matriz_gols = calcular_matriz_poisson(mgf_h, mgf_a)
+                sinais_gols = poisson_intelligence(matriz_gols)
 
-                # =========================================
-                # 🔥 FALLBACK OVER / UNDER
-                # =========================================
-                if not direcao_final:
-                    matriz_gols = calcular_matriz_poisson(mgf_h, mgf_a)
-                    sinais_gols = poisson_intelligence(matriz_gols)
+                d_gols = None
+                if sinais_gols and len(sinais_gols) > 2 and sinais_gols[2]:
+                    txt = str(sinais_gols[2][0]).lower()
+                    if "over" in txt:
+                        d_gols = "Over 2.5"
+                    elif "under" in txt:
+                        d_gols = "Under 2.5"
 
-                    d_gols = None
-                    if sinais_gols and len(sinais_gols) > 2 and sinais_gols[2]:
-                        txt = str(sinais_gols[2][0]).lower()
-                        if "over" in txt:
-                            d_gols = "Over 2.5"
-                        elif "under" in txt:
-                            d_gols = "Under 2.5"
-
-                    if d_gols:
-                        Direcao_IA = f"⚠️ {d_gols} (55%)"
-                    else:
-                        Direcao_IA = ""
+                if d_gols:
+                    Direcao_IA = f"⚠️ {d_gols} (55%)"
                 else:
-                    if len(score) > 1:
-                        confianca *= 0.85
+                    Direcao_IA = ""
+            else:
+                if len(score) > 1:
+                    confianca *= 0.85
 
-                    if confianca >= 0.80:
-                        Direcao_IA = f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
-                    elif confianca >= 0.60:
-                        Direcao_IA = f"🔥 {direcao_final} ({round(confianca*100)}%)"
-                    else:
-                        Direcao_IA = f"⚠️ {direcao_final} ({round(confianca*100)}%)"
+                if confianca >= 0.80:
+                    Direcao_IA = f"🔥🔥 {direcao_final} ({round(confianca*100)}%)"
+                elif confianca >= 0.60:
+                    Direcao_IA = f"🔥 {direcao_final} ({round(confianca*100)}%)"
+                else:
+                    Direcao_IA = f"⚠️ {direcao_final} ({round(confianca*100)}%)"
 
-            except:
-                Direcao_IA = ""
+        except:
+            Direcao_IA = ""
+
+        lista.append({
+            "Home": row["Home"],
+            "Away": row["Away"],
+            "Home_Team": row.get("Home_Team", ""),
+            "Away_Team": row.get("Visitor_Team", ""),
+            "Placar": (
+                "-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
+                else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"
+            ),
+            "HT": (
+                "-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
+                else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"
+            ),
+            "Tipo": res["Tipo"],
+            "Entrada": res["Entrada"],
+            "Classe": res["Classe"],
+            "LAY_DECISAO": definir_lay(row),
+            "HA_Value": row.get("HA_Value", ""),
+            "Direcao": row.get("Direcao_Poisson", ""),
+            "Direcao_IA": Direcao_IA
+        })
 
             lista.append({
                 "Home": row["Home"],
