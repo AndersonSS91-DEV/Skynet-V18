@@ -3220,9 +3220,6 @@ with tab7:
 Home {home_emoji}   x   Away {away_emoji}
 """
 
-            # =========================================
-            # 🎨 RENDER DO CARD (ESSENCIAL)
-            # =========================================
             if resultado["Classe"] == "A+":
                 st.success(texto)
             elif resultado["Classe"] == "A":
@@ -3231,7 +3228,6 @@ Home {home_emoji}   x   Away {away_emoji}
                 st.warning(texto)
             else:
                 st.info(texto)
-
 
         # =========================================
         # 📊 RANKING IA
@@ -3244,6 +3240,7 @@ Home {home_emoji}   x   Away {away_emoji}
             st.dataframe(df_rank, use_container_width=True, hide_index=True)
         else:
             st.info("Nenhum jogo A+/A encontrado")
+
 
 # =========================================
 # 📋 TABELA FINAL (ABA CONTROLADA)
@@ -3292,7 +3289,7 @@ with tab7:
         if res:
 
             # =========================================
-            # 🧠 DIREÇÃO (IGUAL ABA 1)
+            # 🧠 DIREÇÃO (IGUAL AO CARD)
             # =========================================
             try:
                 matriz_dir = calcular_matriz_poisson(
@@ -3301,22 +3298,13 @@ with tab7:
                 )
 
                 sinais_dir = poisson_intelligence(matriz_dir)
-
-                direcoes = sinais_dir[2]
-
-                # 🔥 GARANTE PADRÃO LIMPO
-                if "💀 Lay Away" in direcoes:
-                    direcao = "💀 Lay Away"
-                elif "💀 Lay Home" in direcoes:
-                    direcao = "💀 Lay Home"
-                else:
-                    direcao = ""  # ← NÃO INVENTA TEXTO
+                direcao = " | ".join(sinais_dir[2])  # 🔥 EXATO DO CARD
 
             except:
                 direcao = ""
 
             # =========================================
-            # 🤖 DIREÇÃO IA (MANTIDA)
+            # 🤖 DIREÇÃO IA (IGUAL AO CARD)
             # =========================================
             try:
                 matriz_mgf = calcular_matriz_poisson(
@@ -3333,9 +3321,14 @@ with tab7:
                 sinais_exg = poisson_intelligence(matriz_exg)
                 sinais_vg = poisson_intelligence(matriz_vg)
 
-                Direcao_IA = direcao_ia_peso(
+                raw_ia = direcao_ia_peso(
                     sinais_mgf, sinais_exg, sinais_vg
                 )
+
+                if isinstance(raw_ia, list):
+                    raw_ia = " | ".join(raw_ia)
+
+                Direcao_IA = f"⚠️ {raw_ia}" if raw_ia else ""
 
             except:
                 Direcao_IA = ""
@@ -3359,7 +3352,7 @@ with tab7:
                 "LAY_DECISAO": definir_lay(row),
                 "HA_Value": row.get("HA_Value", ""),
 
-                # 🔥 PADRÃO LIMPO
+                # 🔥 PADRÃO IGUAL AO CARD
                 "Direcao": direcao,
                 "Direcao_IA": Direcao_IA
             })
