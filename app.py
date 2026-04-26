@@ -1902,33 +1902,51 @@ with tab1:
     except Exception as e:
         st.error(f"ERRO POISSON: {e}")
 
-    # =========================================
-    # 📋 TABELA SIMPLES (COM EMOJIS)
-    # =========================================
+# =========================================
+# 📋 TABELA SIMPLES (COM EMOJIS)
+# =========================================
 
-    st.markdown("### 📋 Jogos do Dia")
+st.markdown("### 📋 Jogos do Dia")
 
-    base_df = df_mgf.copy()
+lista = []
 
-    df_simples = base_df.copy()
+for i in range(len(df_mgf)):
 
-    df_simples["Home"] = df_simples.apply(
-        lambda x: classificar_filtro_duplo(
-            x["Media_CG_H_01"], x["CV_CG_H_01"],
-            x["Media_CG_H_02"], x["CV_CG_H_02"]
-        ),
-        axis=1
-    )
+    try:
+        linha = df_mgf.iloc[i]
 
-    df_simples["Away"] = df_simples.apply(
-        lambda x: classificar_filtro_duplo(
-            x["Media_CG_A_01"], x["CV_CG_A_01"],
-            x["Media_CG_A_02"], x["CV_CG_A_02"]
-        ),
-        axis=1
-    )
+        home = classificar_filtro_duplo(
+            linha["Media_CG_H_01"],
+            linha["CV_CG_H_01"],
+            linha["Media_CG_H_02"],
+            linha["CV_CG_H_02"]
+        )
 
-    st.dataframe(df_simples, use_container_width=True)
+        away = classificar_filtro_duplo(
+            linha["Media_CG_A_01"],
+            linha["CV_CG_A_01"],
+            linha["Media_CG_A_02"],
+            linha["CV_CG_A_02"]
+        )
+
+        lista.append({
+            "Home": home,
+            "Away": away,
+            "Home_Team": linha.get("Home_Team", ""),
+            "Visitor_Team": linha.get("Visitor_Team", "")
+        })
+
+    except:
+        lista.append({
+            "Home": "",
+            "Away": "",
+            "Home_Team": "",
+            "Visitor_Team": ""
+        })
+
+df_simples = pd.DataFrame(lista)
+
+st.dataframe(df_simples, use_container_width=True)
 
 # =========================================
 # 🎯 DIREÇÃO (SIMPLES)
