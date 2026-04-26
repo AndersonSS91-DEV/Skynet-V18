@@ -3236,7 +3236,7 @@ Home {home_emoji}   x   Away {away_emoji}
 # =========================================
 # 📋 função card - final
 # =========================================
-            def gerar_card_linha(row):
+def gerar_card_linha(row):
     return {
         "Score": row.get("Score", ""),
         "Leitura": row.get("Leitura", ""),
