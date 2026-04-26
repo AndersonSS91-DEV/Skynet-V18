@@ -3231,77 +3231,15 @@ Home {home_emoji}   x   Away {away_emoji}
         # =========================================
         def gerar_card_linha(row):
     try:
-        matriz_mgf = calcular_matriz_poisson(
-            row["ExG_Home_MGF"],
-            row["ExG_Away_MGF"]
-        )
-
-        matriz_exg = calcular_matriz_poisson(
-            row["ExG_Home_ATKxDEF"],
-            row["ExG_Away_ATKxDEF"]
-        )
-
-        matriz_vg = calcular_matriz_poisson(
-            row["ExG_Home_VG"],
-            row["ExG_Away_VG"]
-        )
-
-        sinais_mgf = poisson_intelligence(matriz_mgf)
-        sinais_exg = poisson_intelligence(matriz_exg)
-        sinais_vg = poisson_intelligence(matriz_vg)
-
-        consenso = consenso_poisson(
-            sinais_mgf,
-            sinais_exg,
-            sinais_vg
-        )
-
-        estrutura = []
-        mercado = []
-        direcao = []
-
-        for s in [sinais_mgf, sinais_exg, sinais_vg]:
-            estrutura += s[0]
-            mercado += s[1]
-            direcao += s[2]
-
-        estrutura = list(set(estrutura))
-        mercado = list(set(mercado))
-        direcao = list(set(direcao))
-
-        lambda_home = np.mean([
-            row["ExG_Home_MGF"],
-            row["ExG_Home_ATKxDEF"],
-            row["ExG_Home_VG"]
-        ])
-
-        lambda_away = np.mean([
-            row["ExG_Away_MGF"],
-            row["ExG_Away_ATKxDEF"],
-            row["ExG_Away_VG"]
-        ])
-
-        matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
-
-        score = poisson_score(matriz_consenso)
-
-        if score > 75:
-            leitura_score = "🔥 Alta previsibilidade"
-        elif score > 55:
-            leitura_score = "⚖️ Jogo equilibrado"
-        else:
-            leitura_score = "⚔️ Jogo imprevisível"
-
         return {
-            "Score": round(score, 1),
-            "Leitura": leitura_score,
-            "Estrutura": " | ".join(estrutura),
-            "Mercado": " | ".join(mercado),
-            "Direcao": " | ".join(direcao),
-            "Consenso": " | ".join(consenso)
+            "Score": 0,
+            "Leitura": "",
+            "Estrutura": "",
+            "Mercado": "",
+            "Direcao": "",
+            "Consenso": ""
         }
-
-    except Exception as e:
+    except:
         return {
             "Score": "",
             "Leitura": "",
