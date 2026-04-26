@@ -3269,38 +3269,10 @@ with tab7:
         except:
             return ""
 
-    # =========================================
-    # 🤖 DIREÇÃO IA (NOVO)
-    # =========================================
-    def calcular_direcao_ia_row(row):
-        try:
-            matriz_mgf = calcular_matriz_poisson(
-                row["ExG_Home_MGF"], row["ExG_Away_MGF"]
-            )
-            matriz_exg = calcular_matriz_poisson(
-                row["ExG_Home_ATKxDEF"], row["ExG_Away_ATKxDEF"]
-            )
-            matriz_vg = calcular_matriz_poisson(
-                row["ExG_Home_VG"], row["ExG_Away_VG"]
-            )
-
-            sinais_mgf = poisson_intelligence(matriz_mgf)
-            sinais_exg = poisson_intelligence(matriz_exg)
-            sinais_vg = poisson_intelligence(matriz_vg)
-
-            return direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg)
-
-        except:
-            return ""
-
     if "Direcao_Poisson" not in base_df.columns:
         base_df["Direcao_Poisson"] = ""
 
-    if "Direcao_IA" not in base_df.columns:
-        base_df["Direcao_IA"] = ""
-
     base_df["Direcao_Poisson"] = base_df.apply(calcular_direcao_row, axis=1)
-    base_df["Direcao_IA"] = base_df.apply(calcular_direcao_ia_row, axis=1)
 
     # =========================================
     # 🔍 FILTRO BASE
@@ -3340,6 +3312,30 @@ with tab7:
         res = classificar_jogo(row)
 
         if res:
+
+            # =========================================
+            # 🤖 DIREÇÃO IA (CORRETO - DENTRO DO LOOP)
+            # =========================================
+            try:
+                matriz_mgf = calcular_matriz_poisson(
+                    row["ExG_Home_MGF"], row["ExG_Away_MGF"]
+                )
+                matriz_exg = calcular_matriz_poisson(
+                    row["ExG_Home_ATKxDEF"], row["ExG_Away_ATKxDEF"]
+                )
+                matriz_vg = calcular_matriz_poisson(
+                    row["ExG_Home_VG"], row["ExG_Away_VG"]
+                )
+
+                sinais_mgf = poisson_intelligence(matriz_mgf)
+                sinais_exg = poisson_intelligence(matriz_exg)
+                sinais_vg = poisson_intelligence(matriz_vg)
+
+                Direcao_IA = direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg)
+
+            except:
+                Direcao_IA = ""
+
             lista.append({
                 "Home": row["Home"],
                 "Away": row["Away"],
@@ -3361,7 +3357,7 @@ with tab7:
 
                 # 🔥 DIREÇÕES
                 "Direcao": row.get("Direcao_Poisson", ""),
-                "Direcao_IA": row.get("Direcao_IA", "")
+                "Direcao_IA": Direcao_IA
             })
 
     # =========================================
