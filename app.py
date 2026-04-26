@@ -259,7 +259,35 @@ def direcao_ia_peso(sinais_mgf, sinais_exg, sinais_vg):
         return f"⚠️ {direcao_final} ({round(confianca*100)}%)"
 
     return ""
+# =========================================
+# 🎯 FUNÇÃO FILTRO VISUAL (MULTI-EMOJI)
+# =========================================
+def classificar_filtro_duplo(media1, cv1, media2, cv2):
 
+    emojis = []
+
+    # CG_01
+    if media1 < 2.00:
+        emojis.append("☃")
+    elif 2.00 <= media1 < 2.70:
+        emojis.append("🟨")
+    elif 2.70 <= media1 <= 3.00 and cv1 <= 0.90:
+        emojis.append("🚀")
+    elif 2.80 <= media1 <= 5.50 and cv1 <= 0.80:
+        emojis.append("🌋")
+    elif media1 > 5.50:
+        emojis.append("🌊")
+
+    # CG_02
+    if media2 < 0.90:
+        emojis.append("❄")
+    elif 0.90 <= media2 <= 2.00 and cv2 <= 0.80:
+        emojis.append("🔥")
+    elif media2 > 2.00:
+        emojis.append("🌬")
+
+    return "".join(emojis) if emojis else "—"
+    
 # =========================================
 # 🎬 BANNER CARROSSEL (OFICIAL SKYNET)
 # =========================================
@@ -1939,35 +1967,37 @@ with tab1:
     except Exception as e:
         st.error(f"ERRO POISSON: {e}")
 
-# =========================================
-# 📋 TABELA SIMPLES (COM EMOJIS)
-# =========================================
+with tab1:
 
-st.markdown("### 📋 Jogos do Dia")
+    # ... todo seu código ...
 
-df_simples = base_df.copy()
+    # =========================================
+    # 📋 TABELA SIMPLES (COM EMOJIS)
+    # =========================================
 
-# =========================================
-# 🎨 COLUNA HOME (EMOJI)
-# =========================================
-df_simples["Home"] = df_simples.apply(
-    lambda x: classificar_filtro_duplo(
-        x["Media_CG_H_01"], x["CV_CG_H_01"],
-        x["Media_CG_H_02"], x["CV_CG_H_02"]
-    ),
-    axis=1
-)
+    st.markdown("### 📋 Jogos do Dia")
 
-# =========================================
-# 🎨 COLUNA AWAY (EMOJI)
-# =========================================
-df_simples["Away"] = df_simples.apply(
-    lambda x: classificar_filtro_duplo(
-        x["Media_CG_A_01"], x["CV_CG_A_01"],
-        x["Media_CG_A_02"], x["CV_CG_A_02"]
-    ),
-    axis=1
-)
+    base_df = df_mgf.copy()
+
+    df_simples = base_df.copy()
+
+    df_simples["Home"] = df_simples.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_H_01"], x["CV_CG_H_01"],
+            x["Media_CG_H_02"], x["CV_CG_H_02"]
+        ),
+        axis=1
+    )
+
+    df_simples["Away"] = df_simples.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_A_01"], x["CV_CG_A_01"],
+            x["Media_CG_A_02"], x["CV_CG_A_02"]
+        ),
+        axis=1
+    )
+
+    st.dataframe(df_simples, use_container_width=True)
 
 # =========================================
 # 🎯 DIREÇÃO (SIMPLES)
