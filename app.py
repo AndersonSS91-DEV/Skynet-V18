@@ -3223,26 +3223,6 @@ with tab7:
 
 Home {home_emoji}   x   Away {away_emoji}
 """
-
-            # =========================================
-            # 🤖 DIREÇÕES (CARD SEPARADO - SEGURO)
-            # =========================================
-            try:
-                df_match = df_consenso[df_consenso["JOGO"] == jogo]
-
-                if not df_match.empty:
-                    linha_cons = df_match.iloc[0]
-
-                    st.info(
-                        f"⚔️ Poisson: {linha_cons['Poisson_Direcao']}  \n"
-                        f"🤖 IA: {linha_cons['IA_Direcao']}"
-                    )
-                else:
-                    st.warning("⚠️ Consenso não encontrado")
-
-            except Exception as e:
-                st.warning(f"Erro consenso: {e}")
-
             # =========================================
             # 🎨 RENDER DO CARD
             # =========================================
