@@ -3235,10 +3235,10 @@ Home {home_emoji}   x   Away {away_emoji}
                     texto += f"\n🤖 Direção IA: {linha_cons['IA_Direcao']}"
 
                 else:
-                    texto += "\n❌ CONSENSO NÃO ENCONTRADO"
+                    texto += "\n❌ Jogo não encontrado no consenso"
 
             except Exception as e:
-                texto += f"\n❌ ERRO CONSENSO: {e}"
+                texto += f"\n❌ Erro ao ler consenso: {e}"
 
             
             # =========================================
