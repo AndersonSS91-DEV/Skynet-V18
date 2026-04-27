@@ -3223,28 +3223,29 @@ with tab7:
 
 Home {home_emoji}   x   Away {away_emoji}
 """
+
             # =========================================
             # 🤖 DIREÇÕES (POISSON + IA) — CONSENSO
             # =========================================
             try:
-                linha_cons = df_consenso[df_consenso["JOGO"] == jogo]
+                linha_cons = None
 
-                if not linha_cons.empty:
-                    linha_cons = linha_cons.iloc[0]
+                df_match = df_consenso[df_consenso["JOGO"] == jogo]
 
-                    texto += "\n"
+                if not df_match.empty:
+                    linha_cons = df_match.iloc[0]
+
+                if linha_cons is not None:
                     texto += f"\n⚔️ Direção Poisson: {linha_cons['Poisson_Direcao']}"
                     texto += f"\n🤖 Direção IA: {linha_cons['IA_Direcao']}"
-
                 else:
-                    texto += "\n❌ Jogo não encontrado no consenso"
+                    texto += "\n⚠️ Sem dados de consenso"
 
             except Exception as e:
                 texto += f"\n❌ Erro ao ler consenso: {e}"
 
-            
             # =========================================
-            # 🎨 RENDER DO CARD (ESSENCIAL)
+            # 🎨 RENDER DO CARD
             # =========================================
             if resultado["Classe"] == "A+":
                 st.success(texto)
@@ -3254,7 +3255,7 @@ Home {home_emoji}   x   Away {away_emoji}
                 st.warning(texto)
             else:
                 st.info(texto)
-
+            
         # =========================================
         # 📊 RANKING IA
         # =========================================
