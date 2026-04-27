@@ -323,9 +323,11 @@ else:
 # =========================================
 df_mgf = pd.read_excel(xls, "Poisson_Media_Gols")
 df_exg = pd.read_excel(xls, "Poisson_Ataque_Defesa")
-df_vg  = pd.read_excel(xls, "Poisson_VG")  # <<< FALTAVA ISSO
+df_vg  = pd.read_excel(xls, "Poisson_VG") 
 df_ht = pd.read_excel(xls,  "Poisson_HT")
 df_cantos = pd.read_excel(xls, "Escanteios") 
+df_consenso = pd.read_excel(xls, "Poisson_Consenso")  # 🔥 ESSA LINHA
+df_consenso["JOGO"] = (df_consenso["Home_Team"] + " x " + df_consenso["Visitor_Team"])
 
 for df in (df_mgf, df_exg, df_vg, df_ht, df_cantos):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
