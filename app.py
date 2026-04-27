@@ -3219,6 +3219,23 @@ Home {home_emoji}   x   Away {away_emoji}
 """
 
             # =========================================
+            # 🤖 DIREÇÕES (POISSON + IA)
+            # =========================================
+            poisson_dir = linha.get("Poisson_Direcao", "")
+            ia_dir = linha.get("IA_Direcao", "")
+
+            extra = ""
+
+            if poisson_dir:
+                extra += f"\n⚔️ Direção Poisson: {poisson_dir}"
+
+            if ia_dir:
+                extra += f"\n🤖 Direção IA: {ia_dir}"
+
+            texto += extra
+
+            
+            # =========================================
             # 🎨 RENDER DO CARD (ESSENCIAL)
             # =========================================
             if resultado["Classe"] == "A+":
