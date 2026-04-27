@@ -1875,32 +1875,6 @@ with tab1:
         st.error(f"ERRO POISSON: {e}")
 
 
-# =========================================
-# 🚨 TABELA FORÇADA (NÃO DEPENDE DE NADA)
-# =========================================
-st.markdown("### 📋 TESTE TABELA FORÇADA")
-
-import pandas as pd
-
-try:
-    linhas = []
-
-    for i in range(len(df_mgf)):
-        linha = df_mgf.iloc[i]
-
-        linhas.append({
-            "Home": "OK",
-            "Away": "OK",
-            "Home_Team": linha.get("Home_Team", ""),
-            "Visitor_Team": linha.get("Visitor_Team", "")
-        })
-
-    df_teste = pd.DataFrame(linhas)
-
-    st.dataframe(df_teste, use_container_width=True)
-
-except Exception as e:
-    st.error(f"ERRO REAL: {e}")
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
@@ -3207,7 +3181,7 @@ with tab7:
     # =========================================
     if not base_df.empty:
         linha = base_df.iloc[0]
-        resultado = classificar_jogo(linha_mgf)
+        resultado = classificar_jogo(linha)
 
         if resultado:
 
@@ -3223,13 +3197,13 @@ with tab7:
                 detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
 
             home_emoji = classificar_filtro_duplo(
-                linha_mgf["Media_CG_H_01"], linha_mgf["CV_CG_H_01"],
-                linha_mgf["Media_CG_H_02"], linha_mgf["CV_CG_H_02"]
+                linha["Media_CG_H_01"], linha["CV_CG_H_01"],
+                linha["Media_CG_H_02"], linha["CV_CG_H_02"]
             )
 
             away_emoji = classificar_filtro_duplo(
-                linha_mgf["Media_CG_A_01"], linha_mgf["CV_CG_A_01"],
-                linha_mgf["Media_CG_A_02"], linha_mgf["CV_CG_A_02"]
+                linha["Media_CG_A_01"], linha["CV_CG_A_01"],
+                linha["Media_CG_A_02"], linha["CV_CG_A_02"]
             )
 
             texto = f"""
