@@ -3244,29 +3244,25 @@ Home {home_emoji}   x   Away {away_emoji}
         st.warning("Base vazia")
 
         
-        # =========================================
-        # 📊 RANKING IA
-        # =========================================
-        df_rank = gerar_ranking_ia(base_df)
 
-        st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
+    # =========================================
+    # 📊 RANKING IA
+    # =========================================
+    st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
-        if not df_rank.empty:
-            st.dataframe(df_rank, use_container_width=True, hide_index=True)
-        else:
-            st.info("Nenhum jogo A+/A encontrado")
+    df_rank = gerar_ranking_ia(base_df)
 
+    if not df_rank.empty:
+        st.dataframe(df_rank, use_container_width=True, hide_index=True)
+    else:
+        st.info("Nenhum jogo A+/A encontrado")
 
-# =========================================
-# 📋 TABELA FINAL (ABA CONTROLADA)
-# =========================================
-with tab7:
-
+    # =========================================
+    # 📋 TABELA FINAL
+    # =========================================
     st.markdown("### 📋 Todos os Jogos Filtrados")
 
-    # =========================================
-    # 🔥 CONVERSÃO DAS ODDS
-    # =========================================
+    # 🔧 Ajuste odds
     cols_odds = [
         "Odd_BTTS_YES",
         "Odds_Over_2,5FT",
@@ -3282,9 +3278,7 @@ with tab7:
         )
         base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
 
-    # =========================================
-    # 🔍 FILTRO BASE
-    # =========================================
+    # 🔍 filtro base
     df_clean = base_df[
         (base_df["Odd_BTTS_YES"] > 0) &
         (base_df["Odds_Over_2,5FT"] > 0) &
@@ -3292,27 +3286,23 @@ with tab7:
         (base_df["Odds_Visitante"] > 0)
     ].copy()
 
-    # =========================================
-    # 🎨 FILTRO VISUAL
-    # =========================================
+    # 🎨 emojis
     df_clean["Home"] = df_clean.apply(
         lambda x: classificar_filtro_duplo(
             x["Media_CG_H_01"], x["CV_CG_H_01"],
             x["Media_CG_H_02"], x["CV_CG_H_02"]
-        ),
-        axis=1
+        ), axis=1
     )
 
     df_clean["Away"] = df_clean.apply(
         lambda x: classificar_filtro_duplo(
             x["Media_CG_A_01"], x["CV_CG_A_01"],
             x["Media_CG_A_02"], x["CV_CG_A_02"]
-        ),
-        axis=1
+        ), axis=1
     )
 
     # =========================================
-    # 📊 LISTA FINAL
+    # 🧠 LISTA FINAL
     # =========================================
     lista = []
 
@@ -3323,93 +3313,23 @@ with tab7:
         if not res:
             continue
 
-        Direcao_IA = ""
-
-        try:
-            home = row["Home_Team"]
-            away = row["Visitor_Team"]
-
-            exg_row = df_exg[
-                (df_exg["Home_Team"] == home) &
-                (df_exg["Visitor_Team"] == away)
-            ]
-
-            vg_row = df_vg[
-                (df_vg["Home_Team"] == home) &
-                (df_vg["Visitor_Team"] == away)
-            ]
-
-            if not exg_row.empty and not vg_row.empty:
-
-                exg_row = exg_row.iloc[0]
-                vg_row  = vg_row.iloc[0]
-
-                matriz_mgf = calcular_matriz_poisson(
-                    row["ExG_Home_MGF"],
-                    row["ExG_Away_MGF"]
-                )
-                sinais_mgf = poisson_intelligence(matriz_mgf)
-
-                matriz_exg = calcular_matriz_poisson(
-                    exg_row["ExG_Home_ATKxDEF"],
-                    exg_row["ExG_Away_ATKxDEF"]
-                )
-                sinais_exg = poisson_intelligence(matriz_exg)
-
-                matriz_vg = calcular_matriz_poisson(
-                    vg_row["ExG_Home_VG"],
-                    vg_row["ExG_Away_VG"]
-                )
-                sinais_vg = poisson_intelligence(matriz_vg)
-
-                Direcao_IA = direcao_ia_peso(
-                    sinais_mgf,
-                    sinais_exg,
-                    sinais_vg
-                )
-
-        except:
-            Direcao_IA = ""
-
         lista.append({
             "Home": row["Home"],
             "Away": row["Away"],
             "Home_Team": row.get("Home_Team", ""),
             "Away_Team": row.get("Visitor_Team", ""),
-            "Placar": (
-                "-" if pd.isna(row.get("Result Home")) or pd.isna(row.get("Result Visitor"))
-                else f"{int(row.get('Result Home'))} x {int(row.get('Result Visitor'))}"
-            ),
-            "HT": (
-                "-" if pd.isna(row.get("Result_Home_HT")) or pd.isna(row.get("Result_Visitor_HT"))
-                else f"{int(row.get('Result_Home_HT'))} x {int(row.get('Result_Visitor_HT'))}"
-            ),
             "Tipo": res["Tipo"],
             "Entrada": res["Entrada"],
             "Classe": res["Classe"],
-            "LAY_DECISAO": definir_lay(row),
-            "HA_Value": row.get("HA_Value", ""),
-            "Direcao": row.get("Direcao_Poisson", ""),
-            "Direcao_IA": Direcao_IA
+            "LAY": definir_lay(row),
+            "HA_Value": row.get("HA_Value", "")
         })
 
     # =========================================
-    # 📈 OUTPUT
+    # 📈 OUTPUT FINAL
     # =========================================
     if lista:
         df_final = pd.DataFrame(lista)
-
-        cols = [
-            "Home", "Away", "Home_Team", "Away_Team",
-            "Placar", "HT",
-            "Tipo", "Entrada", "Classe",
-            "LAY_DECISAO", "HA_Value",
-            "Direcao",
-            "Direcao_IA"
-        ]
-
-        df_final = df_final[cols]
-
         st.dataframe(df_final, use_container_width=True, hide_index=True)
     else:
         st.info("Sem jogos válidos após filtro")
