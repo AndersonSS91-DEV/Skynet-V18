@@ -3221,32 +3221,35 @@ with tab7:
 
 Home {home_emoji}   x   Away {away_emoji}
 """
-
             # =========================================
             # 🤖 DIREÇÕES (POISSON + IA) — CONSENSO
             # =========================================
             try:
-                poisson_dir = (
-                    linha_consenso.get("Direcao_Poisson")
-                    or linha_consenso.get("Poisson_Direcao")
-                    or ""
-                )
+                linha_cons = df_consenso[df_consenso["JOGO"] == jogo]
 
-                ia_dir = (
-                    linha_consenso.get("Direcao_IA")
-                    or linha_consenso.get("IA_Direcao")
-                    or ""
-                )
+                if not linha_cons.empty:
+                    linha_cons = linha_cons.iloc[0]
 
-                if poisson_dir:
-                    texto += f"\n⚔️ Direção Poisson: {poisson_dir}"
+                    poisson_dir = (
+                        linha_cons.get("Direcao_Poisson")
+                        or linha_cons.get("Poisson_Direcao")
+                        or ""
+                    )
 
-                if ia_dir:
-                    texto += f"\n🤖 Direção IA: {ia_dir}"
+                    ia_dir = (
+                        linha_cons.get("Direcao_IA")
+                        or linha_cons.get("IA_Direcao")
+                        or ""
+                    )
 
-            except:
+                    if poisson_dir:
+                        texto += f"\n⚔️ Direção Poisson: {poisson_dir}"
+
+                    if ia_dir:
+                        texto += f"\n🤖 Direção IA: {ia_dir}"
+
+            except Exception:
                 pass
-
             # =========================================
             # 🎨 RENDER DO CARD (ESSENCIAL)
             # =========================================
