@@ -3225,22 +3225,20 @@ Home {home_emoji}   x   Away {away_emoji}
             # 🤖 DIREÇÕES (POISSON + IA) — CONSENSO
             # =========================================
             try:
-                linha_cons = df_consenso.loc[df_consenso["JOGO"] == jogo]
+                linha_cons = df_consenso[df_consenso["JOGO"] == jogo]
 
                 if not linha_cons.empty:
                     linha_cons = linha_cons.iloc[0]
 
-                    poisson_dir = str(linha_cons["Poisson_Direcao"])
-                    ia_dir = str(linha_cons["IA_Direcao"])
-
-                    texto += f"\n⚔️ Direção Poisson: {poisson_dir}"
-                    texto += f"\n🤖 Direção IA: {ia_dir}"
+                    texto += "\n"
+                    texto += f"\n⚔️ Direção Poisson: {linha_cons['Poisson_Direcao']}"
+                    texto += f"\n🤖 Direção IA: {linha_cons['IA_Direcao']}"
 
                 else:
-                    texto += "\n❌ JOGO NÃO ENCONTRADO NO CONSENSO"
+                    texto += "\n❌ CONSENSO NÃO ENCONTRADO"
 
             except Exception as e:
-                texto += f"\n❌ ERRO: {e}"
+                texto += f"\n❌ ERRO CONSENSO: {e}"
 
             
             # =========================================
