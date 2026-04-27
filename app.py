@@ -3164,28 +3164,35 @@ def definir_lay(row):
 
     return "⚠️Lay Away (Atenção)"
 
-
 # =========================================
-# 🚀 ABA IA FINAL
+# 🚀 ABA IA FINAL (ESTÁVEL)
 # =========================================
 with tab7:
 
     st.markdown("## 🤖 Central de Decisão IA")
 
+    # =========================================
+    # 📥 LEITURA BASE (UMA VEZ SÓ)
+    # =========================================
     try:
         base_df = pd.read_excel(xls)
-        base_df["HA_Value"] = base_df.apply(detectar_handicap_value_profissional, axis=1)
-    except:
-        st.error("Erro ao ler arquivo")
+    except Exception as e:
+        st.error(f"Erro ao ler arquivo: {e}")
         st.stop()
+
+    # =========================================
+    # 🔧 PRÉ-PROCESSAMENTO
+    # =========================================
+    base_df["HA_Value"] = base_df.apply(
+        detectar_handicap_value_profissional, axis=1
+    )
 
     # =========================================
     # 🎯 JOGO ATUAL
     # =========================================
     if not base_df.empty:
-        linha = base_df.iloc[0]
 
-        # 👉 usa a linha correta
+        linha = base_df.iloc[0]
         resultado = classificar_jogo(linha)
 
         if resultado:
@@ -3201,7 +3208,6 @@ with tab7:
             if resultado.get("Risco"):
                 detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
 
-            # 👉 emojis usando a linha correta
             home_emoji = classificar_filtro_duplo(
                 linha["Media_CG_H_01"], linha["CV_CG_H_01"],
                 linha["Media_CG_H_02"], linha["CV_CG_H_02"]
@@ -3223,18 +3229,21 @@ with tab7:
 
 Home {home_emoji}   x   Away {away_emoji}
 """
+
             # =========================================
             # 🎨 RENDER DO CARD
             # =========================================
-            if resultado["Classe"] == "A+":
-                st.success(texto)
-            elif resultado["Classe"] == "A":
+            if resultado["Classe"] in ["A+", "A"]:
                 st.success(texto)
             elif resultado["Classe"] == "B":
                 st.warning(texto)
             else:
                 st.info(texto)
-            
+
+    else:
+        st.warning("Base vazia")
+
+        
         # =========================================
         # 📊 RANKING IA
         # =========================================
