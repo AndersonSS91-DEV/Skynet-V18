@@ -3225,24 +3225,23 @@ Home {home_emoji}   x   Away {away_emoji}
 """
 
             # =========================================
-            # 🤖 DIREÇÕES (POISSON + IA) — CONSENSO
+            # 🤖 DIREÇÕES (CARD SEPARADO - SEGURO)
             # =========================================
             try:
-                linha_cons = None
-
                 df_match = df_consenso[df_consenso["JOGO"] == jogo]
 
                 if not df_match.empty:
                     linha_cons = df_match.iloc[0]
 
-                if linha_cons is not None:
-                    texto += f"\n⚔️ Direção Poisson: {linha_cons['Poisson_Direcao']}"
-                    texto += f"\n🤖 Direção IA: {linha_cons['IA_Direcao']}"
+                    st.info(
+                        f"⚔️ Poisson: {linha_cons['Poisson_Direcao']}  \n"
+                        f"🤖 IA: {linha_cons['IA_Direcao']}"
+                    )
                 else:
-                    texto += "\n⚠️ Sem dados de consenso"
+                    st.warning("⚠️ Consenso não encontrado")
 
             except Exception as e:
-                texto += f"\n❌ Erro ao ler consenso: {e}"
+                st.warning(f"Erro consenso: {e}")
 
             # =========================================
             # 🎨 RENDER DO CARD
