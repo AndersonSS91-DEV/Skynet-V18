@@ -3182,7 +3182,9 @@ with tab7:
     # =========================================
     if not base_df.empty:
         linha = base_df.iloc[0]
-        resultado = classificar_jogo(linha_mgf)
+
+        # 👉 usa a linha correta
+        resultado = classificar_jogo(linha)
 
         if resultado:
 
@@ -3197,14 +3199,15 @@ with tab7:
             if resultado.get("Risco"):
                 detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
 
+            # 👉 emojis usando a linha correta
             home_emoji = classificar_filtro_duplo(
-                linha_mgf["Media_CG_H_01"], linha_mgf["CV_CG_H_01"],
-                linha_mgf["Media_CG_H_02"], linha_mgf["CV_CG_H_02"]
+                linha["Media_CG_H_01"], linha["CV_CG_H_01"],
+                linha["Media_CG_H_02"], linha["CV_CG_H_02"]
             )
 
             away_emoji = classificar_filtro_duplo(
-                linha_mgf["Media_CG_A_01"], linha_mgf["CV_CG_A_01"],
-                linha_mgf["Media_CG_A_02"], linha_mgf["CV_CG_A_02"]
+                linha["Media_CG_A_01"], linha["CV_CG_A_01"],
+                linha["Media_CG_A_02"], linha["CV_CG_A_02"]
             )
 
             texto = f"""
@@ -3220,21 +3223,30 @@ Home {home_emoji}   x   Away {away_emoji}
 """
 
             # =========================================
-            # 🤖 DIREÇÕES (POISSON + IA)
+            # 🤖 DIREÇÕES (POISSON + IA) — CONSENSO
             # =========================================
-            poisson_dir = linha_consenso.get("Direcao_Poisson", "")
-            ia_dir = linha_consenso.get("Direcao_IA", "")
+            try:
+                poisson_dir = (
+                    linha_consenso.get("Direcao_Poisson")
+                    or linha_consenso.get("Poisson_Direcao")
+                    or ""
+                )
 
-            extra = ""
+                ia_dir = (
+                    linha_consenso.get("Direcao_IA")
+                    or linha_consenso.get("IA_Direcao")
+                    or ""
+                )
 
-            if poisson_dir:
-                extra += f"\n⚔️ Direção Poisson: {poisson_dir}"
+                if poisson_dir:
+                    texto += f"\n⚔️ Direção Poisson: {poisson_dir}"
 
-            if ia_dir:
-                extra += f"\n🤖 Direção IA: {ia_dir}"
+                if ia_dir:
+                    texto += f"\n🤖 Direção IA: {ia_dir}"
 
-            texto += extra
-            
+            except:
+                pass
+
             # =========================================
             # 🎨 RENDER DO CARD (ESSENCIAL)
             # =========================================
@@ -3246,7 +3258,6 @@ Home {home_emoji}   x   Away {away_emoji}
                 st.warning(texto)
             else:
                 st.info(texto)
-
 
         # =========================================
         # 📊 RANKING IA
