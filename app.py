@@ -391,7 +391,8 @@ linha_mgf = df_mgf[df_mgf["JOGO"] == jogo].iloc[0]
 linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
 linha_vg  = df_vg[df_vg["JOGO"] == jogo].iloc[0]
 linha_ht  = df_ht[df_ht["JOGO"] == jogo].iloc[0]  
-linha_cantos = df_cantos[df_cantos["JOGO"] == jogo].iloc[0] # ✅ ADICIONE ESTA
+linha_cantos = df_cantos[df_cantos["JOGO"] == jogo].iloc[0]
+linha_consenso = df_consenso[df_consenso["JOGO"] == jogo].iloc[0] # ✅ ADICIONE ESTA
 
 st.session_state["jogo"] = jogo
 # =========================================
@@ -3221,8 +3222,8 @@ Home {home_emoji}   x   Away {away_emoji}
             # =========================================
             # 🤖 DIREÇÕES (POISSON + IA)
             # =========================================
-            poisson_dir = linha.get("Direcao_Poisson", "")
-            ia_dir = linha.get("Direcao_IA", "")
+            poisson_dir = linha_consenso.get("Direcao_Poisson", "")
+            ia_dir = linha_consenso.get("Direcao_IA", "")
 
             extra = ""
 
@@ -3233,7 +3234,6 @@ Home {home_emoji}   x   Away {away_emoji}
                 extra += f"\n🤖 Direção IA: {ia_dir}"
 
             texto += extra
-
             
             # =========================================
             # 🎨 RENDER DO CARD (ESSENCIAL)
