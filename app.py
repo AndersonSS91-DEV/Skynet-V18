@@ -3181,7 +3181,7 @@ with tab7:
     # =========================================
     if not base_df.empty:
         linha = base_df.iloc[0]
-        resultado = classificar_jogo(linha)
+        resultado = classificar_jogo(linha_mgf)
 
         if resultado:
 
@@ -3197,13 +3197,13 @@ with tab7:
                 detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
 
             home_emoji = classificar_filtro_duplo(
-                linha["Media_CG_H_01"], linha["CV_CG_H_01"],
-                linha["Media_CG_H_02"], linha["CV_CG_H_02"]
+                linha_mgf["Media_CG_H_01"], linha_mgf["CV_CG_H_01"],
+                linha_mgf["Media_CG_H_02"], linha_mgf["CV_CG_H_02"]
             )
 
             away_emoji = classificar_filtro_duplo(
-                linha["Media_CG_A_01"], linha["CV_CG_A_01"],
-                linha["Media_CG_A_02"], linha["CV_CG_A_02"]
+                linha_mgf["Media_CG_A_01"], linha_mgf["CV_CG_A_01"],
+                linha_mgf["Media_CG_A_02"], linha_mgf["CV_CG_A_02"]
             )
 
             texto = f"""
