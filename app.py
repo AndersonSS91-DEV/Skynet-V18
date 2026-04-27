@@ -3221,8 +3221,8 @@ Home {home_emoji}   x   Away {away_emoji}
             # =========================================
             # 🤖 DIREÇÕES (POISSON + IA)
             # =========================================
-            poisson_dir = linha.get("Poisson_Direcao", "")
-            ia_dir = linha.get("IA_Direcao", "")
+            poisson_dir = linha.get("Direcao_Poisson", "")
+            ia_dir = linha.get("Direcao_IA", "")
 
             extra = ""
 
