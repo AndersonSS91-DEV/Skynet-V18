@@ -1219,7 +1219,18 @@ def mostrar_card(df_base, jogo):
     row = linha.iloc[0]
 
     score = calcular_score(row)
-    estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
+    try:
+    score_val = float(score)
+
+    if np.isnan(score_val):
+        estrelas = "☆☆☆☆☆"
+    else:
+        n = int(round(score_val / 2))
+        n = max(0, min(5, n))  # limita entre 0 e 5
+        estrelas = "⭐" * n + "☆" * (5 - n)
+
+except:
+    estrelas = "☆☆☆☆☆"
     cor = cor_card(row["Interpretacao"])
 
     card = f"""
@@ -3164,61 +3175,48 @@ def definir_lay(row):
 
     return "⚠️Lay Away (Atenção)"
 
-# =========================================
-# 🚀 ABA IA FINAL (ESTÁVEL)
-# =========================================
-with tab7:
-
-    st.markdown("## 🤖 Central de Decisão IA")
-
-    # =========================================
-    # 📥 LEITURA BASE (UMA VEZ SÓ)
-    # =========================================
-    try:
-        base_df = pd.read_excel(xls)
-    except Exception as e:
-        st.error(f"Erro ao ler arquivo: {e}")
-        st.stop()
-
-    # =========================================
-    # 🔧 PRÉ-PROCESSAMENTO
-    # =========================================
-    base_df["HA_Value"] = base_df.apply(
-        detectar_handicap_value_profissional, axis=1
-    )
-
     # =========================================
     # 🎯 JOGO ATUAL
     # =========================================
     if not base_df.empty:
 
-        linha = base_df.iloc[0]
-        resultado = classificar_jogo(linha)
+        df_jogo = base_df[base_df["JOGO"] == jogo]
 
-        if resultado:
+        if not df_jogo.empty:
 
-            detalhes = ""
+            linha = df_jogo.iloc[0]
 
-            if resultado.get("Principal"):
-                detalhes += f"🥇 Principal: {resultado['Principal']}\n"
+            # 🔒 evita quebrar o card
+            if not jogo_valido_para_card(linha):
+                st.warning("⚠️ Dados insuficientes para análise IA")
 
-            if resultado.get("Secundario"):
-                detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
+            else:
+                resultado = classificar_jogo(linha)
 
-            if resultado.get("Risco"):
-                detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
+                if resultado:
 
-            home_emoji = classificar_filtro_duplo(
-                linha["Media_CG_H_01"], linha["CV_CG_H_01"],
-                linha["Media_CG_H_02"], linha["CV_CG_H_02"]
-            )
+                    detalhes = ""
 
-            away_emoji = classificar_filtro_duplo(
-                linha["Media_CG_A_01"], linha["CV_CG_A_01"],
-                linha["Media_CG_A_02"], linha["CV_CG_A_02"]
-            )
+                    if resultado.get("Principal"):
+                        detalhes += f"🥇 Principal: {resultado['Principal']}\n"
 
-            texto = f"""
+                    if resultado.get("Secundario"):
+                        detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
+
+                    if resultado.get("Risco"):
+                        detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
+
+                    home_emoji = classificar_filtro_duplo(
+                        linha["Media_CG_H_01"], linha["CV_CG_H_01"],
+                        linha["Media_CG_H_02"], linha["CV_CG_H_02"]
+                    )
+
+                    away_emoji = classificar_filtro_duplo(
+                        linha["Media_CG_A_01"], linha["CV_CG_A_01"],
+                        linha["Media_CG_A_02"], linha["CV_CG_A_02"]
+                    )
+
+                    texto = f"""
 🧠 Tipo: {resultado['Tipo']}
 🎯 Entrada: {resultado['Entrada']}
 ⏱️ Momento: {resultado['Momento']}
@@ -3230,33 +3228,81 @@ with tab7:
 Home {home_emoji}   x   Away {away_emoji}
 """
 
-            # =========================================
-            # 🎨 RENDER DO CARD
-            # =========================================
-            if resultado["Classe"] in ["A+", "A"]:
-                st.success(texto)
-            elif resultado["Classe"] == "B":
-                st.warning(texto)
-            else:
-                st.info(texto)
+                    # =========================================
+                    # 🤖 DIREÇÕES (CONSENSO - SEM QUEBRAR)
+                    # =========================================
+                    try:
+                        linha_consenso = None
+
+                        df_tmp = df_consenso[
+                            (df_consenso["Home_Team"] == linha["Home_Team"]) &
+                            (df_consenso["Visitor_Team"] == linha["Visitor_Team"])
+                        ]
+
+                        if not df_tmp.empty:
+                            linha_consenso = df_tmp.iloc[0]
+
+                        if linha_consenso is not None:
+                            texto += f"\n⚔️ Direção Poisson: {linha_consenso.get('Poisson_Direcao', '-')}"
+                            texto += f"\n🤖 Direção IA: {linha_consenso.get('IA_Direcao', '-')}"
+                        else:
+                            texto += "\n🧠 IA: não disponível"
+
+                    except:
+                        texto += "\n🧠 IA: erro ao carregar"
+
+                    # 🎨 render
+                    if resultado["Classe"] in ["A+", "A"]:
+                        st.success(texto)
+                    elif resultado["Classe"] == "B":
+                        st.warning(texto)
+                    else:
+                        st.info(texto)
+
+                else:
+                    st.warning("⚠️ IA não gerou classificação para esse jogo")
+
+        else:
+            st.error("❌ Jogo não encontrado no base_df")
 
     else:
-        st.warning("Base vazia")
-
-        
-
+        st.error("❌ base_df vazio")
     # =========================================
-    # 📊 RANKING IA
+    # 📊 RANKING IA (CORRIGIDO)
     # =========================================
     st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
-    df_rank = gerar_ranking_ia(base_df)
+    lista_rank = []
 
-    if not df_rank.empty:
+    for _, row in base_df.iterrows():
+
+        res = classificar_jogo(row)
+
+        if not res:
+            continue
+
+        if res["Classe"] not in ["A+", "A"]:
+            continue
+
+        lista_rank.append({
+            "Home_Team": row.get("Home_Team", ""),
+            "Away_Team": row.get("Visitor_Team", ""),
+            "Tipo": res["Tipo"],
+            "Entrada": res["Entrada"],
+            "Classe": res["Classe"]
+        })
+
+    if lista_rank:
+        df_rank = pd.DataFrame(lista_rank)
+
+        # 🔥 ordena A+ primeiro
+        df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
+        df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
+
         st.dataframe(df_rank, use_container_width=True, hide_index=True)
     else:
-        st.info("Nenhum jogo A+/A encontrado")
-
+        st.info("Nenhum jogo A+/A encontrado")   
+        
     # =========================================
     # 📋 TABELA FINAL
     # =========================================
@@ -3323,6 +3369,9 @@ Home {home_emoji}   x   Away {away_emoji}
             "Classe": res["Classe"],
             "LAY": definir_lay(row),
             "HA_Value": row.get("HA_Value", "")
+             # 🔥 NOVAS COLUNAS (JÁ VÊM DO MERGE)
+            "Poisson_Direcao": row.get("Poisson_Direcao", ""),
+            "IA_Direcao": row.get("IA_Direcao", "")
         })
 
     # =========================================
