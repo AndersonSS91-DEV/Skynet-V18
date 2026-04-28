@@ -2712,7 +2712,7 @@ with tab6:
 # =========================================
 # 🤖 MOTOR IA FINAL (VERSÃO PROFISSIONAL) 🟡🟠🟧⚪🔘🔴🟠🟡🟢🔵🟣🟤⚫⚪🟥🟧🟨🟩🟦🟪🟫⬛⬜
 # =========================================
-
+st.write("DEBUG IA INICIO")
 import pandas as pd
 
 def classificar_jogo(row):
@@ -3384,3 +3384,4 @@ Home {home_emoji}   x   Away {away_emoji}
         st.dataframe(df_final, use_container_width=True, hide_index=True)
     else:
         st.info("Sem jogos válidos após filtro")
+        st.write("DEBUG IA FIM")
