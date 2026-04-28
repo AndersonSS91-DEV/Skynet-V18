@@ -1,5 +1,5 @@
 # =========================================
-# STREAMLIT — POISSON SKYNET (HÍBRIDO)🚀🛸🚥🌋🗻⭐🌠❄☃🌬🌊🔥🌬🟨
+# STREAMLIT — POISSON SKYNET (HÍBRIDO)   🚀🛸🚥🌋🗻⭐🌠❄☃🌬🌊🔥🌬🟨
 # =========================================
 import streamlit as st
 import pandas as pd
