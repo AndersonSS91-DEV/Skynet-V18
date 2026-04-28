@@ -3165,39 +3165,21 @@ def definir_lay(row):
     return "⚠️Lay Away (Atenção)"
 
 # =========================================
-# 🚀 ABA IA FINAL (ESTÁVEL)
+# 🎯 JOGO ATUAL
 # =========================================
-with tab7:
+if not base_df.empty:
 
-    st.markdown("## 🤖 Central de Decisão IA")
+    df_jogo = base_df[base_df["JOGO"] == jogo]
 
-    # =========================================
-    # 📥 LEITURA BASE (UMA VEZ SÓ)
-    # =========================================
-    try:
-        base_df = pd.read_excel(xls)
-    except Exception as e:
-        st.error(f"Erro ao ler arquivo: {e}")
-        st.stop()
+    if not df_jogo.empty:
 
-    # =========================================
-    # 🔧 PRÉ-PROCESSAMENTO
-    # =========================================
-    base_df["HA_Value"] = base_df.apply(
-        detectar_handicap_value_profissional, axis=1
-    )
+        linha = df_jogo.iloc[0]
 
-    # =========================================
-    # 🎯 JOGO ATUAL
-    # =========================================
-    if not base_df.empty:
+        # 🔒 VALIDAÇÃO (evita quebrar o card)
+        if not jogo_valido_para_card(linha):
+            st.warning("⚠️ Dados insuficientes para análise IA")
 
-        # 🔥 pega o jogo correto (NÃO usa mais iloc[0])
-        df_jogo = base_df[base_df["JOGO"] == jogo]
-
-        if not df_jogo.empty:
-
-            linha = df_jogo.iloc[0]
+        else:
             resultado = classificar_jogo(linha)
 
             if resultado:
@@ -3235,7 +3217,22 @@ with tab7:
 Home {home_emoji}   x   Away {away_emoji}
 """
 
-                # 🎨 render
+                # =========================================
+                # 🤖 DIREÇÕES (CONSENSO)
+                # =========================================
+                try:
+                    if linha_consenso is not None:
+
+                        texto += f"\n⚔️ Direção Poisson: {linha_consenso['Poisson_Direcao']}"
+                        texto += f"\n🤖 Direção IA: {linha_consenso['IA_Direcao']}"
+
+                    else:
+                        texto += "\n⚠️ Sem dados de consenso"
+
+                except Exception as e:
+                    texto += f"\n❌ Erro consenso: {e}"
+
+                # 🎨 render (igual ao seu)
                 if resultado["Classe"] in ["A+", "A"]:
                     st.success(texto)
                 elif resultado["Classe"] == "B":
@@ -3246,12 +3243,11 @@ Home {home_emoji}   x   Away {away_emoji}
             else:
                 st.warning("⚠️ IA não gerou classificação para esse jogo")
 
-        else:
-            st.error("❌ Jogo não encontrado no base_df")
-
     else:
-        st.error("❌ base_df vazio")
+        st.error("❌ Jogo não encontrado no base_df")
 
+else:
+    st.error("❌ base_df vazio")
     # =========================================
     # 📊 RANKING IA
     # =========================================
