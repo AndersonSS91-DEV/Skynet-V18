@@ -1219,18 +1219,22 @@ def mostrar_card(df_base, jogo):
     row = linha.iloc[0]
 
     score = calcular_score(row)
+
     try:
-    score_val = float(score)
+        score_val = float(score)
 
-    if np.isnan(score_val):
-        estrelas = "☆☆☆☆☆"
-    else:
-        n = int(round(score_val / 2))
-        n = max(0, min(5, n))  # limita entre 0 e 5
-        estrelas = "⭐" * round(score / 2) + "☆" * (5 - round(score / 2))
-        
+        if np.isnan(score_val):
+            estrelas = "☆☆☆☆☆"
+        else:
+            n = int(round(score_val / 2))
+            n = max(0, min(5, n))
+            estrelas = "⭐" * n + "☆" * (5 - n)
+
+    except:
+        estrelas = ""
+
     cor = cor_card(row["Interpretacao"])
-
+    
     card = f"""
     <div style="background:{cor};
                 padding:18px;
