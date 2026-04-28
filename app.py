@@ -3191,9 +3191,8 @@ with tab7:
     # 🎯 JOGO ATUAL
     # =========================================
     if not base_df.empty:
-
         linha = base_df.iloc[0]
-        resultado = classificar_jogo(linha)
+        resultado = classificar_jogo(linha_mgf)
 
         if resultado:
 
@@ -3209,13 +3208,13 @@ with tab7:
                 detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
 
             home_emoji = classificar_filtro_duplo(
-                linha["Media_CG_H_01"], linha["CV_CG_H_01"],
-                linha["Media_CG_H_02"], linha["CV_CG_H_02"]
+                linha_mgf["Media_CG_H_01"], linha_mgf["CV_CG_H_01"],
+                linha_mgf["Media_CG_H_02"], linha_mgf["CV_CG_H_02"]
             )
 
             away_emoji = classificar_filtro_duplo(
-                linha["Media_CG_A_01"], linha["CV_CG_A_01"],
-                linha["Media_CG_A_02"], linha["CV_CG_A_02"]
+                linha_mgf["Media_CG_A_01"], linha_mgf["CV_CG_A_01"],
+                linha_mgf["Media_CG_A_02"], linha_mgf["CV_CG_A_02"]
             )
 
             texto = f"""
@@ -3231,19 +3230,16 @@ Home {home_emoji}   x   Away {away_emoji}
 """
 
             # =========================================
-            # 🎨 RENDER DO CARD
+            # 🎨 RENDER DO CARD (ESSENCIAL)
             # =========================================
-            if resultado["Classe"] in ["A+", "A"]:
+            if resultado["Classe"] == "A+":
+                st.success(texto)
+            elif resultado["Classe"] == "A":
                 st.success(texto)
             elif resultado["Classe"] == "B":
                 st.warning(texto)
             else:
                 st.info(texto)
-
-    else:
-        st.warning("Base vazia")
-
-        
 
     # =========================================
     # 📊 RANKING IA
