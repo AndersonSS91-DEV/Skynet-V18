@@ -3177,48 +3177,48 @@ def definir_lay(row):
 
     return "⚠️Lay Away (Atenção)"
 
-    # =========================================
-    # 🎯 JOGO ATUAL
-    # =========================================
-    if not base_df.empty:
 
-        df_jogo = base_df[base_df["JOGO"] == jogo]
+# =========================================
+# 🎯 JOGO ATUAL (FORA DA FUNÇÃO)
+# =========================================
+if not base_df.empty:
 
-        if not df_jogo.empty:
+    df_jogo = base_df[base_df["JOGO"] == jogo]
 
-            linha = df_jogo.iloc[0]
+    if not df_jogo.empty:
 
-            # 🔒 evita quebrar o card
-            if not jogo_valido_para_card(linha):
-                st.warning("⚠️ Dados insuficientes para análise IA")
+        linha = df_jogo.iloc[0]
 
-            else:
-                resultado = classificar_jogo(linha)
+        if not jogo_valido_para_card(linha):
+            st.warning("⚠️ Dados insuficientes para análise IA")
 
-                if resultado:
+        else:
+            resultado = classificar_jogo(linha)
 
-                    detalhes = ""
+            if resultado:
 
-                    if resultado.get("Principal"):
-                        detalhes += f"🥇 Principal: {resultado['Principal']}\n"
+                detalhes = ""
 
-                    if resultado.get("Secundario"):
-                        detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
+                if resultado.get("Principal"):
+                    detalhes += f"🥇 Principal: {resultado['Principal']}\n"
 
-                    if resultado.get("Risco"):
-                        detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
+                if resultado.get("Secundario"):
+                    detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
 
-                    home_emoji = classificar_filtro_duplo(
-                        linha["Media_CG_H_01"], linha["CV_CG_H_01"],
-                        linha["Media_CG_H_02"], linha["CV_CG_H_02"]
-                    )
+                if resultado.get("Risco"):
+                    detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
 
-                    away_emoji = classificar_filtro_duplo(
-                        linha["Media_CG_A_01"], linha["CV_CG_A_01"],
-                        linha["Media_CG_A_02"], linha["CV_CG_A_02"]
-                    )
+                home_emoji = classificar_filtro_duplo(
+                    linha["Media_CG_H_01"], linha["CV_CG_H_01"],
+                    linha["Media_CG_H_02"], linha["CV_CG_H_02"]
+                )
 
-                    texto = f"""
+                away_emoji = classificar_filtro_duplo(
+                    linha["Media_CG_A_01"], linha["CV_CG_A_01"],
+                    linha["Media_CG_A_02"], linha["CV_CG_A_02"]
+                )
+
+                texto = f"""
 🧠 Tipo: {resultado['Tipo']}
 🎯 Entrada: {resultado['Entrada']}
 ⏱️ Momento: {resultado['Momento']}
@@ -3230,152 +3230,134 @@ def definir_lay(row):
 Home {home_emoji}   x   Away {away_emoji}
 """
 
-                    # =========================================
-                    # 🤖 DIREÇÕES (CONSENSO - SEM QUEBRAR)
-                    # =========================================
-                    try:
-                        linha_consenso = None
+                # 🤖 DIREÇÕES
+                try:
+                    df_tmp = df_consenso[
+                        (df_consenso["Home_Team"] == linha["Home_Team"]) &
+                        (df_consenso["Visitor_Team"] == linha["Visitor_Team"])
+                    ]
 
-                        df_tmp = df_consenso[
-                            (df_consenso["Home_Team"] == linha["Home_Team"]) &
-                            (df_consenso["Visitor_Team"] == linha["Visitor_Team"])
-                        ]
-
-                        if not df_tmp.empty:
-                            linha_consenso = df_tmp.iloc[0]
-
-                        if linha_consenso is not None:
-                            texto += f"\n⚔️ Direção Poisson: {linha_consenso.get('Poisson_Direcao', '-')}"
-                            texto += f"\n🤖 Direção IA: {linha_consenso.get('IA_Direcao', '-')}"
-                        else:
-                            texto += "\n🧠 IA: não disponível"
-
-                    except:
-                        texto += "\n🧠 IA: erro ao carregar"
-
-                    # 🎨 render
-                    if resultado["Classe"] in ["A+", "A"]:
-                        st.success(texto)
-                    elif resultado["Classe"] == "B":
-                        st.warning(texto)
+                    if not df_tmp.empty:
+                        lc = df_tmp.iloc[0]
+                        texto += f"\n⚔️ Direção Poisson: {lc.get('Poisson_Direcao', '-')}"
+                        texto += f"\n🤖 Direção IA: {lc.get('IA_Direcao', '-')}"
                     else:
-                        st.info(texto)
+                        texto += "\n🧠 IA: não disponível"
 
+                except:
+                    texto += "\n🧠 IA: erro ao carregar"
+
+                if resultado["Classe"] in ["A+", "A"]:
+                    st.success(texto)
+                elif resultado["Classe"] == "B":
+                    st.warning(texto)
                 else:
-                    st.warning("⚠️ IA não gerou classificação para esse jogo")
+                    st.info(texto)
 
-        else:
-            st.error("❌ Jogo não encontrado no base_df")
 
-    else:
-        st.error("❌ base_df vazio")
-    # =========================================
-    # 📊 RANKING IA (CORRIGIDO)
-    # =========================================
-    st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
+# =========================================
+# 📊 RANKING IA
+# =========================================
+st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
-    lista_rank = []
+lista_rank = []
 
-    for _, row in base_df.iterrows():
+for _, row in base_df.iterrows():
 
-        res = classificar_jogo(row)
+    res = classificar_jogo(row)
 
-        if not res:
-            continue
+    if not res:
+        continue
 
-        if res["Classe"] not in ["A+", "A"]:
-            continue
+    if res["Classe"] not in ["A+", "A"]:
+        continue
 
-        lista_rank.append({
-            "Home_Team": row.get("Home_Team", ""),
-            "Away_Team": row.get("Visitor_Team", ""),
-            "Tipo": res["Tipo"],
-            "Entrada": res["Entrada"],
-            "Classe": res["Classe"]
-        })
+    lista_rank.append({
+        "Home_Team": row.get("Home_Team", ""),
+        "Away_Team": row.get("Visitor_Team", ""),
+        "Tipo": res["Tipo"],
+        "Entrada": res["Entrada"],
+        "Classe": res["Classe"]
+    })
 
-    if lista_rank:
-        df_rank = pd.DataFrame(lista_rank)
+if lista_rank:
+    df_rank = pd.DataFrame(lista_rank)
+    df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
+    df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
+    st.dataframe(df_rank, use_container_width=True, hide_index=True)
+else:
+    st.info("Nenhum jogo A+/A encontrado")
 
-        # 🔥 ordena A+ primeiro
-        df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
-        df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
 
-        st.dataframe(df_rank, use_container_width=True, hide_index=True)
-    else:
-        st.info("Nenhum jogo A+/A encontrado")   
-        
-    # =========================================
-    # 📋 TABELA FINAL
-    # =========================================
-    st.markdown("### 📋 Todos os Jogos Filtrados")
+# =========================================
+# 📋 TABELA FINAL
+# =========================================
+st.markdown("### 📋 Todos os Jogos Filtrados")
 
-    # 🔧 Ajuste odds
-    cols_odds = [
-        "Odd_BTTS_YES",
-        "Odds_Over_2,5FT",
-        "Odds_Casa",
-        "Odds_Visitante"
-    ]
+cols_odds = [
+    "Odd_BTTS_YES",
+    "Odds_Over_2,5FT",
+    "Odds_Casa",
+    "Odds_Visitante"
+]
 
-    for col in cols_odds:
-        base_df[col] = (
-            base_df[col]
-            .astype(str)
-            .str.replace(",", ".", regex=False)
-        )
-        base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
-
-    # 🔍 filtro base
-    df_clean = base_df[
-        (base_df["Odd_BTTS_YES"] > 0) &
-        (base_df["Odds_Over_2,5FT"] > 0) &
-        (base_df["Odds_Casa"] > 0) &
-        (base_df["Odds_Visitante"] > 0)
-    ].copy()
-
-    # 🎨 emojis
-    df_clean["Home"] = df_clean.apply(
-        lambda x: classificar_filtro_duplo(
-            x["Media_CG_H_01"], x["CV_CG_H_01"],
-            x["Media_CG_H_02"], x["CV_CG_H_02"]
-        ), axis=1
+for col in cols_odds:
+    base_df[col] = (
+        base_df[col]
+        .astype(str)
+        .str.replace(",", ".", regex=False)
     )
+    base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
 
-    df_clean["Away"] = df_clean.apply(
-        lambda x: classificar_filtro_duplo(
-            x["Media_CG_A_01"], x["CV_CG_A_01"],
-            x["Media_CG_A_02"], x["CV_CG_A_02"]
-        ), axis=1
-    )
+df_clean = base_df[
+    (base_df["Odd_BTTS_YES"] > 0) &
+    (base_df["Odds_Over_2,5FT"] > 0) &
+    (base_df["Odds_Casa"] > 0) &
+    (base_df["Odds_Visitante"] > 0)
+].copy()
 
-    # =========================================
-    # 🧠 LISTA FINAL
-    # =========================================
-    lista = []
+df_clean["Home"] = df_clean.apply(
+    lambda x: classificar_filtro_duplo(
+        x["Media_CG_H_01"], x["CV_CG_H_01"],
+        x["Media_CG_H_02"], x["CV_CG_H_02"]
+    ), axis=1
+)
 
-    for _, row in df_clean.iterrows():
+df_clean["Away"] = df_clean.apply(
+    lambda x: classificar_filtro_duplo(
+        x["Media_CG_A_01"], x["CV_CG_A_01"],
+        x["Media_CG_A_02"], x["CV_CG_A_02"]
+    ), axis=1
+)
 
-        res = classificar_jogo(row)
+lista = []
 
-        if not res:
-            continue
+for _, row in df_clean.iterrows():
 
-        lista.append({
-            "Home": row["Home"],
-            "Away": row["Away"],
-            "Home_Team": row.get("Home_Team", ""),
-            "Away_Team": row.get("Visitor_Team", ""),
-            "Tipo": res["Tipo"],
-            "Entrada": res["Entrada"],
-            "Classe": res["Classe"],
-            "LAY": definir_lay(row),
-            "HA_Value": row.get("HA_Value", ""),
-             # 🔥 NOVAS COLUNAS (JÁ VÊM DO MERGE)
-            "Poisson_Direcao": row.get("Poisson_Direcao", ""),
-            "IA_Direcao": row.get("IA_Direcao", "")
-        })
+    res = classificar_jogo(row)
 
+    if not res:
+        continue
+
+    lista.append({
+        "Home": row["Home"],
+        "Away": row["Away"],
+        "Home_Team": row.get("Home_Team", ""),
+        "Away_Team": row.get("Visitor_Team", ""),
+        "Tipo": res["Tipo"],
+        "Entrada": res["Entrada"],
+        "Classe": res["Classe"],
+        "LAY": definir_lay(row),
+        "HA_Value": row.get("HA_Value", ""),
+        "Poisson_Direcao": row.get("Poisson_Direcao", ""),
+        "IA_Direcao": row.get("IA_Direcao", "")
+    })
+
+if lista:
+    df_final = pd.DataFrame(lista)
+    st.dataframe(df_final, use_container_width=True, hide_index=True)
+else:
+    st.info("Sem jogos válidos após filtro")
     # =========================================
     # 📈 OUTPUT FINAL
     # =========================================
