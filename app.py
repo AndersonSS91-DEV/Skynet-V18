@@ -3191,33 +3191,39 @@ with tab7:
     # 🎯 JOGO ATUAL
     # =========================================
     if not base_df.empty:
-        linha = base_df.iloc[0]
-        resultado = classificar_jogo(linha_mgf)
 
-        if resultado:
+        # 🔥 pega o jogo correto (NÃO usa mais iloc[0])
+        df_jogo = base_df[base_df["JOGO"] == jogo]
 
-            detalhes = ""
+        if not df_jogo.empty:
 
-            if resultado.get("Principal"):
-                detalhes += f"🥇 Principal: {resultado['Principal']}\n"
+            linha = df_jogo.iloc[0]
+            resultado = classificar_jogo(linha)
 
-            if resultado.get("Secundario"):
-                detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
+            if resultado:
 
-            if resultado.get("Risco"):
-                detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
+                detalhes = ""
 
-            home_emoji = classificar_filtro_duplo(
-                linha_mgf["Media_CG_H_01"], linha_mgf["CV_CG_H_01"],
-                linha_mgf["Media_CG_H_02"], linha_mgf["CV_CG_H_02"]
-            )
+                if resultado.get("Principal"):
+                    detalhes += f"🥇 Principal: {resultado['Principal']}\n"
 
-            away_emoji = classificar_filtro_duplo(
-                linha_mgf["Media_CG_A_01"], linha_mgf["CV_CG_A_01"],
-                linha_mgf["Media_CG_A_02"], linha_mgf["CV_CG_A_02"]
-            )
+                if resultado.get("Secundario"):
+                    detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
 
-            texto = f"""
+                if resultado.get("Risco"):
+                    detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
+
+                home_emoji = classificar_filtro_duplo(
+                    linha["Media_CG_H_01"], linha["CV_CG_H_01"],
+                    linha["Media_CG_H_02"], linha["CV_CG_H_02"]
+                )
+
+                away_emoji = classificar_filtro_duplo(
+                    linha["Media_CG_A_01"], linha["CV_CG_A_01"],
+                    linha["Media_CG_A_02"], linha["CV_CG_A_02"]
+                )
+
+                texto = f"""
 🧠 Tipo: {resultado['Tipo']}
 🎯 Entrada: {resultado['Entrada']}
 ⏱️ Momento: {resultado['Momento']}
@@ -3229,17 +3235,22 @@ with tab7:
 Home {home_emoji}   x   Away {away_emoji}
 """
 
-            # =========================================
-            # 🎨 RENDER DO CARD (ESSENCIAL)
-            # =========================================
-            if resultado["Classe"] == "A+":
-                st.success(texto)
-            elif resultado["Classe"] == "A":
-                st.success(texto)
-            elif resultado["Classe"] == "B":
-                st.warning(texto)
+                # 🎨 render
+                if resultado["Classe"] in ["A+", "A"]:
+                    st.success(texto)
+                elif resultado["Classe"] == "B":
+                    st.warning(texto)
+                else:
+                    st.info(texto)
+
             else:
-                st.info(texto)
+                st.warning("⚠️ IA não gerou classificação para esse jogo")
+
+        else:
+            st.error("❌ Jogo não encontrado no base_df")
+
+    else:
+        st.error("❌ base_df vazio")
 
     # =========================================
     # 📊 RANKING IA
