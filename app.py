@@ -3252,7 +3252,10 @@ Home {home_emoji}   x   Away {away_emoji}
    # =========================================
     # 📊 RANKING IA (CORRIGIDO)
     # =========================================
-    base_df = df_mgf.copy()   # 👈 AQUI
+    base_df = df_mgf.merge(
+    df_consenso[["JOGO", "Poisson_Direcao", "IA_Direcao"]],
+    on="JOGO",
+    how="left")
     
     st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
