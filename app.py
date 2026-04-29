@@ -2712,7 +2712,6 @@ with tab6:
 # =========================================
 # 🤖 MOTOR IA FINAL (VERSÃO PROFISSIONAL) 🟡🟠🟧⚪🔘🔴🟠🟡🟢🔵🟣🟤⚫⚪🟥🟧🟨🟩🟦🟪🟫⬛⬜
 # =========================================
-st.write("IA")
 import pandas as pd
 
 def classificar_jogo(row):
@@ -3185,6 +3184,7 @@ aba_ia = st.container()
 
 with aba_ia:
 
+    st.write("IA")
     st.write("DEBUG IA INICIO")
 
     if not df_mgf.empty:
@@ -3254,7 +3254,7 @@ Home {home_emoji}   x   Away {away_emoji}
         st.error("❌ df_mgf vazio")
 
     # =========================================
-    # 📊 RANKING IA (FORA DO ELSE ERRADO)
+    # 📊 RANKING IA
     # =========================================
     df_rank = gerar_ranking_ia(df_mgf)
 
