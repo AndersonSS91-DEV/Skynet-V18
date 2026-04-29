@@ -3256,6 +3256,9 @@ Home {home_emoji}   x   Away {away_emoji}
     df_consenso[["JOGO", "Poisson_Direcao", "IA_Direcao"]],
     on="JOGO",
     how="left")
+
+    # 🔥 AQUI É O QUE FALTAVA
+    base_df["HA_Value"] = base_df.apply(detectar_handicap_value_profissional, axis=1)
     
     st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
