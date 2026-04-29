@@ -3353,6 +3353,8 @@ Home {home_emoji}   x   Away {away_emoji}
             "Home": row["Home"],
             "Away": row["Away"],
             "Home_Team": row.get("Home_Team", ""),
+            "Result Home": row.get("Result Home", ""),
+            "Result Visitor": row.get("Result Visitor", ""),
             "Away_Team": row.get("Visitor_Team", ""),
             "Tipo": res["Tipo"],
             "Entrada": res["Entrada"],
