@@ -3189,9 +3189,6 @@ if not df_mgf.empty:
 
         linha = df_jogo.iloc[0]
 
-        if not jogo_valido_para_card(linha):
-            st.warning("⚠️ Dados insuficientes para análise IA")
-
         else:
             resultado = classificar_jogo(linha)
 
