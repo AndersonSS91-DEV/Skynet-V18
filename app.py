@@ -3182,9 +3182,7 @@ def definir_lay(row):
 # =========================================
 # 🤖 ABA IA (RENDER CORRETO)
 # =========================================
-with aba_ia:
-
-    st.write("DEBUG IA INICIO")
+    st.write("IA")
 
     if not df_mgf.empty:
 
