@@ -3180,13 +3180,9 @@ def definir_lay(row):
 # =========================================
 # 🤖 ABA IA (ISOLADA CORRETA)
 # =========================================
-aba_ia = st.container()
+with tab7:
 
-with aba_ia:
-
-    st.write("IA")
-    st.write("DEBUG IA INICIO")
-
+    
     if not df_mgf.empty:
 
         df_jogo = df_mgf[df_mgf["JOGO"] == jogo]
@@ -3263,4 +3259,3 @@ Home {home_emoji}   x   Away {away_emoji}
     else:
         st.info("Sem jogos válidos após filtro")
 
-    st.write("DEBUG IA FIM")
