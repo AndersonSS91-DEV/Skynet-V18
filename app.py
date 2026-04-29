@@ -3104,6 +3104,41 @@ def classificar_filtro_duplo(media1, cv1, media2, cv2):
 
     return "".join(emojis) if emojis else "—"
     
+
+# =========================================
+# 📊 RANKING IA - FUNÇÃO
+# =========================================
+def gerar_ranking_ia(df):
+
+    lista = []
+
+    for _, row in df.iterrows():
+
+        res = classificar_jogo(row)
+
+        if not res:
+            continue
+
+        if res["Classe"] not in ["A+", "A"]:
+            continue
+
+        lista.append({
+            "Jogo": f"{row.get('Home_Team','')} x {row.get('Visitor_Team','')}",
+            "Tipo": res["Tipo"],
+            "Entrada": res["Entrada"],
+            "Classe": res["Classe"]
+        })
+
+    if not lista:
+        return pd.DataFrame()
+
+    df_rank = pd.DataFrame(lista)
+
+    ordem = {"A+": 0, "A": 1}
+    df_rank["ordem"] = df_rank["Classe"].map(ordem)
+
+    return df_rank.sort_values(by="ordem").drop(columns="ordem")
+    
 # =========================================
 # 🔥 FUNÇÕES AUXILIARES
 # =========================================
