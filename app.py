@@ -3252,9 +3252,11 @@ Home {home_emoji}   x   Away {away_emoji}
    # =========================================
     # 📊 RANKING IA (CORRIGIDO)
     # =========================================
+    base_df = df_mgf.copy()   # 👈 AQUI
+    
     st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
-    lista_rank = []
+    lista_rank = []    
 
     for _, row in base_df.iterrows():
 
