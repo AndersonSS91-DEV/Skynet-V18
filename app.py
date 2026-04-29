@@ -3249,13 +3249,118 @@ Home {home_emoji}   x   Away {away_emoji}
     else:
         st.error("❌ df_mgf vazio")
 
+   # =========================================
+    # 📊 RANKING IA (CORRIGIDO)
     # =========================================
-    # 📊 RANKING IA
-    # =========================================
-    df_rank = gerar_ranking_ia(df_mgf)
+    st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
-    if not df_rank.empty:
+    lista_rank = []
+
+    for _, row in base_df.iterrows():
+
+        res = classificar_jogo(row)
+
+        if not res:
+            continue
+
+        if res["Classe"] not in ["A+", "A"]:
+            continue
+
+        lista_rank.append({
+            "Home_Team": row.get("Home_Team", ""),
+            "Away_Team": row.get("Visitor_Team", ""),
+            "Tipo": res["Tipo"],
+            "Entrada": res["Entrada"],
+            "Classe": res["Classe"]
+        })
+
+    if lista_rank:
+        df_rank = pd.DataFrame(lista_rank)
+
+        # 🔥 ordena A+ primeiro
+        df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
+        df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
+
         st.dataframe(df_rank, use_container_width=True, hide_index=True)
     else:
-        st.info("Sem jogos válidos após filtro")
+        st.info("Nenhum jogo A+/A encontrado")   
+        
+    # =========================================
+    # 📋 TABELA FINAL
+    # =========================================
+    st.markdown("### 📋 Todos os Jogos Filtrados")
 
+    # 🔧 Ajuste odds
+    cols_odds = [
+        "Odd_BTTS_YES",
+        "Odds_Over_2,5FT",
+        "Odds_Casa",
+        "Odds_Visitante"
+    ]
+
+    for col in cols_odds:
+        base_df[col] = (
+            base_df[col]
+            .astype(str)
+            .str.replace(",", ".", regex=False)
+        )
+        base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
+
+    # 🔍 filtro base
+    df_clean = base_df[
+        (base_df["Odd_BTTS_YES"] > 0) &
+        (base_df["Odds_Over_2,5FT"] > 0) &
+        (base_df["Odds_Casa"] > 0) &
+        (base_df["Odds_Visitante"] > 0)
+    ].copy()
+
+    # 🎨 emojis
+    df_clean["Home"] = df_clean.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_H_01"], x["CV_CG_H_01"],
+            x["Media_CG_H_02"], x["CV_CG_H_02"]
+        ), axis=1
+    )
+
+    df_clean["Away"] = df_clean.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_A_01"], x["CV_CG_A_01"],
+            x["Media_CG_A_02"], x["CV_CG_A_02"]
+        ), axis=1
+    )
+
+    # =========================================
+    # 🧠 LISTA FINAL
+    # =========================================
+    lista = []
+
+    for _, row in df_clean.iterrows():
+
+        res = classificar_jogo(row)
+
+        if not res:
+            continue
+
+        lista.append({
+            "Home": row["Home"],
+            "Away": row["Away"],
+            "Home_Team": row.get("Home_Team", ""),
+            "Away_Team": row.get("Visitor_Team", ""),
+            "Tipo": res["Tipo"],
+            "Entrada": res["Entrada"],
+            "Classe": res["Classe"],
+            "LAY": definir_lay(row),
+            "HA_Value": row.get("HA_Value", "")
+             # 🔥 NOVAS COLUNAS (JÁ VÊM DO MERGE)
+            "Poisson_Direcao": row.get("Poisson_Direcao", ""),
+            "IA_Direcao": row.get("IA_Direcao", "")
+        })
+
+    # =========================================
+    # 📈 OUTPUT FINAL
+    # =========================================
+    if lista:
+        df_final = pd.DataFrame(lista)
+        st.dataframe(df_final, use_container_width=True, hide_index=True)
+    else:
+        st.info("Sem jogos válidos após filtro")
