@@ -2712,7 +2712,7 @@ with tab6:
 # =========================================
 # 🤖 MOTOR IA FINAL (VERSÃO PROFISSIONAL) 🟡🟠🟧⚪🔘🔴🟠🟡🟢🔵🟣🟤⚫⚪🟥🟧🟨🟩🟦🟪🟫⬛⬜
 # =========================================
-st.write("DEBUG IA INICIO")
+st.write("IA")
 import pandas as pd
 
 def classificar_jogo(row):
@@ -3179,42 +3179,47 @@ def definir_lay(row):
 
 
 # =========================================
-# 🎯 JOGO ATUAL
+# 🤖 ABA IA (ISOLADA CORRETA)
 # =========================================
-if not df_mgf.empty:
+aba_ia = st.container()
 
-    df_jogo = df_mgf[df_mgf["JOGO"] == jogo]
+with aba_ia:
 
-    if not df_jogo.empty:
+    st.write("DEBUG IA INICIO")
 
-        linha = df_jogo.iloc[0]
+    if not df_mgf.empty:
 
-        resultado = classificar_jogo(linha)
+        df_jogo = df_mgf[df_mgf["JOGO"] == jogo]
 
-        if resultado:
+        if not df_jogo.empty:
 
-            detalhes = ""
+            linha = df_jogo.iloc[0]
+            resultado = classificar_jogo(linha)
 
-            if resultado.get("Principal"):
-                detalhes += f"🥇 Principal: {resultado['Principal']}\n"
+            if resultado:
 
-            if resultado.get("Secundario"):
-                detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
+                detalhes = ""
 
-            if resultado.get("Risco"):
-                detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
+                if resultado.get("Principal"):
+                    detalhes += f"🥇 Principal: {resultado['Principal']}\n"
 
-            home_emoji = classificar_filtro_duplo(
-                linha["Media_CG_H_01"], linha["CV_CG_H_01"],
-                linha["Media_CG_H_02"], linha["CV_CG_H_02"]
-            )
+                if resultado.get("Secundario"):
+                    detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
 
-            away_emoji = classificar_filtro_duplo(
-                linha["Media_CG_A_01"], linha["CV_CG_A_01"],
-                linha["Media_CG_A_02"], linha["CV_CG_A_02"]
-            )
+                if resultado.get("Risco"):
+                    detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
 
-            texto = f"""
+                home_emoji = classificar_filtro_duplo(
+                    linha["Media_CG_H_01"], linha["CV_CG_H_01"],
+                    linha["Media_CG_H_02"], linha["CV_CG_H_02"]
+                )
+
+                away_emoji = classificar_filtro_duplo(
+                    linha["Media_CG_A_01"], linha["CV_CG_A_01"],
+                    linha["Media_CG_A_02"], linha["CV_CG_A_02"]
+                )
+
+                texto = f"""
 🧠 Tipo: {resultado['Tipo']}
 🎯 Entrada: {resultado['Entrada']}
 ⏱️ Momento: {resultado['Momento']}
@@ -3226,39 +3231,36 @@ if not df_mgf.empty:
 Home {home_emoji}   x   Away {away_emoji}
 """
 
-            # =========================================
-            # 🤖 DIREÇÕES (CONSENSO)
-            # =========================================
-            try:
-                if linha_consenso is not None:
-                    texto += f"\n⚔️ Direção Poisson: {linha_consenso.get('Poisson_Direcao', '-')}"
-                    texto += f"\n🤖 Direção IA: {linha_consenso.get('IA_Direcao', '-')}"
-                else:
-                    texto += "\n🧠 IA: não disponível"
-            except:
-                texto += "\n🧠 IA: erro ao carregar"
+                try:
+                    if linha_consenso is not None:
+                        texto += f"\n⚔️ Direção Poisson: {linha_consenso.get('Poisson_Direcao', '-')}"
+                        texto += f"\n🤖 Direção IA: {linha_consenso.get('IA_Direcao', '-')}"
+                    else:
+                        texto += "\n🧠 IA: não disponível"
+                except:
+                    texto += "\n🧠 IA: erro ao carregar"
 
-            # 🎨 render
-            if resultado["Classe"] in ["A+", "A"]:
-                st.success(texto)
-            elif resultado["Classe"] == "B":
-                st.warning(texto)
-            else:
-                st.info(texto)
+                if resultado["Classe"] in ["A+", "A"]:
+                    st.success(texto)
+                elif resultado["Classe"] == "B":
+                    st.warning(texto)
+                else:
+                    st.info(texto)
+
+        else:
+            st.error("❌ Jogo não encontrado")
 
     else:
-        st.error("❌ Jogo não encontrado")
+        st.error("❌ df_mgf vazio")
 
-else:
-    st.error("❌ df_mgf vazio")
-    
     # =========================================
-    # 📈 OUTPUT FINAL
+    # 📊 RANKING IA (FORA DO ELSE ERRADO)
     # =========================================
-    if lista:
-        df_final = pd.DataFrame(lista)
-        st.dataframe(df_final, use_container_width=True, hide_index=True)
+    df_rank = gerar_ranking_ia(df_mgf)
+
+    if not df_rank.empty:
+        st.dataframe(df_rank, use_container_width=True, hide_index=True)
     else:
         st.info("Sem jogos válidos após filtro")
-        st.write("DEBUG IA FIM")
 
+    st.write("DEBUG IA FIM")
