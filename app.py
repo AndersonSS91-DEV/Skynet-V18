@@ -3350,7 +3350,7 @@ Home {home_emoji}   x   Away {away_emoji}
             "Entrada": res["Entrada"],
             "Classe": res["Classe"],
             "LAY": definir_lay(row),
-            "HA_Value": row.get("HA_Value", "")
+            "HA_Value": row.get("HA_Value", ""),
              # 🔥 NOVAS COLUNAS (JÁ VÊM DO MERGE)
             "Poisson_Direcao": row.get("Poisson_Direcao", ""),
             "IA_Direcao": row.get("IA_Direcao", "")
