@@ -2713,11 +2713,9 @@ with tab6:
 # 🤖 MOTOR IA FINAL (VERSÃO PROFISSIONAL) 🟡🟠🟧⚪🔘🔴🟠🟡🟢🔵🟣🟤⚫⚪🟥🟧🟨🟩🟦🟪🟫⬛⬜
 # =========================================
 # =========================================
-# 🧭 ABAS DO APP
+# 🤖 MOTOR IA FINAL
 # =========================================
-aba_resumo, aba_dados, aba_ia = st.tabs(["Resumo", "Dados", "IA"])
 
-st.write("DEBUG IA INICIO")
 import pandas as pd
 
 def classificar_jogo(row):
