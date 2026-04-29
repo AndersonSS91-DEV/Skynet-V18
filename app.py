@@ -3179,11 +3179,11 @@ def definir_lay(row):
 
 
 # =========================================
-# 🎯 JOGO ATUAL (FORA DA FUNÇÃO)
+# 🎯 JOGO ATUAL
 # =========================================
-if not base_df.empty:
+if not df_mgf.empty:
 
-    df_jogo = base_df[base_df["JOGO"] == jogo]
+    df_jogo = df_mgf[df_mgf["JOGO"] == jogo]
 
     if not df_jogo.empty:
 
@@ -3230,29 +3230,31 @@ if not base_df.empty:
 Home {home_emoji}   x   Away {away_emoji}
 """
 
-                # 🤖 DIREÇÕES
+                # =========================================
+                # 🤖 DIREÇÕES (CONSENSO CORRETO)
+                # =========================================
                 try:
-                    df_tmp = df_consenso[
-                        (df_consenso["Home_Team"] == linha["Home_Team"]) &
-                        (df_consenso["Visitor_Team"] == linha["Visitor_Team"])
-                    ]
-
-                    if not df_tmp.empty:
-                        lc = df_tmp.iloc[0]
-                        texto += f"\n⚔️ Direção Poisson: {lc.get('Poisson_Direcao', '-')}"
-                        texto += f"\n🤖 Direção IA: {lc.get('IA_Direcao', '-')}"
+                    if linha_consenso is not None:
+                        texto += f"\n⚔️ Direção Poisson: {linha_consenso.get('Poisson_Direcao', '-')}"
+                        texto += f"\n🤖 Direção IA: {linha_consenso.get('IA_Direcao', '-')}"
                     else:
                         texto += "\n🧠 IA: não disponível"
-
                 except:
                     texto += "\n🧠 IA: erro ao carregar"
 
+                # 🎨 render
                 if resultado["Classe"] in ["A+", "A"]:
                     st.success(texto)
                 elif resultado["Classe"] == "B":
                     st.warning(texto)
                 else:
                     st.info(texto)
+
+    else:
+        st.error("❌ Jogo não encontrado")
+
+else:
+    st.error("❌ df_mgf vazio")
 
 
 # =========================================
@@ -3262,7 +3264,7 @@ st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
 lista_rank = []
 
-for _, row in base_df.iterrows():
+for _, row in df_mgf.iterrows():
 
     res = classificar_jogo(row)
 
@@ -3302,20 +3304,21 @@ cols_odds = [
 ]
 
 for col in cols_odds:
-    base_df[col] = (
-        base_df[col]
+    df_mgf[col] = (
+        df_mgf[col]
         .astype(str)
         .str.replace(",", ".", regex=False)
     )
-    base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
+    df_mgf[col] = pd.to_numeric(df_mgf[col], errors="coerce")
 
-df_clean = base_df[
-    (base_df["Odd_BTTS_YES"] > 0) &
-    (base_df["Odds_Over_2,5FT"] > 0) &
-    (base_df["Odds_Casa"] > 0) &
-    (base_df["Odds_Visitante"] > 0)
+df_clean = df_mgf[
+    (df_mgf["Odd_BTTS_YES"] > 0) &
+    (df_mgf["Odds_Over_2,5FT"] > 0) &
+    (df_mgf["Odds_Casa"] > 0) &
+    (df_mgf["Odds_Visitante"] > 0)
 ].copy()
 
+# emojis
 df_clean["Home"] = df_clean.apply(
     lambda x: classificar_filtro_duplo(
         x["Media_CG_H_01"], x["CV_CG_H_01"],
@@ -3358,6 +3361,7 @@ if lista:
     st.dataframe(df_final, use_container_width=True, hide_index=True)
 else:
     st.info("Sem jogos válidos após filtro")
+    
     # =========================================
     # 📈 OUTPUT FINAL
     # =========================================
