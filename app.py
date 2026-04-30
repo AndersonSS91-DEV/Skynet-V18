@@ -624,6 +624,9 @@ def top_placares(matriz, n=6):
 
     m["Probabilidade%"] = m["Probabilidade%"].map(lambda x: f"{x:.2f}%")
     return m
+
+
+
 def poisson_intelligence(matriz):
 
     matriz_prob = matriz / 100
@@ -1876,7 +1879,7 @@ with tab1:
             linhas.append("📈 Mercado\n" + " | ".join(mercado))
 
         if direcao:
-            linhas.append("🎯 Direção\n" + " | ".join(direcao))
+            linhas.append("🎯 Direção Top 5\n" + " | ".join(direcao))
 
         if Direcao_IA:
             linhas.append(f"🤖 Direção IA {Direcao_IA}")
