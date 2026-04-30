@@ -1882,7 +1882,7 @@ with tab1:
             linhas.append("🎯 Direção Top 5\n" + " | ".join(direcao))
 
         if Direcao_IA:
-            linhas.append(f"🤖 Direção IA {Direcao_IA}")
+            linhas.append(f"🤖 Direção IA Top 5{Direcao_IA}")
 
         if consenso:
             linhas.append("🧠 Consenso\n" + " | ".join(consenso))
