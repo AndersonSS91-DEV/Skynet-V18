@@ -3346,33 +3346,61 @@ Home {home_emoji}   x   Away {away_emoji}
     # =========================================
     def classificar_sniper_core(row):
         try:
-            exg_home = row.get("ExG_Home_Consenso", 0)
-            exg_away = row.get("ExG_Away_Consenso", 0)
+            # =========================================
+            # 🔥 EXG (JÁ VINDO DO MERGE)
+            # =========================================
+            exg_home = row.get("ExG_Home_Consenso")
+            exg_away = row.get("ExG_Away_Consenso")
 
-            odd_home = float(str(row.get("Odds_Casa", 0)).replace(",", "."))
-            odd_away = float(str(row.get("Odds_Visitante", 0)).replace(",", "."))
+            if pd.isna(exg_home) or pd.isna(exg_away):
+                return ""
 
+            # =========================================
+            # 🔥 ODDS
+            # =========================================
+            odd_home = row.get("Odds_Casa")
+            odd_away = row.get("Odds_Visitante")
+
+            if pd.isna(odd_home) or pd.isna(odd_away):
+                return ""
+
+            odd_home = float(str(odd_home).replace(",", "."))
+            odd_away = float(str(odd_away).replace(",", "."))
+
+            if odd_home <= 0 or odd_away <= 0:
+                return ""
+
+            # =========================================
+            # 🔥 CÁLCULOS
+            # =========================================
             exg_diff = exg_home - exg_away
             ratio = exg_home / (exg_away + 0.01)
+
             forca_home = exg_home / odd_home
             forca_away = exg_away / odd_away
 
+            diff_forca = forca_home - forca_away
+
+            # =========================================
             # 🔥 SNIPER
+            # =========================================
             if (
                 (exg_diff > 0.6) and
                 (ratio > 1.45) and
-                ((forca_home - forca_away) > 0.18) and
+                (diff_forca > 0.18) and
                 (odd_away >= 2.9) and
                 (odd_away <= 3.8) and
                 (odd_home >= 1.45)
             ):
                 return "🔥 SNIPER"
 
+            # =========================================
             # 🟢 CORE
+            # =========================================
             elif (
                 (exg_diff > 0.4) and
                 (ratio > 1.30) and
-                ((forca_home - forca_away) > 0.12) and
+                (diff_forca > 0.12) and
                 (odd_away >= 2.5) and
                 (odd_away <= 4.0) and
                 (odd_home >= 1.35)
@@ -3384,6 +3412,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
         except:
             return ""
+            
     # =========================================
     # 🧠 LISTA FINAL
     # =========================================
