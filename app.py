@@ -3252,20 +3252,47 @@ Home {home_emoji}   x   Away {away_emoji}
     else:
         st.error("❌ df_mgf vazio")
 
-   # =========================================
+    # =========================================
     # 📊 RANKING IA (CORRIGIDO)
     # =========================================
     base_df = df_mgf.merge(
-    df_consenso[["JOGO", "Poisson_Direcao", "IA_Direcao"]],
-    on="JOGO",
-    how="left")
+        df_consenso[["JOGO", "Poisson_Direcao", "IA_Direcao"]],
+        on="JOGO",
+        how="left"
+    )
+
+    # 🔥 GARANTE QUE EXG ESTÁ NO DATAFRAME
+    base_df = base_df.merge(
+        df_exg[["JOGO", "ExG_Home_ATKxDEF", "ExG_Away_ATKxDEF"]],
+        on="JOGO",
+        how="left"
+    ).merge(
+        df_vg[["JOGO", "ExG_Home_VG", "ExG_Away_VG"]],
+        on="JOGO",
+        how="left"
+    )
+
+    # =========================================
+    # 🔥 EXG CONSENSO
+    # =========================================
+    base_df["ExG_Home_Consenso"] = (
+        base_df["ExG_Home_MGF"] +
+        base_df["ExG_Home_ATKxDEF"] +
+        base_df["ExG_Home_VG"]
+    ) / 3
+
+    base_df["ExG_Away_Consenso"] = (
+        base_df["ExG_Away_MGF"] +
+        base_df["ExG_Away_ATKxDEF"] +
+        base_df["ExG_Away_VG"]
+    ) / 3
 
     # 🔥 AQUI É O QUE FALTAVA
     base_df["HA_Value"] = base_df.apply(detectar_handicap_value_profissional, axis=1)
-    
+
     st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
-    lista_rank = []    
+    lista_rank = []
 
     for _, row in base_df.iterrows():
 
@@ -3287,21 +3314,17 @@ Home {home_emoji}   x   Away {away_emoji}
 
     if lista_rank:
         df_rank = pd.DataFrame(lista_rank)
-
-        # 🔥 ordena A+ primeiro
         df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
         df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
-
         st.dataframe(df_rank, use_container_width=True, hide_index=True)
     else:
-        st.info("Nenhum jogo A+/A encontrado")   
-        
+        st.info("Nenhum jogo A+/A encontrado")
+
     # =========================================
     # 📋 TABELA FINAL
     # =========================================
     st.markdown("### 📋 Todos os Jogos Filtrados")
 
-    # 🔧 Ajuste odds
     cols_odds = [
         "Odd_BTTS_YES",
         "Odds_Over_2,5FT",
@@ -3317,7 +3340,6 @@ Home {home_emoji}   x   Away {away_emoji}
         )
         base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
 
-    # 🔍 filtro base
     df_clean = base_df[
         (base_df["Odd_BTTS_YES"] > 0) &
         (base_df["Odds_Over_2,5FT"] > 0) &
@@ -3325,7 +3347,6 @@ Home {home_emoji}   x   Away {away_emoji}
         (base_df["Odds_Visitante"] > 0)
     ].copy()
 
-    # 🎨 emojis
     df_clean["Home"] = df_clean.apply(
         lambda x: classificar_filtro_duplo(
             x["Media_CG_H_01"], x["CV_CG_H_01"],
@@ -3340,39 +3361,20 @@ Home {home_emoji}   x   Away {away_emoji}
         ), axis=1
     )
 
-
     # =========================================
-    # 🔥 FUNÇÃO SNIPER / CORE (CORRIGIDA)
+    # 🔥 FUNÇÃO SNIPER / CORE
     # =========================================
     def classificar_sniper_core(row):
         try:
-            # =========================================
-            # 🔥 EXG (JÁ VINDO DO MERGE)
-            # =========================================
             exg_home = row.get("ExG_Home_Consenso")
             exg_away = row.get("ExG_Away_Consenso")
 
             if pd.isna(exg_home) or pd.isna(exg_away):
                 return ""
 
-            # =========================================
-            # 🔥 ODDS
-            # =========================================
-            odd_home = row.get("Odds_Casa")
-            odd_away = row.get("Odds_Visitante")
+            odd_home = float(str(row.get("Odds_Casa", 0)).replace(",", "."))
+            odd_away = float(str(row.get("Odds_Visitante", 0)).replace(",", "."))
 
-            if pd.isna(odd_home) or pd.isna(odd_away):
-                return ""
-
-            odd_home = float(str(odd_home).replace(",", "."))
-            odd_away = float(str(odd_away).replace(",", "."))
-
-            if odd_home <= 0 or odd_away <= 0:
-                return ""
-
-            # =========================================
-            # 🔥 CÁLCULOS
-            # =========================================
             exg_diff = exg_home - exg_away
             ratio = exg_home / (exg_away + 0.01)
 
@@ -3381,9 +3383,6 @@ Home {home_emoji}   x   Away {away_emoji}
 
             diff_forca = forca_home - forca_away
 
-            # =========================================
-            # 🔥 SNIPER
-            # =========================================
             if (
                 (exg_diff > 0.6) and
                 (ratio > 1.45) and
@@ -3394,9 +3393,6 @@ Home {home_emoji}   x   Away {away_emoji}
             ):
                 return "🔥 SNIPER"
 
-            # =========================================
-            # 🟢 CORE
-            # =========================================
             elif (
                 (exg_diff > 0.4) and
                 (ratio > 1.30) and
@@ -3412,7 +3408,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
         except:
             return ""
-            
+
     # =========================================
     # 🧠 LISTA FINAL
     # =========================================
@@ -3437,7 +3433,6 @@ Home {home_emoji}   x   Away {away_emoji}
             "Classe": res["Classe"],
             "LAY": definir_lay(row),
             "HA_Value (Teste)": row.get("HA_Value", ""),
-            # 🔥 NOVA COLUNA
             "Modelo": classificar_sniper_core(row),
             "Poisson_Direcao": row.get("Poisson_Direcao", ""),
             "IA_Direcao": row.get("IA_Direcao", "")
