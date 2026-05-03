@@ -3428,7 +3428,8 @@ for _, row in df_clean.iterrows():
         "Result Home": row.get("Result Home", ""),
         "Result Visitor": row.get("Result Visitor", ""),
         "Away_Team": row.get("Visitor_Team", ""),
-
+        "Result_Home_HT": row.get("Result_Home_HT", ""),
+        "Result_Visitor_HT": row.get("Result_Visitor_HT", ""),
         # 🔥 ODDS
         "Odds_Casa": row.get("Odds_Casa", ""),
         "Odds_Empate": row.get("Odds_Empate", ""),
