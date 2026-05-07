@@ -3458,3 +3458,21 @@ if lista:
     st.dataframe(df_final, use_container_width=True, hide_index=True)
 else:
     st.info("Sem jogos válidos após filtro")
+
+# =========================================
+# ABA 8 — CLEAN SHEET (CS)
+# =========================================
+with tab8:
+
+    st.markdown("## 🧱 Clean Sheet Intelligence")
+
+    st.info("🔍 Em breve você terá aqui:")
+    st.write("""
+    - Probabilidade de Clean Sheet (Home/Away)
+    - Leitura Defensiva Avançada
+    - Consenso entre modelos (MGF / ATKxDEF / VG)
+    - Filtro de valor para CS
+    - Identificação de jogos com defesa dominante
+    """)
+
+    st.warning("🚧 Em desenvolvimento")
