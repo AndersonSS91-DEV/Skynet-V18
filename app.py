@@ -2961,18 +2961,6 @@ def classificar_jogo(row):
     }
 
 
-    # =========================================
-    # 😎😎😎 HANDCAP ESTUDO TESTE
-    # =========================================
-def detectar_handicap_value_profissional(row):
-
-    import numpy as np
-    import pandas as pd
-
-    def g(x, default=0):
-        v = row.get(x, default)
-        return default if pd.isna(v) else v
-
     # =========================
     # 🔴 1. FILTRO BASE (SÓ O ESSENCIAL)
     # =========================
@@ -3145,7 +3133,6 @@ def definir_lay(row):
     odd_home = row.get("Odds_Casa", 0)
     odd_away = row.get("Odds_Visitante", 0)
     over = row.get("Odds_Over_2,5FT", 0)
-    ha = str(row.get("HA_Value", ""))
 
     cg_away = row.get("Media_CG_A_01", 0)
     cv_away = row.get("CV_CG_A_01", 1)
@@ -3286,9 +3273,6 @@ Home {home_emoji}   x   Away {away_emoji}
         base_df["ExG_Away_ATKxDEF"] +
         base_df["ExG_Away_VG"]
     ) / 3
-
-    # 🔥 AQUI É O QUE FALTAVA
-    base_df["HA_Value"] = base_df.apply(detectar_handicap_value_profissional, axis=1)
 
     st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
@@ -3444,7 +3428,6 @@ for _, row in df_clean.iterrows():
         "Entrada": res["Entrada"],
         "Classe": res["Classe"],
         "LAY": definir_lay(row),
-        "HA_Value (Teste)": row.get("HA_Value", ""),
         "Modelo": classificar_sniper_core(row),
         "Poisson_Direcao": row.get("Poisson_Direcao", ""),
         "IA_Direcao": row.get("IA_Direcao", "")
