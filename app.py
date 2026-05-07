@@ -3141,13 +3141,10 @@ def definir_lay(row):
     if odd_home == 0 or odd_away == 0 or over == 0:
         return "—"
 
-    if "Ignorar" in ha:
-        return "❌ Evitar"
-
     # 🚫 visitante favorito
     if odd_away < odd_home:
         return "🔘 Away favorito"
-
+   
     # 🚫 BLOQUEIO: AWAY forte (🌋)
     if (2.80 <= cg_away <= 5.50 and cv_away <= 0.80):
         return "💥 Away forte (🌋)"
@@ -3427,6 +3424,7 @@ for _, row in df_clean.iterrows():
         "Tipo": res["Tipo"],
         "Entrada": res["Entrada"],
         "Classe": res["Classe"],
+
         "LAY": definir_lay(row),
         "Modelo": classificar_sniper_core(row),
         "Poisson_Direcao": row.get("Poisson_Direcao", ""),
