@@ -1261,14 +1261,15 @@ desvio_score = df_mgf["Score_Ofensivo"].std()
 # =========================================
 # ABAS
 # =========================================
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
 "📊🧠 Resumo",
 "📁🧠 Dados",
 "📊⚽ MGF",
 "⚔️⚽ ATK x DEF",
 "💎⚽ VG",
 "🚩 Escanteios",
-"🤖 IA"
+"🤖 IA",
+"👾📡 CS_Score"
 ])
 
 
