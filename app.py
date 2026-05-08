@@ -1261,14 +1261,15 @@ desvio_score = df_mgf["Score_Ofensivo"].std()
 # =========================================
 # ABAS
 # =========================================
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
 "📊🧠 Resumo",
 "📁🧠 Dados",
 "📊⚽ MGF",
 "⚔️⚽ ATK x DEF",
 "💎⚽ VG",
 "🚩 Escanteios",
-"🤖 IA"
+"🤖 IA",
+"👾📡 CS_Score"
 ])
 
 
@@ -2961,18 +2962,6 @@ def classificar_jogo(row):
     }
 
 
-    # =========================================
-    # 😎😎😎 HANDCAP ESTUDO TESTE
-    # =========================================
-def detectar_handicap_value_profissional(row):
-
-    import numpy as np
-    import pandas as pd
-
-    def g(x, default=0):
-        v = row.get(x, default)
-        return default if pd.isna(v) else v
-
     # =========================
     # 🔴 1. FILTRO BASE (SÓ O ESSENCIAL)
     # =========================
@@ -3145,7 +3134,6 @@ def definir_lay(row):
     odd_home = row.get("Odds_Casa", 0)
     odd_away = row.get("Odds_Visitante", 0)
     over = row.get("Odds_Over_2,5FT", 0)
-    ha = str(row.get("HA_Value", ""))
 
     cg_away = row.get("Media_CG_A_01", 0)
     cv_away = row.get("CV_CG_A_01", 1)
@@ -3154,13 +3142,10 @@ def definir_lay(row):
     if odd_home == 0 or odd_away == 0 or over == 0:
         return "—"
 
-    if "Ignorar" in ha:
-        return "❌ Evitar"
-
     # 🚫 visitante favorito
     if odd_away < odd_home:
         return "🔘 Away favorito"
-
+   
     # 🚫 BLOQUEIO: AWAY forte (🌋)
     if (2.80 <= cg_away <= 5.50 and cv_away <= 0.80):
         return "💥 Away forte (🌋)"
@@ -3287,9 +3272,6 @@ Home {home_emoji}   x   Away {away_emoji}
         base_df["ExG_Away_VG"]
     ) / 3
 
-    # 🔥 AQUI É O QUE FALTAVA
-    base_df["HA_Value"] = base_df.apply(detectar_handicap_value_profissional, axis=1)
-
     st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
     lista_rank = []
@@ -3409,52 +3391,80 @@ Home {home_emoji}   x   Away {away_emoji}
         except:
             return ""
 
+    # =========================================
+    # 🧠 LISTA FINAL
+    # =========================================
+    lista = []
+
+    for _, row in df_clean.iterrows():
+
+        res = classificar_jogo(row)
+
+        if not res:
+            continue
+
+        lista.append({
+            "Home": row["Home"],
+            "Away": row["Away"],
+            "Home_Team": row.get("Home_Team", ""),
+            "Result Home": row.get("Result Home", ""),
+            "Result Visitor": row.get("Result Visitor", ""),
+            "Away_Team": row.get("Visitor_Team", ""),
+            "Result_Home_HT": row.get("Result_Home_HT", ""),
+            "Result_Visitor_HT": row.get("Result_Visitor_HT", ""),
+
+            # 🔥 ODDS
+            "Odds_Casa": row.get("Odds_Casa", ""),
+            "Odds_Empate": row.get("Odds_Empate", ""),
+            "Odds_Visitante": row.get("Odds_Visitante", ""),
+            "Odd_Over_1,5FT": row.get("Odd_Over_1,5FT", ""),
+            "Odds_Over_2,5FT": row.get("Odds_Over_2,5FT", ""),
+            "Odds_Under_2,5FT": row.get("Odds_Under_2,5FT", ""),
+            "Odd_BTTS_YES": row.get("Odd_BTTS_YES", ""),
+
+            # 🔥 RESTO
+            "Tipo": res["Tipo"],
+            "Entrada": res["Entrada"],
+            "Classe": res["Classe"],
+
+            "LAY": definir_lay(row),
+            "Modelo": classificar_sniper_core(row),
+
+            "Poisson_Direcao": row.get("Poisson_Direcao", ""),
+            "IA_Direcao": row.get("IA_Direcao", "")
+        })
+
+    # =========================================
+    # 📈 OUTPUT FINAL
+    # =========================================
+    if lista:
+
+        df_final_aba7 = pd.DataFrame(lista)
+
+        st.dataframe(
+            df_final_aba7,
+            use_container_width=True,
+            hide_index=True
+        )
+
+    else:
+
+        st.info("Sem jogos válidos após filtro")
+
 # =========================================
-# 🧠 LISTA FINAL
+# ABA 8 — CLEAN SHEET (CS)
 # =========================================
-lista = []
+with tab8:
 
-for _, row in df_clean.iterrows():
+    st.markdown("## 🧱 Clean Sheet Intelligence")
 
-    res = classificar_jogo(row)
+    st.info("🔍 Em breve você terá aqui:")
+    st.write("""
+    - Probabilidade de Clean Sheet (Home/Away)
+    - Leitura Defensiva Avançada
+    - Consenso entre modelos (MGF / ATKxDEF / VG)
+    - Filtro de valor para CS
+    - Identificação de jogos com defesa dominante
+    """)
 
-    if not res:
-        continue
-
-    lista.append({
-        "Home": row["Home"],
-        "Away": row["Away"],
-        "Home_Team": row.get("Home_Team", ""),
-        "Result Home": row.get("Result Home", ""),
-        "Result Visitor": row.get("Result Visitor", ""),
-        "Away_Team": row.get("Visitor_Team", ""),
-        "Result_Home_HT": row.get("Result_Home_HT", ""),
-        "Result_Visitor_HT": row.get("Result_Visitor_HT", ""),
-        # 🔥 ODDS
-        "Odds_Casa": row.get("Odds_Casa", ""),
-        "Odds_Empate": row.get("Odds_Empate", ""),
-        "Odds_Visitante": row.get("Odds_Visitante", ""),
-        "Odd_Over_1,5FT": row.get("Odd_Over_1,5FT", ""),
-        "Odds_Over_2,5FT": row.get("Odds_Over_2,5FT", ""),
-        "Odds_Under_2,5FT": row.get("Odds_Under_2,5FT", ""),
-        "Odd_BTTS_YES": row.get("Odd_BTTS_YES", ""),
-
-        # 🔥 RESTO
-        "Tipo": res["Tipo"],
-        "Entrada": res["Entrada"],
-        "Classe": res["Classe"],
-        "LAY": definir_lay(row),
-        "HA_Value (Teste)": row.get("HA_Value", ""),
-        "Modelo": classificar_sniper_core(row),
-        "Poisson_Direcao": row.get("Poisson_Direcao", ""),
-        "IA_Direcao": row.get("IA_Direcao", "")
-    })
-
-# =========================================
-# 📈 OUTPUT FINAL
-# =========================================
-if lista:
-    df_final = pd.DataFrame(lista)
-    st.dataframe(df_final, use_container_width=True, hide_index=True)
-else:
-    st.info("Sem jogos válidos após filtro")
+    st.warning("🚧 Em desenvolvimento")
