@@ -3531,7 +3531,7 @@ faixas = {
         linha_consenso["GF_0-15_Home"] +
         linha_consenso["GF_0-15_Away"] +
 
-        linha_consenso["GC_0-150_Home"] +
+        linha_consenso["GC_0-15_Home"] +
         linha_consenso["GC_0-15_Away"]
     ),
 
