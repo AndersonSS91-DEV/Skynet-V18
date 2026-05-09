@@ -3870,7 +3870,7 @@ with tab8:
         clean_away_consenso >= 65
     ):
 
-        score_l00 -= 14
+        score_l00 -= 5
         riscos_l00.append("⚠ Defesas podem travar o jogo")
 
     if (
@@ -3878,7 +3878,7 @@ with tab8:
         linha_consenso["NS_Games_A"] >= 35
     ):
 
-        score_l00 -= 12
+        score_l00 -= 4
         riscos_l00.append("⚠ Baixa produção ofensiva")
 
     conf_l00 = min(score_l00 * 1.1, 99)
