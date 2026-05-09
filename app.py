@@ -3468,3 +3468,587 @@ with tab8:
     """)
 
     st.warning("🚧 Em desenvolvimento")
+    # =========================================================
+# 👾📡 CS ENGINE V1 — SKYNET OPERATIONAL CORE
+# =========================================================
+
+st.markdown("## 👾📡 CS ENGINE")
+
+# =========================================================
+# 🧠 CONSENSOS BASE
+# =========================================================
+
+home_abrir_consenso = np.mean([
+    linha_mgf["Home_Abrir_Placar"],
+    linha_exg["Home_Abrir_Placar"],
+    linha_vg["Home_Abrir_Placar"]
+])
+
+away_abrir_consenso = np.mean([
+    linha_mgf["Away_Abrir_Placar"],
+    linha_exg["Away_Abrir_Placar"],
+    linha_vg["Away_Abrir_Placar"]
+])
+
+clean_home_consenso = np.mean([
+    linha_mgf["Clean_Sheet_Home_%"],
+    linha_exg["Clean_Sheet_Home_%"],
+    linha_vg["Clean_Sheet_Home_%"]
+])
+
+clean_away_consenso = np.mean([
+    linha_mgf["Clean_Sheet_Away_%"],
+    linha_exg["Clean_Sheet_Away_%"],
+    linha_vg["Clean_Sheet_Away_%"]
+])
+
+# =========================================================
+# 🧠 SINAIS CONSENSO POISSON
+# =========================================================
+
+estrutura = []
+mercado = []
+direcao = []
+
+for s in [sinais_mgf, sinais_exg, sinais_vg]:
+
+    estrutura += s[0]
+    mercado += s[1]
+    direcao += s[2]
+
+estrutura = list(set(estrutura))
+mercado = list(set(mercado))
+direcao = list(set(direcao))
+
+# =========================================================
+# ⚡ SCORE TEMPORAL
+# =========================================================
+
+faixas = {
+
+    "0-15": (
+        linha_consenso["GF_0NaN5_Home"] +
+        linha_consenso["GC_0NaN5_Away"]
+    ),
+
+    "16-30": (
+        linha_consenso["GF_16-30_Home"] +
+        linha_consenso["GC_16-30_Away"]
+    ),
+
+    "31-45": (
+        linha_consenso["GF_31-45_Home"] +
+        linha_consenso["GC_31-45_Away"]
+    ),
+
+    "46-60": (
+        linha_consenso["GF_46-60_Home"] +
+        linha_consenso["GC_46-60_Away"]
+    ),
+
+    "61-75": (
+        linha_consenso["GF_61-75_Home"] +
+        linha_consenso["GC_61-75_Away"]
+    ),
+
+    "76-90": (
+        linha_consenso["GF_76-90_Home"] +
+        linha_consenso["GC_76-90_Away"]
+    )
+}
+
+melhor_janela = max(faixas, key=faixas.get)
+
+# =========================================================
+# 🧠 FUNÇÃO BASE
+# =========================================================
+
+def criar_cs(
+    nome,
+    score,
+    confianca,
+    motivos,
+    riscos,
+    janela,
+    tendencia
+):
+
+    if score >= 85:
+        nivel = "🟢 Elite"
+
+    elif score >= 70:
+        nivel = "🟢 Forte"
+
+    elif score >= 55:
+        nivel = "🟡 Médio"
+
+    elif score >= 40:
+        nivel = "🟠 Fraco"
+
+    else:
+        nivel = "🔴 Evitar"
+
+    return {
+        "mercado": nome,
+        "score": round(score, 1),
+        "confianca": round(confianca, 1),
+        "nivel": nivel,
+        "motivos": motivos,
+        "riscos": riscos,
+        "janela": janela,
+        "tendencia": tendencia
+    }
+
+# =========================================================
+# 🥇 LAY 0x1
+# =========================================================
+
+score_l01 = 0
+motivos_l01 = []
+riscos_l01 = []
+
+# ---------------------------------------------------------
+# consenso
+# ---------------------------------------------------------
+
+if "💀 Lay 0x1" in estrutura:
+
+    score_l01 += 20
+    motivos_l01.append("✔ Consenso Lay 0x1 forte")
+
+# ---------------------------------------------------------
+# abrir placar
+# ---------------------------------------------------------
+
+if home_abrir_consenso >= 65:
+
+    score_l01 += 15
+    motivos_l01.append("✔ Home possui forte tendência de abrir o placar")
+
+# ---------------------------------------------------------
+# clean sheet
+# ---------------------------------------------------------
+
+if clean_home_consenso >= 55:
+
+    score_l01 += 12
+    motivos_l01.append("✔ Home sustenta pressão defensiva")
+
+# ---------------------------------------------------------
+# NS games
+# ---------------------------------------------------------
+
+if linha_consenso["NS_Games_A"] >= 35:
+
+    score_l01 += 14
+    motivos_l01.append("✔ Away possui baixa produção ofensiva")
+
+# ---------------------------------------------------------
+# FS WIN
+# ---------------------------------------------------------
+
+if linha_consenso["FS_Win_H"] >= 60:
+
+    score_l01 += 14
+    motivos_l01.append("✔ Home costuma converter vantagem em vitória")
+
+# ---------------------------------------------------------
+# pressão temporal
+# ---------------------------------------------------------
+
+if melhor_janela in ["31-45", "46-60"]:
+
+    score_l01 += 15
+    motivos_l01.append("✔ Pressão ofensiva cresce entre 30-60'")
+
+# ---------------------------------------------------------
+# BTTS
+# ---------------------------------------------------------
+
+if linha_consenso["BTTS_%"] >= 70:
+
+    score_l01 -= 8
+    riscos_l01.append("⚠ BTTS muito forte")
+
+# ---------------------------------------------------------
+# changer
+# ---------------------------------------------------------
+
+if linha_consenso["Changer_A"] >= 35:
+
+    score_l01 -= 10
+    riscos_l01.append("⚠ Away possui forte capacidade de reação")
+
+# ---------------------------------------------------------
+# tendência
+# ---------------------------------------------------------
+
+if (
+    linha_consenso["Eficiência_2nd_H"] >
+    linha_consenso["Eficiência_HT_H"]
+):
+
+    tendencia_l01 = "📈 Intensidade cresce no 2T"
+
+else:
+
+    tendencia_l01 = "⚡ Forte início de jogo"
+
+# ---------------------------------------------------------
+# confiança
+# ---------------------------------------------------------
+
+conf_l01 = min(score_l01 * 1.1, 99)
+
+lay_0x1 = criar_cs(
+    "Lay 0x1",
+    score_l01,
+    conf_l01,
+    motivos_l01,
+    riscos_l01,
+    melhor_janela,
+    tendencia_l01
+)
+
+# =========================================================
+# 🥇 LAY 1x0
+# =========================================================
+
+score_l10 = 0
+motivos_l10 = []
+riscos_l10 = []
+
+if "💀 Lay 1x0" in estrutura:
+
+    score_l10 += 20
+    motivos_l10.append("✔ Consenso Lay 1x0 forte")
+
+if linha_consenso["Changer_A"] >= 35:
+
+    score_l10 += 16
+    motivos_l10.append("✔ Away possui forte capacidade de reação")
+
+if linha_consenso["BTTS_%"] >= 60:
+
+    score_l10 += 12
+    motivos_l10.append("✔ BTTS tendência")
+
+if clean_home_consenso <= 45:
+
+    score_l10 += 10
+    motivos_l10.append("✔ Home possui baixa sustentação defensiva")
+
+if away_abrir_consenso >= 45:
+
+    score_l10 += 10
+    motivos_l10.append("✔ Away possui boa agressividade ofensiva")
+
+if linha_consenso["FS_Win_H"] >= 70:
+
+    score_l10 -= 12
+    riscos_l10.append("⚠ Home costuma matar o jogo após vantagem")
+
+if linha_consenso["Win4_H"] >= 35:
+
+    score_l10 -= 10
+    riscos_l10.append("⚠ Home possui perfil dominante")
+
+if (
+    linha_consenso["Eficiência_2nd_A"] >
+    linha_consenso["Eficiência_HT_A"]
+):
+
+    tendencia_l10 = "📈 Away cresce no 2T"
+
+else:
+
+    tendencia_l10 = "⚡ Away competitivo desde o início"
+
+conf_l10 = min(score_l10 * 1.1, 99)
+
+lay_1x0 = criar_cs(
+    "Lay 1x0",
+    score_l10,
+    conf_l10,
+    motivos_l10,
+    riscos_l10,
+    melhor_janela,
+    tendencia_l10
+)
+
+# =========================================================
+# 🥇 LAY 0x0
+# =========================================================
+
+score_l00 = 0
+motivos_l00 = []
+riscos_l00 = []
+
+if "⚽ Gol provável (Lay 0x0)" in estrutura:
+
+    score_l00 += 18
+    motivos_l00.append("✔ Forte tendência de gol")
+
+if linha_consenso["Prob_Gol_HT"] >= 65:
+
+    score_l00 += 16
+    motivos_l00.append("✔ Over HT agressivo")
+
+if home_abrir_consenso >= 60:
+
+    score_l00 += 12
+    motivos_l00.append("✔ Home tende a iniciar forte")
+
+if away_abrir_consenso >= 45:
+
+    score_l00 += 8
+    motivos_l00.append("✔ Away também participa ofensivamente")
+
+if score_ofensivo >= 75:
+
+    score_l00 += 12
+    motivos_l00.append("✔ Intensidade ofensiva elevada")
+
+if (
+    clean_home_consenso >= 65 and
+    clean_away_consenso >= 65
+):
+
+    score_l00 -= 14
+    riscos_l00.append("⚠ Defesas podem travar o jogo")
+
+if (
+    linha_consenso["NS_Games_H"] >= 35 and
+    linha_consenso["NS_Games_A"] >= 35
+):
+
+    score_l00 -= 12
+    riscos_l00.append("⚠ Baixa produção ofensiva")
+
+if melhor_janela in ["0-15", "16-30"]:
+
+    tendencia_l00 = "⚡ Forte início de jogo"
+
+else:
+
+    tendencia_l00 = "📈 Pressão cresce progressivamente"
+
+conf_l00 = min(score_l00 * 1.1, 99)
+
+lay_0x0 = criar_cs(
+    "Lay 0x0",
+    score_l00,
+    conf_l00,
+    motivos_l00,
+    riscos_l00,
+    melhor_janela,
+    tendencia_l00
+)
+
+# =========================================================
+# 🥇 LAY 2x2
+# =========================================================
+
+score_l22 = 0
+motivos_l22 = []
+riscos_l22 = []
+
+# ---------------------------------------------------------
+# BTTS
+# ---------------------------------------------------------
+
+if linha_consenso["BTTS_%"] >= 70:
+
+    score_l22 += 18
+    motivos_l22.append("✔ BTTS extremamente forte")
+
+elif linha_consenso["BTTS_%"] >= 60:
+
+    score_l22 += 12
+    motivos_l22.append("✔ BTTS tendência")
+
+# ---------------------------------------------------------
+# over alto
+# ---------------------------------------------------------
+
+if score_ofensivo >= 80:
+
+    score_l22 += 16
+    motivos_l22.append("✔ Intensidade ofensiva elevada")
+
+# ---------------------------------------------------------
+# changer
+# ---------------------------------------------------------
+
+if linha_consenso["Changer_H"] >= 30:
+
+    score_l22 += 14
+    motivos_l22.append("✔ Home possui capacidade de reação")
+
+if linha_consenso["Changer_A"] >= 30:
+
+    score_l22 += 14
+    motivos_l22.append("✔ Away possui capacidade de reação")
+
+# ---------------------------------------------------------
+# marcar primeiro
+# ---------------------------------------------------------
+
+if (
+    home_abrir_consenso >= 55 and
+    away_abrir_consenso >= 40
+):
+
+    score_l22 += 10
+    motivos_l22.append("✔ Ambos os lados possuem agressividade ofensiva")
+
+# ---------------------------------------------------------
+# pressão temporal
+# ---------------------------------------------------------
+
+if melhor_janela in ["46-60", "61-75"]:
+
+    score_l22 += 15
+    motivos_l22.append("✔ Forte aceleração ofensiva no 2T")
+
+# ---------------------------------------------------------
+# win4
+# ---------------------------------------------------------
+
+if linha_consenso["Win4_H"] >= 25:
+
+    score_l22 += 8
+    motivos_l22.append("✔ Home possui perfil de jogo explosivo")
+
+if linha_consenso["Win4_A"] >= 25:
+
+    score_l22 += 8
+    motivos_l22.append("✔ Away possui perfil ofensivo agressivo")
+
+# ---------------------------------------------------------
+# clean sheet
+# ---------------------------------------------------------
+
+if (
+    clean_home_consenso >= 60 or
+    clean_away_consenso >= 60
+):
+
+    score_l22 -= 14
+    riscos_l22.append("⚠ Estrutura defensiva pode limitar o caos ofensivo")
+
+# ---------------------------------------------------------
+# NS GAMES
+# ---------------------------------------------------------
+
+if (
+    linha_consenso["NS_Games_H"] >= 35 or
+    linha_consenso["NS_Games_A"] >= 35
+):
+
+    score_l22 -= 12
+    riscos_l22.append("⚠ Um dos ataques pode desaparecer ofensivamente")
+
+# ---------------------------------------------------------
+# tendência
+# ---------------------------------------------------------
+
+if (
+    linha_consenso["Eficiência_2nd_H"] >
+    linha_consenso["Eficiência_HT_H"]
+    and
+    linha_consenso["Eficiência_2nd_A"] >
+    linha_consenso["Eficiência_HT_A"]
+):
+
+    tendencia_l22 = "💣 Jogo tende a explodir no 2T"
+
+else:
+
+    tendencia_l22 = "⚡ Jogo ofensivo desde o início"
+
+# ---------------------------------------------------------
+# confiança
+# ---------------------------------------------------------
+
+conf_l22 = min(score_l22 * 1.1, 99)
+
+lay_2x2 = criar_cs(
+    "Lay 2x2",
+    score_l22,
+    conf_l22,
+    motivos_l22,
+    riscos_l22,
+    melhor_janela,
+    tendencia_l22
+)
+
+# =========================================================
+# 📊 RANKING
+# =========================================================
+
+ranking_cs = [
+    lay_0x1,
+    lay_1x0,
+    lay_0x0,
+    lay_2x2
+]
+
+ranking_cs = sorted(
+    ranking_cs,
+    key=lambda x: x["score"],
+    reverse=True
+)
+
+melhor_cs = ranking_cs[0]
+
+# =========================================================
+# 🔥 CARD PRINCIPAL
+# =========================================================
+
+texto = f"""
+🔥 MELHOR CS DO JOGO
+
+🥇 {melhor_cs['mercado']} — Score {melhor_cs['score']} ({melhor_cs['confianca']}%)
+
+{melhor_cs['nivel']}
+
+{chr(10).join(melhor_cs['motivos'][:5])}
+
+⏱ Melhor janela:
+{melhor_cs['janela']}
+
+{melhor_cs['tendencia']}
+"""
+
+if melhor_cs["riscos"]:
+
+    texto += f"""
+
+⚠ Riscos:
+{chr(10).join(melhor_cs['riscos'])}
+"""
+
+st.success(texto)
+
+# =========================================================
+# 📊 RANKING SECUNDÁRIO
+# =========================================================
+
+st.markdown("### 📊 Ranking CS")
+
+for cs in ranking_cs[1:]:
+
+    risco_txt = (
+        cs["riscos"][0]
+        if cs["riscos"]
+        else "✔ Cenário operacional saudável"
+    )
+
+    st.info(
+        f"""
+{cs['mercado']} — Score {cs['score']} ({cs['confianca']}%)
+
+{risco_txt}
+"""
+    )
