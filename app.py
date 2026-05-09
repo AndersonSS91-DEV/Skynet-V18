@@ -3470,6 +3470,20 @@ with tab8:
     st.warning("🚧 Em desenvolvimento")
 
     # =========================================================
+    # 🔥 HT DATA
+    # =========================================================
+
+    jogo_ht = df_ht[df_ht["JOGO"] == jogo]
+
+    if not jogo_ht.empty:
+
+        linha_ht = jogo_ht.iloc[0]
+
+    else:
+
+        linha_ht = pd.Series(dtype=float)
+
+    # =========================================================
     # 👾📡 CS ENGINE V1 — SKYNET OPERATIONAL CORE
     # =========================================================
 
@@ -3831,7 +3845,7 @@ with tab8:
         score_l00 += 18
         motivos_l00.append("✔ Forte tendência de gol")
 
-    if linha_consenso["Prob_Gol_HT"] >= 65:
+    if linha_ht.get("Prob_Gol_HT", 0) >= 65:
 
         score_l00 += 16
         motivos_l00.append("✔ Over HT agressivo")
