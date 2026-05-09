@@ -3528,11 +3528,11 @@ faixas = {
 
     "0-15": (
 
-        linha_consenso["GF_0NaN5_Home"] +
-        linha_consenso["GF_0NaN5_Away"] +
+        linha_consenso["GF_0-15_Home"] +
+        linha_consenso["GF_0-15_Away"] +
 
-        linha_consenso["GC_0NaN5_Home"] +
-        linha_consenso["GC_0NaN5_Away"]
+        linha_consenso["GC_0-150_Home"] +
+        linha_consenso["GC_0-15_Away"]
     ),
 
     "16-30": (
