@@ -4053,21 +4053,33 @@ with tab8:
         # 🎨 COR HOME
         # =================================================
 
-        if perfil_home["score"] >= 70:
+        if perfil_home["score"] <= 20:
 
-            st.success(
+            st.error(
                 texto_home
             )
 
-        elif perfil_home["score"] >= 45:
+        elif perfil_home["score"] <= 35:
 
             st.warning(
                 texto_home
             )
 
+        elif perfil_home["score"] <= 50:
+
+            st.info(
+                texto_home
+            )
+
+        elif perfil_home["score"] <= 65:
+
+            st.success(
+                texto_home
+            )
+
         else:
 
-            st.error(
+            st.success(
                 texto_home
             )
 
@@ -4094,23 +4106,36 @@ with tab8:
         # 🎨 COR AWAY
         # =================================================
 
-        if perfil_away["score"] >= 70:
+        if perfil_away["score"] <= 20:
 
-            st.success(
+            st.error(
                 texto_away
             )
 
-        elif perfil_away["score"] >= 45:
+        elif perfil_away["score"] <= 35:
 
             st.warning(
                 texto_away
             )
 
-        else:
+        elif perfil_away["score"] <= 50:
 
-            st.error(
+            st.info(
                 texto_away
             )
+
+        elif perfil_away["score"] <= 65:
+
+            st.success(
+                texto_away
+            )
+
+        else:
+
+            st.success(
+                texto_away
+            )
+            
     # =========================================================
     # ⚡ SCORE TEMPORAL GLOBAL
     # =========================================================
