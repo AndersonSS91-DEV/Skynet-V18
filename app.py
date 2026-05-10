@@ -4049,45 +4049,27 @@ with tab8:
 {perfil_home['operacional']}
 """
 
+        # =================================================
+        # 🎨 COR HOME
+        # =================================================
+
         if perfil_home["score"] >= 70:
 
-            cor_home = "#0f5132"
+            st.success(
+                texto_home
+            )
 
         elif perfil_home["score"] >= 45:
 
-            cor_home = "#6b4f00"
+            st.warning(
+                texto_home
+            )
 
         else:
 
-            cor_home = "#5c232a"
-
-        st.markdown(
-            f"""
-<div style="
-    background:{cor_home};
-    padding:12px 16px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.08);
-    width:100%;
-    box-sizing:border-box;
-    margin-bottom:12px;
-">
-
-<div style="
-    white-space:pre-line;
-    color:#FFFFFF;
-    font-family:'Source Sans Pro', sans-serif;
-    line-height:1.55;
-">
-
-{texto_home}
-
-</div>
-
-</div>
-""",
-            unsafe_allow_html=True
-        )
+            st.error(
+                texto_home
+            )
 
     # =====================================================
     # 🧠 AWAY
@@ -4108,45 +4090,27 @@ with tab8:
 {perfil_away['operacional']}
 """
 
+        # =================================================
+        # 🎨 COR AWAY
+        # =================================================
+
         if perfil_away["score"] >= 70:
 
-            cor_away = "#0f5132"
+            st.success(
+                texto_away
+            )
 
         elif perfil_away["score"] >= 45:
 
-            cor_away = "#6b4f00"
+            st.warning(
+                texto_away
+            )
 
         else:
 
-            cor_away = "#5c232a"
-
-        st.markdown(
-            f"""
-<div style="
-    background:{cor_away};
-    padding:12px 16px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.08);
-    width:100%;
-    box-sizing:border-box;
-    margin-bottom:12px;
-">
-
-<div style="
-    white-space:pre-line;
-    color:#FFFFFF;
-    font-family:'Source Sans Pro', sans-serif;
-    line-height:1.55;
-">
-
-{texto_away}
-
-</div>
-
-</div>
-""",
-            unsafe_allow_html=True
-        )
+            st.error(
+                texto_away
+            )
     # =========================================================
     # ⚡ SCORE TEMPORAL GLOBAL
     # =========================================================
