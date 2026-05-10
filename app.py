@@ -3831,8 +3831,7 @@ with tab8:
         melhor_janela,
         tendencia_global
     )
-
-    # =========================================================
+        # =========================================================
     # 🥇 LAY 0x0
     # =========================================================
 
@@ -3840,30 +3839,57 @@ with tab8:
     motivos_l00 = []
     riscos_l00 = []
 
-    if "⚽ Gol provável (Lay 0x0)" in estrutura:
+    # =========================================================
+    # ⚽ CONSENSO DE GOL
+    # =========================================================
+
+    if (
+        "⚽ Gol provável (Lay 0x0)" in estrutura or
+        "Lay 0x0" in estrutura
+    ):
 
         score_l00 += 18
         motivos_l00.append("✔ Forte tendência de gol")
+
+    # =========================================================
+    # 🔥 OVER HT
+    # =========================================================
 
     if linha_ht.get("Prob_Gol_HT", 0) >= 65:
 
         score_l00 += 16
         motivos_l00.append("✔ Over HT agressivo")
 
+    # =========================================================
+    # 🏠 HOME AGRESSIVO
+    # =========================================================
+
     if home_abrir_consenso >= 60:
 
         score_l00 += 12
         motivos_l00.append("✔ Home tende a iniciar forte")
+
+    # =========================================================
+    # ✈️ AWAY PARTICIPA
+    # =========================================================
 
     if away_abrir_consenso >= 45:
 
         score_l00 += 8
         motivos_l00.append("✔ Away também participa ofensivamente")
 
+    # =========================================================
+    # ⚡ INTENSIDADE OFENSIVA
+    # =========================================================
+
     if linha_consenso["Score_Ofensivo"] >= 75:
 
         score_l00 += 12
         motivos_l00.append("✔ Intensidade ofensiva elevada")
+
+    # =========================================================
+    # 🧱 DEFESAS FORTES
+    # =========================================================
 
     if (
         clean_home_consenso >= 65 and
@@ -3873,6 +3899,10 @@ with tab8:
         score_l00 -= 5
         riscos_l00.append("⚠ Defesas podem travar o jogo")
 
+    # =========================================================
+    # 🚫 ATAQUES FRACOS
+    # =========================================================
+
     if (
         linha_consenso["NS_Games_H"] >= 35 and
         linha_consenso["NS_Games_A"] >= 35
@@ -3881,7 +3911,46 @@ with tab8:
         score_l00 -= 4
         riscos_l00.append("⚠ Baixa produção ofensiva")
 
+    # =========================================================
+    # 🔥 PISO OPERACIONAL
+    # =========================================================
+
+    if (
+        linha_ht.get("Prob_Gol_HT", 0) >= 65 and
+        linha_consenso["Score_Ofensivo"] >= 75
+    ):
+
+        score_l00 = max(score_l00, 55)
+
+        motivos_l00.append(
+            "🔥 Cenário ofensivo forte impede classificação 'Evitar'"
+        )
+
+    # =========================================================
+    # 📊 CONFIANÇA
+    # =========================================================
+
     conf_l00 = min(score_l00 * 1.1, 99)
+
+    # =========================================================
+    # 🧠 LEITURA OPERACIONAL
+    # =========================================================
+
+    if melhor_janela in ["0-15", "16-30"]:
+
+        tendencia_l00 = "⚡ Forte início de jogo"
+
+    elif melhor_janela in ["31-45"]:
+
+        tendencia_l00 = "📈 Pressão crescente no HT"
+
+    else:
+
+        tendencia_l00 = "🔥 Pressão ofensiva tende a crescer no 2T"
+
+    # =========================================================
+    # 🧠 CRIAÇÃO
+    # =========================================================
 
     lay_0x0 = criar_cs(
         "Lay 0x0",
@@ -3890,8 +3959,9 @@ with tab8:
         motivos_l00,
         riscos_l00,
         melhor_janela,
-        tendencia_global
+        tendencia_l00
     )
+    
 
     # =========================================================
     # 🥇 LAY 2x2
