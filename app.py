@@ -4266,7 +4266,21 @@ with tab8:
 {chr(10).join(melhor_cs['riscos'])}
 """
 
-    st.success(texto)
+        # =========================================================
+    # 🎨 COR DO CARD
+    # =========================================================
+
+    if melhor_cs["score"] >= 55:
+
+        st.success(texto)
+
+    elif melhor_cs["score"] >= 35:
+
+        st.warning(texto)
+
+    else:
+
+        st.error(texto)
 
     # =========================================================
     # 📊 RANKING SECUNDÁRIO
