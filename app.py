@@ -4136,9 +4136,21 @@ with tab8:
 
     for cs in ranking_cs[1:]:
 
-        if cs["score"] < 40:
+        # =====================================================
+        # 🔴 LEITURA OPERACIONAL
+        # =====================================================
+
+        if cs["score"] < 18:
 
             risco_txt = "🔴 Evitar operação"
+
+        elif cs["score"] < 25:
+
+            risco_txt = "🟠 Cenário fraco"
+
+        elif cs["score"] < 35:
+
+            risco_txt = "🟡 Cenário moderado"
 
         elif cs["riscos"]:
 
@@ -4146,7 +4158,11 @@ with tab8:
 
         else:
 
-            risco_txt = "✔ Cenário operacional saudável"
+            risco_txt = "🟢 Cenário operacional saudável"
+
+        # =====================================================
+        # 📊 CARD
+        # =====================================================
 
         st.info(
             f"""
