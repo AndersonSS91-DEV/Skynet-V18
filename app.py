@@ -4039,14 +4039,14 @@ with tab8:
 
     with c1:
 
-        texto_home = f"""
+texto_home = f"""
 ⚽ {perfil_home['time']}
 
 {perfil_home['perfil']} — {perfil_home['score']}/100
 
 {perfil_home['bloco']}
 
-{chr(10).join(perfil_home['leitura'][:7])}
+{"".join([f"- {x}\n" for x in perfil_home['leitura'][:7]])}
 
 🧠 Operacional:
 {perfil_home['operacional']}
@@ -4076,14 +4076,14 @@ with tab8:
 
     with c2:
 
-        texto_away = f"""
+texto_away = f"""
 ⚽ {perfil_away['time']}
 
 {perfil_away['perfil']} — {perfil_away['score']}/100
 
 {perfil_away['bloco']}
 
-{chr(10).join(perfil_away['leitura'][:7])}
+{"".join([f"- {x}\n" for x in perfil_away['leitura'][:7]])}
 
 🧠 Operacional:
 {perfil_away['operacional']}
