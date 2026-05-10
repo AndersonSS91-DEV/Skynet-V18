@@ -3553,7 +3553,7 @@ with tab8:
     mercado = list(set(mercado))
     direcao = list(set(direcao))
 
-        # =========================================================
+    # =========================================================
     # 🧠 PERFIL TÁTICO AVANÇADO
     # =========================================================
 
@@ -3586,7 +3586,7 @@ with tab8:
         # ⚔ EFICIÊNCIA OFENSIVA
         # =====================================================
 
-        if eficiencia >= 70:
+        if eficiencia >= 75:
 
             score += 18
 
@@ -3594,12 +3594,20 @@ with tab8:
                 "⚔ Eficiência ofensiva elite"
             )
 
-        elif eficiencia >= 55:
+        elif eficiencia >= 60:
 
-            score += 12
+            score += 13
 
             leitura.append(
                 "⚔ Boa eficiência ofensiva"
+            )
+
+        elif eficiencia >= 45:
+
+            score += 7
+
+            leitura.append(
+                "⚔ Eficiência ofensiva moderada"
             )
 
         else:
@@ -3622,10 +3630,18 @@ with tab8:
 
         elif score_ofensivo >= 65:
 
-            score += 10
+            score += 11
 
             leitura.append(
                 "🎯 Boa criação ofensiva"
+            )
+
+        elif score_ofensivo >= 50:
+
+            score += 6
+
+            leitura.append(
+                "🎯 Criação ofensiva moderada"
             )
 
         else:
@@ -3635,30 +3651,40 @@ with tab8:
             )
 
         # =====================================================
-        # 🌊 VOLUME DE JOGO
+        # 🌊 VOLUME OFENSIVO
         # =====================================================
 
-        volume = (
-            gf_early +
-            gf_mid +
-            gf_late +
-            gc_total
-        )
+        volume = np.mean([
 
-        if volume >= 5:
+            score_ofensivo,
 
-            score += 12
+            eficiencia,
+
+            abrir_placar
+        ])
+
+        if volume >= 75:
+
+            score += 16
 
             leitura.append(
                 "🌊 Volume ofensivo muito alto"
             )
 
-        elif volume >= 3.5:
+        elif volume >= 60:
 
-            score += 8
+            score += 11
 
             leitura.append(
                 "🌊 Volume ofensivo consistente"
+            )
+
+        elif volume >= 45:
+
+            score += 6
+
+            leitura.append(
+                "🌊 Volume ofensivo moderado"
             )
 
         else:
@@ -3671,23 +3697,35 @@ with tab8:
         # 🛡 SUSTENTAÇÃO DEFENSIVA
         # =====================================================
 
-        if (
-            clean_sheet >= 60 and
-            fs_win >= 60
-        ):
+        sustentacao = np.mean([
+
+            clean_sheet,
+
+            fs_win
+        ])
+
+        if sustentacao >= 70:
 
             score += 18
 
             leitura.append(
-                "🛡 Sustentação defensiva forte"
+                "🛡 Sustentação defensiva elite"
             )
 
-        elif clean_sheet >= 50:
+        elif sustentacao >= 55:
 
-            score += 10
+            score += 12
 
             leitura.append(
                 "🛡 Estrutura defensiva sólida"
+            )
+
+        elif sustentacao >= 40:
+
+            score += 6
+
+            leitura.append(
+                "🛡 Sustentação defensiva moderada"
             )
 
         else:
@@ -3701,8 +3739,8 @@ with tab8:
         # =====================================================
 
         if (
-            changer <= 25 and
-            fs_win >= 55
+            changer <= 20 and
+            fs_win >= 60
         ):
 
             score += 14
@@ -3726,34 +3764,44 @@ with tab8:
             )
 
         # =====================================================
-        # ⚡ PRESSÃO EARLY
+        # ⚡ TENDÊNCIA TEMPORAL
         # =====================================================
 
         if (
-            gf_early >= gf_late and
-            abrir_placar >= 60
+            gf_early > gf_mid and
+            gf_early > gf_late
         ):
 
-            score += 12
+            score += 10
 
             leitura.append(
                 "⚡ Forte pressão early"
             )
 
-        # =====================================================
-        # 📈 PRESSÃO TARDIA
-        # =====================================================
+            bloco = "🔺 Bloco Alto"
 
         elif gf_late > gf_early:
 
-            score += 12
+            score += 10
 
             leitura.append(
                 "📈 Crescimento ofensivo tardio"
             )
 
+            bloco = "⚖️ Bloco Médio"
+
+        else:
+
+            score += 5
+
+            leitura.append(
+                "⚖️ Ritmo ofensivo equilibrado"
+            )
+
+            bloco = "🔻 Bloco Baixo"
+
         # =====================================================
-        # 🔥 BTTS / TRANSIÇÃO
+        # 🔥 TRANSIÇÕES
         # =====================================================
 
         if odd_btts <= 1.70:
@@ -3764,10 +3812,18 @@ with tab8:
                 "🔥 Transições ofensivas agressivas"
             )
 
-        elif odd_btts >= 2.00:
+        elif odd_btts >= 2.10:
+
+            score += 5
 
             leitura.append(
                 "🧱 Transições controladas"
+            )
+
+        else:
+
+            leitura.append(
+                "⚖️ Transições equilibradas"
             )
 
         # =====================================================
@@ -3776,39 +3832,40 @@ with tab8:
 
         if ns_games >= 35:
 
-            score -= 8
+            score -= 5
 
             leitura.append(
                 "🚫 Produção ofensiva inconsistente"
             )
 
-        # =====================================================
-        # 🧱 BLOCO TÁTICO
-        # =====================================================
-
-        if (
-            gf_early >= 1.4 and
-            abrir_placar >= 65
-        ):
-
-            bloco = "🔺 Bloco Alto"
-
-        elif gf_late > gf_early:
-
-            bloco = "⚖️ Bloco Médio"
-
         else:
 
-            bloco = "🔻 Bloco Baixo"
+            score += 4
+
+            leitura.append(
+                "✔ Produção ofensiva consistente"
+            )
 
         # =====================================================
-        # 🧠 PERFIL FINAL
+        # 🧠 SCORE FINAL NORMALIZADO
         # =====================================================
+
+        score_maximo = 105
+
+        score = (
+            score / score_maximo
+        ) * 100
+
+        score = round(score)
 
         score = max(
-            min(round(score), 100),
+            min(score, 100),
             0
         )
+
+        # =====================================================
+        # 🎨 PERFIL FINAL
+        # =====================================================
 
         if score <= 25:
 
@@ -3838,19 +3895,19 @@ with tab8:
         # 🧠 OPERACIONAL
         # =====================================================
 
-        if score >= 75:
+        if score >= 80:
 
             operacional = (
                 "forte imposição tática e controle estrutural"
             )
 
-        elif score >= 55:
+        elif score >= 60:
 
             operacional = (
-                "time competitivo com boa sustentação"
+                "time competitivo e consistente"
             )
 
-        elif score >= 35:
+        elif score >= 40:
 
             operacional = (
                 "jogo tende ao equilíbrio operacional"
@@ -3962,7 +4019,7 @@ with tab8:
     )
 
     # =========================================================
-    # 🚀 RENDER
+    # 🚀 RENDER FINAL
     # =========================================================
 
     c1, c2 = st.columns(2)
@@ -3973,10 +4030,10 @@ with tab8:
             f"""
 <div style="
     background:{perfil_home['cor']};
-    padding:18px;
+    padding:14px;
     border-radius:14px;
     color:white;
-    min-height:330px;
+    min-height:285px;
 ">
 
 <div style="
@@ -3986,14 +4043,14 @@ with tab8:
 ">
 
 <div style="
-    font-size:24px;
+    font-size:20px;
     font-weight:700;
 ">
 {perfil_home['time']}
 </div>
 
 <div style="
-    font-size:30px;
+    font-size:24px;
     font-weight:800;
 ">
 {perfil_home['score']}/100
@@ -4006,7 +4063,7 @@ with tab8:
 ">
 
 <div style="
-    font-size:19px;
+    font-size:17px;
     font-weight:700;
     margin-bottom:10px;
 ">
@@ -4015,13 +4072,13 @@ with tab8:
 
 <div style="
     font-size:15px;
-    margin-bottom:14px;
+    margin-bottom:10px;
 ">
 {perfil_home['bloco']}
 </div>
 
 <div style="
-    line-height:1.8;
+    line-height:1.7;
     font-size:15px;
 ">
 
@@ -4030,8 +4087,8 @@ with tab8:
 </div>
 
 <div style="
-    margin-top:16px;
-    padding:10px;
+    margin-top:14px;
+    padding:8px;
     border-radius:10px;
     background:rgba(255,255,255,0.10);
     font-size:14px;
@@ -4052,10 +4109,10 @@ with tab8:
             f"""
 <div style="
     background:{perfil_away['cor']};
-    padding:18px;
+    padding:14px;
     border-radius:14px;
     color:white;
-    min-height:330px;
+    min-height:285px;
 ">
 
 <div style="
@@ -4065,14 +4122,14 @@ with tab8:
 ">
 
 <div style="
-    font-size:24px;
+    font-size:20px;
     font-weight:700;
 ">
 {perfil_away['time']}
 </div>
 
 <div style="
-    font-size:30px;
+    font-size:24px;
     font-weight:800;
 ">
 {perfil_away['score']}/100
@@ -4085,7 +4142,7 @@ with tab8:
 ">
 
 <div style="
-    font-size:19px;
+    font-size:17px;
     font-weight:700;
     margin-bottom:10px;
 ">
@@ -4094,13 +4151,13 @@ with tab8:
 
 <div style="
     font-size:15px;
-    margin-bottom:14px;
+    margin-bottom:10px;
 ">
 {perfil_away['bloco']}
 </div>
 
 <div style="
-    line-height:1.8;
+    line-height:1.7;
     font-size:15px;
 ">
 
@@ -4109,8 +4166,8 @@ with tab8:
 </div>
 
 <div style="
-    margin-top:16px;
-    padding:10px;
+    margin-top:14px;
+    padding:8px;
     border-radius:10px;
     background:rgba(255,255,255,0.10);
     font-size:14px;
