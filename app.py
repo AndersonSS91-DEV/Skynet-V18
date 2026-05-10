@@ -4031,11 +4031,9 @@ with tab8:
         score_ofensivo=linha_consenso["Score_Ofensivo"]
     )
 
-        # =========================================================
+    # =========================================================
     # 🚀 RENDER FINAL
     # =========================================================
-
-    st.markdown("## 🧠 PERFIL TÁTICO AUTOMÁTICO")
 
     c1, c2 = st.columns(2)
 
@@ -4052,24 +4050,48 @@ with tab8:
             with linha1_home:
 
                 st.markdown(
-                    f"#### {perfil_home['time']}"
+                    f"**{perfil_home['time']}**"
                 )
 
             with linha2_home:
 
                 st.markdown(
-                    f"#### {perfil_home['score']}/100"
+                    f"**{perfil_home['score']}/100**"
                 )
 
-            st.markdown(
-                perfil_home["perfil"]
-            )
+            # =================================================
+            # 🎨 PERFIL
+            # =================================================
+
+            if perfil_home["score"] <= 25:
+
+                st.error(
+                    perfil_home["perfil"]
+                )
+
+            elif perfil_home["score"] <= 50:
+
+                st.warning(
+                    perfil_home["perfil"]
+                )
+
+            else:
+
+                st.success(
+                    perfil_home["perfil"]
+                )
+
+            # =================================================
+            # 🧱 BLOCO TÁTICO
+            # =================================================
 
             st.caption(
                 perfil_home["bloco"]
             )
 
-            st.divider()
+            # =================================================
+            # 📋 LEITURAS
+            # =================================================
 
             for leitura in perfil_home["leitura"][:7]:
 
@@ -4077,7 +4099,9 @@ with tab8:
                     leitura
                 )
 
-            st.divider()
+            # =================================================
+            # 🧠 OPERACIONAL
+            # =================================================
 
             st.caption(
                 f"🧠 {perfil_home['operacional']}"
@@ -4096,24 +4120,48 @@ with tab8:
             with linha1_away:
 
                 st.markdown(
-                    f"#### {perfil_away['time']}"
+                    f"**{perfil_away['time']}**"
                 )
 
             with linha2_away:
 
                 st.markdown(
-                    f"#### {perfil_away['score']}/100"
+                    f"**{perfil_away['score']}/100**"
                 )
 
-            st.markdown(
-                perfil_away["perfil"]
-            )
+            # =================================================
+            # 🎨 PERFIL
+            # =================================================
+
+            if perfil_away["score"] <= 25:
+
+                st.error(
+                    perfil_away["perfil"]
+                )
+
+            elif perfil_away["score"] <= 50:
+
+                st.warning(
+                    perfil_away["perfil"]
+                )
+
+            else:
+
+                st.success(
+                    perfil_away["perfil"]
+                )
+
+            # =================================================
+            # 🧱 BLOCO TÁTICO
+            # =================================================
 
             st.caption(
                 perfil_away["bloco"]
             )
 
-            st.divider()
+            # =================================================
+            # 📋 LEITURAS
+            # =================================================
 
             for leitura in perfil_away["leitura"][:7]:
 
@@ -4121,7 +4169,9 @@ with tab8:
                     leitura
                 )
 
-            st.divider()
+            # =================================================
+            # 🧠 OPERACIONAL
+            # =================================================
 
             st.caption(
                 f"🧠 {perfil_away['operacional']}"
