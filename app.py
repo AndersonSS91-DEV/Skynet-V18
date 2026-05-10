@@ -3519,7 +3519,7 @@ with tab8:
             )
 
         # =====================================================
-        # ⚡ EARLY AGGRESSIVE
+        # ⚡ AGRESSIVO EARLY
         # =====================================================
 
         if (
@@ -3605,7 +3605,7 @@ with tab8:
             )
 
         # =====================================================
-        # 🔥 AJUSTES DE SCORE
+        # 🔥 AJUSTE FINAL
         # =====================================================
 
         score += (
@@ -3639,7 +3639,7 @@ with tab8:
             cor = "#166534"
 
         # =====================================================
-        # 🧠 TEXTO
+        # 🧠 HTML
         # =====================================================
 
         leitura_html = "<br>".join(leitura)
@@ -3719,7 +3719,7 @@ with tab8:
 
 
     # =========================================================
-    # 🔥 CONVERTER ESCUDO BASE64
+    # 🔥 CONVERTER ESCUDO
     # =========================================================
     def image_to_base64(path):
 
@@ -3731,19 +3731,24 @@ with tab8:
 
 
     # =========================================================
-    # 🧠 DADOS HOME
+    # 🧠 HOME
     # =========================================================
+
     escudo_home64 = image_to_base64(
         escudo_path(home)
     )
 
     gf_early_home = (
+
         linha_consenso["GF_0-15_Home"] +
+
         linha_consenso["GF_16-30_Home"]
     )
 
     gf_late_home = (
+
         linha_consenso["GF_61-75_Home"] +
+
         linha_consenso["GF_76-90_Home"]
     )
 
@@ -3757,7 +3762,7 @@ with tab8:
 
         score_ofensivo=linha_consenso["Score_Ofensivo"],
 
-        clean_sheet=linha_consenso["Clean_Sheet_Home_%"],
+        clean_sheet=clean_home_consenso,
 
         btts=linha_consenso["BTTS_%"],
 
@@ -3767,7 +3772,7 @@ with tab8:
 
         ns_games=linha_consenso["NS_Games_H"],
 
-        abrir_placar=linha_consenso["Home_Abrir_Placar"],
+        abrir_placar=home_abrir_consenso,
 
         gf_early=gf_early_home,
 
@@ -3778,19 +3783,24 @@ with tab8:
 
 
     # =========================================================
-    # 🧠 DADOS AWAY
+    # 🧠 AWAY
     # =========================================================
+
     escudo_away64 = image_to_base64(
         escudo_path(away)
     )
 
     gf_early_away = (
+
         linha_consenso["GF_0-15_Away"] +
+
         linha_consenso["GF_16-30_Away"]
     )
 
     gf_late_away = (
+
         linha_consenso["GF_61-75_Away"] +
+
         linha_consenso["GF_76-90_Away"]
     )
 
@@ -3804,7 +3814,7 @@ with tab8:
 
         score_ofensivo=linha_consenso["Score_Ofensivo"],
 
-        clean_sheet=linha_consenso["Clean_Sheet_Away_%"],
+        clean_sheet=clean_away_consenso,
 
         btts=linha_consenso["BTTS_%"],
 
@@ -3814,7 +3824,7 @@ with tab8:
 
         ns_games=linha_consenso["NS_Games_A"],
 
-        abrir_placar=linha_consenso["Away_Abrir_Placar"],
+        abrir_placar=away_abrir_consenso,
 
         gf_early=gf_early_away,
 
@@ -3827,6 +3837,7 @@ with tab8:
     # =========================================================
     # 🚀 RENDER
     # =========================================================
+
     st.markdown("## 🧠 PERFIL TÁTICO AUTOMÁTICO")
 
     c1, c2 = st.columns(2)
