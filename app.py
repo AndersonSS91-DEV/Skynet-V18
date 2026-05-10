@@ -4026,7 +4026,7 @@ with tab8:
     # 🧠 PERFIL TÁTICO AUTOMÁTICO
     # =========================================================
 
-    st.markdown("## 🧠 PERFIL TÁTICO AUTOMÁTICO")
+    st.markdown("### 🧠 PERFIL TÁTICO AUTOMÁTICO")
 
     c1, c2 = st.columns(2)
 
