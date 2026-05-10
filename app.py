@@ -3489,6 +3489,22 @@ with tab8:
     # =========================================================
 
     st.markdown("## 👾📡 CS ENGINE")
+    
+        # =========================================================
+    # 🔥 LINHA CONSENSO
+    # =========================================================
+
+    jogo_consenso = df_consenso[
+        df_consenso["JOGO"] == jogo
+    ]
+
+    if not jogo_consenso.empty:
+
+        linha_consenso = jogo_consenso.iloc[0]
+
+    else:
+
+        linha_consenso = pd.Series(dtype=float)
 
     # =========================================================
     # 🧠 CONSENSOS BASE
