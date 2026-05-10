@@ -3831,7 +3831,10 @@ with tab8:
         melhor_janela,
         tendencia_global
     )
-        # =========================================================
+    
+    
+    
+    # =========================================================
     # 🥇 LAY 0x0
     # =========================================================
 
@@ -3944,6 +3947,37 @@ with tab8:
 
         tendencia_l00 = "🔥 Pressão ofensiva tende a crescer no 2T"
 
+
+
+        # =========================================================
+    # ⏱ JANELA OPERACIONAL LAY 0x0
+    # =========================================================
+
+    if (
+        faixas["0-15"] +
+        faixas["16-30"]
+    ) >= (
+        faixas["46-60"] +
+        faixas["61-75"]
+    ):
+
+        janela_l00 = "0-30"
+
+        tendencia_l00 = "⚡ Forte início de jogo"
+
+    elif faixas["31-45"] >= max(faixas.values()):
+
+        janela_l00 = "30-45"
+
+        tendencia_l00 = "📈 Pressão crescente no HT"
+
+    else:
+
+        janela_l00 = "45-60"
+
+        tendencia_l00 = "🔥 Pressão ofensiva cresce no 2T"
+
+    
     # =========================================================
     # 🧠 CRIAÇÃO
     # =========================================================
@@ -3954,7 +3988,7 @@ with tab8:
         conf_l00,
         motivos_l00,
         riscos_l00,
-        melhor_janela,
+        janela_l00,
         tendencia_l00
     )
     
