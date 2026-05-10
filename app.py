@@ -4054,21 +4054,37 @@ with tab8:
 
         if perfil_home["score"] >= 70:
 
-            st.success(
-                texto_home
-            )
+            cor_home = "#0f5132"
 
         elif perfil_home["score"] >= 45:
 
-            st.warning(
-                texto_home
-            )
+            cor_home = "#5a4300"
 
         else:
 
-            st.error(
-                texto_home
-            )
+            cor_home = "#4b1f24"
+
+        st.markdown(
+            f"""
+<div style="
+    background:{cor_home};
+    padding:14px;
+    border-radius:12px;
+    color:white;
+">
+<pre style="
+    white-space:pre-wrap;
+    color:white;
+    font-family:inherit;
+    font-size:15px;
+    margin:0;
+">
+{texto_home}
+</pre>
+</div>
+""",
+            unsafe_allow_html=True
+        )
 
     # =====================================================
     # 🧠 AWAY
@@ -4091,22 +4107,37 @@ with tab8:
 
         if perfil_away["score"] >= 70:
 
-            st.success(
-                texto_away
-            )
+            cor_away = "#0f5132"
 
         elif perfil_away["score"] >= 45:
 
-            st.warning(
-                texto_away
-            )
+            cor_away = "#5a4300"
 
         else:
 
-            st.error(
-                texto_away
-            )
+            cor_away = "#4b1f24"
 
+        st.markdown(
+            f"""
+<div style="
+    background:{cor_away};
+    padding:14px;
+    border-radius:12px;
+    color:white;
+">
+<pre style="
+    white-space:pre-wrap;
+    color:white;
+    font-family:inherit;
+    font-size:15px;
+    margin:0;
+">
+{texto_away}
+</pre>
+</div>
+""",
+            unsafe_allow_html=True
+        )
 
     
     # =========================================================
