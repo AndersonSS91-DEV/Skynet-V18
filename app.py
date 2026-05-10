@@ -3738,10 +3738,15 @@ with tab8:
         # 🧠 CONTROLE DE RITMO
         # =====================================================
 
-        if (
-            changer <= 20 and
-            fs_win >= 60
-        ):
+        controle = np.mean([
+
+            fs_win,
+
+            100 - (changer * 2)
+
+        ])
+
+        if controle >= 75:
 
             score += 14
 
@@ -3749,12 +3754,20 @@ with tab8:
                 "🧠 Forte controle de ritmo"
             )
 
-        elif changer <= 35:
+        elif controle >= 55:
 
             score += 8
 
             leitura.append(
-                "🧠 Controle emocional equilibrado"
+                "🧠 Boa estabilidade emocional"
+            )
+
+        elif controle >= 40:
+
+            score += 4
+
+            leitura.append(
+                "🧠 Ritmo relativamente equilibrado"
             )
 
         else:
@@ -4018,169 +4031,102 @@ with tab8:
         score_ofensivo=linha_consenso["Score_Ofensivo"]
     )
 
-    # =========================================================
+        # =========================================================
     # 🚀 RENDER FINAL
     # =========================================================
 
+    st.markdown("## 🧠 PERFIL TÁTICO AUTOMÁTICO")
+
     c1, c2 = st.columns(2)
+
+    # =====================================================
+    # 🧠 HOME
+    # =====================================================
 
     with c1:
 
-        st.markdown(
-            f"""
-<div style="
-    background:{perfil_home['cor']};
-    padding:14px;
-    border-radius:14px;
-    color:white;
-    min-height:285px;
-">
+        with st.container(border=True):
 
-<div style="
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-">
+            linha1_home, linha2_home = st.columns([5, 1])
 
-<div style="
-    font-size:20px;
-    font-weight:700;
-">
-{perfil_home['time']}
-</div>
+            with linha1_home:
 
-<div style="
-    font-size:24px;
-    font-weight:800;
-">
-{perfil_home['score']}/100
-</div>
+                st.markdown(
+                    f"#### {perfil_home['time']}"
+                )
 
-</div>
+            with linha2_home:
 
-<hr style="
-    border:1px solid rgba(255,255,255,0.12);
-">
+                st.markdown(
+                    f"#### {perfil_home['score']}/100"
+                )
 
-<div style="
-    font-size:17px;
-    font-weight:700;
-    margin-bottom:10px;
-">
-{perfil_home['perfil']}
-</div>
+            st.markdown(
+                perfil_home["perfil"]
+            )
 
-<div style="
-    font-size:15px;
-    margin-bottom:10px;
-">
-{perfil_home['bloco']}
-</div>
+            st.caption(
+                perfil_home["bloco"]
+            )
 
-<div style="
-    line-height:1.7;
-    font-size:15px;
-">
+            st.divider()
 
-{"<br>".join(perfil_home['leitura'][:7])}
+            for leitura in perfil_home["leitura"][:7]:
 
-</div>
+                st.markdown(
+                    leitura
+                )
 
-<div style="
-    margin-top:14px;
-    padding:8px;
-    border-radius:10px;
-    background:rgba(255,255,255,0.10);
-    font-size:14px;
-">
+            st.divider()
 
-🧠 {perfil_home['operacional']}
+            st.caption(
+                f"🧠 {perfil_home['operacional']}"
+            )
 
-</div>
-
-</div>
-""",
-            unsafe_allow_html=True
-        )
+    # =====================================================
+    # 🧠 AWAY
+    # =====================================================
 
     with c2:
 
-        st.markdown(
-            f"""
-<div style="
-    background:{perfil_away['cor']};
-    padding:14px;
-    border-radius:14px;
-    color:white;
-    min-height:285px;
-">
+        with st.container(border=True):
 
-<div style="
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-">
+            linha1_away, linha2_away = st.columns([5, 1])
 
-<div style="
-    font-size:20px;
-    font-weight:700;
-">
-{perfil_away['time']}
-</div>
+            with linha1_away:
 
-<div style="
-    font-size:24px;
-    font-weight:800;
-">
-{perfil_away['score']}/100
-</div>
+                st.markdown(
+                    f"#### {perfil_away['time']}"
+                )
 
-</div>
+            with linha2_away:
 
-<hr style="
-    border:1px solid rgba(255,255,255,0.12);
-">
+                st.markdown(
+                    f"#### {perfil_away['score']}/100"
+                )
 
-<div style="
-    font-size:17px;
-    font-weight:700;
-    margin-bottom:10px;
-">
-{perfil_away['perfil']}
-</div>
+            st.markdown(
+                perfil_away["perfil"]
+            )
 
-<div style="
-    font-size:15px;
-    margin-bottom:10px;
-">
-{perfil_away['bloco']}
-</div>
+            st.caption(
+                perfil_away["bloco"]
+            )
 
-<div style="
-    line-height:1.7;
-    font-size:15px;
-">
+            st.divider()
 
-{"<br>".join(perfil_away['leitura'][:7])}
+            for leitura in perfil_away["leitura"][:7]:
 
-</div>
+                st.markdown(
+                    leitura
+                )
 
-<div style="
-    margin-top:14px;
-    padding:8px;
-    border-radius:10px;
-    background:rgba(255,255,255,0.10);
-    font-size:14px;
-">
+            st.divider()
 
-🧠 {perfil_away['operacional']}
-
-</div>
-
-</div>
-""",
-            unsafe_allow_html=True
-        )
+            st.caption(
+                f"🧠 {perfil_away['operacional']}"
+            )
+            
     # =========================================================
     # ⚡ SCORE TEMPORAL GLOBAL
     # =========================================================
