@@ -4039,7 +4039,7 @@ with tab8:
 
     with c1:
 
-texto_home = f"""
+        texto_home = f"""
 ⚽ {perfil_home['time']}
 
 {perfil_home['perfil']} — {perfil_home['score']}/100
@@ -4076,7 +4076,7 @@ texto_home = f"""
 
     with c2:
 
-texto_away = f"""
+        texto_away = f"""
 ⚽ {perfil_away['time']}
 
 {perfil_away['perfil']} — {perfil_away['score']}/100
