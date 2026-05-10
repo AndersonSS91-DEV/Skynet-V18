@@ -3847,7 +3847,7 @@ with tab8:
 
         clean_sheet=clean_home_consenso,
 
-        btts=linha_consenso["BTTS_%"],
+        btts=linha_consenso["Odd_BTTS_YES"],
 
         changer=linha_consenso["Changer_H"],
 
@@ -3899,7 +3899,7 @@ with tab8:
 
         clean_sheet=clean_away_consenso,
 
-        btts=linha_consenso["BTTS_%"],
+        btts=linha_consenso["Odd_BTTS_YES"],
 
         changer=linha_consenso["Changer_A"],
 
