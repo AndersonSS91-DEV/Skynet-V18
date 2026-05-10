@@ -3553,153 +3553,17 @@ with tab8:
     mercado = list(set(mercado))
     direcao = list(set(direcao))
 
+        # =========================================================
+    # 🧠 PERFIL TÁTICO CARD SIMPLES
     # =========================================================
-    # 🧠 PERFIL TÁTICO AUTOMÁTICO
-    # =========================================================
-    def perfil_tatico(
+    def perfil_tatico_card(
         nome,
-        escudo,
-        eficiencia,
-        score_ofensivo,
-        clean_sheet,
-        btts,
-        changer,
-        fs_win,
-        ns_games,
-        abrir_placar,
-        gf_early,
-        gf_late,
-        gc_total
+        score,
+        perfil,
+        leitura,
+        operacional,
+        escudo
     ):
-
-        score = 0
-        perfil = "⚖️ Equilibrado"
-        leitura = []
-        operacional = ""
-
-        # =====================================================
-        # 🧱 CONTROLADOR
-        # =====================================================
-
-        if (
-            clean_sheet >= 55 and
-            fs_win >= 60 and
-            changer <= 25 and
-            btts <= 55
-        ):
-
-            score += 30
-
-            perfil = "🧱 Time Controlador"
-
-            leitura.append("✔ Defesa sólida")
-            leitura.append("✔ Sustenta vantagem")
-            leitura.append("✔ Controle emocional")
-            leitura.append("✔ Baixa tendência de caos")
-
-            operacional = (
-                "👉 tende a controlar o jogo após abrir vantagem"
-            )
-
-        # =====================================================
-        # ⚡ AGRESSIVO EARLY
-        # =====================================================
-
-        if (
-            gf_early >= 1.2 and
-            abrir_placar >= 60
-        ):
-
-            score += 22
-
-            perfil = "⚡ Time Agressivo Early"
-
-            leitura.append("✔ Forte início de jogo")
-            leitura.append("✔ Alta pressão inicial")
-            leitura.append("✔ Costuma marcar cedo")
-
-            operacional = (
-                "👉 perigoso principalmente antes dos 30'"
-            )
-
-        # =====================================================
-        # 📈 PRESSÃO TARDIA
-        # =====================================================
-
-        if (
-            gf_late >= 1.0 and
-            gf_late > gf_early
-        ):
-
-            score += 20
-
-            perfil = "📈 Pressão Tardia"
-
-            leitura.append("✔ Cresce durante o jogo")
-            leitura.append("✔ Forte intensidade no 2T")
-            leitura.append("✔ Mantém pressão até o fim")
-
-            operacional = (
-                "👉 perigoso principalmente após os 60'"
-            )
-
-        # =====================================================
-        # 🔥 CAÓTICO
-        # =====================================================
-
-        if (
-            btts >= 70 and
-            changer >= 35 and
-            gc_total >= 1.4
-        ):
-
-            score += 18
-
-            perfil = "🔥 Time Caótico"
-
-            leitura.append("✔ Alta troca de golpes")
-            leitura.append("✔ Forte tendência BTTS")
-            leitura.append("✔ Jogo emocionalmente instável")
-
-            operacional = (
-                "👉 tendência a jogos descontrolados"
-            )
-
-        # =====================================================
-        # 🛡️ REATIVO
-        # =====================================================
-
-        if (
-            clean_sheet >= 50 and
-            ns_games >= 30 and
-            score_ofensivo <= 55
-        ):
-
-            score += 15
-
-            perfil = "🛡️ Time Reativo"
-
-            leitura.append("✔ Baixa exposição defensiva")
-            leitura.append("✔ Pouca agressividade ofensiva")
-            leitura.append("✔ Atua em transição")
-
-            operacional = (
-                "👉 tende a esperar erros do adversário"
-            )
-
-        # =====================================================
-        # 🔥 AJUSTE FINAL
-        # =====================================================
-
-        score += (
-            eficiencia * 0.15
-        )
-
-        score += (
-            abrir_placar * 0.10
-        )
-
-        score = min(round(score), 100)
 
         # =====================================================
         # 🎨 COR
@@ -3722,198 +3586,333 @@ with tab8:
             cor = "#166534"
 
         # =====================================================
-        # 🧠 HTML
+        # 🧠 TEXTO
         # =====================================================
 
-        leitura_html = "<br>".join(leitura)
+        leitura_txt = " / ".join(leitura[:4])
 
-        html = f"""
-        <div style="
-            background:{cor};
-            padding:18px;
-            border-radius:16px;
-            color:white;
-            box-shadow:0 0 14px rgba(0,0,0,0.45);
-            margin-bottom:14px;
-            min-height:270px;
-        ">
+        st.markdown(
+            f"""
+<div style="
+    background:{cor};
+    padding:16px;
+    border-radius:14px;
+    color:white;
+    margin-bottom:12px;
+">
 
-            <div style="
-                display:flex;
-                align-items:center;
-                gap:14px;
-                margin-bottom:10px;
-            ">
+<div style="
+    display:flex;
+    align-items:center;
+    gap:12px;
+">
 
-                <img src="data:image/png;base64,{escudo}"
-                     width="70">
+<img src="data:image/png;base64,{escudo}" width="52">
 
-                <div>
+<div>
 
-                    <div style="
-                        font-size:24px;
-                        font-weight:900;
-                    ">
-                        {nome}
-                    </div>
+<div style="
+    font-size:20px;
+    font-weight:700;
+">
+{nome}
+</div>
 
-                    <div style="
-                        font-size:18px;
-                        opacity:0.9;
-                        font-weight:700;
-                    ">
-                        {perfil}
-                    </div>
+<div style="
+    font-size:15px;
+    opacity:0.9;
+">
+{perfil}
+</div>
 
-                </div>
+</div>
 
-            </div>
+<div style="
+    margin-left:auto;
+    font-size:28px;
+    font-weight:800;
+">
+{score}/100
+</div>
 
-            <div style="
-                font-size:42px;
-                font-weight:900;
-                margin-bottom:12px;
-            ">
-                {score}/100
-            </div>
+</div>
 
-            <div style="
-                font-size:16px;
-                line-height:1.7;
-                margin-bottom:14px;
-            ">
-                {leitura_html}
-            </div>
+<hr style="
+    border:1px solid rgba(255,255,255,0.15);
+">
 
-            <div style="
-                font-size:16px;
-                background:rgba(255,255,255,0.10);
-                padding:10px;
-                border-radius:10px;
-            ">
-                🧠 Operacional:<br>
-                {operacional}
-            </div>
+<div style="
+    font-size:14px;
+    line-height:1.6;
+">
 
-        </div>
-        """
+{leitura_txt}
 
-        return html
+</div>
 
+<div style="
+    margin-top:10px;
+    font-size:14px;
+    background:rgba(255,255,255,0.10);
+    padding:8px;
+    border-radius:8px;
+">
 
-    # =========================================================
-    # 🔥 CONVERTER ESCUDO
-    # =========================================================
-    def image_to_base64(path):
+🧠 {operacional}
 
-        with open(path, "rb") as img_file:
+</div>
 
-            return base64.b64encode(
-                img_file.read()
-            ).decode()
+</div>
+""",
+            unsafe_allow_html=True
+        )
 
 
     # =========================================================
-    # 🧠 HOME
+    # 🧠 PERFIL HOME
     # =========================================================
 
-    escudo_home64 = image_to_base64(
-        escudo_path(home)
+    score_home = 0
+
+    leitura_home = []
+
+    perfil_home_nome = "⚖️ Equilibrado"
+
+    operacional_home = (
+        "👉 sem tendência tática dominante"
     )
 
-    gf_early_home = (
+    if clean_home_consenso >= 55:
 
-        linha_consenso["GF_0-15_Home"] +
+        score_home += 20
 
-        linha_consenso["GF_16-30_Home"]
-    )
+        leitura_home.append(
+            "✔ Defesa sólida"
+        )
 
-    gf_late_home = (
+    if linha_consenso["FS_Win_H"] >= 60:
 
+        score_home += 20
+
+        leitura_home.append(
+            "✔ Sustenta vantagem"
+        )
+
+    if linha_consenso["Changer_H"] <= 25:
+
+        score_home += 15
+
+        leitura_home.append(
+            "✔ Controle emocional"
+        )
+
+    if home_abrir_consenso >= 60:
+
+        score_home += 15
+
+        leitura_home.append(
+            "✔ Forte início de jogo"
+        )
+
+    if (
         linha_consenso["GF_61-75_Home"] +
-
         linha_consenso["GF_76-90_Home"]
-    )
+    ) > (
+        linha_consenso["GF_0-15_Home"] +
+        linha_consenso["GF_16-30_Home"]
+    ):
 
-    perfil_home = perfil_tatico(
+        score_home += 12
 
-        nome=home,
+        leitura_home.append(
+            "✔ Cresce no 2T"
+        )
 
-        escudo=escudo_home64,
+    if linha_consenso["Odd_BTTS_YES"] <= 1.70:
 
-        eficiencia=linha_consenso["Eficiência_H"],
+        score_home += 10
 
-        score_ofensivo=linha_consenso["Score_Ofensivo"],
+        leitura_home.append(
+            "✔ Forte tendência BTTS"
+        )
 
-        clean_sheet=clean_home_consenso,
+    # =====================================================
+    # 🧠 PERFIL FINAL HOME
+    # =====================================================
 
-        btts=linha_consenso["Odd_BTTS_YES"],
+    if (
+        clean_home_consenso >= 55 and
+        linha_consenso["FS_Win_H"] >= 60
+    ):
 
-        changer=linha_consenso["Changer_H"],
+        perfil_home_nome = (
+            "🧱 Time Controlador"
+        )
 
-        fs_win=linha_consenso["FS_Win_H"],
+        operacional_home = (
+            "👉 tende a controlar vantagem após marcar"
+        )
 
-        ns_games=linha_consenso["NS_Games_H"],
+    elif home_abrir_consenso >= 60:
 
-        abrir_placar=home_abrir_consenso,
+        perfil_home_nome = (
+            "⚡ Time Agressivo Early"
+        )
 
-        gf_early=gf_early_home,
+        operacional_home = (
+            "👉 perigoso principalmente antes dos 30'"
+        )
 
-        gf_late=gf_late_home,
+    elif (
+        linha_consenso["GF_61-75_Home"] +
+        linha_consenso["GF_76-90_Home"]
+    ) >= 1.0:
 
-        gc_total=linha_consenso["MGC_H"]
+        perfil_home_nome = (
+            "📈 Pressão Tardia"
+        )
+
+        operacional_home = (
+            "👉 cresce ofensivamente no 2T"
+        )
+
+    elif linha_consenso["Odd_BTTS_YES"] <= 1.70:
+
+        perfil_home_nome = (
+            "🔥 Time Caótico"
+        )
+
+        operacional_home = (
+            "👉 tendência a jogos abertos"
+        )
+
+    score_home = min(
+        round(score_home),
+        100
     )
 
 
     # =========================================================
-    # 🧠 AWAY
+    # 🧠 PERFIL AWAY
     # =========================================================
 
-    escudo_away64 = image_to_base64(
-        escudo_path(away)
+    score_away = 0
+
+    leitura_away = []
+
+    perfil_away_nome = "⚖️ Equilibrado"
+
+    operacional_away = (
+        "👉 sem tendência tática dominante"
     )
 
-    gf_early_away = (
+    if clean_away_consenso >= 55:
 
-        linha_consenso["GF_0-15_Away"] +
+        score_away += 20
 
-        linha_consenso["GF_16-30_Away"]
-    )
+        leitura_away.append(
+            "✔ Defesa sólida"
+        )
 
-    gf_late_away = (
+    if linha_consenso["FS_Win_A"] >= 60:
 
+        score_away += 20
+
+        leitura_away.append(
+            "✔ Sustenta vantagem"
+        )
+
+    if linha_consenso["Changer_A"] <= 25:
+
+        score_away += 15
+
+        leitura_away.append(
+            "✔ Controle emocional"
+        )
+
+    if away_abrir_consenso >= 55:
+
+        score_away += 15
+
+        leitura_away.append(
+            "✔ Forte início de jogo"
+        )
+
+    if (
         linha_consenso["GF_61-75_Away"] +
-
         linha_consenso["GF_76-90_Away"]
-    )
+    ) > (
+        linha_consenso["GF_0-15_Away"] +
+        linha_consenso["GF_16-30_Away"]
+    ):
 
-    perfil_away = perfil_tatico(
+        score_away += 12
 
-        nome=away,
+        leitura_away.append(
+            "✔ Cresce no 2T"
+        )
 
-        escudo=escudo_away64,
+    if linha_consenso["Odd_BTTS_YES"] <= 1.70:
 
-        eficiencia=linha_consenso["Eficiência_A"],
+        score_away += 10
 
-        score_ofensivo=linha_consenso["Score_Ofensivo"],
+        leitura_away.append(
+            "✔ Forte tendência BTTS"
+        )
 
-        clean_sheet=clean_away_consenso,
+    # =====================================================
+    # 🧠 PERFIL FINAL AWAY
+    # =====================================================
 
-        btts=linha_consenso["Odd_BTTS_YES"],
+    if (
+        clean_away_consenso >= 55 and
+        linha_consenso["FS_Win_A"] >= 60
+    ):
 
-        changer=linha_consenso["Changer_A"],
+        perfil_away_nome = (
+            "🧱 Time Controlador"
+        )
 
-        fs_win=linha_consenso["FS_Win_A"],
+        operacional_away = (
+            "👉 tende a controlar vantagem após marcar"
+        )
 
-        ns_games=linha_consenso["NS_Games_A"],
+    elif away_abrir_consenso >= 55:
 
-        abrir_placar=away_abrir_consenso,
+        perfil_away_nome = (
+            "⚡ Time Agressivo Early"
+        )
 
-        gf_early=gf_early_away,
+        operacional_away = (
+            "👉 perigoso principalmente antes dos 30'"
+        )
 
-        gf_late=gf_late_away,
+    elif (
+        linha_consenso["GF_61-75_Away"] +
+        linha_consenso["GF_76-90_Away"]
+    ) >= 1.0:
 
-        gc_total=linha_consenso["MGC_A"]
+        perfil_away_nome = (
+            "📈 Pressão Tardia"
+        )
+
+        operacional_away = (
+            "👉 cresce ofensivamente no 2T"
+        )
+
+    elif linha_consenso["Odd_BTTS_YES"] <= 1.70:
+
+        perfil_away_nome = (
+            "🔥 Time Caótico"
+        )
+
+        operacional_away = (
+            "👉 tendência a jogos abertos"
+        )
+
+    score_away = min(
+        round(score_away),
+        100
     )
 
 
@@ -3921,22 +3920,32 @@ with tab8:
     # 🚀 RENDER
     # =========================================================
 
-    st.markdown("## 🧠 PERFIL TÁTICO AUTOMÁTICO")
+    st.markdown(
+        "## 🧠 PERFIL TÁTICO AUTOMÁTICO"
+    )
 
     c1, c2 = st.columns(2)
 
     with c1:
 
-        st.markdown(
-            perfil_home,
-            unsafe_allow_html=True
+        perfil_tatico_card(
+            home,
+            score_home,
+            perfil_home_nome,
+            leitura_home,
+            operacional_home,
+            escudo_home64
         )
 
     with c2:
 
-        st.markdown(
-            perfil_away,
-            unsafe_allow_html=True
+        perfil_tatico_card(
+            away,
+            score_away,
+            perfil_away_nome,
+            leitura_away,
+            operacional_away,
+            escudo_away64
         )
 
 
