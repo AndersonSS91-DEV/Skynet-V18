@@ -3456,21 +3456,8 @@ Home {home_emoji}   x   Away {away_emoji}
 
 with tab8:
 
-    st.markdown("## 🧱 Clean Sheet Intelligence")
-
-    st.info("🔍 Em breve você terá aqui:")
-
-    st.write("""
-    - Probabilidade de Clean Sheet (Home/Away)
-    - Leitura Defensiva Avançada
-    - Consenso entre modelos (MGF / ATKxDEF / VG)
-    - Filtro de valor para CS
-    - Identificação de jogos com defesa dominante
-    """)
-
     st.warning("🚧 Em desenvolvimento")
-
-    
+   
     # =========================================================
     # 🔥 HT DATA
     # =========================================================
