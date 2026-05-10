@@ -4043,7 +4043,7 @@ with tab8:
 
 {perfil_home['bloco']}
 
-{chr(10).join(perfil_home['leitura'][:7])}
+• {chr(10).join(perfil_home['leitura'][:7])}
 
 🧠 Operacional:
 {perfil_home['operacional']}
@@ -4084,12 +4084,11 @@ with tab8:
 
 {perfil_away['bloco']}
 
-{chr(10).join(perfil_away['leitura'][:7])}
+• {chr(10).join(perfil_away['leitura'][:7])}
 
 🧠 Operacional:
 {perfil_away['operacional']}
 """
-
         # =================================================
         # 🎨 COR AWAY
         # =================================================
