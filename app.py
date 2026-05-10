@@ -3554,13 +3554,7 @@ with tab8:
     direcao = list(set(direcao))
 
     # =========================================================
-    # 🧠 PERFIL TÁTICO AVANÇADO
-    # =========================================================
-
-    st.markdown("## 🧠 PERFIL TÁTICO AUTOMÁTICO")
-
-    # =========================================================
-    # 🧠 FUNÇÃO PRINCIPAL
+    # 🧠 FUNÇÃO PRINCIPAL - CARD TÁTICO
     # =========================================================
     def gerar_perfil_tatico(
         time,
@@ -4032,8 +4026,10 @@ with tab8:
     )
 
     # =========================================================
-    # 🚀 RENDER FINAL
+    # 🧠 PERFIL TÁTICO AUTOMÁTICO
     # =========================================================
+
+    st.markdown("## 🧠 PERFIL TÁTICO AUTOMÁTICO")
 
     c1, c2 = st.columns(2)
 
@@ -4043,68 +4039,35 @@ with tab8:
 
     with c1:
 
-        with st.container(border=True):
+        texto_home = f"""
+⚽ {perfil_home['time']}
 
-            linha1_home, linha2_home = st.columns([5, 1])
+{perfil_home['perfil']} — {perfil_home['score']}/100
 
-            with linha1_home:
+{perfil_home['bloco']}
 
-                st.markdown(
-                    f"**{perfil_home['time']}**"
-                )
+{chr(10).join(perfil_home['leitura'][:7])}
 
-            with linha2_home:
+🧠 Operacional:
+{perfil_home['operacional']}
+"""
 
-                st.markdown(
-                    f"**{perfil_home['score']}/100**"
-                )
+        if perfil_home["score"] >= 70:
 
-            # =================================================
-            # 🎨 PERFIL
-            # =================================================
-
-            if perfil_home["score"] <= 25:
-
-                st.error(
-                    perfil_home["perfil"]
-                )
-
-            elif perfil_home["score"] <= 50:
-
-                st.warning(
-                    perfil_home["perfil"]
-                )
-
-            else:
-
-                st.success(
-                    perfil_home["perfil"]
-                )
-
-            # =================================================
-            # 🧱 BLOCO TÁTICO
-            # =================================================
-
-            st.caption(
-                perfil_home["bloco"]
+            st.success(
+                texto_home
             )
 
-            # =================================================
-            # 📋 LEITURAS
-            # =================================================
+        elif perfil_home["score"] >= 45:
 
-            for leitura in perfil_home["leitura"][:7]:
+            st.warning(
+                texto_home
+            )
 
-                st.markdown(
-                    leitura
-                )
+        else:
 
-            # =================================================
-            # 🧠 OPERACIONAL
-            # =================================================
-
-            st.caption(
-                f"🧠 {perfil_home['operacional']}"
+            st.error(
+                texto_home
             )
 
     # =====================================================
@@ -4113,70 +4076,39 @@ with tab8:
 
     with c2:
 
-        with st.container(border=True):
+        texto_away = f"""
+⚽ {perfil_away['time']}
 
-            linha1_away, linha2_away = st.columns([5, 1])
+{perfil_away['perfil']} — {perfil_away['score']}/100
 
-            with linha1_away:
+{perfil_away['bloco']}
 
-                st.markdown(
-                    f"**{perfil_away['time']}**"
-                )
+{chr(10).join(perfil_away['leitura'][:7])}
 
-            with linha2_away:
+🧠 Operacional:
+{perfil_away['operacional']}
+"""
 
-                st.markdown(
-                    f"**{perfil_away['score']}/100**"
-                )
+        if perfil_away["score"] >= 70:
 
-            # =================================================
-            # 🎨 PERFIL
-            # =================================================
-
-            if perfil_away["score"] <= 25:
-
-                st.error(
-                    perfil_away["perfil"]
-                )
-
-            elif perfil_away["score"] <= 50:
-
-                st.warning(
-                    perfil_away["perfil"]
-                )
-
-            else:
-
-                st.success(
-                    perfil_away["perfil"]
-                )
-
-            # =================================================
-            # 🧱 BLOCO TÁTICO
-            # =================================================
-
-            st.caption(
-                perfil_away["bloco"]
+            st.success(
+                texto_away
             )
 
-            # =================================================
-            # 📋 LEITURAS
-            # =================================================
+        elif perfil_away["score"] >= 45:
 
-            for leitura in perfil_away["leitura"][:7]:
-
-                st.markdown(
-                    leitura
-                )
-
-            # =================================================
-            # 🧠 OPERACIONAL
-            # =================================================
-
-            st.caption(
-                f"🧠 {perfil_away['operacional']}"
+            st.warning(
+                texto_away
             )
-            
+
+        else:
+
+            st.error(
+                texto_away
+            )
+
+
+    
     # =========================================================
     # ⚡ SCORE TEMPORAL GLOBAL
     # =========================================================
