@@ -3470,7 +3470,90 @@ with tab8:
 
     st.warning("🚧 Em desenvolvimento")
 
+    
+    # =========================================================
+    # 🔥 HT DATA
+    # =========================================================
+
+    jogo_ht = df_ht[df_ht["JOGO"] == jogo]
+
+    if not jogo_ht.empty:
+
+        linha_ht = jogo_ht.iloc[0]
+
+    else:
+
+        linha_ht = pd.Series(dtype=float)
+
+    # =========================================================
+    # 👾📡 CS ENGINE V2 — SKYNET OPERATIONAL CORE
+    # =========================================================
+
+    st.markdown("## 👾📡 CS ENGINE")
+    
         # =========================================================
+    # 🔥 LINHA CONSENSO
+    # =========================================================
+
+    jogo_consenso = df_consenso[
+        df_consenso["JOGO"] == jogo
+    ]
+
+    if not jogo_consenso.empty:
+
+        linha_consenso = jogo_consenso.iloc[0]
+
+    else:
+
+        linha_consenso = pd.Series(dtype=float)
+
+    # =========================================================
+    # 🧠 CONSENSOS BASE
+    # =========================================================
+
+    home_abrir_consenso = np.mean([
+        linha_mgf["Home_Abrir_Placar"],
+        linha_exg["Home_Abrir_Placar"],
+        linha_vg["Home_Abrir_Placar"]
+    ])
+
+    away_abrir_consenso = np.mean([
+        linha_mgf["Away_Abrir_Placar"],
+        linha_exg["Away_Abrir_Placar"],
+        linha_vg["Away_Abrir_Placar"]
+    ])
+
+    clean_home_consenso = np.mean([
+        linha_mgf["Clean_Sheet_Home_%"],
+        linha_exg["Clean_Sheet_Home_%"],
+        linha_vg["Clean_Sheet_Home_%"]
+    ])
+
+    clean_away_consenso = np.mean([
+        linha_mgf["Clean_Sheet_Away_%"],
+        linha_exg["Clean_Sheet_Away_%"],
+        linha_vg["Clean_Sheet_Away_%"]
+    ])
+
+    # =========================================================
+    # 🧠 SINAIS CONSENSO POISSON
+    # =========================================================
+
+    estrutura = []
+    mercado = []
+    direcao = []
+
+    for s in [sinais_mgf, sinais_exg, sinais_vg]:
+
+        estrutura += s[0]
+        mercado += s[1]
+        direcao += s[2]
+
+    estrutura = list(set(estrutura))
+    mercado = list(set(mercado))
+    direcao = list(set(direcao))
+
+    # =========================================================
     # 🧠 PERFIL TÁTICO AUTOMÁTICO
     # =========================================================
     def perfil_tatico(
@@ -3856,87 +3939,6 @@ with tab8:
             unsafe_allow_html=True
         )
 
-    # =========================================================
-    # 🔥 HT DATA
-    # =========================================================
-
-    jogo_ht = df_ht[df_ht["JOGO"] == jogo]
-
-    if not jogo_ht.empty:
-
-        linha_ht = jogo_ht.iloc[0]
-
-    else:
-
-        linha_ht = pd.Series(dtype=float)
-
-    # =========================================================
-    # 👾📡 CS ENGINE V2 — SKYNET OPERATIONAL CORE
-    # =========================================================
-
-    st.markdown("## 👾📡 CS ENGINE")
-    
-        # =========================================================
-    # 🔥 LINHA CONSENSO
-    # =========================================================
-
-    jogo_consenso = df_consenso[
-        df_consenso["JOGO"] == jogo
-    ]
-
-    if not jogo_consenso.empty:
-
-        linha_consenso = jogo_consenso.iloc[0]
-
-    else:
-
-        linha_consenso = pd.Series(dtype=float)
-
-    # =========================================================
-    # 🧠 CONSENSOS BASE
-    # =========================================================
-
-    home_abrir_consenso = np.mean([
-        linha_mgf["Home_Abrir_Placar"],
-        linha_exg["Home_Abrir_Placar"],
-        linha_vg["Home_Abrir_Placar"]
-    ])
-
-    away_abrir_consenso = np.mean([
-        linha_mgf["Away_Abrir_Placar"],
-        linha_exg["Away_Abrir_Placar"],
-        linha_vg["Away_Abrir_Placar"]
-    ])
-
-    clean_home_consenso = np.mean([
-        linha_mgf["Clean_Sheet_Home_%"],
-        linha_exg["Clean_Sheet_Home_%"],
-        linha_vg["Clean_Sheet_Home_%"]
-    ])
-
-    clean_away_consenso = np.mean([
-        linha_mgf["Clean_Sheet_Away_%"],
-        linha_exg["Clean_Sheet_Away_%"],
-        linha_vg["Clean_Sheet_Away_%"]
-    ])
-
-    # =========================================================
-    # 🧠 SINAIS CONSENSO POISSON
-    # =========================================================
-
-    estrutura = []
-    mercado = []
-    direcao = []
-
-    for s in [sinais_mgf, sinais_exg, sinais_vg]:
-
-        estrutura += s[0]
-        mercado += s[1]
-        direcao += s[2]
-
-    estrutura = list(set(estrutura))
-    mercado = list(set(mercado))
-    direcao = list(set(direcao))
 
     # =========================================================
     # ⚡ SCORE TEMPORAL GLOBAL
