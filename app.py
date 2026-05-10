@@ -3553,7 +3553,7 @@ with tab8:
     mercado = list(set(mercado))
     direcao = list(set(direcao))
 
-        # =========================================================
+    # =========================================================
     # 🧠 PERFIL TÁTICO CARD SIMPLES
     # =========================================================
     def perfil_tatico_card(
@@ -3561,8 +3561,7 @@ with tab8:
         score,
         perfil,
         leitura,
-        operacional,
-        escudo
+        operacional
     ):
 
         # =====================================================
@@ -3604,10 +3603,7 @@ with tab8:
 <div style="
     display:flex;
     align-items:center;
-    gap:12px;
 ">
-
-<img src="data:image/png;base64,{escudo}" width="52">
 
 <div>
 
@@ -3929,25 +3925,22 @@ with tab8:
     with c1:
 
         perfil_tatico_card(
-            home,
-            score_home,
-            perfil_home_nome,
-            leitura_home,
-            operacional_home,
-            escudo_home64
+            nome=home,
+            score=score_home,
+            perfil=perfil_home_nome,
+            leitura=leitura_home,
+            operacional=operacional_home
         )
 
     with c2:
 
         perfil_tatico_card(
-            away,
-            score_away,
-            perfil_away_nome,
-            leitura_away,
-            operacional_away,
-            escudo_away64
+            nome=away,
+            score=score_away,
+            perfil=perfil_away_nome,
+            leitura=leitura_away,
+            operacional=operacional_away
         )
-
 
     # =========================================================
     # ⚡ SCORE TEMPORAL GLOBAL
