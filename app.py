@@ -3915,13 +3915,9 @@ with tab8:
     # 🔥 PISO OPERACIONAL
     # =========================================================
 
-    if (
-        linha_ht.get("Prob_Gol_HT", 0) >= 65 and
-        linha_consenso["Score_Ofensivo"] >= 75
-    ):
-
+    if score_l00 >= 30:
         score_l00 = max(score_l00, 55)
-
+        
         motivos_l00.append(
             "🔥 Cenário ofensivo forte impede classificação 'Evitar'"
         )
