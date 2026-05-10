@@ -3553,116 +3553,11 @@ with tab8:
     mercado = list(set(mercado))
     direcao = list(set(direcao))
 
+        # =========================================================
+    # 🧠 PERFIL TÁTICO AUTOMÁTICO
     # =========================================================
-    # 🧠 PERFIL TÁTICO CARD SIMPLES
-    # =========================================================
-    def perfil_tatico_card(
-        nome,
-        score,
-        perfil,
-        leitura,
-        operacional
-    ):
 
-        # =====================================================
-        # 🎨 COR
-        # =====================================================
-
-        if score <= 25:
-
-            cor = "#7f1d1d"
-
-        elif score <= 50:
-
-            cor = "#92400e"
-
-        elif score <= 70:
-
-            cor = "#1e3a8a"
-
-        else:
-
-            cor = "#166534"
-
-        # =====================================================
-        # 🧠 TEXTO
-        # =====================================================
-
-        leitura_txt = " / ".join(leitura[:4])
-
-        st.markdown(
-            f"""
-<div style="
-    background:{cor};
-    padding:16px;
-    border-radius:14px;
-    color:white;
-    margin-bottom:12px;
-">
-
-<div style="
-    display:flex;
-    align-items:center;
-">
-
-<div>
-
-<div style="
-    font-size:20px;
-    font-weight:700;
-">
-{nome}
-</div>
-
-<div style="
-    font-size:15px;
-    opacity:0.9;
-">
-{perfil}
-</div>
-
-</div>
-
-<div style="
-    margin-left:auto;
-    font-size:28px;
-    font-weight:800;
-">
-{score}/100
-</div>
-
-</div>
-
-<hr style="
-    border:1px solid rgba(255,255,255,0.15);
-">
-
-<div style="
-    font-size:14px;
-    line-height:1.6;
-">
-
-{leitura_txt}
-
-</div>
-
-<div style="
-    margin-top:10px;
-    font-size:14px;
-    background:rgba(255,255,255,0.10);
-    padding:8px;
-    border-radius:8px;
-">
-
-🧠 {operacional}
-
-</div>
-
-</div>
-""",
-            unsafe_allow_html=True
-        )
-
+    st.markdown("## 🧠 PERFIL TÁTICO AUTOMÁTICO")
 
     # =========================================================
     # 🧠 PERFIL HOME
@@ -3675,7 +3570,7 @@ with tab8:
     perfil_home_nome = "⚖️ Equilibrado"
 
     operacional_home = (
-        "👉 sem tendência tática dominante"
+        "sem tendência tática dominante"
     )
 
     if clean_home_consenso >= 55:
@@ -3746,7 +3641,7 @@ with tab8:
         )
 
         operacional_home = (
-            "👉 tende a controlar vantagem após marcar"
+            "tende a controlar vantagem após marcar"
         )
 
     elif home_abrir_consenso >= 60:
@@ -3756,7 +3651,7 @@ with tab8:
         )
 
         operacional_home = (
-            "👉 perigoso principalmente antes dos 30'"
+            "perigoso principalmente antes dos 30'"
         )
 
     elif (
@@ -3769,7 +3664,7 @@ with tab8:
         )
 
         operacional_home = (
-            "👉 cresce ofensivamente no 2T"
+            "cresce ofensivamente no 2T"
         )
 
     elif linha_consenso["Odd_BTTS_YES"] <= 1.70:
@@ -3779,14 +3674,13 @@ with tab8:
         )
 
         operacional_home = (
-            "👉 tendência a jogos abertos"
+            "tendência a jogos abertos"
         )
 
     score_home = min(
         round(score_home),
         100
     )
-
 
     # =========================================================
     # 🧠 PERFIL AWAY
@@ -3799,7 +3693,7 @@ with tab8:
     perfil_away_nome = "⚖️ Equilibrado"
 
     operacional_away = (
-        "👉 sem tendência tática dominante"
+        "sem tendência tática dominante"
     )
 
     if clean_away_consenso >= 55:
@@ -3870,7 +3764,7 @@ with tab8:
         )
 
         operacional_away = (
-            "👉 tende a controlar vantagem após marcar"
+            "tende a controlar vantagem após marcar"
         )
 
     elif away_abrir_consenso >= 55:
@@ -3880,7 +3774,7 @@ with tab8:
         )
 
         operacional_away = (
-            "👉 perigoso principalmente antes dos 30'"
+            "perigoso principalmente antes dos 30'"
         )
 
     elif (
@@ -3893,7 +3787,7 @@ with tab8:
         )
 
         operacional_away = (
-            "👉 cresce ofensivamente no 2T"
+            "cresce ofensivamente no 2T"
         )
 
     elif linha_consenso["Odd_BTTS_YES"] <= 1.70:
@@ -3903,7 +3797,7 @@ with tab8:
         )
 
         operacional_away = (
-            "👉 tendência a jogos abertos"
+            "tendência a jogos abertos"
         )
 
     score_away = min(
@@ -3911,36 +3805,55 @@ with tab8:
         100
     )
 
-
     # =========================================================
     # 🚀 RENDER
     # =========================================================
-
-    st.markdown(
-        "## 🧠 PERFIL TÁTICO AUTOMÁTICO"
-    )
 
     c1, c2 = st.columns(2)
 
     with c1:
 
-        perfil_tatico_card(
-            nome=home,
-            score=score_home,
-            perfil=perfil_home_nome,
-            leitura=leitura_home,
-            operacional=operacional_home
-        )
+        with st.container(border=True):
+
+            st.markdown(
+                f"### {home}"
+            )
+
+            st.metric(
+                label="Perfil Tático",
+                value=perfil_home_nome,
+                delta=f"{score_home}/100"
+            )
+
+            for item in leitura_home[:4]:
+
+                st.write(item)
+
+            st.caption(
+                f"🧠 {operacional_home}"
+            )
 
     with c2:
 
-        perfil_tatico_card(
-            nome=away,
-            score=score_away,
-            perfil=perfil_away_nome,
-            leitura=leitura_away,
-            operacional=operacional_away
-        )
+        with st.container(border=True):
+
+            st.markdown(
+                f"### {away}"
+            )
+
+            st.metric(
+                label="Perfil Tático",
+                value=perfil_away_nome,
+                delta=f"{score_away}/100"
+            )
+
+            for item in leitura_away[:4]:
+
+                st.write(item)
+
+            st.caption(
+                f"🧠 {operacional_away}"
+            )
 
     # =========================================================
     # ⚡ SCORE TEMPORAL GLOBAL
