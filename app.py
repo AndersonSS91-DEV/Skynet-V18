@@ -4134,13 +4134,17 @@ with tab8:
 
     st.markdown("### 📊 Ranking CS")
 
-    for cs in ranking_cs[1:]:
+        if cs["score"] < 40:
 
-        risco_txt = (
-            cs["riscos"][0]
-            if cs["riscos"]
-            else "✔ Cenário operacional saudável"
-        )
+            risco_txt = "🔴 Evitar operação"
+
+        elif cs["riscos"]:
+
+            risco_txt = cs["riscos"][0]
+
+        else:
+
+            risco_txt = "✔ Cenário operacional saudável"
 
         st.info(
             f"""
