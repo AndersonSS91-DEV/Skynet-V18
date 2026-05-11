@@ -4958,7 +4958,7 @@ for jogo in jogos:
 
             eficiencia=linha_consenso["Eficiência_H"],
 
-            clean_sheet=linha_consenso["Clean_Sheet_H"],
+            clean_sheet=linha_consenso["Clean_Sheet_Home_Consenso"],
 
             fs_win=linha_consenso["FS_Win_H"],
 
@@ -5000,7 +5000,7 @@ for jogo in jogos:
 
             eficiencia=linha_consenso["Eficiência_A"],
 
-            clean_sheet=linha_consenso["Clean_Sheet_A"],
+            clean_sheet=linha_consenso["Clean_Sheet_Away_Consenso"],
 
             fs_win=linha_consenso["FS_Win_A"],
 
@@ -5093,7 +5093,7 @@ for jogo in jogos:
         if linha_consenso["Home_Abrir_Placar"] >= 65:
             score_l01 += 20
 
-        if linha_consenso["Clean_Sheet_H"] >= 55:
+        if linha_consenso["Clean_Sheet_Home_Consenso"] >= 55:
             score_l01 += 15
 
         if linha_consenso["FS_Win_H"] >= 60:
@@ -5176,7 +5176,7 @@ for jogo in jogos:
         if linha_consenso["Clean_Sheet_H"] >= 55:
             score_l22 += 15
 
-        if linha_consenso["Clean_Sheet_A"] >= 55:
+        if linha_consenso["Clean_Sheet_Away_Consenso"] >= 55:
             score_l22 += 15
 
         if linha_consenso["Odd_BTTS_YES"] >= 1.95:
