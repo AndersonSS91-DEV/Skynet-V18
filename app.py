@@ -4905,32 +4905,63 @@ st.markdown("## 📋 Scanner Operacional CS")
 lista_cs = []
 
 # =========================================================
-# 🔄 TODOS OS JOGOS
+# 🔄 LOOP GLOBAL
 # =========================================================
 
-for _, row in df_consenso.iterrows():
+for _, row in df_mgf.iterrows():
 
     try:
 
-        home = row["Home_Team"]
-        away = row["Visitor_Team"]
+        # =================================================
+        # ⚽ JOGO
+        # =================================================
+
+        jogo_nome = row["JOGO"]
+
+        home = row.get("Home_Team", "")
+
+        away = row.get(
+            "Visitor_Team",
+            row.get("Away_Team", "")
+        )
 
         # =================================================
-        # 🧠 SCORE
+        # 🔥 CONSENSO
+        # =================================================
+
+        consenso_match = df_consenso[
+            df_consenso["JOGO"] == jogo_nome
+        ]
+
+        if consenso_match.empty:
+            continue
+
+        linha_consenso = consenso_match.iloc[0]
+
+        # =================================================
+        # 🧠 SCORE HOME
         # =================================================
 
         score_home = round(np.mean([
 
-            row["Eficiência_H"],
-            row["FS_Win_H"],
+            linha_consenso["Eficiência_H"],
+
+            linha_consenso["FS_Win_H"],
+
             row["Score_Ofensivo"]
 
         ]), 1)
 
+        # =================================================
+        # 🧠 SCORE AWAY
+        # =================================================
+
         score_away = round(np.mean([
 
-            row["Eficiência_A"],
-            row["FS_Win_A"],
+            linha_consenso["Eficiência_A"],
+
+            linha_consenso["FS_Win_A"],
+
             row["Score_Ofensivo"]
 
         ]), 1)
@@ -4967,13 +4998,17 @@ for _, row in df_consenso.iterrows():
             return "⚖️ Médio"
 
         bloco_home = bloco(
-            row["GF_0-15_Home"],
-            row["GF_76-90_Home"]
+
+            linha_consenso["GF_0-15_Home"],
+
+            linha_consenso["GF_76-90_Home"]
         )
 
         bloco_away = bloco(
-            row["GF_0-15_Away"],
-            row["GF_76-90_Away"]
+
+            linha_consenso["GF_0-15_Away"],
+
+            linha_consenso["GF_76-90_Away"]
         )
 
         # =================================================
@@ -4981,19 +5016,19 @@ for _, row in df_consenso.iterrows():
         # =================================================
 
         pontos_home = (
-            f"⚔ {row['Eficiência_H']:.0f} | "
+            f"⚔ {linha_consenso['Eficiência_H']:.0f} | "
             f"🎯 {row['Score_Ofensivo']:.0f} | "
-            f"🌊 {row['FS_Win_H']:.0f}"
+            f"🌊 {linha_consenso['FS_Win_H']:.0f}"
         )
 
         pontos_away = (
-            f"⚔ {row['Eficiência_A']:.0f} | "
+            f"⚔ {linha_consenso['Eficiência_A']:.0f} | "
             f"🎯 {row['Score_Ofensivo']:.0f} | "
-            f"🌊 {row['FS_Win_A']:.0f}"
+            f"🌊 {linha_consenso['FS_Win_A']:.0f}"
         )
 
         # =================================================
-        # 🥇 MELHOR CS
+        # 🎯 CS SCORE
         # =================================================
 
         cs_scores = {
@@ -5002,15 +5037,15 @@ for _, row in df_consenso.iterrows():
                 row["Score_Ofensivo"],
 
             "Lay 0x1":
-                row["FS_Win_H"],
+                linha_consenso["FS_Win_H"],
 
             "Lay 1x0":
-                row["Changer_A"],
+                linha_consenso["Changer_A"],
 
             "Lay 2x2":
                 (
-                    row["Clean_Sheet_Home_%"] +
-                    row["Clean_Sheet_Away_%"]
+                    linha_consenso["Clean_Sheet_Home_%"] +
+                    linha_consenso["Clean_Sheet_Away_%"]
                 ) / 2
         }
 
@@ -5063,24 +5098,30 @@ for _, row in df_consenso.iterrows():
                 pontos_away,
 
             "MELHOR CS":
-                f"{melhor_cs[0]} ({melhor_cs[1]:.1f})",
+                f"{melhor_cs[0]} "
+                f"({melhor_cs[1]:.1f})",
 
             "JANELA":
                 "30-60",
 
             "DADOS CS":
-                "✔ Estrutura forte | ✔ Pressão",
+                "✔ Estrutura forte | "
+                "✔ Pressão ofensiva",
 
             "OPERACIONAL":
                 "🔥 Entrada favorável",
 
             "PRÓXIMO CS":
-                f"{prox_cs[0]} ({prox_cs[1]:.1f})"
+                f"{prox_cs[0]} "
+                f"({prox_cs[1]:.1f})"
         })
 
-    except:
+    except Exception as e:
 
-        pass
+        st.write(
+            f"Erro em {jogo_nome}:",
+            e
+        )
 
 # =========================================================
 # 📊 DATAFRAME FINAL
@@ -5092,7 +5133,9 @@ df_lista_cs = pd.DataFrame(lista_cs)
 # 🔎 BUSCA
 # =========================================================
 
-busca = st.text_input("Buscar Time")
+busca = st.text_input(
+    "Buscar Time"
+)
 
 if busca:
 
@@ -5120,7 +5163,7 @@ if busca:
     ]
 
 # =========================================================
-# 📊 EXIBIR
+# 📊 EXIBIÇÃO
 # =========================================================
 
 st.dataframe(
