@@ -4895,8 +4895,6 @@ with tab8:
 """
         )
        
-
-
 # =========================================================
 # 📋 SCANNER OPERACIONAL CS
 # =========================================================
@@ -4949,6 +4947,15 @@ for jogo in jogos:
         away = linha_exg["Visitor_Team"]
 
         # =================================================
+        # 🧠 SCORE OFENSIVO
+        # =================================================
+
+        score_ofensivo = linha_consenso.get(
+            "Score_Ofensivo",
+            50
+        )
+
+        # =================================================
         # 🧠 PERFIL HOME
         # =================================================
 
@@ -4958,13 +4965,17 @@ for jogo in jogos:
 
             eficiencia=linha_consenso["Eficiência_H"],
 
-            clean_sheet=linha_consenso["Clean_Sheet_Home_Consenso"],
+            clean_sheet=linha_consenso[
+                "Clean_Sheet_Home_Consenso"
+            ],
 
             fs_win=linha_consenso["FS_Win_H"],
 
             changer=linha_consenso["Changer_H"],
 
-            abrir_placar=linha_consenso["Home_Abrir_Placar_Consenso"],
+            abrir_placar=linha_consenso[
+                "Home_Abrir_Placar_Consenso"
+            ],
 
             ns_games=linha_consenso["NS_Games_H"],
 
@@ -4987,7 +4998,7 @@ for jogo in jogos:
 
             odd_btts=linha_consenso["Odd_BTTS_YES"],
 
-            score_ofensivo=linha_exg["Score_Ofensivo"]
+            score_ofensivo=score_ofensivo
         )
 
         # =================================================
@@ -5000,13 +5011,17 @@ for jogo in jogos:
 
             eficiencia=linha_consenso["Eficiência_A"],
 
-            clean_sheet=linha_consenso["Clean_Sheet_Away_Consenso"],
+            clean_sheet=linha_consenso[
+                "Clean_Sheet_Away_Consenso"
+            ],
 
             fs_win=linha_consenso["FS_Win_A"],
 
             changer=linha_consenso["Changer_A"],
 
-            abrir_placar=linha_consenso["Away_Abrir_Placar_Consenso"],
+            abrir_placar=linha_consenso[
+                "Away_Abrir_Placar_Consenso"
+            ],
 
             ns_games=linha_consenso["NS_Games_A"],
 
@@ -5029,7 +5044,7 @@ for jogo in jogos:
 
             odd_btts=linha_consenso["Odd_BTTS_YES"],
 
-            score_ofensivo=linha_exg["Score_Ofensivo"]
+            score_ofensivo=score_ofensivo
         )
 
         # =================================================
@@ -5044,23 +5059,31 @@ for jogo in jogos:
 
         score_l00 = 0
 
-        if linha_exg["Score_Ofensivo"] >= 75:
+        if score_ofensivo >= 75:
             score_l00 += 20
 
         if linha_consenso["Odd_BTTS_YES"] <= 1.80:
             score_l00 += 15
 
-        if linha_consenso["Home_Abrir_Placar_Consenso"] >= 60:
+        if linha_consenso[
+            "Home_Abrir_Placar_Consenso"
+        ] >= 60:
+
             score_l00 += 15
 
-        if linha_consenso["Away_Abrir_Placar_Consenso"] >= 45:
+        if linha_consenso[
+            "Away_Abrir_Placar_Consenso"
+        ] >= 45:
+
             score_l00 += 10
 
         ranking_cs.append({
 
-            "mercado": "Lay 0x0",
+            "mercado":
+                "Lay 0x0",
 
-            "score": score_l00,
+            "score":
+                score_l00,
 
             "confianca":
                 round(
@@ -5068,7 +5091,8 @@ for jogo in jogos:
                     1
                 ),
 
-            "janela": "0-30",
+            "janela":
+                "0-30",
 
             "operacional":
                 "⚡ Entrada early",
@@ -5087,10 +5111,16 @@ for jogo in jogos:
 
         score_l01 = 0
 
-        if linha_consenso["Home_Abrir_Placar_Consenso"] >= 65:
+        if linha_consenso[
+            "Home_Abrir_Placar_Consenso"
+        ] >= 65:
+
             score_l01 += 20
 
-        if linha_consenso["Clean_Sheet_Home_Consenso"] >= 55:
+        if linha_consenso[
+            "Clean_Sheet_Home_Consenso"
+        ] >= 55:
+
             score_l01 += 15
 
         if linha_consenso["FS_Win_H"] >= 60:
@@ -5098,9 +5128,11 @@ for jogo in jogos:
 
         ranking_cs.append({
 
-            "mercado": "Lay 0x1",
+            "mercado":
+                "Lay 0x1",
 
-            "score": score_l01,
+            "score":
+                score_l01,
 
             "confianca":
                 round(
@@ -5108,7 +5140,8 @@ for jogo in jogos:
                     1
                 ),
 
-            "janela": "30-60",
+            "janela":
+                "30-60",
 
             "operacional":
                 "🔥 Pressão progressiva",
@@ -5130,14 +5163,19 @@ for jogo in jogos:
         if linha_consenso["Changer_A"] >= 35:
             score_l10 += 20
 
-        if linha_consenso["Away_Abrir_Placar_Consenso"] >= 45:
+        if linha_consenso[
+            "Away_Abrir_Placar_Consenso"
+        ] >= 45:
+
             score_l10 += 15
 
         ranking_cs.append({
 
-            "mercado": "Lay 1x0",
+            "mercado":
+                "Lay 1x0",
 
-            "score": score_l10,
+            "score":
+                score_l10,
 
             "confianca":
                 round(
@@ -5145,7 +5183,8 @@ for jogo in jogos:
                     1
                 ),
 
-            "janela": "45-75",
+            "janela":
+                "45-75",
 
             "operacional":
                 "⚡ Pressão away",
@@ -5164,10 +5203,16 @@ for jogo in jogos:
 
         score_l22 = 0
 
-        if linha_consenso["Clean_Sheet_Home_Consenso"] >= 55:
+        if linha_consenso[
+            "Clean_Sheet_Home_Consenso"
+        ] >= 55:
+
             score_l22 += 15
 
-        if linha_consenso["Clean_Sheet_Away_Consenso"] >= 55:
+        if linha_consenso[
+            "Clean_Sheet_Away_Consenso"
+        ] >= 55:
+
             score_l22 += 15
 
         if linha_consenso["Odd_BTTS_YES"] >= 1.95:
@@ -5175,9 +5220,11 @@ for jogo in jogos:
 
         ranking_cs.append({
 
-            "mercado": "Lay 2x2",
+            "mercado":
+                "Lay 2x2",
 
-            "score": score_l22,
+            "score":
+                score_l22,
 
             "confianca":
                 round(
@@ -5185,7 +5232,8 @@ for jogo in jogos:
                     1
                 ),
 
-            "janela": "30-60",
+            "janela":
+                "30-60",
 
             "operacional":
                 "🛡 Controle placar",
@@ -5221,9 +5269,11 @@ for jogo in jogos:
 
         lista_cs.append({
 
-            "HOME": home,
+            "HOME":
+                home,
 
-            "AWAY": away,
+            "AWAY":
+                away,
 
             "PERFIL HOME":
                 perfil_home["perfil"],
@@ -5339,3 +5389,4 @@ st.dataframe(
 
     hide_index=True
 )
+
