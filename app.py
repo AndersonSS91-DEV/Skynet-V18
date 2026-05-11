@@ -4896,189 +4896,434 @@ with tab8:
         )
 
 
-
 # =========================================================
-# 📊 LISTA FINAL CS OPERACIONAL
+# 🌍 SCANNER GLOBAL CS
 # =========================================================
 
 st.markdown("## 📋 Scanner Operacional CS")
 
-# =====================================================
-# 🧠 DADOS HOME
-# =====================================================
+lista_cs = []
 
-perfil_home_txt = (
-    f"{perfil_home['perfil']} "
-    f"({perfil_home['score']}/100)"
-)
+# =========================================================
+# 🔄 LOOP TODOS OS JOGOS
+# =========================================================
 
-bloco_home = perfil_home["bloco"]
+for _, jogo_row in df_filtrado.iterrows():
 
-pontos_home = " | ".join(
-    perfil_home["leitura"][:4]
-)
+    try:
 
-operacional_home = perfil_home["operacional"]
+        # =================================================
+        # ⚽ JOGO
+        # =================================================
 
-# =====================================================
-# 🧠 DADOS AWAY
-# =====================================================
+        home = jogo_row["Home_Team"]
+        away = jogo_row["Away_Team"]
 
-perfil_away_txt = (
-    f"{perfil_away['perfil']} "
-    f"({perfil_away['score']}/100)"
-)
+        jogo_nome = f"{home} x {away}"
 
-bloco_away = perfil_away["bloco"]
+        # =================================================
+        # 🔥 CONSENSO
+        # =================================================
 
-pontos_away = " | ".join(
-    perfil_away["leitura"][:4]
-)
+        jogo_consenso = df_consenso[
+            df_consenso["JOGO"] == jogo_nome
+        ]
 
-operacional_away = perfil_away["operacional"]
+        if jogo_consenso.empty:
 
-# =====================================================
-# 🥇 MELHOR CS
-# =====================================================
+            continue
 
-melhor_cs_txt = (
-    f"{melhor_cs['mercado']} "
-    f"— Score {melhor_cs['score']} "
-    f"({melhor_cs['confianca']}%)"
-)
+        linha_consenso = jogo_consenso.iloc[0]
 
-melhor_cs_dados = " | ".join(
-    melhor_cs["motivos"][:2]
-)
+        # =================================================
+        # 🔥 MÉDIAS BASE
+        # =================================================
 
-# =====================================================
-# 🥈 PRÓXIMO CS
-# =====================================================
+        home_abrir_consenso = np.mean([
 
-proximo_cs = ranking_cs[1]
+            linha_consenso["Home_Abrir_Placar"]
 
-proximo_cs_txt = (
-    f"{proximo_cs['mercado']} "
-    f"— Score {proximo_cs['score']} "
-    f"({proximo_cs['confianca']}%)"
-)
+        ])
 
-# =====================================================
+        away_abrir_consenso = np.mean([
+
+            linha_consenso["Away_Abrir_Placar"]
+
+        ])
+
+        clean_home_consenso = np.mean([
+
+            linha_consenso["Clean_Sheet_Home_%"]
+
+        ])
+
+        clean_away_consenso = np.mean([
+
+            linha_consenso["Clean_Sheet_Away_%"]
+
+        ])
+
+        # =================================================
+        # 🧠 PERFIL TÁTICO HOME
+        # =================================================
+
+        perfil_home = gerar_perfil_tatico(
+
+            time=home,
+
+            eficiencia=linha_consenso["Eficiência_H"],
+
+            clean_sheet=clean_home_consenso,
+
+            fs_win=linha_consenso["FS_Win_H"],
+
+            changer=linha_consenso["Changer_H"],
+
+            abrir_placar=home_abrir_consenso,
+
+            ns_games=linha_consenso["NS_Games_H"],
+
+            gf_early=(
+                linha_consenso["GF_0-15_Home"] +
+                linha_consenso["GF_16-30_Home"]
+            ),
+
+            gf_mid=(
+                linha_consenso["GF_31-45_Home"] +
+                linha_consenso["GF_46-60_Home"]
+            ),
+
+            gf_late=(
+                linha_consenso["GF_61-75_Home"] +
+                linha_consenso["GF_76-90_Home"]
+            ),
+
+            gc_total=linha_consenso["MGC_H"],
+
+            odd_btts=linha_consenso["Odd_BTTS_YES"],
+
+            score_ofensivo=linha_consenso["Score_Ofensivo"]
+        )
+
+        # =================================================
+        # 🧠 PERFIL TÁTICO AWAY
+        # =================================================
+
+        perfil_away = gerar_perfil_tatico(
+
+            time=away,
+
+            eficiencia=linha_consenso["Eficiência_A"],
+
+            clean_sheet=clean_away_consenso,
+
+            fs_win=linha_consenso["FS_Win_A"],
+
+            changer=linha_consenso["Changer_A"],
+
+            abrir_placar=away_abrir_consenso,
+
+            ns_games=linha_consenso["NS_Games_A"],
+
+            gf_early=(
+                linha_consenso["GF_0-15_Away"] +
+                linha_consenso["GF_16-30_Away"]
+            ),
+
+            gf_mid=(
+                linha_consenso["GF_31-45_Away"] +
+                linha_consenso["GF_46-60_Away"]
+            ),
+
+            gf_late=(
+                linha_consenso["GF_61-75_Away"] +
+                linha_consenso["GF_76-90_Away"]
+            ),
+
+            gc_total=linha_consenso["MGC_A"],
+
+            odd_btts=linha_consenso["Odd_BTTS_YES"],
+
+            score_ofensivo=linha_consenso["Score_Ofensivo"]
+        )
+
+        # =================================================
+        # 🥇 MELHOR CS
+        # =================================================
+
+        ranking_cs = []
+
+        # =================================================
+        # 🔥 LAY 0x0
+        # =================================================
+
+        score_l00 = 0
+
+        if linha_consenso["Score_Ofensivo"] >= 75:
+            score_l00 += 20
+
+        if linha_consenso["Odd_BTTS_YES"] <= 1.80:
+            score_l00 += 15
+
+        if home_abrir_consenso >= 60:
+            score_l00 += 15
+
+        if away_abrir_consenso >= 45:
+            score_l00 += 10
+
+        ranking_cs.append({
+
+            "mercado": "Lay 0x0",
+
+            "score": score_l00,
+
+            "confianca": round(
+                min(score_l00 * 1.1, 99),
+                1
+            ),
+
+            "janela": "0-30",
+
+            "operacional":
+                "⚡ Entrada early favorável",
+
+            "motivos": [
+
+                "✔ Forte pressão ofensiva",
+
+                "✔ Tendência alta de gol"
+
+            ]
+        })
+
+        # =================================================
+        # 🔥 LAY 0x1
+        # =================================================
+
+        score_l01 = 0
+
+        if home_abrir_consenso >= 65:
+            score_l01 += 20
+
+        if clean_home_consenso >= 55:
+            score_l01 += 15
+
+        if linha_consenso["FS_Win_H"] >= 60:
+            score_l01 += 15
+
+        ranking_cs.append({
+
+            "mercado": "Lay 0x1",
+
+            "score": score_l01,
+
+            "confianca": round(
+                min(score_l01 * 1.1, 99),
+                1
+            ),
+
+            "janela": "30-60",
+
+            "operacional":
+                "🔥 Entrada após domínio progressivo",
+
+            "motivos": [
+
+                "✔ Home dominante",
+
+                "✔ Forte tendência de pressão"
+
+            ]
+        })
+
+        # =================================================
+        # 🔥 LAY 1x0
+        # =================================================
+
+        score_l10 = 0
+
+        if linha_consenso["Changer_A"] >= 35:
+            score_l10 += 20
+
+        if away_abrir_consenso >= 45:
+            score_l10 += 15
+
+        ranking_cs.append({
+
+            "mercado": "Lay 1x0",
+
+            "score": score_l10,
+
+            "confianca": round(
+                min(score_l10 * 1.1, 99),
+                1
+            ),
+
+            "janela": "45-75",
+
+            "operacional":
+                "⚡ Entrada após pressão away",
+
+            "motivos": [
+
+                "✔ Away reage bem",
+
+                "✔ Home vulnerável"
+
+            ]
+        })
+
+        # =================================================
+        # 🔥 LAY 2x2
+        # =================================================
+
+        score_l22 = 0
+
+        if clean_home_consenso >= 55:
+            score_l22 += 15
+
+        if clean_away_consenso >= 55:
+            score_l22 += 15
+
+        if linha_consenso["Odd_BTTS_YES"] >= 1.95:
+            score_l22 += 15
+
+        ranking_cs.append({
+
+            "mercado": "Lay 2x2",
+
+            "score": score_l22,
+
+            "confianca": round(
+                min(score_l22 * 1.1, 99),
+                1
+            ),
+
+            "janela": "30-60",
+
+            "operacional":
+                "🛡 Controle de placar",
+
+            "motivos": [
+
+                "✔ Estrutura defensiva forte",
+
+                "✔ Baixa tendência de caos"
+
+            ]
+        })
+
+        # =================================================
+        # 📊 ORDENAR
+        # =================================================
+
+        ranking_cs = sorted(
+
+            ranking_cs,
+
+            key=lambda x: x["score"],
+
+            reverse=True
+        )
+
+        melhor_cs = ranking_cs[0]
+
+        proximo_cs = ranking_cs[1]
+
+        # =================================================
+        # 📊 LINHA FINAL
+        # =================================================
+
+        lista_cs.append({
+
+            "HOME":
+                home,
+
+            "AWAY":
+                away,
+
+            "PERFIL HOME":
+                perfil_home["perfil"],
+
+            "SCORE HOME":
+                perfil_home["score"],
+
+            "BLOCO HOME":
+                perfil_home["bloco"],
+
+            "PONTOS HOME":
+                " | ".join(
+                    perfil_home["leitura"][:3]
+                ),
+
+            "OPERACIONAL HOME":
+                perfil_home["operacional"],
+
+            "PERFIL AWAY":
+                perfil_away["perfil"],
+
+            "SCORE AWAY":
+                perfil_away["score"],
+
+            "BLOCO AWAY":
+                perfil_away["bloco"],
+
+            "PONTOS AWAY":
+                " | ".join(
+                    perfil_away["leitura"][:3]
+                ),
+
+            "OPERACIONAL AWAY":
+                perfil_away["operacional"],
+
+            "MELHOR CS":
+                f"{melhor_cs['mercado']} "
+                f"— Score {melhor_cs['score']} "
+                f"({melhor_cs['confianca']}%)",
+
+            "JANELA":
+                melhor_cs["janela"],
+
+            "DADOS CS":
+                " | ".join(
+                    melhor_cs["motivos"][:2]
+                ),
+
+            "OPERACIONAL CS":
+                melhor_cs["operacional"],
+
+            "PRÓXIMO CS":
+                f"{proximo_cs['mercado']} "
+                f"— Score {proximo_cs['score']} "
+                f"({proximo_cs['confianca']}%)"
+        })
+
+    except:
+
+        pass
+
+# =========================================================
 # 📊 DATAFRAME FINAL
-# =====================================================
+# =========================================================
 
-df_operacional_cs = pd.DataFrame([{
+df_lista_cs = pd.DataFrame(lista_cs)
 
-    # =================================================
-    # ⚽ JOGO
-    # =================================================
+# =========================================================
+# 🔎 BUSCA
+# =========================================================
 
-    "HOME": home,
-    "AWAY": away,
-
-    # =================================================
-    # 🧠 PERFIL HOME
-    # =================================================
-
-    "PERFIL HOME": perfil_home_txt,
-
-    "BLOCO HOME": bloco_home,
-
-    "PONTOS HOME": pontos_home,
-
-    "OPERACIONAL HOME": operacional_home,
-
-    # =================================================
-    # 🧠 PERFIL AWAY
-    # =================================================
-
-    "PERFIL AWAY": perfil_away_txt,
-
-    "BLOCO AWAY": bloco_away,
-
-    "PONTOS AWAY": pontos_away,
-
-    "OPERACIONAL AWAY": operacional_away,
-
-    # =================================================
-    # 🥇 MELHOR CS
-    # =================================================
-
-    "MELHOR CS": melhor_cs_txt,
-
-    "JANELA": melhor_cs["janela"],
-
-    "DADOS CS": melhor_cs_dados,
-
-    "OPERACIONAL CS": melhor_cs["operacional"],
-
-    # =================================================
-    # 🥈 PRÓXIMO CS
-    # =================================================
-
-    "PRÓXIMO CS": proximo_cs_txt
-
-}])
-
-# =====================================================
-# 🔥 FILTROS
-# =====================================================
-
-c1, c2, c3 = st.columns(3)
-
-# =====================================================
-# 🔎 BUSCA TIME
-# =====================================================
-
-busca_time = c1.text_input(
+busca = st.text_input(
     "Buscar Time"
 )
 
-# =====================================================
-# 🔎 FILTRO PERFIL
-# =====================================================
+if busca:
 
-perfil_select = c2.selectbox(
-
-    "Perfil",
-
-    [
-        "Todos",
-        "🔴 Time Passivo",
-        "🟡 Time Equilibrado",
-        "🔵 Time Competitivo",
-        "🟢 Time Dominante"
-    ]
-)
-
-# =====================================================
-# 🔎 FILTRO BLOCO
-# =====================================================
-
-bloco_select = c3.selectbox(
-
-    "Bloco",
-
-    [
-        "Todos",
-        "🔺 Bloco Alto",
-        "⚖️ Bloco Médio",
-        "🔻 Bloco Baixo"
-    ]
-)
-
-# =====================================================
-# 🔥 FILTRO TIME
-# =====================================================
-
-if busca_time:
-
-    df_operacional_cs = df_operacional_cs[
+    df_lista_cs = df_lista_cs[
 
         (
-            df_operacional_cs["HOME"]
+            df_lista_cs["HOME"]
             .str.contains(
-                busca_time,
+                busca,
                 case=False,
                 na=False
             )
@@ -5087,77 +5332,25 @@ if busca_time:
         |
 
         (
-            df_operacional_cs["AWAY"]
+            df_lista_cs["AWAY"]
             .str.contains(
-                busca_time,
+                busca,
                 case=False,
                 na=False
             )
         )
     ]
 
-# =====================================================
-# 🔥 FILTRO PERFIL
-# =====================================================
-
-if perfil_select != "Todos":
-
-    df_operacional_cs = df_operacional_cs[
-
-        (
-            df_operacional_cs["PERFIL HOME"]
-            .str.contains(
-                perfil_select,
-                na=False
-            )
-        )
-
-        |
-
-        (
-            df_operacional_cs["PERFIL AWAY"]
-            .str.contains(
-                perfil_select,
-                na=False
-            )
-        )
-    ]
-
-# =====================================================
-# 🔥 FILTRO BLOCO
-# =====================================================
-
-if bloco_select != "Todos":
-
-    df_operacional_cs = df_operacional_cs[
-
-        (
-            df_operacional_cs["BLOCO HOME"]
-            == bloco_select
-        )
-
-        |
-
-        (
-            df_operacional_cs["BLOCO AWAY"]
-            == bloco_select
-        )
-    ]
-
-# =====================================================
-# 📊 EXIBIÇÃO FINAL
-# =====================================================
+# =========================================================
+# 📊 EXIBIÇÃO
+# =========================================================
 
 st.dataframe(
 
-    df_operacional_cs,
+    df_lista_cs,
 
     use_container_width=True,
+
     hide_index=True
 )
-
-
-
-
-
         
