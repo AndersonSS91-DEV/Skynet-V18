@@ -4897,147 +4897,320 @@ with tab8:
        
 
 
-# =========================================
-# 🧠 LISTA FINAL CS
-# =========================================
+# =========================================================
+# 📋 SCANNER OPERACIONAL CS
+# =========================================================
+
+st.markdown("## 📋 Scanner Operacional CS")
+
+# =========================================================
+# 🌍 LISTA GLOBAL
+# =========================================================
 
 lista_cs = []
 
-for _, row in df_clean.iterrows():
+# =========================================================
+# 🔄 LOOP TODOS OS JOGOS
+# =========================================================
+
+for jogo in jogos:
 
     try:
 
         # =================================================
-        # ⚽ TIMES
+        # ⚽ FILTRO JOGO
         # =================================================
 
-        home = row.get("Home_Team", "")
-        away = row.get("Visitor_Team", "")
+        linha_exg = df_exg[
+            df_exg["JOGO"] == jogo
+        ].iloc[0]
+
+        linha_consenso = df_consenso[
+            df_consenso["JOGO"] == jogo
+        ].iloc[0]
+
+        home = linha_exg["Home_Team"]
+
+        away = linha_exg["Visitor_Team"]
 
         # =================================================
-        # 🧠 SCORE TÁTICO
+        # 🧠 PERFIL HOME
         # =================================================
 
-        score_home = round(np.mean([
+        perfil_home = gerar_perfil_tatico(
 
-            row.get("Eficiência_H", 0),
+            time=home,
 
-            row.get("FS_Win_H", 0),
+            eficiencia=linha_consenso["Eficiência_H"],
 
-            row.get("Score_Ofensivo", 0)
+            clean_sheet=linha_consenso["Clean_Sheet_H"],
 
-        ]), 1)
+            fs_win=linha_consenso["FS_Win_H"],
 
-        score_away = round(np.mean([
+            changer=linha_consenso["Changer_H"],
 
-            row.get("Eficiência_A", 0),
+            abrir_placar=linha_consenso["Home_Abrir_Placar"],
 
-            row.get("FS_Win_A", 0),
+            ns_games=linha_consenso["NS_Games_H"],
 
-            row.get("Score_Ofensivo", 0)
+            gf_early=(
+                linha_consenso["GF_0-15_Home"] +
+                linha_consenso["GF_16-30_Home"]
+            ),
 
-        ]), 1)
+            gf_mid=(
+                linha_consenso["GF_31-45_Home"] +
+                linha_consenso["GF_46-60_Home"]
+            ),
 
-        # =================================================
-        # 🎨 PERFIL
-        # =================================================
+            gf_late=(
+                linha_consenso["GF_61-75_Home"] +
+                linha_consenso["GF_76-90_Home"]
+            ),
 
-        def perfil(score):
+            gc_total=linha_consenso["MGC_H"],
 
-            if score <= 25:
-                return "🔴 Passivo"
+            odd_btts=linha_consenso["Odd_BTTS_YES"],
 
-            elif score <= 50:
-                return "🟡 Equilibrado"
-
-            elif score <= 70:
-                return "🔵 Competitivo"
-
-            return "🟢 Dominante"
-
-        # =================================================
-        # 🧠 BLOCO
-        # =================================================
-
-        def bloco(early, late):
-
-            if early > late:
-                return "🔺 Alto"
-
-            elif late > early:
-                return "🔻 Baixo"
-
-            return "⚖️ Médio"
-
-        bloco_home = bloco(
-
-            row.get("GF_0-15_Home", 0),
-
-            row.get("GF_76-90_Home", 0)
-        )
-
-        bloco_away = bloco(
-
-            row.get("GF_0-15_Away", 0),
-
-            row.get("GF_76-90_Away", 0)
+            score_ofensivo=linha_exg["Score_Ofensivo"]
         )
 
         # =================================================
-        # 📊 PONTOS
+        # 🧠 PERFIL AWAY
         # =================================================
 
-        pontos_home = (
-            f"⚔ {row.get('Eficiência_H', 0):.0f} | "
-            f"🎯 {row.get('Score_Ofensivo', 0):.0f} | "
-            f"🌊 {row.get('FS_Win_H', 0):.0f}"
+        perfil_away = gerar_perfil_tatico(
+
+            time=away,
+
+            eficiencia=linha_consenso["Eficiência_A"],
+
+            clean_sheet=linha_consenso["Clean_Sheet_A"],
+
+            fs_win=linha_consenso["FS_Win_A"],
+
+            changer=linha_consenso["Changer_A"],
+
+            abrir_placar=linha_consenso["Away_Abrir_Placar"],
+
+            ns_games=linha_consenso["NS_Games_A"],
+
+            gf_early=(
+                linha_consenso["GF_0-15_Away"] +
+                linha_consenso["GF_16-30_Away"]
+            ),
+
+            gf_mid=(
+                linha_consenso["GF_31-45_Away"] +
+                linha_consenso["GF_46-60_Away"]
+            ),
+
+            gf_late=(
+                linha_consenso["GF_61-75_Away"] +
+                linha_consenso["GF_76-90_Away"]
+            ),
+
+            gc_total=linha_consenso["MGC_A"],
+
+            odd_btts=linha_consenso["Odd_BTTS_YES"],
+
+            score_ofensivo=linha_exg["Score_Ofensivo"]
         )
 
-        pontos_away = (
-            f"⚔ {row.get('Eficiência_A', 0):.0f} | "
-            f"🎯 {row.get('Score_Ofensivo', 0):.0f} | "
-            f"🌊 {row.get('FS_Win_A', 0):.0f}"
-        )
-
         # =================================================
-        # 🎯 SCORE CS
+        # 🥇 RANKING CS
         # =================================================
 
-        cs_scores = {
+        ranking_cs = []
 
-            "Lay 0x0":
+        # =================================================
+        # 🔥 LAY 0x0
+        # =================================================
 
-                row.get("Score_Ofensivo", 0),
+        score_l00 = 0
 
-            "Lay 0x1":
+        if linha_exg["Score_Ofensivo"] >= 75:
+            score_l00 += 20
 
-                row.get("FS_Win_H", 0),
+        if linha_consenso["Odd_BTTS_YES"] <= 1.80:
+            score_l00 += 15
 
-            "Lay 1x0":
+        if linha_consenso["Home_Abrir_Placar"] >= 60:
+            score_l00 += 15
 
-                row.get("Changer_A", 0),
+        if linha_consenso["Away_Abrir_Placar"] >= 45:
+            score_l00 += 10
 
-            "Lay 2x2":
+        ranking_cs.append({
 
-                np.mean([
+            "mercado":
+                "Lay 0x0",
 
-                    row.get("Clean_Sheet_H", 0),
+            "score":
+                score_l00,
 
-                    row.get("Clean_Sheet_A", 0)
-                ])
-        }
+            "confianca":
+                round(
+                    min(score_l00 * 1.1, 99),
+                    1
+                ),
 
-        ranking = sorted(
+            "janela":
+                "0-30",
 
-            cs_scores.items(),
+            "operacional":
+                "⚡ Entrada early",
 
-            key=lambda x: x[1],
+            "motivos": [
+
+                "✔ Forte pressão ofensiva",
+
+                "✔ Tendência alta de gol"
+            ]
+        })
+
+        # =================================================
+        # 🔥 LAY 0x1
+        # =================================================
+
+        score_l01 = 0
+
+        if linha_consenso["Home_Abrir_Placar"] >= 65:
+            score_l01 += 20
+
+        if linha_consenso["Clean_Sheet_H"] >= 55:
+            score_l01 += 15
+
+        if linha_consenso["FS_Win_H"] >= 60:
+            score_l01 += 15
+
+        ranking_cs.append({
+
+            "mercado":
+                "Lay 0x1",
+
+            "score":
+                score_l01,
+
+            "confianca":
+                round(
+                    min(score_l01 * 1.1, 99),
+                    1
+                ),
+
+            "janela":
+                "30-60",
+
+            "operacional":
+                "🔥 Pressão progressiva",
+
+            "motivos": [
+
+                "✔ Home dominante",
+
+                "✔ Forte tendência pressão"
+            ]
+        })
+
+        # =================================================
+        # 🔥 LAY 1x0
+        # =================================================
+
+        score_l10 = 0
+
+        if linha_consenso["Changer_A"] >= 35:
+            score_l10 += 20
+
+        if linha_consenso["Away_Abrir_Placar"] >= 45:
+            score_l10 += 15
+
+        ranking_cs.append({
+
+            "mercado":
+                "Lay 1x0",
+
+            "score":
+                score_l10,
+
+            "confianca":
+                round(
+                    min(score_l10 * 1.1, 99),
+                    1
+                ),
+
+            "janela":
+                "45-75",
+
+            "operacional":
+                "⚡ Pressão away",
+
+            "motivos": [
+
+                "✔ Away reage bem",
+
+                "✔ Home vulnerável"
+            ]
+        })
+
+        # =================================================
+        # 🔥 LAY 2x2
+        # =================================================
+
+        score_l22 = 0
+
+        if linha_consenso["Clean_Sheet_H"] >= 55:
+            score_l22 += 15
+
+        if linha_consenso["Clean_Sheet_A"] >= 55:
+            score_l22 += 15
+
+        if linha_consenso["Odd_BTTS_YES"] >= 1.95:
+            score_l22 += 15
+
+        ranking_cs.append({
+
+            "mercado":
+                "Lay 2x2",
+
+            "score":
+                score_l22,
+
+            "confianca":
+                round(
+                    min(score_l22 * 1.1, 99),
+                    1
+                ),
+
+            "janela":
+                "30-60",
+
+            "operacional":
+                "🛡 Controle placar",
+
+            "motivos": [
+
+                "✔ Estrutura defensiva",
+
+                "✔ Baixa tendência caos"
+            ]
+        })
+
+        # =================================================
+        # 📊 ORDENAR
+        # =================================================
+
+        ranking_cs = sorted(
+
+            ranking_cs,
+
+            key=lambda x: x["score"],
 
             reverse=True
         )
 
-        melhor_cs = ranking[0]
-        prox_cs = ranking[1]
+        melhor_cs = ranking_cs[0]
+
+        proximo_cs = ranking_cs[1]
 
         # =================================================
         # 📋 LISTA FINAL
@@ -5049,121 +5222,139 @@ for _, row in df_clean.iterrows():
             # ⚽ JOGO
             # =================================================
 
-            "Home":
-                row.get("Home", ""),
-
-            "Away":
-                row.get("Away", ""),
-
-            "Home_Team":
+            "HOME":
                 home,
 
-            "Away_Team":
+            "AWAY":
                 away,
 
             # =================================================
-            # 🧠 PERFIL
+            # 🧠 PERFIL HOME
             # =================================================
 
-            "Perfil Home":
-                perfil(score_home),
+            "PERFIL HOME":
+                perfil_home["perfil"],
 
-            "Score Home":
-                score_home,
+            "SCORE HOME":
+                perfil_home["score"],
 
-            "Bloco Home":
-                bloco_home,
+            "BLOCO HOME":
+                perfil_home["bloco"],
 
-            "Pontos Home":
-                pontos_home,
+            "PONTOS HOME":
+                " | ".join(
+                    perfil_home["leitura"][:4]
+                ),
 
-            "Perfil Away":
-                perfil(score_away),
+            # =================================================
+            # 🧠 PERFIL AWAY
+            # =================================================
 
-            "Score Away":
-                score_away,
+            "PERFIL AWAY":
+                perfil_away["perfil"],
 
-            "Bloco Away":
-                bloco_away,
+            "SCORE AWAY":
+                perfil_away["score"],
 
-            "Pontos Away":
-                pontos_away,
+            "BLOCO AWAY":
+                perfil_away["bloco"],
+
+            "PONTOS AWAY":
+                " | ".join(
+                    perfil_away["leitura"][:4]
+                ),
 
             # =================================================
             # 🎯 MELHOR CS
             # =================================================
 
-            "Melhor CS":
-                f"{melhor_cs[0]} "
-                f"— Score {melhor_cs[1]:.1f}",
-
-            "Janela":
-                "30-60",
-
-            "Dados CS":
+            "MELHOR CS":
                 (
-                    "✔ Baixa remontada | "
-                    "✔ Pressão sustentável"
+                    f"{melhor_cs['mercado']} "
+                    f"— Score "
+                    f"{melhor_cs['score']} "
+                    f"({melhor_cs['confianca']}%)"
                 ),
 
-            "Operacional":
-                "🔥 Entrada favorável",
+            "JANELA":
+                melhor_cs["janela"],
+
+            "DADOS CS":
+                " | ".join(
+                    melhor_cs["motivos"][:2]
+                ),
+
+            "OPERACIONAL CS":
+                melhor_cs["operacional"],
 
             # =================================================
-            # 🥈 SEGUNDO CS
+            # 🥈 PRÓXIMO CS
             # =================================================
 
-            "Próximo CS":
-                f"{prox_cs[0]} "
-                f"— Score {prox_cs[1]:.1f}",
-
-            # =================================================
-            # 🔥 ODDS
-            # =================================================
-
-            "Odds_Casa":
-                row.get("Odds_Casa", ""),
-
-            "Odds_Empate":
-                row.get("Odds_Empate", ""),
-
-            "Odds_Visitante":
-                row.get("Odds_Visitante", ""),
-
-            "Odd_Over_1,5FT":
-                row.get("Odd_Over_1,5FT", ""),
-
-            "Odds_Over_2,5FT":
-                row.get("Odds_Over_2,5FT", ""),
-
-            "Odds_Under_2,5FT":
-                row.get("Odds_Under_2,5FT", ""),
-
-            "Odd_BTTS_YES":
-                row.get("Odd_BTTS_YES", "")
+            "PRÓXIMO CS":
+                (
+                    f"{proximo_cs['mercado']} "
+                    f"— Score "
+                    f"{proximo_cs['score']} "
+                    f"({proximo_cs['confianca']}%)"
+                )
         })
 
     except Exception as e:
 
-        st.write(e)
+        st.write(
+            f"Erro em {jogo}:",
+            e
+        )
 
-# =========================================
-# 📈 OUTPUT FINAL
-# =========================================
+# =========================================================
+# 📊 DATAFRAME FINAL
+# =========================================================
 
-if lista_cs:
+df_operacional_cs = pd.DataFrame(lista_cs)
 
-    df_final_cs = pd.DataFrame(lista_cs)
+# =========================================================
+# 🔎 FILTRO
+# =========================================================
 
-    st.dataframe(
+busca = st.text_input(
+    "Buscar Time"
+)
 
-        df_final_cs,
+if busca:
 
-        use_container_width=True,
+    df_operacional_cs = df_operacional_cs[
 
-        hide_index=True
-    )
+        (
+            df_operacional_cs["HOME"]
+            .str.contains(
+                busca,
+                case=False,
+                na=False
+            )
+        )
 
-else:
+        |
 
-    st.info("Sem jogos válidos após filtro")
+        (
+            df_operacional_cs["AWAY"]
+            .str.contains(
+                busca,
+                case=False,
+                na=False
+            )
+        )
+    ]
+
+# =========================================================
+# 📊 OUTPUT FINAL
+# =========================================================
+
+st.dataframe(
+
+    df_operacional_cs,
+
+    use_container_width=True,
+
+    hide_index=True
+)
