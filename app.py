@@ -5044,9 +5044,9 @@ for _, row in df_mgf.iterrows():
 
             "Lay 2x2":
                 (
-                    linha_consenso["Clean_Home"] +
-                    linha_consenso["Clean_Away"]
-                ) / 2
+                    linha_consenso["Clean_Sheet_H"] +
+                    linha_consenso["Clean_Sheet_A"]
+                ) / 2       
          }
 
         ranking = sorted(
