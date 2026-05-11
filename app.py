@@ -4805,148 +4805,6 @@ with tab8:
         reverse=True
     )
 
-# =========================================================
-# 🔎 FILTROS CS
-# =========================================================
-
-st.markdown("## 🔎 Scanner CS")
-
-c1, c2, c3, c4 = st.columns(4)
-
-# =====================================================
-# 🎯 MERCADO
-# =====================================================
-
-mercado_select = c1.selectbox(
-
-    "Mercado",
-
-    [
-        "Todos",
-        "Lay 0x0",
-        "Lay 0x1",
-        "Lay 1x0",
-        "Lay 2x2"
-    ]
-)
-
-# =====================================================
-# 🎯 SCORE
-# =====================================================
-
-score_min = c2.slider(
-
-    "Score Mínimo",
-
-    0,
-    100,
-    40
-)
-
-# =====================================================
-# 🎯 CONFIANÇA
-# =====================================================
-
-conf_min = c3.slider(
-
-    "Confiança Mínima",
-
-    0,
-    100,
-    50
-)
-
-# =====================================================
-# 🎯 NÍVEL
-# =====================================================
-
-nivel_select = c4.selectbox(
-
-    "Nível",
-
-    [
-        "Todos",
-        "🟢 Elite",
-        "🟢 Forte",
-        "🟡 Médio",
-        "🟠 Fraco",
-        "🔴 Evitar"
-    ]
-)
-
-# =========================================================
-# 📊 DATAFRAME FINAL
-# =========================================================
-
-df_cs_final = pd.DataFrame(ranking_cs)
-
-# =========================================================
-# 🔥 FILTRO MERCADO
-# =====================================================
-
-if mercado_select != "Todos":
-
-    df_cs_final = df_cs_final[
-
-        df_cs_final["mercado"] == mercado_select
-    ]
-
-# =========================================================
-# 🔥 FILTRO SCORE
-# =====================================================
-
-df_cs_final = df_cs_final[
-
-    df_cs_final["score"] >= score_min
-]
-
-# =========================================================
-# 🔥 FILTRO CONFIANÇA
-# =====================================================
-
-df_cs_final = df_cs_final[
-
-    df_cs_final["confianca"] >= conf_min
-]
-
-# =========================================================
-# 🔥 FILTRO NÍVEL
-# =====================================================
-
-if nivel_select != "Todos":
-
-    df_cs_final = df_cs_final[
-
-        df_cs_final["nivel"] == nivel_select
-    ]
-
-# =========================================================
-# 📊 EXIBIÇÃO FINAL
-# =========================================================
-
-if not df_cs_final.empty:
-
-    st.dataframe(
-
-        df_cs_final[[
-            "mercado",
-            "score",
-            "confianca",
-            "nivel",
-            "janela",
-            "tendencia"
-        ]],
-
-        use_container_width=True,
-        hide_index=True
-    )
-
-else:
-
-    st.warning(
-        "Nenhum cenário encontrado nos filtros."
-    )
-
     # =========================================================
     # 🔥 MELHOR CS - RANKING
     # =========================================================
@@ -5036,3 +4894,270 @@ else:
 🧠 {cs['operacional']}
 """
         )
+
+
+
+# =========================================================
+# 📊 LISTA FINAL CS OPERACIONAL
+# =========================================================
+
+st.markdown("## 📋 Scanner Operacional CS")
+
+# =====================================================
+# 🧠 DADOS HOME
+# =====================================================
+
+perfil_home_txt = (
+    f"{perfil_home['perfil']} "
+    f"({perfil_home['score']}/100)"
+)
+
+bloco_home = perfil_home["bloco"]
+
+pontos_home = " | ".join(
+    perfil_home["leitura"][:4]
+)
+
+operacional_home = perfil_home["operacional"]
+
+# =====================================================
+# 🧠 DADOS AWAY
+# =====================================================
+
+perfil_away_txt = (
+    f"{perfil_away['perfil']} "
+    f"({perfil_away['score']}/100)"
+)
+
+bloco_away = perfil_away["bloco"]
+
+pontos_away = " | ".join(
+    perfil_away["leitura"][:4]
+)
+
+operacional_away = perfil_away["operacional"]
+
+# =====================================================
+# 🥇 MELHOR CS
+# =====================================================
+
+melhor_cs_txt = (
+    f"{melhor_cs['mercado']} "
+    f"— Score {melhor_cs['score']} "
+    f"({melhor_cs['confianca']}%)"
+)
+
+melhor_cs_dados = " | ".join(
+    melhor_cs["motivos"][:2]
+)
+
+# =====================================================
+# 🥈 PRÓXIMO CS
+# =====================================================
+
+proximo_cs = ranking_cs[1]
+
+proximo_cs_txt = (
+    f"{proximo_cs['mercado']} "
+    f"— Score {proximo_cs['score']} "
+    f"({proximo_cs['confianca']}%)"
+)
+
+# =====================================================
+# 📊 DATAFRAME FINAL
+# =====================================================
+
+df_operacional_cs = pd.DataFrame([{
+
+    # =================================================
+    # ⚽ JOGO
+    # =================================================
+
+    "HOME": home,
+    "AWAY": away,
+
+    # =================================================
+    # 🧠 PERFIL HOME
+    # =================================================
+
+    "PERFIL HOME": perfil_home_txt,
+
+    "BLOCO HOME": bloco_home,
+
+    "PONTOS HOME": pontos_home,
+
+    "OPERACIONAL HOME": operacional_home,
+
+    # =================================================
+    # 🧠 PERFIL AWAY
+    # =================================================
+
+    "PERFIL AWAY": perfil_away_txt,
+
+    "BLOCO AWAY": bloco_away,
+
+    "PONTOS AWAY": pontos_away,
+
+    "OPERACIONAL AWAY": operacional_away,
+
+    # =================================================
+    # 🥇 MELHOR CS
+    # =================================================
+
+    "MELHOR CS": melhor_cs_txt,
+
+    "JANELA": melhor_cs["janela"],
+
+    "DADOS CS": melhor_cs_dados,
+
+    "OPERACIONAL CS": melhor_cs["operacional"],
+
+    # =================================================
+    # 🥈 PRÓXIMO CS
+    # =================================================
+
+    "PRÓXIMO CS": proximo_cs_txt
+
+}])
+
+# =====================================================
+# 🔥 FILTROS
+# =====================================================
+
+c1, c2, c3 = st.columns(3)
+
+# =====================================================
+# 🔎 BUSCA TIME
+# =====================================================
+
+busca_time = c1.text_input(
+    "Buscar Time"
+)
+
+# =====================================================
+# 🔎 FILTRO PERFIL
+# =====================================================
+
+perfil_select = c2.selectbox(
+
+    "Perfil",
+
+    [
+        "Todos",
+        "🔴 Time Passivo",
+        "🟡 Time Equilibrado",
+        "🔵 Time Competitivo",
+        "🟢 Time Dominante"
+    ]
+)
+
+# =====================================================
+# 🔎 FILTRO BLOCO
+# =====================================================
+
+bloco_select = c3.selectbox(
+
+    "Bloco",
+
+    [
+        "Todos",
+        "🔺 Bloco Alto",
+        "⚖️ Bloco Médio",
+        "🔻 Bloco Baixo"
+    ]
+)
+
+# =====================================================
+# 🔥 FILTRO TIME
+# =====================================================
+
+if busca_time:
+
+    df_operacional_cs = df_operacional_cs[
+
+        (
+            df_operacional_cs["HOME"]
+            .str.contains(
+                busca_time,
+                case=False,
+                na=False
+            )
+        )
+
+        |
+
+        (
+            df_operacional_cs["AWAY"]
+            .str.contains(
+                busca_time,
+                case=False,
+                na=False
+            )
+        )
+    ]
+
+# =====================================================
+# 🔥 FILTRO PERFIL
+# =====================================================
+
+if perfil_select != "Todos":
+
+    df_operacional_cs = df_operacional_cs[
+
+        (
+            df_operacional_cs["PERFIL HOME"]
+            .str.contains(
+                perfil_select,
+                na=False
+            )
+        )
+
+        |
+
+        (
+            df_operacional_cs["PERFIL AWAY"]
+            .str.contains(
+                perfil_select,
+                na=False
+            )
+        )
+    ]
+
+# =====================================================
+# 🔥 FILTRO BLOCO
+# =====================================================
+
+if bloco_select != "Todos":
+
+    df_operacional_cs = df_operacional_cs[
+
+        (
+            df_operacional_cs["BLOCO HOME"]
+            == bloco_select
+        )
+
+        |
+
+        (
+            df_operacional_cs["BLOCO AWAY"]
+            == bloco_select
+        )
+    ]
+
+# =====================================================
+# 📊 EXIBIÇÃO FINAL
+# =====================================================
+
+st.dataframe(
+
+    df_operacional_cs,
+
+    use_container_width=True,
+    hide_index=True
+)
+
+
+
+
+
+        
