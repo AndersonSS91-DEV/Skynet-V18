@@ -4894,3 +4894,276 @@ with tab8:
 🧠 {cs['operacional']}
 """
         )
+        # =========================================
+# 🧠 LISTA FINAL CS
+# =========================================
+
+lista_cs = []
+
+for _, row in df_clean.iterrows():
+
+    try:
+
+        # =================================================
+        # ⚽ TIMES
+        # =================================================
+
+        home = row.get("Home_Team", "")
+        away = row.get("Visitor_Team", "")
+
+        # =================================================
+        # 🧠 SCORE TÁTICO
+        # =================================================
+
+        score_home = round(np.mean([
+
+            row.get("Eficiência_H", 0),
+
+            row.get("FS_Win_H", 0),
+
+            row.get("Score_Ofensivo", 0)
+
+        ]), 1)
+
+        score_away = round(np.mean([
+
+            row.get("Eficiência_A", 0),
+
+            row.get("FS_Win_A", 0),
+
+            row.get("Score_Ofensivo", 0)
+
+        ]), 1)
+
+        # =================================================
+        # 🎨 PERFIL
+        # =================================================
+
+        def perfil(score):
+
+            if score <= 25:
+                return "🔴 Passivo"
+
+            elif score <= 50:
+                return "🟡 Equilibrado"
+
+            elif score <= 70:
+                return "🔵 Competitivo"
+
+            return "🟢 Dominante"
+
+        # =================================================
+        # 🧠 BLOCO
+        # =================================================
+
+        def bloco(early, late):
+
+            if early > late:
+                return "🔺 Alto"
+
+            elif late > early:
+                return "🔻 Baixo"
+
+            return "⚖️ Médio"
+
+        bloco_home = bloco(
+
+            row.get("GF_0-15_Home", 0),
+
+            row.get("GF_76-90_Home", 0)
+        )
+
+        bloco_away = bloco(
+
+            row.get("GF_0-15_Away", 0),
+
+            row.get("GF_76-90_Away", 0)
+        )
+
+        # =================================================
+        # 📊 PONTOS
+        # =================================================
+
+        pontos_home = (
+            f"⚔ {row.get('Eficiência_H', 0):.0f} | "
+            f"🎯 {row.get('Score_Ofensivo', 0):.0f} | "
+            f"🌊 {row.get('FS_Win_H', 0):.0f}"
+        )
+
+        pontos_away = (
+            f"⚔ {row.get('Eficiência_A', 0):.0f} | "
+            f"🎯 {row.get('Score_Ofensivo', 0):.0f} | "
+            f"🌊 {row.get('FS_Win_A', 0):.0f}"
+        )
+
+        # =================================================
+        # 🎯 SCORE CS
+        # =================================================
+
+        cs_scores = {
+
+            "Lay 0x0":
+
+                row.get("Score_Ofensivo", 0),
+
+            "Lay 0x1":
+
+                row.get("FS_Win_H", 0),
+
+            "Lay 1x0":
+
+                row.get("Changer_A", 0),
+
+            "Lay 2x2":
+
+                np.mean([
+
+                    row.get("Clean_Sheet_H", 0),
+
+                    row.get("Clean_Sheet_A", 0)
+                ])
+        }
+
+        ranking = sorted(
+
+            cs_scores.items(),
+
+            key=lambda x: x[1],
+
+            reverse=True
+        )
+
+        melhor_cs = ranking[0]
+        prox_cs = ranking[1]
+
+        # =================================================
+        # 📋 LISTA FINAL
+        # =================================================
+
+        lista_cs.append({
+
+            # =================================================
+            # ⚽ JOGO
+            # =================================================
+
+            "Home":
+                row.get("Home", ""),
+
+            "Away":
+                row.get("Away", ""),
+
+            "Home_Team":
+                home,
+
+            "Away_Team":
+                away,
+
+            # =================================================
+            # 🧠 PERFIL
+            # =================================================
+
+            "Perfil Home":
+                perfil(score_home),
+
+            "Score Home":
+                score_home,
+
+            "Bloco Home":
+                bloco_home,
+
+            "Pontos Home":
+                pontos_home,
+
+            "Perfil Away":
+                perfil(score_away),
+
+            "Score Away":
+                score_away,
+
+            "Bloco Away":
+                bloco_away,
+
+            "Pontos Away":
+                pontos_away,
+
+            # =================================================
+            # 🎯 MELHOR CS
+            # =================================================
+
+            "Melhor CS":
+                f"{melhor_cs[0]} "
+                f"— Score {melhor_cs[1]:.1f}",
+
+            "Janela":
+                "30-60",
+
+            "Dados CS":
+                (
+                    "✔ Baixa remontada | "
+                    "✔ Pressão sustentável"
+                ),
+
+            "Operacional":
+                "🔥 Entrada favorável",
+
+            # =================================================
+            # 🥈 SEGUNDO CS
+            # =================================================
+
+            "Próximo CS":
+                f"{prox_cs[0]} "
+                f"— Score {prox_cs[1]:.1f}",
+
+            # =================================================
+            # 🔥 ODDS
+            # =================================================
+
+            "Odds_Casa":
+                row.get("Odds_Casa", ""),
+
+            "Odds_Empate":
+                row.get("Odds_Empate", ""),
+
+            "Odds_Visitante":
+                row.get("Odds_Visitante", ""),
+
+            "Odd_Over_1,5FT":
+                row.get("Odd_Over_1,5FT", ""),
+
+            "Odds_Over_2,5FT":
+                row.get("Odds_Over_2,5FT", ""),
+
+            "Odds_Under_2,5FT":
+                row.get("Odds_Under_2,5FT", ""),
+
+            "Odd_BTTS_YES":
+                row.get("Odd_BTTS_YES", "")
+        })
+
+    except Exception as e:
+
+        st.write(e)
+
+# =========================================
+# 📈 OUTPUT FINAL
+# =========================================
+
+if lista_cs:
+
+    df_final_cs = pd.DataFrame(lista_cs)
+
+    st.dataframe(
+
+        df_final_cs,
+
+        use_container_width=True,
+
+        hide_index=True
+    )
+
+else:
+
+    st.info("Sem jogos válidos após filtro")
+
+
+
