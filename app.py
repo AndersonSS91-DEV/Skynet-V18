@@ -4908,57 +4908,30 @@ lista_cs = []
 # 🔄 TODOS OS JOGOS
 # =========================================================
 
-for _, row in df_mgf.iterrows():
+for _, row in df_consenso.iterrows():
 
     try:
-
-        # =================================================
-        # ⚽ JOGO
-        # =================================================
 
         home = row["Home_Team"]
         away = row["Visitor_Team"]
 
-        jogo_nome = f"{home} x {away}"
-
         # =================================================
-        # 🔥 CONSENSO
-        # =================================================
-
-        consenso_row = df_consenso[
-            df_consenso["JOGO"] == jogo_nome
-        ]
-
-        if consenso_row.empty:
-            continue
-
-        linha_consenso = consenso_row.iloc[0]
-
-        # =================================================
-        # 🧠 PERFIL HOME
+        # 🧠 SCORE
         # =================================================
 
         score_home = round(np.mean([
 
-            linha_consenso["Eficiência_H"],
-
-            linha_consenso["FS_Win_H"],
-
-            linha_consenso["Score_Ofensivo"]
+            row["Eficiência_H"],
+            row["FS_Win_H"],
+            row["Score_Ofensivo"]
 
         ]), 1)
 
-        # =================================================
-        # 🧠 PERFIL AWAY
-        # =================================================
-
         score_away = round(np.mean([
 
-            linha_consenso["Eficiência_A"],
-
-            linha_consenso["FS_Win_A"],
-
-            linha_consenso["Score_Ofensivo"]
+            row["Eficiência_A"],
+            row["FS_Win_A"],
+            row["Score_Ofensivo"]
 
         ]), 1)
 
@@ -4969,42 +4942,38 @@ for _, row in df_mgf.iterrows():
         def perfil(score):
 
             if score <= 25:
-                return "🔴 Time Passivo"
+                return "🔴 Passivo"
 
             elif score <= 50:
-                return "🟡 Time Equilibrado"
+                return "🟡 Equilibrado"
 
             elif score <= 70:
-                return "🔵 Time Competitivo"
+                return "🔵 Competitivo"
 
-            return "🟢 Time Dominante"
+            return "🟢 Dominante"
 
         # =================================================
         # 🧠 BLOCO
         # =================================================
 
-        def bloco(gf_early, gf_late):
+        def bloco(early, late):
 
-            if gf_early > gf_late:
-                return "🔺 Bloco Alto"
+            if early > late:
+                return "🔺 Alto"
 
-            elif gf_late > gf_early:
-                return "🔻 Bloco Baixo"
+            elif late > early:
+                return "🔻 Baixo"
 
-            return "⚖️ Bloco Médio"
+            return "⚖️ Médio"
 
         bloco_home = bloco(
-
-            linha_consenso["GF_0-15_Home"],
-
-            linha_consenso["GF_76-90_Home"]
+            row["GF_0-15_Home"],
+            row["GF_76-90_Home"]
         )
 
         bloco_away = bloco(
-
-            linha_consenso["GF_0-15_Away"],
-
-            linha_consenso["GF_76-90_Away"]
+            row["GF_0-15_Away"],
+            row["GF_76-90_Away"]
         )
 
         # =================================================
@@ -5012,15 +4981,15 @@ for _, row in df_mgf.iterrows():
         # =================================================
 
         pontos_home = (
-            f"⚔ {linha_consenso['Eficiência_H']:.0f} | "
-            f"🎯 {linha_consenso['Score_Ofensivo']:.0f} | "
-            f"🌊 {linha_consenso['FS_Win_H']:.0f}"
+            f"⚔ {row['Eficiência_H']:.0f} | "
+            f"🎯 {row['Score_Ofensivo']:.0f} | "
+            f"🌊 {row['FS_Win_H']:.0f}"
         )
 
         pontos_away = (
-            f"⚔ {linha_consenso['Eficiência_A']:.0f} | "
-            f"🎯 {linha_consenso['Score_Ofensivo']:.0f} | "
-            f"🌊 {linha_consenso['FS_Win_A']:.0f}"
+            f"⚔ {row['Eficiência_A']:.0f} | "
+            f"🎯 {row['Score_Ofensivo']:.0f} | "
+            f"🌊 {row['FS_Win_A']:.0f}"
         )
 
         # =================================================
@@ -5030,41 +4999,22 @@ for _, row in df_mgf.iterrows():
         cs_scores = {
 
             "Lay 0x0":
-
-                linha_consenso["Score_Ofensivo"],
+                row["Score_Ofensivo"],
 
             "Lay 0x1":
-
-                linha_consenso["FS_Win_H"],
+                row["FS_Win_H"],
 
             "Lay 1x0":
-
-                linha_consenso["Changer_A"],
+                row["Changer_A"],
 
             "Lay 2x2":
-
                 (
-                    linha_consenso["Clean_Sheet_Home_%"] +
-
-                    linha_consenso["Clean_Sheet_Away_%"]
+                    row["Clean_Sheet_Home_%"] +
+                    row["Clean_Sheet_Away_%"]
                 ) / 2
         }
 
-        melhor_nome = max(
-            cs_scores,
-            key=cs_scores.get
-        )
-
-        melhor_score = round(
-            cs_scores[melhor_nome],
-            1
-        )
-
-        # =================================================
-        # 🥈 PRÓXIMO CS
-        # =================================================
-
-        ordenado = sorted(
+        ranking = sorted(
 
             cs_scores.items(),
 
@@ -5073,15 +5023,11 @@ for _, row in df_mgf.iterrows():
             reverse=True
         )
 
-        prox_nome = ordenado[1][0]
-
-        prox_score = round(
-            ordenado[1][1],
-            1
-        )
+        melhor_cs = ranking[0]
+        prox_cs = ranking[1]
 
         # =================================================
-        # 📊 LINHA FINAL
+        # 📊 LISTA FINAL
         # =================================================
 
         lista_cs.append({
@@ -5116,26 +5062,20 @@ for _, row in df_mgf.iterrows():
             "PONTOS AWAY":
                 pontos_away,
 
-            "OPERACIONAL":
-                "⚡ Jogo operacional",
-
             "MELHOR CS":
-                f"{melhor_nome} "
-                f"({melhor_score})",
+                f"{melhor_cs[0]} ({melhor_cs[1]:.1f})",
 
             "JANELA":
                 "30-60",
 
             "DADOS CS":
-                "✔ Estrutura ofensiva "
-                "✔ Pressão sustentável",
+                "✔ Estrutura forte | ✔ Pressão",
 
-            "OPERACIONAL CS":
+            "OPERACIONAL":
                 "🔥 Entrada favorável",
 
             "PRÓXIMO CS":
-                f"{prox_nome} "
-                f"({prox_score})"
+                f"{prox_cs[0]} ({prox_cs[1]:.1f})"
         })
 
     except:
@@ -5143,7 +5083,7 @@ for _, row in df_mgf.iterrows():
         pass
 
 # =========================================================
-# 📊 DATAFRAME
+# 📊 DATAFRAME FINAL
 # =========================================================
 
 df_lista_cs = pd.DataFrame(lista_cs)
@@ -5152,9 +5092,7 @@ df_lista_cs = pd.DataFrame(lista_cs)
 # 🔎 BUSCA
 # =========================================================
 
-busca = st.text_input(
-    "Buscar Time"
-)
+busca = st.text_input("Buscar Time")
 
 if busca:
 
@@ -5182,7 +5120,7 @@ if busca:
     ]
 
 # =========================================================
-# 📊 EXIBIÇÃO
+# 📊 EXIBIR
 # =========================================================
 
 st.dataframe(
