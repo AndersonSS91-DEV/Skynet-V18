@@ -5274,6 +5274,53 @@ for jogo in jogos:
             "AWAY":
                 away,
 
+            # =================================================
+            # 📊 RESULTADOS
+            # =================================================
+
+            "Home_Team":
+                linha_exg.get("Home_Team", ""),
+
+            "Result Home":
+                linha_exg.get("Result Home", ""),
+
+            "Result Visitor":
+                linha_exg.get("Result Visitor", ""),
+
+            "Away_Team":
+                linha_exg.get("Visitor_Team", ""),
+
+            "Result_Home_HT":
+                linha_exg.get("Result_Home_HT", ""),
+
+            "Result_Visitor_HT":
+                linha_exg.get("Result_Visitor_HT", ""),
+
+            # =================================================
+            # 🔥 ODDS
+            # =================================================
+
+            "Odds_Casa":
+                linha_exg.get("Odds_Casa", ""),
+
+            "Odds_Empate":
+                linha_exg.get("Odds_Empate", ""),
+
+            "Odds_Visitante":
+                linha_exg.get("Odds_Visitante", ""),
+
+            "Odd_Over_1,5FT":
+                linha_exg.get("Odd_Over_1,5FT", ""),
+
+            "Odds_Over_2,5FT":
+                linha_exg.get("Odds_Over_2,5FT", ""),
+
+            "Odds_Under_2,5FT":
+                linha_exg.get("Odds_Under_2,5FT", ""),
+
+            "Odd_BTTS_YES":
+                linha_exg.get("Odd_BTTS_YES", ""),
+
             "PERFIL HOME":
                 perfil_home["perfil"],
 
