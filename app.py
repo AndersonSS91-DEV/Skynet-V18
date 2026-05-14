@@ -2562,7 +2562,7 @@ with tab6:
 
         linha_cantos = df_filtrado.iloc[0]
 
-            # =========================================
+    # =========================================
     # 🚀 CENTRAL INTELIGENTE — ESCANTEIOS
     # =========================================
     st.markdown("## 🚀 Central Inteligente de Escanteios")
@@ -2718,8 +2718,167 @@ with tab6:
     else:
         st.success("✅ Tendência de Jogo Dinâmico")
 
+
+# Tabela Geral — Aba Escanteios (Streamlit)
+
+```python
+# =========================================================
+# 📊 TABELA GERAL ESCANTEIOS
+# =========================================================
+
+st.markdown("---")
+st.markdown("# 📋 Tabela Geral de Escanteios")
+
+# =========================================================
+# DATAFRAME BASE
+# =========================================================
+
+lista_tabela_cantos = []
+
+for jogo in jogos:
+
+    try:
+
+        linha = df_cantos[
+            df_cantos["JOGO"] == jogo
+        ].iloc[0]
+
+        lista_tabela_cantos.append({
+
+            "Home": linha.get("Home_Team", ""),
+
+            "Away": linha.get("Visitor_Team", ""),
+
+            "League": linha.get("League", ""),
+
+            "Hour": linha.get("Hour", ""),
+
+            "Score Home": round(float(linha.get("Score_Home", 0)), 2),
+
+            "Score Away": round(float(linha.get("Score_Away", 0)), 2),
+
+            "Direção": linha.get("Direcao_Jogo", ""),
+
+            "Pace": round(float(linha.get("Corner_Pace_Factor", 0)), 2),
+
+            "Momentum": round(float(linha.get("Momentum", 0)), 2),
+
+            "Explosão": round(float(linha.get("Explosao", 0)), 2),
+
+            "Prob Over 3.5 HT": round(float(linha.get("Prob_Over_35_HT", 0)), 2),
+
+            "λ HT Home": round(float(linha.get("Lambda_HT_Home", 0)), 2),
+
+            "λ HT Away": round(float(linha.get("Lambda_HT_Away", 0)), 2),
+
+            "Entrada": linha.get("Entrada_Indicada", "SEM ENTRADA"),
+
+            "Trap": linha.get("Trap_Signal", ""),
+
+            "Over 8.5": linha.get("Prob_Over_85", ""),
+
+            "Over 9.5": linha.get("Prob_Over_95", ""),
+
+            "Over 10.5": linha.get("Prob_Over_105", ""),
+
+            "Corners Home": linha.get("Corners_Home", ""),
+
+            "Corners Away": linha.get("Corners_Away", "")
+        })
+
+    except Exception as e:
+
+        st.write(f"Erro tabela cantos: {jogo}", e)
+
+# =========================================================
+# DATAFRAME
+# =========================================================
+
+df_tabela_cantos = pd.DataFrame(lista_tabela_cantos)
+
+# =========================================================
+# FILTRO
+# =========================================================
+
+busca_cantos = st.text_input(
+    "🔎 Buscar jogo na tabela de escanteios"
+)
+
+if busca_cantos:
+
+    df_tabela_cantos = df_tabela_cantos[
+
+        (
+            df_tabela_cantos["Home"]
+            .astype(str)
+            .str.contains(
+                busca_cantos,
+                case=False,
+                na=False
+            )
+        )
+
+        |
+
+        (
+            df_tabela_cantos["Away"]
+            .astype(str)
+            .str.contains(
+                busca_cantos,
+                case=False,
+                na=False
+            )
+        )
+    ]
+
+# =========================================================
+# CORES
+# =========================================================
+
+def colorir_pace(v):
+
+    try:
+
+        v = float(v)
+
+        if v >= 1.30:
+            return "background-color: rgba(0,255,0,0.25); color:white"
+
+        elif v >= 1.10:
+            return "background-color: rgba(255,255,0,0.20); color:white"
+
+        elif v < 0.90:
+            return "background-color: rgba(255,0,0,0.25); color:white"
+
+        return ""
+
+    except:
+
+        return ""
+
+# =========================================================
+# TABELA
+# =========================================================
+
+st.dataframe(
+
+    df_tabela_cantos.style.applymap(
+        colorir_pace,
+        subset=["Pace"]
+    ),
+
+    use_container_width=True,
+
+    hide_index=True,
+
+    height=850
+)
+```
+
+
+
 # =========================================
-# 🤖 MOTOR IA FINAL (VERSÃO PROFISSIONAL) 🟡🟠🟧⚪🔘🔴🟠🟡🟢🔵🟣🟤⚫⚪🟥🟧🟨🟩🟦🟪🟫⬛⬜
+# ABA  07 🤖 MOTOR IA FINAL (VERSÃO PROFISSIONAL) 🟡🟠🟧⚪🔘🔴🟠🟡🟢🔵🟣🟤⚫⚪🟥🟧🟨🟩🟦🟪🟫⬛⬜
 # =========================================
 import pandas as pd
 
