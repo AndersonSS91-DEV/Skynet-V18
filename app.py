@@ -2719,9 +2719,7 @@ with tab6:
         st.success("✅ Tendência de Jogo Dinâmico")
 
 
-# Tabela Geral — Aba Escanteios (Streamlit)
 
-```python
 # =========================================================
 # 📊 TABELA GERAL ESCANTEIOS
 # =========================================================
