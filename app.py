@@ -2708,9 +2708,10 @@ with tab6:
 
     if pd.notna(trap_signal) and str(trap_signal).strip() not in ["", "-", "nan"]:
 
-    st.error(
-        f"🪤 Armadilha Detectada\n\n"
-        f"⚠️ {trap_signal}")
+        st.error(
+            f"🪤 Armadilha Detectada\n\n"
+            f"⚠️ {trap_signal}"
+        )
     
     elif pace_factor < 0.9:
         st.warning("❄️ Tendência de Jogo Lento")
