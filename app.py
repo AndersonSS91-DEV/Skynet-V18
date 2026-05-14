@@ -2706,8 +2706,12 @@ with tab6:
     trap_signal = str(linha_cantos.get("Trap_Signal", ""))
     pace_factor = float(linha_cantos.get("Corner_Pace_Factor", 0))
 
-    if trap_signal != "":
-        st.error("🪤 Armadilha Detectada")
+    if pd.notna(trap_signal) and str(trap_signal).strip() not in ["", "-", "nan"]:
+
+    st.error(
+        f"🪤 Armadilha Detectada\n\n"
+        f"⚠️ {trap_signal}")
+    
     elif pace_factor < 0.9:
         st.warning("❄️ Tendência de Jogo Lento")
     else:
