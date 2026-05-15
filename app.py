@@ -2664,40 +2664,7 @@ with tab6:
 
     
     st.markdown("---")
-    # =========================================
-    # 🟢 ENTRADA HT
-    # =========================================
-    st.markdown("### 🟢 Direção HT(Primeiro Tempo)")
-
-    col1, col2, col3, col4 = st.columns(4)
-
-    prob_ht_over35 = float(linha_cantos.get("Prob_Over3_5_Cantos_HT", 0))
-    lambda_ht_home = float(linha_cantos.get("Lambda_Cantos_HT_Home", 0))
-    lambda_ht_away = float(linha_cantos.get("Lambda_Cantos_HT_Away", 0))
-
-    if "EXPLOSÃO" in str(linha_cantos.get("HT_Corner_Value", "")):
-        sinal_ht = "💣 HT Dinâmico"
-    elif prob_ht_over35 >= 60:
-        sinal_ht = "🔥 Tendência de Over HT"
-    elif prob_ht_over35 >= 50:
-        sinal_ht = "⚡ Normal"
-    else:
-        sinal_ht = "❄️ Tendência de HT Lento"
-
-    with col1:
-        st.metric("Prob. Over 3.5 HT", f"{prob_ht_over35:.1f}%")
-
-    with col2:
-        st.metric("λ HT Home", f"{lambda_ht_home:.2f}")
-
-    with col3:
-        st.metric("λ HT Away", f"{lambda_ht_away:.2f}")
-
-    with col4:
-        st.markdown(f"### {sinal_ht}")
-
     
-    st.markdown("---")
     # =========================================
     # 🚨 ALERTAS
     # =========================================
