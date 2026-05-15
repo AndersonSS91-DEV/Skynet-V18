@@ -2724,50 +2724,28 @@ with tab6:
 
     with col1:
 
-        st.markdown(
-            f"""
-            <div style='font-size:14px;color:#AAAAAA'>
-            Pace
-            </div>
-
-            <div style='font-size:22px;font-weight:700'>
-            {pace:.2f} <span style='font-size:16px;color:#BBBBBB'>({pace_txt})</span>
-            </div>
-            """,
-            unsafe_allow_html=True
+        st.metric(
+            "Pace",
+            f"{pace:.2f} ({pace_txt})"
         )
 
     with col2:
 
-        st.markdown(
-            f"""
-            <div style='font-size:14px;color:#AAAAAA'>
-            Explosão
-            </div>
-
-            <div style='font-size:22px;font-weight:700'>
-            {explosao:.2f} <span style='font-size:16px;color:#BBBBBB'>({explosao_txt})</span>
-            </div>
-            """,
-            unsafe_allow_html=True
+        st.metric(
+            "Explosão",
+            f"{explosao:.2f} ({explosao_txt})"
         )
 
     with col3:
 
-        st.markdown(
-            f"""
-            <div style='font-size:14px;color:#AAAAAA'>
-            Momentum
-            </div>
-
-            <div style='font-size:22px;font-weight:700'>
-            {momentum:.2f} <span style='font-size:16px;color:#BBBBBB'>({momentum_txt})</span>
-            </div>
-            """,
-            unsafe_allow_html=True
+        st.metric(
+            "Momentum",
+            f"{momentum:.2f} ({momentum_txt})"
         )
 
     st.markdown("---")
+
+    
     
     # =========================================
     # 🚨 ALERTAS
