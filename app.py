@@ -2798,15 +2798,6 @@ with tab6:
                 "Prob_Over10_5_Cantos":
                     linha.get("Prob_Over10_5_Cantos", ""),
 
-                "Odd_Justa_Over8_5_Cantos":
-                    linha.get("Odd_Justa_Over8_5_Cantos", ""),
-
-                "Odd_Justa_Over9_5_Cantos":
-                    linha.get("Odd_Justa_Over9_5_Cantos", ""),
-
-                "Odd_Justa_Over10_5_Cantos":
-                    linha.get("Odd_Justa_Over10_5_Cantos", ""),
-
                 "Placar_Cantos_HT_Mais_Provavel":
                     linha.get("Placar_Cantos_HT_Mais_Provavel", ""),
 
