@@ -2724,35 +2724,47 @@ with tab6:
 
     with col1:
 
-        st.metric(
-            "Pace",
-            f"{pace:.2f}"
-        )
+        st.markdown(
+            f"""
+            <div style='font-size:14px;color:#AAAAAA'>
+            Pace
+            </div>
 
-        st.caption(
-            f"({pace_txt})"
+            <div style='font-size:22px;font-weight:700'>
+            {pace:.2f} <span style='font-size:16px;color:#BBBBBB'>({pace_txt})</span>
+            </div>
+            """,
+            unsafe_allow_html=True
         )
 
     with col2:
 
-        st.metric(
-            "Explosão",
-            f"{explosao:.2f}"
-        )
+        st.markdown(
+            f"""
+            <div style='font-size:14px;color:#AAAAAA'>
+            Explosão
+            </div>
 
-        st.caption(
-            f"({explosao_txt})"
+            <div style='font-size:22px;font-weight:700'>
+            {explosao:.2f} <span style='font-size:16px;color:#BBBBBB'>({explosao_txt})</span>
+            </div>
+            """,
+            unsafe_allow_html=True
         )
 
     with col3:
 
-        st.metric(
-            "Momentum",
-            f"{momentum:.2f}"
-        )
+        st.markdown(
+            f"""
+            <div style='font-size:14px;color:#AAAAAA'>
+            Momentum
+            </div>
 
-        st.caption(
-            f"({momentum_txt})"
+            <div style='font-size:22px;font-weight:700'>
+            {momentum:.2f} <span style='font-size:16px;color:#BBBBBB'>({momentum_txt})</span>
+            </div>
+            """,
+            unsafe_allow_html=True
         )
 
     st.markdown("---")
