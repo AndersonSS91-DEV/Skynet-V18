@@ -2717,6 +2717,7 @@ with tab6:
         st.warning("❄️ Tendência de Jogo Lento")
     else:
         st.success("✅ Tendência de Jogo Dinâmico")
+with tab6:
 
     # =========================================================
     # 📊 TABELA GERAL ESCANTEIOS
@@ -2731,13 +2732,9 @@ with tab6:
 
     lista_tabela_cantos = []
 
-    for jogo in jogos:
+    for _, linha in df_cantos.iterrows():
 
         try:
-
-            linha = df_cantos[
-                df_cantos["JOGO"] == jogo
-            ].iloc[0]
 
             lista_tabela_cantos.append({
 
@@ -2784,7 +2781,12 @@ with tab6:
 
         except Exception as e:
 
-            st.write(f"Erro tabela cantos: {jogo}", e)
+            st.write(
+                f"Erro tabela cantos: "
+                f"{linha.get('Home_Team', '')} x "
+                f"{linha.get('Visitor_Team', '')}",
+                e
+            )
 
     # =========================================================
     # DATAFRAME
