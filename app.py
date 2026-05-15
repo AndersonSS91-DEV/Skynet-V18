@@ -2579,7 +2579,7 @@ with tab6:
         st.metric("Race 9 Away", get_val(linha_cantos, "R9_Away", "{:.2f}"))
         st.metric("Cantos Sofridos 37HT Away", get_val(linha_cantos, "MC_Cantos_37HT_Away", "{:.2f}"))
         st.metric("Cantos Sofridos 80FT Away", get_val(linha_cantos, "MC_Cantos_80FT_Away", "{:.2f}"))
-        st.metric("Cantos Sofridos 87FT Away", get_val(linha_cantos, "MC_Cantos_87FT_Away, "{:.2f}"))
+        st.metric("Cantos Sofridos 87FT Away", get_val(linha_cantos, "MC_Cantos_87FT_Away", "{:.2f}"))
 
     st.markdown("---")
 
