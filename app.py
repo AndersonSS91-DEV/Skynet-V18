@@ -2645,6 +2645,7 @@ with tab6:
     # =========================================
     # ⚡ RITMO DO JOGO
     # =========================================
+
     st.markdown("### ⚡ Ritmo & Dinâmica")
 
     col1, col2, col3 = st.columns(3)
@@ -2653,16 +2654,101 @@ with tab6:
     explosao = float(linha_cantos.get("Corner_Explosion_Index", 0))
     momentum = float(linha_cantos.get("CMI", 0))
 
+    # =========================================
+    # PACE
+    # =========================================
+
+    if pace < 0.85:
+
+        pace_txt = "🐢 Jogo Lento"
+
+    elif pace < 1.00:
+
+        pace_txt = "⚖️ Ritmo Normal"
+
+    elif pace < 1.20:
+
+        pace_txt = "⚡ Jogo Acelerado"
+
+    else:
+
+        pace_txt = "🔥 Pressão Forte"
+
+    # =========================================
+    # EXPLOSÃO
+    # =========================================
+
+    if explosao < 25:
+
+        explosao_txt = "🔵 Fraco"
+
+    elif explosao < 45:
+
+        explosao_txt = "🟡 Moderado"
+
+    elif explosao < 65:
+
+        explosao_txt = "🟠 Forte"
+
+    else:
+
+        explosao_txt = "💣 Explosivo"
+
+    # =========================================
+    # MOMENTUM
+    # =========================================
+
+    if momentum < 8:
+
+        momentum_txt = "🐢 Aceleração Baixa"
+
+    elif momentum < 15:
+
+        momentum_txt = "⚖️ Jogo Morno"
+
+    elif momentum < 25:
+
+        momentum_txt = "⚡ Aceleração Crescente"
+
+    elif momentum < 40:
+
+        momentum_txt = "🔥 Pressão Forte"
+
+    else:
+
+        momentum_txt = "💣 Avalanche"
+
+    # =========================================
+    # MÉTRICAS
+    # =========================================
+
     with col1:
-        st.metric("Pace", f"{pace:.2f}")
+
+        st.metric(
+            "Pace",
+            f"{pace:.2f}"
+        )
+
+        st.caption(pace_txt)
 
     with col2:
-        st.metric("Explosão", f"{explosao:.2f}")
+
+        st.metric(
+            "Explosão",
+            f"{explosao:.2f}"
+        )
+
+        st.caption(explosao_txt)
 
     with col3:
-        st.metric("Momentum", f"{momentum:.2f}")
 
-    
+        st.metric(
+            "Momentum",
+            f"{momentum:.2f}"
+        )
+
+        st.caption(momentum_txt)
+
     st.markdown("---")
     
     # =========================================
