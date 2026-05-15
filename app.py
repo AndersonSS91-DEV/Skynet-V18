@@ -2660,19 +2660,19 @@ with tab6:
 
     if pace < 0.85:
 
-        pace_txt = "🐢 Jogo Lento"
+        pace_txt = "Jogo Lento"
 
     elif pace < 1.00:
 
-        pace_txt = "⚖️ Ritmo Normal"
+        pace_txt = "Ritmo Normal"
 
     elif pace < 1.20:
 
-        pace_txt = "⚡ Jogo Acelerado"
+        pace_txt = "Jogo Acelerado"
 
     else:
 
-        pace_txt = "🔥 Pressão Forte"
+        pace_txt = "Pressão Forte"
 
     # =========================================
     # EXPLOSÃO
@@ -2680,19 +2680,19 @@ with tab6:
 
     if explosao < 25:
 
-        explosao_txt = "🔵 Fraco"
+        explosao_txt = "Fraco"
 
     elif explosao < 45:
 
-        explosao_txt = "🟡 Moderado"
+        explosao_txt = "Moderado"
 
     elif explosao < 65:
 
-        explosao_txt = "🟠 Forte"
+        explosao_txt = "Forte"
 
     else:
 
-        explosao_txt = "💣 Explosivo"
+        explosao_txt = "Explosivo"
 
     # =========================================
     # MOMENTUM
@@ -2700,23 +2700,23 @@ with tab6:
 
     if momentum < 8:
 
-        momentum_txt = "🐢 Aceleração Baixa"
+        momentum_txt = "Aceleração Baixa"
 
     elif momentum < 15:
 
-        momentum_txt = "⚖️ Jogo Morno"
+        momentum_txt = "Jogo Morno"
 
     elif momentum < 25:
 
-        momentum_txt = "⚡ Aceleração Crescente"
+        momentum_txt = "Aceleração Crescente"
 
     elif momentum < 40:
 
-        momentum_txt = "🔥 Pressão Forte"
+        momentum_txt = "Pressão Forte"
 
     else:
 
-        momentum_txt = "💣 Avalanche"
+        momentum_txt = "Avalanche"
 
     # =========================================
     # MÉTRICAS
@@ -2729,7 +2729,9 @@ with tab6:
             f"{pace:.2f}"
         )
 
-        st.caption(pace_txt)
+        st.caption(
+            f"({pace_txt})"
+        )
 
     with col2:
 
@@ -2738,7 +2740,9 @@ with tab6:
             f"{explosao:.2f}"
         )
 
-        st.caption(explosao_txt)
+        st.caption(
+            f"({explosao_txt})"
+        )
 
     with col3:
 
@@ -2747,7 +2751,9 @@ with tab6:
             f"{momentum:.2f}"
         )
 
-        st.caption(momentum_txt)
+        st.caption(
+            f"({momentum_txt})"
+        )
 
     st.markdown("---")
     
