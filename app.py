@@ -2545,6 +2545,45 @@ with tab6:
         st.metric("Prob Over HT 4.5", get_val(linha_cantos, "Prob_Over4_5_Cantos_HT", "{:.2f}"))
 
     st.markdown("---")
+
+    # =========================================
+    # 🚩 ESCANTEIOS - ASIÁTICOS / LIMITES
+    # =========================================
+    st.markdown("### 🚩 Escanteios")
+
+    d1, d2, d3, d4 = st.columns(4)
+
+    with d1:
+        st.metric("Race 3 Home", get_val(linha_cantos, "R3_Home", "{:.2f}"))
+        st.metric("Race 7 Home", get_val(linha_cantos, "R7_Home", "{:.2f}"))
+        st.metric("Cantos Marcados 37HT Home", get_val(linha_cantos, "MF_Cantos_37HT_Home", "{:.2f}"))
+        st.metric("Cantos Marcados 80FT Home", get_val(linha_cantos, "MF_Cantos_80FT_Home", "{:.2f}"))
+        st.metric("Cantos Marcados 87FT Home", get_val(linha_cantos, "MF_Cantos_87FT_Home", "{:.2f}"))
+
+    with d2:
+        st.metric("Race 3 Away", get_val(linha_cantos, "R3_Away", "{:.2f}"))
+        st.metric("Race 7 Away", get_val(linha_cantos, "R7_Away", "{:.2f}"))
+        st.metric("Cantos Marcados 37HT Away", get_val(linha_cantos, "MF_Cantos_37HT_Away", "{:.2f}"))
+        st.metric("Cantos Marcados 80FT Away", get_val(linha_cantos, "MF_Cantos_80FT_Away", "{:.2f}"))
+        st.metric("Cantos Marcados 87FT Away", get_val(linha_cantos, "MF_Cantos_87FT_Away", "{:.2f}"))
+
+    with d3:
+        st.metric("Race 5 Home", get_val(linha_cantos, "R5_Home", "{:.2f}"))
+        st.metric("Race 9 Home", get_val(linha_cantos, "R9_Home", "{:.2f}"))
+        st.metric("Cantos Sofridos 37HT Home", get_val(linha_cantos, "MC_Cantos_37HT_Home", "{:.2f}"))
+        st.metric("Cantos Sofridos 80FT Home", get_val(linha_cantos, "MC_Cantos_80FT_Home", "{:.2f}"))
+        st.metric("Cantos Sofridos 87FT Home", get_val(linha_cantos, "MC_Cantos_87FT_Home", "{:.2f}"))
+
+    with d4:
+        st.metric("Race 5 Away", get_val(linha_cantos, "R5_Away", "{:.2f}"))
+        st.metric("Race 9 Away", get_val(linha_cantos, "R9_Away", "{:.2f}"))
+        st.metric("Cantos Sofridos 37HT Away", get_val(linha_cantos, "MC_Cantos_37HT_Away", "{:.2f}"))
+        st.metric("Cantos Sofridos 80FT Away", get_val(linha_cantos, "MC_Cantos_80FT_Away", "{:.2f}"))
+        st.metric("Cantos Sofridos 87FT Away", get_val(linha_cantos, "MC_Cantos_87FT_Away, "{:.2f}"))
+
+    st.markdown("---")
+
+
 # =========================================
 # ABA 6 — ESCANTEIOS (BLINDADA)
 # =========================================
