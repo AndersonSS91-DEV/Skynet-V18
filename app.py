@@ -2459,13 +2459,13 @@ with tab6:
         row["Score_Supremo"] = score
 
         if score >= 75:
-            row["Nivel_Jogo"] = "💣 ELITE"
+            row["Nivel_Jogo"] = "💣 Elite"
         elif score >= 60:
-            row["Nivel_Jogo"] = "🔥 FORTE"
+            row["Nivel_Jogo"] = "🔥 Forte"
         elif score >= 45:
-            row["Nivel_Jogo"] = "⚡ MÉDIO"
+            row["Nivel_Jogo"] = "⚡ Médio"
         else:
-            row["Nivel_Jogo"] = "❄️ FRACO"
+            row["Nivel_Jogo"] = "❄️ Fraco"
 
         return row
 
