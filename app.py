@@ -2741,9 +2741,6 @@ with tab6:
                 "League":
                     linha.get("League", ""),
 
-                "Hour":
-                    linha.get("Hour", ""),
-
                 "Home":
                     linha.get("Home_Team", ""),
 
@@ -2756,6 +2753,9 @@ with tab6:
                 "Result Visitor":
                     linha.get("Result Visitor", ""),
 
+                "Dominio_Ofensivo":
+                    linha.get("Dominio_Ofensivo", ""),
+
                 "Score_Cantos_Home":
                     linha.get("Score_Cantos_Home", ""),
 
@@ -2765,68 +2765,65 @@ with tab6:
                 "Dominio_Cantos":
                     linha.get("Dominio_Cantos", ""),
 
-                "Dominio_Ofensivo":
-                    linha.get("Dominio_Ofensivo", ""),
+                "CPG":
+                    linha.get("CPG", ""),
 
-                "Expectativa_Cantos":
-                    linha.get("Expectativa_Cantos", ""),
+                "Value_Signal":
+                    linha.get("Value_Signal", ""),
 
-                "Pressão_Home":
-                    linha.get("Pressão_Média_Home", ""),
+                "Race_Dom_Home":
+                    linha.get("Race_Dom_Home", ""),
 
-                "Pressão_Away":
-                    linha.get("Pressão_Média_Away", ""),
+                "Race_Dom_Away":
+                    linha.get("Race_Dom_Away", ""),
 
-                "Posse_Home":
-                    linha.get("Posse_Bola_Home", ""),
+                "Corner_Explosion_Index":
+                    linha.get("Corner_Explosion_Index", ""),
 
-                "Posse_Away":
-                    linha.get("Posse_Bola_Away", ""),
+                "CMI":
+                    linha.get("CMI", ""),
 
-                "MF_Cantos_HT_Home":
-                    linha.get("MF_Cantos_HT_Home", ""),
+                "Trap_Signal":
+                    linha.get("Trap_Signal", ""),
 
-                "MF_Cantos_HT_Away":
-                    linha.get("MF_Cantos_HT_Away", ""),
+                "Placar_Cantos_Mais_Provavel":
+                    linha.get("Placar_Cantos_Mais_Provavel", ""),
 
-                "MF_Cantos_FT_Home":
-                    linha.get("MF_Cantos_FT_Home", ""),
+                "Prob_Over8_5_Cantos":
+                    linha.get("Prob_Over8_5_Cantos", ""),
 
-                "MF_Cantos_FT_Away":
-                    linha.get("MF_Cantos_FT_Away", ""),
+                "Prob_Over9_5_Cantos":
+                    linha.get("Prob_Over9_5_Cantos", ""),
 
-                "MC_Cantos_HT_Home":
-                    linha.get("MC_Cantos_HT_Home", ""),
+                "Prob_Over10_5_Cantos":
+                    linha.get("Prob_Over10_5_Cantos", ""),
 
-                "MC_Cantos_HT_Away":
-                    linha.get("MC_Cantos_HT_Away", ""),
+                "Odd_Justa_Over8_5_Cantos":
+                    linha.get("Odd_Justa_Over8_5_Cantos", ""),
 
-                "MC_Cantos_FT_Home":
-                    linha.get("MC_Cantos_FT_Home", ""),
+                "Odd_Justa_Over9_5_Cantos":
+                    linha.get("Odd_Justa_Over9_5_Cantos", ""),
 
-                "MC_Cantos_FT_Away":
-                    linha.get("MC_Cantos_FT_Away", ""),
+                "Odd_Justa_Over10_5_Cantos":
+                    linha.get("Odd_Justa_Over10_5_Cantos", ""),
 
-                "CV_Cantos_HT_Home":
-                    linha.get("CV_Cantos_HT_Home", ""),
+                "Placar_Cantos_HT_Mais_Provavel":
+                    linha.get("Placar_Cantos_HT_Mais_Provavel", ""),
 
-                "CV_Cantos_HT_Away":
-                    linha.get("CV_Cantos_HT_Away", ""),
+                "Prob_Over2_5_Cantos_HT":
+                    linha.get("Prob_Over2_5_Cantos_HT", ""),
 
-                "CV_Cantos_FT_Home":
-                    linha.get("CV_Cantos_FT_Home", ""),
+                "Prob_Over3_5_Cantos_HT":
+                    linha.get("Prob_Over3_5_Cantos_HT", ""),
 
-                "CV_Cantos_FT_Away":
-                    linha.get("CV_Cantos_FT_Away", ""),
+                "Prob_Over4_5_Cantos_HT":
+                    linha.get("Prob_Over4_5_Cantos_HT", ""),
 
-                "M7,5_Cantos_FT":
-                    linha.get("M7,5_Cantos_FT", ""),
+                "HT_Corner_Value":
+                    linha.get("HT_Corner_Value", ""),
 
-                "M8,5_Cantos_FT":
-                    linha.get("M8,5_Cantos_FT", ""),
-
-                "M9,5_Cantos_FT":
-                    linha.get("M9,5_Cantos_FT", "")
+                "HT_Corner_Acceleration":
+                    linha.get("HT_Corner_Acceleration", "")
             })
 
         except Exception as e:
