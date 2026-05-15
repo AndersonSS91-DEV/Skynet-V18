@@ -2717,14 +2717,15 @@ with tab6:
         st.warning("❄️ Tendência de Jogo Lento")
     else:
         st.success("✅ Tendência de Jogo Dinâmico")
+
 with tab6:
 
     # =========================================================
-    # 📊 TABELA GERAL ESCANTEIOS
+    # 📋 TABELA GERAL ESCANTEIOS
     # =========================================================
 
     st.markdown("---")
-    st.markdown("# 📋 Tabela Geral de Escanteios")
+    st.markdown("## 📋 Tabela Geral de Escanteios")
 
     # =========================================================
     # DATAFRAME BASE
@@ -2738,53 +2739,71 @@ with tab6:
 
             lista_tabela_cantos.append({
 
-                "Home": linha.get("Home_Team", ""),
+                "Home":
+                    linha.get("Home_Team", ""),
 
-                "Away": linha.get("Visitor_Team", ""),
+                "Away":
+                    linha.get("Visitor_Team", ""),
 
-                "League": linha.get("League", ""),
+                "League":
+                    linha.get("League", ""),
 
-                "Hour": linha.get("Hour", ""),
+                "Hour":
+                    linha.get("Hour", ""),
 
-                "Score Home": round(float(linha.get("Score_Home", 0)), 2),
+                "Score_Home":
+                    linha.get("Score_Home", ""),
 
-                "Score Away": round(float(linha.get("Score_Away", 0)), 2),
+                "Score_Away":
+                    linha.get("Score_Away", ""),
 
-                "Direção": linha.get("Direcao_Jogo", ""),
+                "Direção":
+                    linha.get("Direcao_Jogo", ""),
 
-                "Pace": round(float(linha.get("Corner_Pace_Factor", 0)), 2),
+                "Corner_Pace":
+                    linha.get("Corner_Pace_Factor", ""),
 
-                "Momentum": round(float(linha.get("Momentum", 0)), 2),
+                "Momentum":
+                    linha.get("Momentum", ""),
 
-                "Explosão": round(float(linha.get("Explosao", 0)), 2),
+                "Explosão":
+                    linha.get("Explosao", ""),
 
-                "Prob Over 3.5 HT": round(float(linha.get("Prob_Over_35_HT", 0)), 2),
+                "Prob_Over_35_HT":
+                    linha.get("Prob_Over_35_HT", ""),
 
-                "λ HT Home": round(float(linha.get("Lambda_HT_Home", 0)), 2),
+                "Lambda_HT_Home":
+                    linha.get("Lambda_HT_Home", ""),
 
-                "λ HT Away": round(float(linha.get("Lambda_HT_Away", 0)), 2),
+                "Lambda_HT_Away":
+                    linha.get("Lambda_HT_Away", ""),
 
-                "Entrada": linha.get("Entrada_Indicada", "SEM ENTRADA"),
+                "Entrada":
+                    linha.get("Entrada_Indicada", ""),
 
-                "Trap": linha.get("Trap_Signal", ""),
+                "Trap":
+                    linha.get("Trap_Signal", ""),
 
-                "Over 8.5": linha.get("Prob_Over_85", ""),
+                "Over_8_5":
+                    linha.get("Prob_Over_85", ""),
 
-                "Over 9.5": linha.get("Prob_Over_95", ""),
+                "Over_9_5":
+                    linha.get("Prob_Over_95", ""),
 
-                "Over 10.5": linha.get("Prob_Over_105", ""),
+                "Over_10_5":
+                    linha.get("Prob_Over_105", ""),
 
-                "Corners Home": linha.get("Corners_Home", ""),
+                "Corners_Home":
+                    linha.get("Corners_Home", ""),
 
-                "Corners Away": linha.get("Corners_Away", "")
+                "Corners_Away":
+                    linha.get("Corners_Away", "")
             })
 
         except Exception as e:
 
             st.write(
-                f"Erro tabela cantos: "
-                f"{linha.get('Home_Team', '')} x "
-                f"{linha.get('Visitor_Team', '')}",
+                "Erro tabela cantos:",
                 e
             )
 
@@ -2792,14 +2811,16 @@ with tab6:
     # DATAFRAME
     # =========================================================
 
-    df_tabela_cantos = pd.DataFrame(lista_tabela_cantos)
+    df_tabela_cantos = pd.DataFrame(
+        lista_tabela_cantos
+    )
 
     # =========================================================
     # FILTRO
     # =========================================================
 
     busca_cantos = st.text_input(
-        "🔎 Buscar jogo na tabela de escanteios"
+        "🔎 Buscar jogo"
     )
 
     if busca_cantos:
@@ -2830,40 +2851,12 @@ with tab6:
         ]
 
     # =========================================================
-    # CORES
-    # =========================================================
-
-    def colorir_pace(v):
-
-        try:
-
-            v = float(v)
-
-            if v >= 1.30:
-                return "background-color: rgba(0,255,0,0.25); color:white"
-
-            elif v >= 1.10:
-                return "background-color: rgba(255,255,0,0.20); color:white"
-
-            elif v < 0.90:
-                return "background-color: rgba(255,0,0,0.25); color:white"
-
-            return ""
-
-        except:
-
-            return ""
-
-    # =========================================================
     # TABELA
     # =========================================================
 
     st.dataframe(
 
-        df_tabela_cantos.style.applymap(
-            colorir_pace,
-            subset=["Pace"]
-        ),
+        df_tabela_cantos,
 
         use_container_width=True,
 
