@@ -2407,13 +2407,13 @@ def calcular_score_supremo(row):
 def classificar_jogo(score):
 
     if score >= 75:
-        return "💣 ELITE"
+        return "💣 Elite"
     elif score >= 60:
-        return "🔥 FORTE"
+        return "🔥 Forte"
     elif score >= 45:
-        return "⚡ MÉDIO"
+        return "⚡ Médio"
     else:
-        return "❄️ FRACO"
+        return "❄️ Fraco"
 
 df_cantos["Score_Supremo"] = df_cantos.apply(calcular_score_supremo, axis=1)
 df_cantos["Nivel_Jogo"] = df_cantos["Score_Supremo"].apply(classificar_jogo)
@@ -2600,21 +2600,21 @@ with tab6:
 
     elif prob_over_85 >= 60 and score_supremo >= 70:
         if prob_over_95 >= 45:
-            st.success("💣 OVER 9.5 (VALOR ALTO)")
+            st.success("💣 Over 9.5 (Valor Alto)")
         else:
-            st.success("🔥 OVER 8.5 (FORTE)")
+            st.success("🔥 Over 8.5 (Forte)")
 
     elif prob_over_85 >= 55:
-        st.success("🔥 OVER 8.5")
+        st.success("🔥 Over 8.5")
 
     elif prob_over_85 >= 50:
-        st.warning("⚡ OVER 8.5 (MODERADO)")
+        st.warning("⚡ Over 8.5 (Moderado)")
 
     elif expectativa_cantos >= 10:
-        st.warning("⚡ OVER 7.5 (LIVE)")
+        st.warning("⚡ Over 7.5 (Live)")
 
     else:
-        st.error("❌ SEM ENTRADA")
+        st.error("❌ Sem Entrada")
 
     # =========================================
     # 🎯 DIREÇÃO DO JOGO
