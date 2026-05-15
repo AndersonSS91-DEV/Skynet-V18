@@ -2718,7 +2718,6 @@ with tab6:
     else:
         st.success("✅ Tendência de Jogo Dinâmico")
 
-with tab6:
 
     # =========================================================
     # 📋 TABELA GERAL ESCANTEIOS
@@ -2739,65 +2738,95 @@ with tab6:
 
             lista_tabela_cantos.append({
 
-                "Home":
-                    linha.get("Home_Team", ""),
-
-                "Away":
-                    linha.get("Visitor_Team", ""),
-
                 "League":
                     linha.get("League", ""),
 
                 "Hour":
                     linha.get("Hour", ""),
 
-                "Score_Home":
-                    linha.get("Score_Home", ""),
+                "Home":
+                    linha.get("Home_Team", ""),
 
-                "Score_Away":
-                    linha.get("Score_Away", ""),
+                "Away":
+                    linha.get("Visitor_Team", ""),
 
-                "Direção":
-                    linha.get("Direcao_Jogo", ""),
+                "Result Home":
+                    linha.get("Result Home", ""),
 
-                "Corner_Pace":
-                    linha.get("Corner_Pace_Factor", ""),
+                "Result Visitor":
+                    linha.get("Result Visitor", ""),
 
-                "Momentum":
-                    linha.get("Momentum", ""),
+                "Score_Cantos_Home":
+                    linha.get("Score_Cantos_Home", ""),
 
-                "Explosão":
-                    linha.get("Explosao", ""),
+                "Score_Cantos_Away":
+                    linha.get("Score_Cantos_Away", ""),
 
-                "Prob_Over_35_HT":
-                    linha.get("Prob_Over_35_HT", ""),
+                "Dominio_Cantos":
+                    linha.get("Dominio_Cantos", ""),
 
-                "Lambda_HT_Home":
-                    linha.get("Lambda_HT_Home", ""),
+                "Dominio_Ofensivo":
+                    linha.get("Dominio_Ofensivo", ""),
 
-                "Lambda_HT_Away":
-                    linha.get("Lambda_HT_Away", ""),
+                "Expectativa_Cantos":
+                    linha.get("Expectativa_Cantos", ""),
 
-                "Entrada":
-                    linha.get("Entrada_Indicada", ""),
+                "Pressão_Home":
+                    linha.get("Pressão_Média_Home", ""),
 
-                "Trap":
-                    linha.get("Trap_Signal", ""),
+                "Pressão_Away":
+                    linha.get("Pressão_Média_Away", ""),
 
-                "Over_8_5":
-                    linha.get("Prob_Over_85", ""),
+                "Posse_Home":
+                    linha.get("Posse_Bola_Home", ""),
 
-                "Over_9_5":
-                    linha.get("Prob_Over_95", ""),
+                "Posse_Away":
+                    linha.get("Posse_Bola_Away", ""),
 
-                "Over_10_5":
-                    linha.get("Prob_Over_105", ""),
+                "MF_Cantos_HT_Home":
+                    linha.get("MF_Cantos_HT_Home", ""),
 
-                "Corners_Home":
-                    linha.get("Corners_Home", ""),
+                "MF_Cantos_HT_Away":
+                    linha.get("MF_Cantos_HT_Away", ""),
 
-                "Corners_Away":
-                    linha.get("Corners_Away", "")
+                "MF_Cantos_FT_Home":
+                    linha.get("MF_Cantos_FT_Home", ""),
+
+                "MF_Cantos_FT_Away":
+                    linha.get("MF_Cantos_FT_Away", ""),
+
+                "MC_Cantos_HT_Home":
+                    linha.get("MC_Cantos_HT_Home", ""),
+
+                "MC_Cantos_HT_Away":
+                    linha.get("MC_Cantos_HT_Away", ""),
+
+                "MC_Cantos_FT_Home":
+                    linha.get("MC_Cantos_FT_Home", ""),
+
+                "MC_Cantos_FT_Away":
+                    linha.get("MC_Cantos_FT_Away", ""),
+
+                "CV_Cantos_HT_Home":
+                    linha.get("CV_Cantos_HT_Home", ""),
+
+                "CV_Cantos_HT_Away":
+                    linha.get("CV_Cantos_HT_Away", ""),
+
+                "CV_Cantos_FT_Home":
+                    linha.get("CV_Cantos_FT_Home", ""),
+
+                "CV_Cantos_FT_Away":
+                    linha.get("CV_Cantos_FT_Away", ""),
+
+                "M7,5_Cantos_FT":
+                    linha.get("M7,5_Cantos_FT", ""),
+
+                "M8,5_Cantos_FT":
+                    linha.get("M8,5_Cantos_FT", ""),
+
+                "M9,5_Cantos_FT":
+                    linha.get("M9,5_Cantos_FT", "")
             })
 
         except Exception as e:
@@ -2864,6 +2893,7 @@ with tab6:
 
         height=850
     )
+
 
 
 # =========================================
