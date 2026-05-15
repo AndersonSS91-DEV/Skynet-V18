@@ -2407,13 +2407,13 @@ def calcular_score_supremo(row):
 def classificar_jogo(score):
 
     if score >= 75:
-        return "💣 ELITE"
+        return "💣 Elite"
     elif score >= 60:
-        return "🔥 FORTE"
+        return "🔥 Forte"
     elif score >= 45:
-        return "⚡ MÉDIO"
+        return "⚡ Médio"
     else:
-        return "❄️ FRACO"
+        return "❄️ Fraco"
 
 df_cantos["Score_Supremo"] = df_cantos.apply(calcular_score_supremo, axis=1)
 df_cantos["Nivel_Jogo"] = df_cantos["Score_Supremo"].apply(classificar_jogo)
@@ -2459,13 +2459,13 @@ with tab6:
         row["Score_Supremo"] = score
 
         if score >= 75:
-            row["Nivel_Jogo"] = "💣 ELITE"
+            row["Nivel_Jogo"] = "💣 Elite"
         elif score >= 60:
-            row["Nivel_Jogo"] = "🔥 FORTE"
+            row["Nivel_Jogo"] = "🔥 Forte"
         elif score >= 45:
-            row["Nivel_Jogo"] = "⚡ MÉDIO"
+            row["Nivel_Jogo"] = "⚡ Médio"
         else:
-            row["Nivel_Jogo"] = "❄️ FRACO"
+            row["Nivel_Jogo"] = "❄️ Fraco"
 
         return row
 
@@ -2474,7 +2474,7 @@ with tab6:
     # =========================================
     # 📊 DADOS GERAIS
     # =========================================
-    st.markdown("## 📊📈 Dados Gerais")
+    st.markdown("### 📊📈 Dados Gerais")
 
     c1, c2, c3, c4, c5, c6 = st.columns(6)
 
@@ -2511,7 +2511,7 @@ with tab6:
     # =========================================
     # 🚩 ESCANTEIOS
     # =========================================
-    st.markdown("## 🚩 Escanteios")
+    st.markdown("### 🚩 Escanteios")
 
     a1, a2, a3, a4, a5 = st.columns(5)
 
@@ -2545,6 +2545,45 @@ with tab6:
         st.metric("Prob Over HT 4.5", get_val(linha_cantos, "Prob_Over4_5_Cantos_HT", "{:.2f}"))
 
     st.markdown("---")
+
+    # =========================================
+    # 🚩 ESCANTEIOS - ASIÁTICOS / LIMITES
+    # =========================================
+    st.markdown("### 🚩 Escanteios")
+
+    d1, d2, d3, d4 = st.columns(4)
+
+    with d1:
+        st.metric("Race 3 Home", get_val(linha_cantos, "R3_Home", "{:.2f}"))
+        st.metric("Race 7 Home", get_val(linha_cantos, "R7_Home", "{:.2f}"))
+        st.metric("Cantos Marcados 37HT Home", get_val(linha_cantos, "MF_Cantos_37HT_Home", "{:.2f}"))
+        st.metric("Cantos Marcados 80FT Home", get_val(linha_cantos, "MF_Cantos_80FT_Home", "{:.2f}"))
+        st.metric("Cantos Marcados 87FT Home", get_val(linha_cantos, "MF_Cantos_87FT_Home", "{:.2f}"))
+
+    with d2:
+        st.metric("Race 3 Away", get_val(linha_cantos, "R3_Away", "{:.2f}"))
+        st.metric("Race 7 Away", get_val(linha_cantos, "R7_Away", "{:.2f}"))
+        st.metric("Cantos Marcados 37HT Away", get_val(linha_cantos, "MF_Cantos_37HT_Away", "{:.2f}"))
+        st.metric("Cantos Marcados 80FT Away", get_val(linha_cantos, "MF_Cantos_80FT_Away", "{:.2f}"))
+        st.metric("Cantos Marcados 87FT Away", get_val(linha_cantos, "MF_Cantos_87FT_Away", "{:.2f}"))
+
+    with d3:
+        st.metric("Race 5 Home", get_val(linha_cantos, "R5_Home", "{:.2f}"))
+        st.metric("Race 9 Home", get_val(linha_cantos, "R9_Home", "{:.2f}"))
+        st.metric("Cantos Sofridos 37HT Home", get_val(linha_cantos, "MC_Cantos_37HT_Home", "{:.2f}"))
+        st.metric("Cantos Sofridos 80FT Home", get_val(linha_cantos, "MC_Cantos_80FT_Home", "{:.2f}"))
+        st.metric("Cantos Sofridos 87FT Home", get_val(linha_cantos, "MC_Cantos_87FT_Home", "{:.2f}"))
+
+    with d4:
+        st.metric("Race 5 Away", get_val(linha_cantos, "R5_Away", "{:.2f}"))
+        st.metric("Race 9 Away", get_val(linha_cantos, "R9_Away", "{:.2f}"))
+        st.metric("Cantos Sofridos 37HT Away", get_val(linha_cantos, "MC_Cantos_37HT_Away", "{:.2f}"))
+        st.metric("Cantos Sofridos 80FT Away", get_val(linha_cantos, "MC_Cantos_80FT_Away", "{:.2f}"))
+        st.metric("Cantos Sofridos 87FT Away", get_val(linha_cantos, "MC_Cantos_87FT_Away", "{:.2f}"))
+
+    st.markdown("---")
+
+
 # =========================================
 # ABA 6 — ESCANTEIOS (BLINDADA)
 # =========================================
@@ -2562,10 +2601,10 @@ with tab6:
 
         linha_cantos = df_filtrado.iloc[0]
 
-            # =========================================
+    # =========================================
     # 🚀 CENTRAL INTELIGENTE — ESCANTEIOS
     # =========================================
-    st.markdown("## 🚀 Central Inteligente de Escanteios")
+    st.markdown("### 🚀 Central Inteligente de Escanteios")
 
     score_supremo = float(linha_cantos.get("Score_Supremo", 0))
     nivel_jogo = linha_cantos.get("Nivel_Jogo", "-")
@@ -2589,7 +2628,7 @@ with tab6:
     # =========================================
     # 🎯 ENTRADA RECOMENDADA
     # =========================================
-    st.markdown("## 🎯 Entrada Recomendada")
+    st.markdown("### 🎯 Entrada Recomendada")
 
     prob_over_85 = float(linha_cantos.get("Prob_Over8_5_Cantos", 0))
     prob_over_95 = float(linha_cantos.get("Prob_Over9_5_Cantos", 0))
@@ -2600,26 +2639,26 @@ with tab6:
 
     elif prob_over_85 >= 60 and score_supremo >= 70:
         if prob_over_95 >= 45:
-            st.success("💣 OVER 9.5 (VALOR ALTO)")
+            st.success("💣 Over 9.5 (Valor Alto)")
         else:
-            st.success("🔥 OVER 8.5 (FORTE)")
+            st.success("🔥 Over 8.5 (Forte)")
 
     elif prob_over_85 >= 55:
-        st.success("🔥 OVER 8.5")
+        st.success("🔥 Over 8.5")
 
     elif prob_over_85 >= 50:
-        st.warning("⚡ OVER 8.5 (MODERADO)")
+        st.warning("⚡ Over 8.5 (Moderado)")
 
     elif expectativa_cantos >= 10:
-        st.warning("⚡ OVER 7.5 (LIVE)")
+        st.warning("⚡ Over 7.5 (Live)")
 
     else:
-        st.error("❌ SEM ENTRADA")
+        st.error("❌ Sem Entrada")
 
     # =========================================
     # 🎯 DIREÇÃO DO JOGO
     # =========================================
-    st.markdown("## 🎯 Direção do Jogo")
+    st.markdown("### 🎯 Direção do Jogo")
 
     col1, col2, col3 = st.columns(3)
 
@@ -2645,7 +2684,8 @@ with tab6:
     # =========================================
     # ⚡ RITMO DO JOGO
     # =========================================
-    st.markdown("## ⚡ Ritmo & Dinâmica")
+
+    st.markdown("### ⚡ Ritmo & Dinâmica")
 
     col1, col2, col3 = st.columns(3)
 
@@ -2653,68 +2693,287 @@ with tab6:
     explosao = float(linha_cantos.get("Corner_Explosion_Index", 0))
     momentum = float(linha_cantos.get("CMI", 0))
 
-    with col1:
-        st.metric("Pace", f"{pace:.2f}")
-
-    with col2:
-        st.metric("Explosão", f"{explosao:.2f}")
-
-    with col3:
-        st.metric("Momentum", f"{momentum:.2f}")
-
-    
-    st.markdown("---")
     # =========================================
-    # 🟢 ENTRADA HT
+    # PACE
     # =========================================
-    st.markdown("## 🟢 Direção HT(Primeiro Tempo)")
 
-    col1, col2, col3, col4 = st.columns(4)
+    if pace < 0.85:
 
-    prob_ht_over35 = float(linha_cantos.get("Prob_Over3_5_Cantos_HT", 0))
-    lambda_ht_home = float(linha_cantos.get("Lambda_Cantos_HT_Home", 0))
-    lambda_ht_away = float(linha_cantos.get("Lambda_Cantos_HT_Away", 0))
+        pace_txt = "Jogo Lento"
 
-    if "EXPLOSÃO" in str(linha_cantos.get("HT_Corner_Value", "")):
-        sinal_ht = "💣 HT Dinâmico"
-    elif prob_ht_over35 >= 60:
-        sinal_ht = "🔥 Tendência de Over HT"
-    elif prob_ht_over35 >= 50:
-        sinal_ht = "⚡ Normal"
+    elif pace < 1.00:
+
+        pace_txt = "Ritmo Normal"
+
+    elif pace < 1.20:
+
+        pace_txt = "Jogo Acelerado"
+
     else:
-        sinal_ht = "❄️ Tendência de HT Lento"
+
+        pace_txt = "Pressão Forte"
+
+    # =========================================
+    # EXPLOSÃO
+    # =========================================
+
+    if explosao < 25:
+
+        explosao_txt = "Fraco"
+
+    elif explosao < 45:
+
+        explosao_txt = "Moderado"
+
+    elif explosao < 65:
+
+        explosao_txt = "Forte"
+
+    else:
+
+        explosao_txt = "Explosivo"
+
+    # =========================================
+    # MOMENTUM
+    # =========================================
+
+    if momentum < 8:
+
+        momentum_txt = "Aceleração Baixa"
+
+    elif momentum < 15:
+
+        momentum_txt = "Jogo Morno"
+
+    elif momentum < 25:
+
+        momentum_txt = "Aceleração Crescente"
+
+    elif momentum < 40:
+
+        momentum_txt = "Pressão Forte"
+
+    else:
+
+        momentum_txt = "Avalanche"
+
+    # =========================================
+    # MÉTRICAS
+    # =========================================
 
     with col1:
-        st.metric("Prob. Over 3.5 HT", f"{prob_ht_over35:.1f}%")
+
+        st.metric(
+            "Pace",
+            f"{pace:.2f} ({pace_txt})"
+        )
 
     with col2:
-        st.metric("λ HT Home", f"{lambda_ht_home:.2f}")
+
+        st.metric(
+            "Explosão",
+            f"{explosao:.2f} ({explosao_txt})"
+        )
 
     with col3:
-        st.metric("λ HT Away", f"{lambda_ht_away:.2f}")
 
-    with col4:
-        st.markdown(f"### {sinal_ht}")
+        st.metric(
+            "Momentum",
+            f"{momentum:.2f} ({momentum_txt})"
+        )
+
+    st.markdown("---")
 
     
-    st.markdown("---")
+    
     # =========================================
     # 🚨 ALERTAS
     # =========================================
-    st.markdown("## 🚨 Alertas")
+    st.markdown("### 🚨 Alertas")
 
     trap_signal = str(linha_cantos.get("Trap_Signal", ""))
     pace_factor = float(linha_cantos.get("Corner_Pace_Factor", 0))
 
-    if trap_signal != "":
-        st.error("🪤 Armadilha Detectada")
+    if pd.notna(trap_signal) and str(trap_signal).strip() not in ["", "-", "nan"]:
+
+        st.error(
+            f"🪤 Armadilha Detectada\n\n"
+            f"⚠️ {trap_signal}"
+        )
+    
     elif pace_factor < 0.9:
         st.warning("❄️ Tendência de Jogo Lento")
     else:
         st.success("✅ Tendência de Jogo Dinâmico")
 
+
+    # =========================================================
+    # 📋 TABELA GERAL ESCANTEIOS
+    # =========================================================
+
+    st.markdown("---")
+    st.markdown("## 📋 Tabela Geral de Escanteios")
+
+    # =========================================================
+    # DATAFRAME BASE
+    # =========================================================
+
+    lista_tabela_cantos = []
+
+    for _, linha in df_cantos.iterrows():
+
+        try:
+
+            lista_tabela_cantos.append({
+
+                "League":
+                    linha.get("League", ""),
+
+                "Home":
+                    linha.get("Home_Team", ""),
+
+                "Away":
+                    linha.get("Visitor_Team", ""),
+
+                "Result Home":
+                    linha.get("Result Home", ""),
+
+                "Result Visitor":
+                    linha.get("Result Visitor", ""),
+
+                "Dominio_Ofensivo":
+                    linha.get("Dominio_Ofensivo", ""),
+
+                "Score_Cantos_Home":
+                    linha.get("Score_Cantos_Home", ""),
+
+                "Score_Cantos_Away":
+                    linha.get("Score_Cantos_Away", ""),
+
+                "Dominio_Cantos":
+                    linha.get("Dominio_Cantos", ""),
+
+                "CPG":
+                    linha.get("CPG", ""),
+
+                "Value_Signal":
+                    linha.get("Value_Signal", ""),
+
+                "Race_Dom_Home":
+                    linha.get("Race_Dom_Home", ""),
+
+                "Race_Dom_Away":
+                    linha.get("Race_Dom_Away", ""),
+
+                "Corner_Explosion_Index":
+                    linha.get("Corner_Explosion_Index", ""),
+
+                "CMI":
+                    linha.get("CMI", ""),
+
+                "Trap_Signal":
+                    linha.get("Trap_Signal", ""),
+
+                "Placar_Cantos_Mais_Provavel":
+                    linha.get("Placar_Cantos_Mais_Provavel", ""),
+
+                "Prob_Over8_5_Cantos":
+                    linha.get("Prob_Over8_5_Cantos", ""),
+
+                "Prob_Over9_5_Cantos":
+                    linha.get("Prob_Over9_5_Cantos", ""),
+
+                "Prob_Over10_5_Cantos":
+                    linha.get("Prob_Over10_5_Cantos", ""),
+
+                "Placar_Cantos_HT_Mais_Provavel":
+                    linha.get("Placar_Cantos_HT_Mais_Provavel", ""),
+
+                "Prob_Over2_5_Cantos_HT":
+                    linha.get("Prob_Over2_5_Cantos_HT", ""),
+
+                "Prob_Over3_5_Cantos_HT":
+                    linha.get("Prob_Over3_5_Cantos_HT", ""),
+
+                "Prob_Over4_5_Cantos_HT":
+                    linha.get("Prob_Over4_5_Cantos_HT", ""),
+
+                "HT_Corner_Value":
+                    linha.get("HT_Corner_Value", ""),
+
+                "HT_Corner_Acceleration":
+                    linha.get("HT_Corner_Acceleration", "")
+            })
+
+        except Exception as e:
+
+            st.write(
+                "Erro tabela cantos:",
+                e
+            )
+
+    # =========================================================
+    # DATAFRAME
+    # =========================================================
+
+    df_tabela_cantos = pd.DataFrame(
+        lista_tabela_cantos
+    )
+
+    # =========================================================
+    # FILTRO
+    # =========================================================
+
+    busca_cantos = st.text_input(
+        "🔎 Buscar jogo"
+    )
+
+    if busca_cantos:
+
+        df_tabela_cantos = df_tabela_cantos[
+
+            (
+                df_tabela_cantos["Home"]
+                .astype(str)
+                .str.contains(
+                    busca_cantos,
+                    case=False,
+                    na=False
+                )
+            )
+
+            |
+
+            (
+                df_tabela_cantos["Away"]
+                .astype(str)
+                .str.contains(
+                    busca_cantos,
+                    case=False,
+                    na=False
+                )
+            )
+        ]
+
+    # =========================================================
+    # TABELA
+    # =========================================================
+
+    st.dataframe(
+
+        df_tabela_cantos,
+
+        use_container_width=True,
+
+        hide_index=True,
+
+        height=850
+    )
+
+
+
 # =========================================
-# 🤖 MOTOR IA FINAL (VERSÃO PROFISSIONAL) 🟡🟠🟧⚪🔘🔴🟠🟡🟢🔵🟣🟤⚫⚪🟥🟧🟨🟩🟦🟪🟫⬛⬜
+# ABA  07 🤖 MOTOR IA FINAL (VERSÃO PROFISSIONAL) 🟡🟠🟧⚪🔘🔴🟠🟡🟢🔵🟣🟤⚫⚪🟥🟧🟨🟩🟦🟪🟫⬛⬜
 # =========================================
 import pandas as pd
 
@@ -4894,539 +5153,533 @@ with tab8:
 🧠 {cs['operacional']}
 """
         )
-       
-# 📋 SCANNER OPERACIONAL CS
-# =========================================================
 
-st.markdown("## 📋 Scanner Operacional CS")
+    # =========================================================
+    # 📋 SCANNER OPERACIONAL CS
+    # =========================================================
 
-# =========================================================
-# 🌍 LISTA GLOBAL
-# =========================================================
+    st.markdown("## 📋 Scanner Operacional CS")
 
-lista_cs = []
+    # =========================================================
+    # 🌍 LISTA GLOBAL
+    # =========================================================
 
-# =========================================================
-# 🎮 LISTA DE JOGOS
-# =========================================================
+    lista_cs = []
 
-jogos = sorted(
+    # =========================================================
+    # 🎮 LISTA DE JOGOS
+    # =========================================================
 
-    df_exg["JOGO"]
+    jogos = sorted(
 
-    .dropna()
+        df_exg["JOGO"]
 
-    .unique()
+        .dropna()
 
-    .tolist()
-)
+        .unique()
 
-# =========================================================
-# 🔄 LOOP TODOS OS JOGOS
-# =========================================================
+        .tolist()
+    )
 
-for jogo in jogos:
+    # =========================================================
+    # 🔄 LOOP TODOS OS JOGOS
+    # =========================================================
 
-    try:
+    for jogo in jogos:
 
-        # =================================================
-        # ⚽ FILTRO JOGO
-        # =================================================
+        try:
 
-        linha_exg = df_exg[
-            df_exg["JOGO"] == jogo
-        ].iloc[0]
+            # =================================================
+            # ⚽ FILTRO JOGO
+            # =================================================
 
-        linha_consenso = df_consenso[
-            df_consenso["JOGO"] == jogo
-        ].iloc[0]
+            linha_exg = df_exg[
+                df_exg["JOGO"] == jogo
+            ].iloc[0]
 
-        home = linha_exg["Home_Team"]
+            linha_consenso = df_consenso[
+                df_consenso["JOGO"] == jogo
+            ].iloc[0]
 
-        away = linha_exg["Visitor_Team"]
+            home = linha_exg["Home_Team"]
 
-        # =================================================
-        # 🧠 SCORE OFENSIVO
-        # =================================================
+            away = linha_exg["Visitor_Team"]
 
-        score_ofensivo = linha_consenso.get(
-            "Score_Ofensivo",
-            50
-        )
+            # =================================================
+            # 🧠 SCORE OFENSIVO
+            # =================================================
 
-        # =================================================
-        # 🧠 PERFIL HOME
-        # =================================================
+            score_ofensivo = linha_consenso.get(
+                "Score_Ofensivo",
+                50
+            )
 
-        perfil_home = gerar_perfil_tatico(
+            # =================================================
+            # 🧠 PERFIL HOME
+            # =================================================
 
-            time=home,
+            perfil_home = gerar_perfil_tatico(
 
-            eficiencia=linha_consenso["Eficiência_H"],
+                time=home,
 
-            clean_sheet=linha_consenso[
-                "Clean_Sheet_Home_Consenso"
-            ],
+                eficiencia=linha_consenso["Eficiência_H"],
 
-            fs_win=linha_consenso["FS_Win_H"],
+                clean_sheet=linha_consenso[
+                    "Clean_Sheet_Home_Consenso"
+                ],
 
-            changer=linha_consenso["Changer_H"],
+                fs_win=linha_consenso["FS_Win_H"],
 
-            abrir_placar=linha_consenso[
+                changer=linha_consenso["Changer_H"],
+
+                abrir_placar=linha_consenso[
+                    "Home_Abrir_Placar_Consenso"
+                ],
+
+                ns_games=linha_consenso["NS_Games_H"],
+
+                gf_early=(
+                    linha_consenso["GF_0-15_Home"] +
+                    linha_consenso["GF_16-30_Home"]
+                ),
+
+                gf_mid=(
+                    linha_consenso["GF_31-45_Home"] +
+                    linha_consenso["GF_46-60_Home"]
+                ),
+
+                gf_late=(
+                    linha_consenso["GF_61-75_Home"] +
+                    linha_consenso["GF_76-90_Home"]
+                ),
+
+                gc_total=linha_consenso["MGC_H"],
+
+                odd_btts=linha_consenso["Odd_BTTS_YES"],
+
+                score_ofensivo=score_ofensivo
+            )
+
+            # =================================================
+            # 🧠 PERFIL AWAY
+            # =================================================
+
+            perfil_away = gerar_perfil_tatico(
+
+                time=away,
+
+                eficiencia=linha_consenso["Eficiência_A"],
+
+                clean_sheet=linha_consenso[
+                    "Clean_Sheet_Away_Consenso"
+                ],
+
+                fs_win=linha_consenso["FS_Win_A"],
+
+                changer=linha_consenso["Changer_A"],
+
+                abrir_placar=linha_consenso[
+                    "Away_Abrir_Placar_Consenso"
+                ],
+
+                ns_games=linha_consenso["NS_Games_A"],
+
+                gf_early=(
+                    linha_consenso["GF_0-15_Away"] +
+                    linha_consenso["GF_16-30_Away"]
+                ),
+
+                gf_mid=(
+                    linha_consenso["GF_31-45_Away"] +
+                    linha_consenso["GF_46-60_Away"]
+                ),
+
+                gf_late=(
+                    linha_consenso["GF_61-75_Away"] +
+                    linha_consenso["GF_76-90_Away"]
+                ),
+
+                gc_total=linha_consenso["MGC_A"],
+
+                odd_btts=linha_consenso["Odd_BTTS_YES"],
+
+                score_ofensivo=score_ofensivo
+            )
+
+            # =================================================
+            # 🥇 RANKING CS
+            # =================================================
+
+            ranking_cs = []
+
+            # =================================================
+            # 🔥 LAY 0x0
+            # =================================================
+
+            score_l00 = 0
+
+            if score_ofensivo >= 75:
+                score_l00 += 20
+
+            if linha_consenso["Odd_BTTS_YES"] <= 1.80:
+                score_l00 += 15
+
+            if linha_consenso[
                 "Home_Abrir_Placar_Consenso"
-            ],
+            ] >= 60:
 
-            ns_games=linha_consenso["NS_Games_H"],
+                score_l00 += 15
 
-            gf_early=(
-                linha_consenso["GF_0-15_Home"] +
-                linha_consenso["GF_16-30_Home"]
-            ),
-
-            gf_mid=(
-                linha_consenso["GF_31-45_Home"] +
-                linha_consenso["GF_46-60_Home"]
-            ),
-
-            gf_late=(
-                linha_consenso["GF_61-75_Home"] +
-                linha_consenso["GF_76-90_Home"]
-            ),
-
-            gc_total=linha_consenso["MGC_H"],
-
-            odd_btts=linha_consenso["Odd_BTTS_YES"],
-
-            score_ofensivo=score_ofensivo
-        )
-
-        # =================================================
-        # 🧠 PERFIL AWAY
-        # =================================================
-
-        perfil_away = gerar_perfil_tatico(
-
-            time=away,
-
-            eficiencia=linha_consenso["Eficiência_A"],
-
-            clean_sheet=linha_consenso[
-                "Clean_Sheet_Away_Consenso"
-            ],
-
-            fs_win=linha_consenso["FS_Win_A"],
-
-            changer=linha_consenso["Changer_A"],
-
-            abrir_placar=linha_consenso[
+            if linha_consenso[
                 "Away_Abrir_Placar_Consenso"
-            ],
+            ] >= 45:
 
-            ns_games=linha_consenso["NS_Games_A"],
+                score_l00 += 10
 
-            gf_early=(
-                linha_consenso["GF_0-15_Away"] +
-                linha_consenso["GF_16-30_Away"]
-            ),
+            ranking_cs.append({
 
-            gf_mid=(
-                linha_consenso["GF_31-45_Away"] +
-                linha_consenso["GF_46-60_Away"]
-            ),
+                "mercado":
+                    "Lay 0x0",
 
-            gf_late=(
-                linha_consenso["GF_61-75_Away"] +
-                linha_consenso["GF_76-90_Away"]
-            ),
+                "score":
+                    score_l00,
 
-            gc_total=linha_consenso["MGC_A"],
+                "confianca":
+                    round(
+                        min(score_l00 * 1.1, 99),
+                        1
+                    ),
 
-            odd_btts=linha_consenso["Odd_BTTS_YES"],
+                "janela":
+                    "0-30",
 
-            score_ofensivo=score_ofensivo
-        )
+                "operacional":
+                    "⚡ Entrada early",
 
-        # =================================================
-        # 🥇 RANKING CS
-        # =================================================
+                "motivos": [
 
-        ranking_cs = []
+                    "✔ Forte pressão ofensiva",
 
-        # =================================================
-        # 🔥 LAY 0x0
-        # =================================================
-
-        score_l00 = 0
-
-        if score_ofensivo >= 75:
-            score_l00 += 20
-
-        if linha_consenso["Odd_BTTS_YES"] <= 1.80:
-            score_l00 += 15
-
-        if linha_consenso[
-            "Home_Abrir_Placar_Consenso"
-        ] >= 60:
-
-            score_l00 += 15
-
-        if linha_consenso[
-            "Away_Abrir_Placar_Consenso"
-        ] >= 45:
-
-            score_l00 += 10
-
-        ranking_cs.append({
-
-            "mercado":
-                "Lay 0x0",
-
-            "score":
-                score_l00,
-
-            "confianca":
-                round(
-                    min(score_l00 * 1.1, 99),
-                    1
-                ),
-
-            "janela":
-                "0-30",
-
-            "operacional":
-                "⚡ Entrada early",
-
-            "motivos": [
-
-                "✔ Forte pressão ofensiva",
-
-                "✔ Tendência alta de gol"
-            ]
-        })
-
-        # =================================================
-        # 🔥 LAY 0x1
-        # =================================================
-
-        score_l01 = 0
-
-        if linha_consenso[
-            "Home_Abrir_Placar_Consenso"
-        ] >= 65:
-
-            score_l01 += 20
-
-        if linha_consenso[
-            "Clean_Sheet_Home_Consenso"
-        ] >= 55:
-
-            score_l01 += 15
-
-        if linha_consenso["FS_Win_H"] >= 60:
-            score_l01 += 15
-
-        ranking_cs.append({
-
-            "mercado":
-                "Lay 0x1",
-
-            "score":
-                score_l01,
-
-            "confianca":
-                round(
-                    min(score_l01 * 1.1, 99),
-                    1
-                ),
-
-            "janela":
-                "30-60",
-
-            "operacional":
-                "🔥 Pressão progressiva",
-
-            "motivos": [
-
-                "✔ Home dominante",
-
-                "✔ Forte tendência pressão"
-            ]
-        })
-
-        # =================================================
-        # 🔥 LAY 1x0
-        # =================================================
-
-        score_l10 = 0
-
-        if linha_consenso["Changer_A"] >= 35:
-            score_l10 += 20
-
-        if linha_consenso[
-            "Away_Abrir_Placar_Consenso"
-        ] >= 45:
-
-            score_l10 += 15
-
-        ranking_cs.append({
-
-            "mercado":
-                "Lay 1x0",
-
-            "score":
-                score_l10,
-
-            "confianca":
-                round(
-                    min(score_l10 * 1.1, 99),
-                    1
-                ),
-
-            "janela":
-                "45-75",
-
-            "operacional":
-                "⚡ Pressão away",
-
-            "motivos": [
-
-                "✔ Away reage bem",
-
-                "✔ Home vulnerável"
-            ]
-        })
-
-        # =================================================
-        # 🔥 LAY 2x2
-        # =================================================
-
-        score_l22 = 0
-
-        if linha_consenso[
-            "Clean_Sheet_Home_Consenso"
-        ] >= 55:
-
-            score_l22 += 15
-
-        if linha_consenso[
-            "Clean_Sheet_Away_Consenso"
-        ] >= 55:
-
-            score_l22 += 15
-
-        if linha_consenso["Odd_BTTS_YES"] >= 1.95:
-            score_l22 += 15
-
-        ranking_cs.append({
-
-            "mercado":
-                "Lay 2x2",
-
-            "score":
-                score_l22,
-
-            "confianca":
-                round(
-                    min(score_l22 * 1.1, 99),
-                    1
-                ),
-
-            "janela":
-                "30-60",
-
-            "operacional":
-                "🛡 Controle placar",
-
-            "motivos": [
-
-                "✔ Estrutura defensiva",
-
-                "✔ Baixa tendência caos"
-            ]
-        })
-
-        # =================================================
-        # 📊 ORDENAR
-        # =================================================
-
-        ranking_cs = sorted(
-
-            ranking_cs,
-
-            key=lambda x: x["score"],
-
-            reverse=True
-        )
-
-        melhor_cs = ranking_cs[0]
-
-        proximo_cs = ranking_cs[1]
-
-        # =================================================
-        # 📋 LISTA FINAL
-        # =================================================
-
-        lista_cs.append({
+                    "✔ Tendência alta de gol"
+                ]
+            })
 
             # =================================================
-            # 📊 RESULTADOS
+            # 🔥 LAY 0x1
             # =================================================
 
-            "Home_Team":
-                linha_exg.get("Home_Team", ""),
+            score_l01 = 0
 
-            "Result Home":
-                linha_exg.get("Result Home", ""),
+            if linha_consenso[
+                "Home_Abrir_Placar_Consenso"
+            ] >= 65:
 
-            "Result Visitor":
-                linha_exg.get("Result Visitor", ""),
+                score_l01 += 20
 
-            "Away_Team":
-                linha_exg.get("Visitor_Team", ""),
+            if linha_consenso[
+                "Clean_Sheet_Home_Consenso"
+            ] >= 55:
 
-            "Result_Home_HT":
-                linha_exg.get("Result_Home_HT", ""),
+                score_l01 += 15
 
-            "Result_Visitor_HT":
-                linha_exg.get("Result_Visitor_HT", ""),
+            if linha_consenso["FS_Win_H"] >= 60:
+                score_l01 += 15
+
+            ranking_cs.append({
+
+                "mercado":
+                    "Lay 0x1",
+
+                "score":
+                    score_l01,
+
+                "confianca":
+                    round(
+                        min(score_l01 * 1.1, 99),
+                        1
+                    ),
+
+                "janela":
+                    "30-60",
+
+                "operacional":
+                    "🔥 Pressão progressiva",
+
+                "motivos": [
+
+                    "✔ Home dominante",
+
+                    "✔ Forte tendência pressão"
+                ]
+            })
 
             # =================================================
-            # 🔥 ODDS
+            # 🔥 LAY 1x0
             # =================================================
 
-            "Odds_Casa":
-                linha_exg.get("Odds_Casa", ""),
+            score_l10 = 0
 
-            "Odds_Empate":
-                linha_exg.get("Odds_Empate", ""),
+            if linha_consenso["Changer_A"] >= 35:
+                score_l10 += 20
 
-            "Odds_Visitante":
-                linha_exg.get("Odds_Visitante", ""),
+            if linha_consenso[
+                "Away_Abrir_Placar_Consenso"
+            ] >= 45:
 
-            "Odd_Over_1,5FT":
-                linha_exg.get("Odd_Over_1,5FT", ""),
+                score_l10 += 15
 
-            "Odds_Over_2,5FT":
-                linha_exg.get("Odds_Over_2,5FT", ""),
+            ranking_cs.append({
 
-            "Odds_Under_2,5FT":
-                linha_exg.get("Odds_Under_2,5FT", ""),
+                "mercado":
+                    "Lay 1x0",
 
-            "Odd_BTTS_YES":
-                linha_exg.get("Odd_BTTS_YES", ""),
+                "score":
+                    score_l10,
 
-            "PERFIL HOME":
-                perfil_home["perfil"],
+                "confianca":
+                    round(
+                        min(score_l10 * 1.1, 99),
+                        1
+                    ),
 
-            "SCORE HOME":
-                perfil_home["score"],
+                "janela":
+                    "45-75",
 
-            "BLOCO HOME":
-                perfil_home["bloco"],
+                "operacional":
+                    "⚡ Pressão away",
 
-            "PONTOS HOME":
-                " | ".join(
-                    perfil_home["leitura"][:4]
-                ),
+                "motivos": [
 
-            "PERFIL AWAY":
-                perfil_away["perfil"],
+                    "✔ Away reage bem",
 
-            "SCORE AWAY":
-                perfil_away["score"],
+                    "✔ Home vulnerável"
+                ]
+            })
 
-            "BLOCO AWAY":
-                perfil_away["bloco"],
+            # =================================================
+            # 🔥 LAY 2x2
+            # =================================================
 
-            "PONTOS AWAY":
-                " | ".join(
-                    perfil_away["leitura"][:4]
-                ),
+            score_l22 = 0
 
-            "MELHOR CS":
-                (
-                    f"{melhor_cs['mercado']} "
-                    f"— Score "
-                    f"{melhor_cs['score']} "
-                    f"({melhor_cs['confianca']}%)"
-                ),
+            if linha_consenso[
+                "Clean_Sheet_Home_Consenso"
+            ] >= 55:
 
-            "JANELA":
-                melhor_cs["janela"],
+                score_l22 += 15
 
-            "DADOS CS":
-                " | ".join(
-                    melhor_cs["motivos"][:2]
-                ),
+            if linha_consenso[
+                "Clean_Sheet_Away_Consenso"
+            ] >= 55:
 
-            "OPERACIONAL CS":
-                melhor_cs["operacional"],
+                score_l22 += 15
 
-            "PRÓXIMO CS":
-                (
-                    f"{proximo_cs['mercado']} "
-                    f"— Score "
-                    f"{proximo_cs['score']} "
-                    f"({proximo_cs['confianca']}%)"
+            if linha_consenso["Odd_BTTS_YES"] >= 1.95:
+                score_l22 += 15
+
+            ranking_cs.append({
+
+                "mercado":
+                    "Lay 2x2",
+
+                "score":
+                    score_l22,
+
+                "confianca":
+                    round(
+                        min(score_l22 * 1.1, 99),
+                        1
+                    ),
+
+                "janela":
+                    "30-60",
+
+                "operacional":
+                    "🛡 Controle placar",
+
+                "motivos": [
+
+                    "✔ Estrutura defensiva",
+
+                    "✔ Baixa tendência caos"
+                ]
+            })
+
+            # =================================================
+            # 📊 ORDENAR
+            # =================================================
+
+            ranking_cs = sorted(
+
+                ranking_cs,
+
+                key=lambda x: x["score"],
+
+                reverse=True
+            )
+
+            melhor_cs = ranking_cs[0]
+
+            proximo_cs = ranking_cs[1]
+
+            # =================================================
+            # 📋 LISTA FINAL
+            # =================================================
+
+            lista_cs.append({
+
+                "Home_Team":
+                    linha_exg.get("Home_Team", ""),
+
+                "Result Home":
+                    linha_exg.get("Result Home", ""),
+
+                "Result Visitor":
+                    linha_exg.get("Result Visitor", ""),
+
+                "Away_Team":
+                    linha_exg.get("Visitor_Team", ""),
+
+                "Result_Home_HT":
+                    linha_exg.get("Result_Home_HT", ""),
+
+                "Result_Visitor_HT":
+                    linha_exg.get("Result_Visitor_HT", ""),
+
+                "Odds_Casa":
+                    linha_exg.get("Odds_Casa", ""),
+
+                "Odds_Empate":
+                    linha_exg.get("Odds_Empate", ""),
+
+                "Odds_Visitante":
+                    linha_exg.get("Odds_Visitante", ""),
+
+                "Odd_Over_1,5FT":
+                    linha_exg.get("Odd_Over_1,5FT", ""),
+
+                "Odds_Over_2,5FT":
+                    linha_exg.get("Odds_Over_2,5FT", ""),
+
+                "Odds_Under_2,5FT":
+                    linha_exg.get("Odds_Under_2,5FT", ""),
+
+                "Odd_BTTS_YES":
+                    linha_exg.get("Odd_BTTS_YES", ""),
+
+                "PERFIL HOME":
+                    perfil_home["perfil"],
+
+                "SCORE HOME":
+                    perfil_home["score"],
+
+                "BLOCO HOME":
+                    perfil_home["bloco"],
+
+                "PONTOS HOME":
+                    " | ".join(
+                        perfil_home["leitura"][:4]
+                    ),
+
+                "PERFIL AWAY":
+                    perfil_away["perfil"],
+
+                "SCORE AWAY":
+                    perfil_away["score"],
+
+                "BLOCO AWAY":
+                    perfil_away["bloco"],
+
+                "PONTOS AWAY":
+                    " | ".join(
+                        perfil_away["leitura"][:4]
+                    ),
+
+                "MELHOR CS":
+                    (
+                        f"{melhor_cs['mercado']} "
+                        f"— Score "
+                        f"{melhor_cs['score']} "
+                        f"({melhor_cs['confianca']}%)"
+                    ),
+
+                "JANELA":
+                    melhor_cs["janela"],
+
+                "DADOS CS":
+                    " | ".join(
+                        melhor_cs["motivos"][:2]
+                    ),
+
+                "OPERACIONAL CS":
+                    melhor_cs["operacional"],
+
+                "PRÓXIMO CS":
+                    (
+                        f"{proximo_cs['mercado']} "
+                        f"— Score "
+                        f"{proximo_cs['score']} "
+                        f"({proximo_cs['confianca']}%)"
+                    )
+            })
+
+        except Exception as e:
+
+            st.write(
+                f"Erro em {jogo}:",
+                e
+            )
+
+    # =========================================================
+    # 📊 DATAFRAME FINAL
+    # =========================================================
+
+    df_operacional_cs = pd.DataFrame(lista_cs)
+
+    # =========================================================
+    # 🔎 FILTRO
+    # =========================================================
+
+    busca = st.text_input(
+        "Buscar Time"
+    )
+
+    if busca:
+
+        df_operacional_cs = df_operacional_cs[
+
+            (
+                df_operacional_cs["Home_Team"]
+                .str.contains(
+                    busca,
+                    case=False,
+                    na=False
                 )
-        })
-
-    except Exception as e:
-
-        st.write(
-            f"Erro em {jogo}:",
-            e
-        )
-
-# =========================================================
-# 📊 DATAFRAME FINAL
-# =========================================================
-
-df_operacional_cs = pd.DataFrame(lista_cs)
-
-# =========================================================
-# 🔎 FILTRO
-# =========================================================
-
-busca = st.text_input(
-    "Buscar Time"
-)
-
-if busca:
-
-    df_operacional_cs = df_operacional_cs[
-
-        (
-            df_operacional_cs["HOME"]
-            .str.contains(
-                busca,
-                case=False,
-                na=False
             )
-        )
 
-        |
+            |
 
-        (
-            df_operacional_cs["AWAY"]
-            .str.contains(
-                busca,
-                case=False,
-                na=False
+            (
+                df_operacional_cs["Away_Team"]
+                .str.contains(
+                    busca,
+                    case=False,
+                    na=False
+                )
             )
-        )
-    ]
+        ]
 
-# =========================================================
-# 📊 OUTPUT FINAL
-# =========================================================
+    # =========================================================
+    # 📊 OUTPUT FINAL
+    # =========================================================
 
-st.dataframe(
+    st.dataframe(
 
-    df_operacional_cs,
+        df_operacional_cs,
 
-    use_container_width=True,
+        use_container_width=True,
 
-    hide_index=True
-)
+        hide_index=True
+    )
+        
        
