@@ -2549,7 +2549,7 @@ with tab6:
     # =========================================
     # 🚩 ESCANTEIOS - ASIÁTICOS / LIMITES
     # =========================================
-    st.markdown("### 🚩 Escanteios")
+    st.markdown("### 🚩 Escanteios - Race, Asiático e Limite")
 
     d1, d2, d3, d4 = st.columns(4)
 
