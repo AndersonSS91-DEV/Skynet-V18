@@ -2835,12 +2835,6 @@ with tab6:
                 "Away":
                     linha.get("Visitor_Team", ""),
 
-                "Result Home":
-                    linha.get("Result Home", ""),
-
-                "Result Visitor":
-                    linha.get("Result Visitor", ""),
-
                 "Dominio_Ofensivo":
                     linha.get("Dominio_Ofensivo", ""),
 
