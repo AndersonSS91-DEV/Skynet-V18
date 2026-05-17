@@ -2835,12 +2835,6 @@ with tab6:
                 "Away":
                     linha.get("Visitor_Team", ""),
 
-                "Result Home":
-                    linha.get("Result Home", ""),
-
-                "Result Visitor":
-                    linha.get("Result Visitor", ""),
-
                 "Dominio_Ofensivo":
                     linha.get("Dominio_Ofensivo", ""),
 
@@ -3547,7 +3541,12 @@ Home {home_emoji}   x   Away {away_emoji}
 
         lista_rank.append({
             "Home_Team": row.get("Home_Team", ""),
+            "Result Home": row.get("Result Home", ""),
+            "Result Visitor": row.get("Result Visitor", ""),
             "Away_Team": row.get("Visitor_Team", ""),
+            "Result_Home_HT": row.get("Result_Home_HT", ""),
+            "Result_Visitor_HT": row.get("Result_Visitor_HT", ""),
+
             "Tipo": res["Tipo"],
             "Entrada": res["Entrada"],
             "Classe": res["Classe"]
