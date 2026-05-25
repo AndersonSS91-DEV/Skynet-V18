@@ -317,6 +317,35 @@ elif os.path.exists(ARQUIVO_PADRAO):
 else:
     st.error("❌ Nenhum arquivo disponível (nem upload nem padrão)")
     st.stop()
+    
+# =========================================
+# 🧠 RANKING LAY AWAY 300K
+# =========================================
+RANKING_PATH = (
+    "data/"
+    "ranking_times_base_TOP600_LIMPO.xlsx"
+)
+
+if os.path.exists(RANKING_PATH):
+
+    df_rank_la = pd.read_excel(
+        RANKING_PATH
+    )
+
+    # 🔑 NORMALIZA
+    df_rank_la["Home_Key"] = (
+
+        df_rank_la["Home"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+
+    )
+
+else:
+
+    df_rank_la = pd.DataFrame()
+
 
 # =========================================
 # LEITURA DAS ABAS
@@ -3656,14 +3685,50 @@ Home {home_emoji}   x   Away {away_emoji}
 
     for _, row in df_clean.iterrows():
 
-        res = classificar_jogo(row)
+    res = classificar_jogo(row)
 
-        if not res:
-            continue
+    if not res:
+        continue
 
-        lista.append({
+    # =========================================
+    # 🧠 TIER LAY AWAY
+    # =========================================
+
+    tier_la = ""
+
+    if not df_rank_la.empty:
+
+        home_key = (
+
+            str(row["Home_Team"])
+            .strip()
+            .lower()
+
+        )
+
+        linha_rank = df_rank_la[
+
+            df_rank_la["Home_Key"]
+            == home_key
+
+        ]
+
+        if not linha_rank.empty:
+
+            tier_la = linha_rank.iloc[0].get(
+                "Tier_LA",
+                ""
+            )
+
+    # 🔥 MOSTRAR APENAS RANQUEADOS
+    if tier_la == "":
+        continue
+
+    lista.append({
+
             "Home": row["Home"],
             "Away": row["Away"],
+            "Tier_LA": tier_la,
             "Home_Team": row.get("Home_Team", ""),
             "Result Home": row.get("Result Home", ""),
             "Result Visitor": row.get("Result Visitor", ""),
