@@ -3677,13 +3677,13 @@ Home {home_emoji}   x   Away {away_emoji}
 
         except:
             return ""
+            
+# =========================================
+# 🧠 LISTA FINAL
+# =========================================
+lista = []
 
-    # =========================================
-    # 🧠 LISTA FINAL
-    # =========================================
-    lista = []
-
-    for _, row in df_clean.iterrows():
+for _, row in df_clean.iterrows():
 
     res = classificar_jogo(row)
 
@@ -3726,36 +3726,38 @@ Home {home_emoji}   x   Away {away_emoji}
 
     lista.append({
 
-            "Home": row["Home"],
-            "Away": row["Away"],
-            "Tier_LA": tier_la,
-            "Home_Team": row.get("Home_Team", ""),
-            "Result Home": row.get("Result Home", ""),
-            "Result Visitor": row.get("Result Visitor", ""),
-            "Away_Team": row.get("Visitor_Team", ""),
-            "Result_Home_HT": row.get("Result_Home_HT", ""),
-            "Result_Visitor_HT": row.get("Result_Visitor_HT", ""),
+        "Home": row["Home"],
+        "Away": row["Away"],
 
-            # 🔥 ODDS
-            "Odds_Casa": row.get("Odds_Casa", ""),
-            "Odds_Empate": row.get("Odds_Empate", ""),
-            "Odds_Visitante": row.get("Odds_Visitante", ""),
-            "Odd_Over_1,5FT": row.get("Odd_Over_1,5FT", ""),
-            "Odds_Over_2,5FT": row.get("Odds_Over_2,5FT", ""),
-            "Odds_Under_2,5FT": row.get("Odds_Under_2,5FT", ""),
-            "Odd_BTTS_YES": row.get("Odd_BTTS_YES", ""),
+        "Tier_LA": tier_la,
 
-            # 🔥 RESTO
-            "Tipo": res["Tipo"],
-            "Entrada": res["Entrada"],
-            "Classe": res["Classe"],
+        "Home_Team": row.get("Home_Team", ""),
+        "Result Home": row.get("Result Home", ""),
+        "Result Visitor": row.get("Result Visitor", ""),
+        "Away_Team": row.get("Visitor_Team", ""),
+        "Result_Home_HT": row.get("Result_Home_HT", ""),
+        "Result_Visitor_HT": row.get("Result_Visitor_HT", ""),
 
-            "LAY": definir_lay(row),
-            "Modelo": classificar_sniper_core(row),
+        # 🔥 ODDS
+        "Odds_Casa": row.get("Odds_Casa", ""),
+        "Odds_Empate": row.get("Odds_Empate", ""),
+        "Odds_Visitante": row.get("Odds_Visitante", ""),
+        "Odd_Over_1,5FT": row.get("Odd_Over_1,5FT", ""),
+        "Odds_Over_2,5FT": row.get("Odds_Over_2,5FT", ""),
+        "Odds_Under_2,5FT": row.get("Odds_Under_2,5FT", ""),
+        "Odd_BTTS_YES": row.get("Odd_BTTS_YES", ""),
 
-            "Poisson_Direcao": row.get("Poisson_Direcao", ""),
-            "IA_Direcao": row.get("IA_Direcao", "")
-        })
+        # 🔥 RESTO
+        "Tipo": res["Tipo"],
+        "Entrada": res["Entrada"],
+        "Classe": res["Classe"],
+
+        "LAY": definir_lay(row),
+        "Modelo": classificar_sniper_core(row),
+
+        "Poisson_Direcao": row.get("Poisson_Direcao", ""),
+        "IA_Direcao": row.get("IA_Direcao", "")
+    })
 
     # =========================================
     # 📈 OUTPUT FINAL
