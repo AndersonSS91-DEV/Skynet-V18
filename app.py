@@ -3686,7 +3686,7 @@ lista = []
 for _, row in df_clean.iterrows():
 
     # =========================================
-    # 🧠 CLASSIFICAÇÃO PRINCIPAL
+    # 🧠 CLASSIFICAÇÃO
     # =========================================
     res = classificar_jogo(row)
 
@@ -3694,8 +3694,11 @@ for _, row in df_clean.iterrows():
         continue
 
     # =========================================
-    # 🧠 DIREÇÕES
+    # 🎯 FILTRO 300K LAY AWAY
     # =========================================
+
+    passou_filtro_300k = True
+
     dir_poisson = str(
         row.get("Poisson_Direcao", "")
     )
@@ -3704,9 +3707,6 @@ for _, row in df_clean.iterrows():
         row.get("IA_Direcao", "")
     )
 
-    # =========================================
-    # 🎯 FILTRO LAY AWAY
-    # =========================================
     def is_lay_away(x):
 
         return (
@@ -3715,32 +3715,38 @@ for _, row in df_clean.iterrows():
             "lay away" in x.lower()
         )
 
-    passou_filtro_300k = True
-
-    # =========================================
+    # =====================================
     # 🚫 CONFLITOS
-    # =========================================
+    # =====================================
+
     if "conflito" in dir_poisson.lower():
+
         passou_filtro_300k = False
 
     if "conflito" in dir_ia.lower():
+
         passou_filtro_300k = False
 
     if "analisar" in dir_ia.lower():
+
         passou_filtro_300k = False
 
-    # =========================================
+    # =====================================
     # 🚫 NÃO É LAY AWAY
-    # =========================================
+    # =====================================
+
     if not is_lay_away(dir_poisson):
+
         passou_filtro_300k = False
 
     if not is_lay_away(dir_ia):
+
         passou_filtro_300k = False
 
-    # =========================================
+    # =====================================
     # 🚫 BLACKLIST
-    # =========================================
+    # =====================================
+
     league = str(
         row.get("League", "")
     ).lower()
@@ -3775,9 +3781,10 @@ for _, row in df_clean.iterrows():
 
         passou_filtro_300k = False
 
-    # =========================================
+    # =====================================
     # 🚫 UNDER 2.5
-    # =========================================
+    # =====================================
+
     odd_under25 = row.get(
         "Odds_Under_2,5FT",
         np.nan
@@ -3789,9 +3796,10 @@ for _, row in df_clean.iterrows():
 
             passou_filtro_300k = False
 
-    # =========================================
+    # =====================================
     # 🚫 CV AWAY
-    # =========================================
+    # =====================================
+
     CV_CG_A_01 = row.get(
         "CV_CG_A_01",
         np.nan
@@ -3803,9 +3811,10 @@ for _, row in df_clean.iterrows():
 
             passou_filtro_300k = False
 
-    # =========================================
-    # 🚫 AWAY ROCKET/VOLCANO
-    # =========================================
+    # =====================================
+    # 🚫 AWAY ROCKET / VOLCANO
+    # =====================================
+
     Media_CG_A_01 = row.get(
         "Media_CG_A_01",
         np.nan
@@ -3826,14 +3835,17 @@ for _, row in df_clean.iterrows():
         )
 
     if away_is_rocket():
+
         passou_filtro_300k = False
 
     if away_is_volcano():
+
         passou_filtro_300k = False
 
     # =========================================
     # 🧠 TIER LAY AWAY
     # =========================================
+
     tier_la = ""
 
     if passou_filtro_300k:
@@ -3859,7 +3871,7 @@ for _, row in df_clean.iterrows():
 
                 tier_la = linha_rank.iloc[0].get(
                     "Tier_LA",
-                    ""
+                    "Sem Sinal"
                 )
 
             else:
@@ -3867,15 +3879,18 @@ for _, row in df_clean.iterrows():
                 tier_la = "Sem Sinal"
 
     # =========================================
-    # 📋 LISTA FINAL
+    # 📋 APPEND FINAL
     # =========================================
+
     lista.append({
 
         "Home": row["Home"],
         "Away": row["Away"],
 
+        # 🔥 TIER
         "Tier_LA": tier_la,
 
+        # 🔥 TIMES
         "Home_Team": row.get(
             "Home_Team",
             ""
@@ -3886,6 +3901,28 @@ for _, row in df_clean.iterrows():
             ""
         ),
 
+        # 🔥 RESULTADOS
+        "Result Home": row.get(
+            "Result Home",
+            ""
+        ),
+
+        "Result Visitor": row.get(
+            "Result Visitor",
+            ""
+        ),
+
+        "Result_Home_HT": row.get(
+            "Result_Home_HT",
+            ""
+        ),
+
+        "Result_Visitor_HT": row.get(
+            "Result_Visitor_HT",
+            ""
+        ),
+
+        # 🔥 ODDS
         "Odds_Casa": row.get(
             "Odds_Casa",
             ""
@@ -3901,6 +3938,27 @@ for _, row in df_clean.iterrows():
             ""
         ),
 
+        "Odd_Over_1,5FT": row.get(
+            "Odd_Over_1,5FT",
+            ""
+        ),
+
+        "Odds_Over_2,5FT": row.get(
+            "Odds_Over_2,5FT",
+            ""
+        ),
+
+        "Odds_Under_2,5FT": row.get(
+            "Odds_Under_2,5FT",
+            ""
+        ),
+
+        "Odd_BTTS_YES": row.get(
+            "Odd_BTTS_YES",
+            ""
+        ),
+
+        # 🔥 MODELO
         "Tipo": res["Tipo"],
         "Entrada": res["Entrada"],
         "Classe": res["Classe"],
@@ -3919,6 +3977,24 @@ for _, row in df_clean.iterrows():
             ""
         )
     })
+
+# =========================================
+# 📈 OUTPUT FINAL
+# =========================================
+
+if lista:
+
+    df_final_aba7 = pd.DataFrame(lista)
+
+    st.dataframe(
+        df_final_aba7,
+        use_container_width=True,
+        hide_index=True
+    )
+
+else:
+
+    st.info("Sem jogos válidos após filtro")
 
 
 # =========================================
