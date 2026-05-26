@@ -3906,19 +3906,20 @@ for _, row in df_clean.iterrows():
 
                 tier_la = "Sem Sinal"
                 
-    # =========================================
-    # 🧠 TIER LAY HOME
-    # =========================================
 
+    # =========================================
+    # 🎯 LAY HOME
+    # =========================================
     tier_lh = ""
 
     # 🔥 SOMENTE LAY HOME
-    if (
-        is_lay_away(dir_poisson)
-        and
-        is_lay_away(dir_ia)
-    ):
+    def is_lay_home(x):
 
+        return (
+            isinstance(x, str)
+            and
+            "lay home" in x.lower()
+        )
         if not df_rank_lh.empty:
 
             away_key = (
