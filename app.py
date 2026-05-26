@@ -346,6 +346,34 @@ else:
 
     df_rank_la = pd.DataFrame()
 
+# =========================================
+# 🧠 RANKING LAY HOME
+# =========================================
+
+RANKING_LH_PATH = (
+    "data/"
+    "ranking_away_base_TOP200_LIMPO.xlsx"
+)
+
+if os.path.exists(RANKING_LH_PATH):
+
+    df_rank_lh = pd.read_excel(
+        RANKING_LH_PATH
+    )
+
+    df_rank_lh["Away_Key"] = (
+
+        df_rank_lh["Away"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+
+    )
+
+else:
+
+    df_rank_lh = pd.DataFrame()
+
 
 # =========================================
 # LEITURA DAS ABAS
@@ -3877,6 +3905,47 @@ for _, row in df_clean.iterrows():
             else:
 
                 tier_la = "Sem Sinal"
+                
+    # =========================================
+    # 🧠 TIER LAY HOME
+    # =========================================
+
+    tier_lh = ""
+
+    # 🔥 SOMENTE LAY HOME
+    if (
+        is_lay_away(dir_poisson)
+        and
+        is_lay_away(dir_ia)
+    ):
+
+        if not df_rank_lh.empty:
+
+            away_key = (
+
+                str(row["Visitor_Team"])
+                .strip()
+                .lower()
+
+            )
+
+            linha_rank = df_rank_lh[
+
+                df_rank_lh["Away_Key"]
+                == away_key
+
+            ]
+
+            if not linha_rank.empty:
+
+                tier_lh = linha_rank.iloc[0].get(
+                    "Tier_LH",
+                    "Sem Sinal"
+                )
+
+            else:
+
+                tier_lh = "Sem Sinal"
 
     # =========================================
     # 📋 APPEND FINAL
@@ -3889,6 +3958,7 @@ for _, row in df_clean.iterrows():
 
         # 🔥 TIER
         "Tier_LA": tier_la,
+        "Tier_LH": tier_lh,
 
         # 🔥 TIMES
         "Home_Team": row.get(
