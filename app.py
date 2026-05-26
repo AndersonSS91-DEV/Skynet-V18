@@ -3694,7 +3694,7 @@ for _, row in df_clean.iterrows():
     # 🧠 TIER LAY AWAY
     # =========================================
 
-    tier_la = ""
+    tier_la = "Sem Sinal"
 
     if not df_rank_la.empty:
 
@@ -3717,18 +3717,19 @@ for _, row in df_clean.iterrows():
 
             tier_la = linha_rank.iloc[0].get(
                 "Tier_LA",
-                ""
+                "Sem Sinal"
             )
 
-    # 🔥 MOSTRAR APENAS RANQUEADOS
-    if tier_la == "":
-        continue
+    # =========================================
+    # 🧠 LISTA FINAL
+    # =========================================
 
     lista.append({
 
         "Home": row["Home"],
         "Away": row["Away"],
 
+        # 🔥 NOVA COLUNA
         "Tier_LA": tier_la,
 
         "Home_Team": row.get("Home_Team", ""),
@@ -3759,22 +3760,25 @@ for _, row in df_clean.iterrows():
         "IA_Direcao": row.get("IA_Direcao", "")
     })
 
-    # =========================================
-    # 📈 OUTPUT FINAL
-    # =========================================
-    if lista:
+# =========================================
+# 📈 OUTPUT FINAL
+# =========================================
 
-        df_final_aba7 = pd.DataFrame(lista)
+if lista:
 
-        st.dataframe(
-            df_final_aba7,
-            use_container_width=True,
-            hide_index=True
-        )
+    df_final_aba7 = pd.DataFrame(lista)
 
-    else:
+    st.dataframe(
+        df_final_aba7,
+        use_container_width=True,
+        hide_index=True
+    )
 
-        st.info("Sem jogos válidos após filtro")
+else:
+
+    st.info("Sem jogos válidos após filtro")
+
+
 # =========================================
 # ABA 8 — CLEAN SHEET (CS)
 # =========================================
