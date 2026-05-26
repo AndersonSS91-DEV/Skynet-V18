@@ -3685,98 +3685,240 @@ lista = []
 
 for _, row in df_clean.iterrows():
 
+    # =========================================
+    # 🧠 CLASSIFICAÇÃO PRINCIPAL
+    # =========================================
     res = classificar_jogo(row)
 
     if not res:
         continue
 
     # =========================================
-    # 🧠 TIER LAY AWAY
+    # 🧠 DIREÇÕES
     # =========================================
+    dir_poisson = str(
+        row.get("Poisson_Direcao", "")
+    )
 
-    tier_la = "Sem Sinal"
+    dir_ia = str(
+        row.get("IA_Direcao", "")
+    )
 
-    if not df_rank_la.empty:
+    # =========================================
+    # 🎯 FILTRO LAY AWAY
+    # =========================================
+    def is_lay_away(x):
 
-        home_key = (
-
-            str(row["Home_Team"])
-            .strip()
-            .lower()
-
+        return (
+            isinstance(x, str)
+            and
+            "lay away" in x.lower()
         )
 
-        linha_rank = df_rank_la[
+    passou_filtro_300k = True
 
-            df_rank_la["Home_Key"]
-            == home_key
+    # =========================================
+    # 🚫 CONFLITOS
+    # =========================================
+    if "conflito" in dir_poisson.lower():
+        passou_filtro_300k = False
 
-        ]
+    if "conflito" in dir_ia.lower():
+        passou_filtro_300k = False
 
-        if not linha_rank.empty:
+    if "analisar" in dir_ia.lower():
+        passou_filtro_300k = False
 
-            tier_la = linha_rank.iloc[0].get(
-                "Tier_LA",
-                "Sem Sinal"
+    # =========================================
+    # 🚫 NÃO É LAY AWAY
+    # =========================================
+    if not is_lay_away(dir_poisson):
+        passou_filtro_300k = False
+
+    if not is_lay_away(dir_ia):
+        passou_filtro_300k = False
+
+    # =========================================
+    # 🚫 BLACKLIST
+    # =========================================
+    league = str(
+        row.get("League", "")
+    ).lower()
+
+    blacklist_keywords = [
+
+        "u17",
+        "u19",
+        "u20",
+        "u21",
+        "u23",
+        "youth",
+        "juniores",
+        "juvenil",
+
+        "women",
+        "woman",
+        "feminino",
+        "fem",
+
+        "reserve",
+        "reserves",
+
+        "friendly",
+        "amistoso"
+    ]
+
+    if any(
+        word in league
+        for word in blacklist_keywords
+    ):
+
+        passou_filtro_300k = False
+
+    # =========================================
+    # 🚫 UNDER 2.5
+    # =========================================
+    odd_under25 = row.get(
+        "Odds_Under_2,5FT",
+        np.nan
+    )
+
+    if pd.notna(odd_under25):
+
+        if odd_under25 > 8.50:
+
+            passou_filtro_300k = False
+
+    # =========================================
+    # 🚫 CV AWAY
+    # =========================================
+    CV_CG_A_01 = row.get(
+        "CV_CG_A_01",
+        np.nan
+    )
+
+    if pd.notna(CV_CG_A_01):
+
+        if CV_CG_A_01 > 2.00:
+
+            passou_filtro_300k = False
+
+    # =========================================
+    # 🚫 AWAY ROCKET/VOLCANO
+    # =========================================
+    Media_CG_A_01 = row.get(
+        "Media_CG_A_01",
+        np.nan
+    )
+
+    def away_is_rocket():
+
+        return (
+            2.70 <= Media_CG_A_01 <= 3.00
+            and CV_CG_A_01 <= 0.90
+        )
+
+    def away_is_volcano():
+
+        return (
+            2.80 <= Media_CG_A_01 <= 5.50
+            and CV_CG_A_01 <= 0.80
+        )
+
+    if away_is_rocket():
+        passou_filtro_300k = False
+
+    if away_is_volcano():
+        passou_filtro_300k = False
+
+    # =========================================
+    # 🧠 TIER LAY AWAY
+    # =========================================
+    tier_la = ""
+
+    if passou_filtro_300k:
+
+        if not df_rank_la.empty:
+
+            home_key = (
+
+                str(row["Home_Team"])
+                .strip()
+                .lower()
+
             )
 
-    # =========================================
-    # 🧠 LISTA FINAL
-    # =========================================
+            linha_rank = df_rank_la[
 
+                df_rank_la["Home_Key"]
+                == home_key
+
+            ]
+
+            if not linha_rank.empty:
+
+                tier_la = linha_rank.iloc[0].get(
+                    "Tier_LA",
+                    ""
+                )
+
+            else:
+
+                tier_la = "Sem Sinal"
+
+    # =========================================
+    # 📋 LISTA FINAL
+    # =========================================
     lista.append({
 
         "Home": row["Home"],
         "Away": row["Away"],
 
-        # 🔥 NOVA COLUNA
         "Tier_LA": tier_la,
 
-        "Home_Team": row.get("Home_Team", ""),
-        "Result Home": row.get("Result Home", ""),
-        "Result Visitor": row.get("Result Visitor", ""),
-        "Away_Team": row.get("Visitor_Team", ""),
-        "Result_Home_HT": row.get("Result_Home_HT", ""),
-        "Result_Visitor_HT": row.get("Result_Visitor_HT", ""),
+        "Home_Team": row.get(
+            "Home_Team",
+            ""
+        ),
 
-        # 🔥 ODDS
-        "Odds_Casa": row.get("Odds_Casa", ""),
-        "Odds_Empate": row.get("Odds_Empate", ""),
-        "Odds_Visitante": row.get("Odds_Visitante", ""),
-        "Odd_Over_1,5FT": row.get("Odd_Over_1,5FT", ""),
-        "Odds_Over_2,5FT": row.get("Odds_Over_2,5FT", ""),
-        "Odds_Under_2,5FT": row.get("Odds_Under_2,5FT", ""),
-        "Odd_BTTS_YES": row.get("Odd_BTTS_YES", ""),
+        "Away_Team": row.get(
+            "Visitor_Team",
+            ""
+        ),
 
-        # 🔥 RESTO
+        "Odds_Casa": row.get(
+            "Odds_Casa",
+            ""
+        ),
+
+        "Odds_Empate": row.get(
+            "Odds_Empate",
+            ""
+        ),
+
+        "Odds_Visitante": row.get(
+            "Odds_Visitante",
+            ""
+        ),
+
         "Tipo": res["Tipo"],
         "Entrada": res["Entrada"],
         "Classe": res["Classe"],
 
         "LAY": definir_lay(row),
+
         "Modelo": classificar_sniper_core(row),
 
-        "Poisson_Direcao": row.get("Poisson_Direcao", ""),
-        "IA_Direcao": row.get("IA_Direcao", "")
+        "Poisson_Direcao": row.get(
+            "Poisson_Direcao",
+            ""
+        ),
+
+        "IA_Direcao": row.get(
+            "IA_Direcao",
+            ""
+        )
     })
-
-# =========================================
-# 📈 OUTPUT FINAL
-# =========================================
-
-if lista:
-
-    df_final_aba7 = pd.DataFrame(lista)
-
-    st.dataframe(
-        df_final_aba7,
-        use_container_width=True,
-        hide_index=True
-    )
-
-else:
-
-    st.info("Sem jogos válidos após filtro")
 
 
 # =========================================
