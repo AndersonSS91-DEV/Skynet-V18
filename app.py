@@ -3970,35 +3970,40 @@ for _, row in df_clean.iterrows():
 
     tier_la = ""
 
-    if passou_filtro_la:
+    if "lay away" in dir_ia.lower():
 
-        if not df_rank_la.empty:
+        odd_home = row.get(
+            "Odds_Casa",
+            np.nan
+        )
 
-            home_key = (
+        if pd.notna(odd_home):
 
-                str(row["Home"])
-                .strip()
-                .lower()
+            if odd_home > 1.13:
 
-            )
+                if not df_rank_la.empty:
 
-            linha_rank = df_rank_la[
+                    home_key = (
 
-                df_rank_la["Home_Key"]
-                == home_key
+                        str(row["Home"])
+                        .strip()
+                        .lower()
 
-            ]
+                    )
 
-            if not linha_rank.empty:
+                    linha_rank = df_rank_la[
 
-                tier_la = linha_rank.iloc[0].get(
-                    "Tier_LA",
-                    "Sem Sinal"
-                )
+                        df_rank_la["Home_Key"]
+                        == home_key
 
-            else:
+                    ]
 
-                tier_la = "Sem Sinal"
+                    if not linha_rank.empty:
+
+                        tier_la = linha_rank.iloc[0].get(
+                            "Tier_LA",
+                            ""
+                        )
 
     # =========================================
     # 🧠 TIER LAY HOME
@@ -4006,35 +4011,40 @@ for _, row in df_clean.iterrows():
 
     tier_lh = ""
 
-    if passou_filtro_lh:
+    if "lay home" in dir_ia.lower():
 
-        if not df_rank_lh.empty:
+        odd_away = row.get(
+            "Odds_Visitante",
+            np.nan
+        )
 
-            away_key = (
+        if pd.notna(odd_away):
 
-                str(row["Visitor_Team"])
-                .strip()
-                .lower()
+            if odd_away > 1.13:
 
-            )
+                if not df_rank_lh.empty:
 
-            linha_rank = df_rank_lh[
+                    away_key = (
 
-                df_rank_lh["Away_Key"]
-                == away_key
+                        str(row["Visitor_Team"])
+                        .strip()
+                        .lower()
 
-            ]
+                    )
 
-            if not linha_rank.empty:
+                    linha_rank = df_rank_lh[
 
-                tier_lh = linha_rank.iloc[0].get(
-                    "Tier_LH",
-                    "Sem Sinal"
-                )
+                        df_rank_lh["Away_Key"]
+                        == away_key
 
-            else:
+                    ]
 
-                tier_lh = "Sem Sinal"
+                    if not linha_rank.empty:
+
+                        tier_lh = linha_rank.iloc[0].get(
+                            "Tier_LH",
+                            ""
+                        )
 
     # =========================================
     # 📋 APPEND FINAL
