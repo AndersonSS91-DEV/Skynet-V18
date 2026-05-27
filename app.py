@@ -3709,6 +3709,7 @@ Home {home_emoji}   x   Away {away_emoji}
 # =========================================
 # 🧠 LISTA FINAL
 # =========================================
+
 lista = []
 
 for _, row in df_clean.iterrows():
@@ -3716,16 +3717,15 @@ for _, row in df_clean.iterrows():
     # =========================================
     # 🧠 CLASSIFICAÇÃO
     # =========================================
+
     res = classificar_jogo(row)
 
     if not res:
         continue
 
     # =========================================
-    # 🎯 FILTRO 300K LAY AWAY
+    # 🎯 DIREÇÕES
     # =========================================
-
-    passou_filtro_300k = True
 
     dir_poisson = str(
         row.get("Poisson_Direcao", "")
@@ -3735,6 +3735,10 @@ for _, row in df_clean.iterrows():
         row.get("IA_Direcao", "")
     )
 
+    # =========================================
+    # 🎯 FUNÇÕES
+    # =========================================
+
     def is_lay_away(x):
 
         return (
@@ -3743,37 +3747,67 @@ for _, row in df_clean.iterrows():
             "lay away" in x.lower()
         )
 
-    # =====================================
+    def is_lay_home(x):
+
+        return (
+            isinstance(x, str)
+            and
+            "lay home" in x.lower()
+        )
+
+    # =========================================
+    # 🎯 FLAGS
+    # =========================================
+
+    passou_filtro_la = True
+    passou_filtro_lh = True
+
+    # =========================================
     # 🚫 CONFLITOS
-    # =====================================
+    # =========================================
 
     if "conflito" in dir_poisson.lower():
 
-        passou_filtro_300k = False
+        passou_filtro_la = False
+        passou_filtro_lh = False
 
     if "conflito" in dir_ia.lower():
 
-        passou_filtro_300k = False
+        passou_filtro_la = False
+        passou_filtro_lh = False
 
     if "analisar" in dir_ia.lower():
 
-        passou_filtro_300k = False
+        passou_filtro_la = False
+        passou_filtro_lh = False
 
-    # =====================================
+    # =========================================
     # 🚫 NÃO É LAY AWAY
-    # =====================================
+    # =========================================
 
-    if not is_lay_away(dir_poisson):
+    if not (
+        is_lay_away(dir_poisson)
+        or
+        is_lay_away(dir_ia)
+    ):
 
-        passou_filtro_300k = False
+        passou_filtro_la = False
 
-    if not is_lay_away(dir_ia):
+    # =========================================
+    # 🚫 NÃO É LAY HOME
+    # =========================================
 
-        passou_filtro_300k = False
+    if not (
+        is_lay_home(dir_poisson)
+        or
+        is_lay_home(dir_ia)
+    ):
 
-    # =====================================
+        passou_filtro_lh = False
+
+    # =========================================
     # 🚫 BLACKLIST
-    # =====================================
+    # =========================================
 
     league = str(
         row.get("League", "")
@@ -3807,11 +3841,12 @@ for _, row in df_clean.iterrows():
         for word in blacklist_keywords
     ):
 
-        passou_filtro_300k = False
+        passou_filtro_la = False
+        passou_filtro_lh = False
 
-    # =====================================
+    # =========================================
     # 🚫 UNDER 2.5
-    # =====================================
+    # =========================================
 
     odd_under25 = row.get(
         "Odds_Under_2,5FT",
@@ -3822,14 +3857,20 @@ for _, row in df_clean.iterrows():
 
         if odd_under25 > 8.50:
 
-            passou_filtro_300k = False
+            passou_filtro_la = False
+            passou_filtro_lh = False
 
-    # =====================================
+    # =========================================
     # 🚫 CV AWAY
-    # =====================================
+    # =========================================
 
     CV_CG_A_01 = row.get(
         "CV_CG_A_01",
+        np.nan
+    )
+
+    Media_CG_A_01 = row.get(
+        "Media_CG_A_01",
         np.nan
     )
 
@@ -3837,38 +3878,91 @@ for _, row in df_clean.iterrows():
 
         if CV_CG_A_01 > 2.00:
 
-            passou_filtro_300k = False
+            passou_filtro_la = False
 
-    # =====================================
-    # 🚫 AWAY ROCKET / VOLCANO
-    # =====================================
-
-    Media_CG_A_01 = row.get(
-        "Media_CG_A_01",
-        np.nan
-    )
+    # =========================================
+    # 🚫 AWAY ROCKET
+    # =========================================
 
     def away_is_rocket():
 
         return (
             2.70 <= Media_CG_A_01 <= 3.00
-            and CV_CG_A_01 <= 0.90
+            and
+            CV_CG_A_01 <= 0.90
         )
+
+    # =========================================
+    # 🚫 AWAY VOLCANO
+    # =========================================
 
     def away_is_volcano():
 
         return (
             2.80 <= Media_CG_A_01 <= 5.50
-            and CV_CG_A_01 <= 0.80
+            and
+            CV_CG_A_01 <= 0.80
         )
 
     if away_is_rocket():
 
-        passou_filtro_300k = False
+        passou_filtro_la = False
 
     if away_is_volcano():
 
-        passou_filtro_300k = False
+        passou_filtro_la = False
+
+    # =========================================
+    # 🚫 CV HOME
+    # =========================================
+
+    CV_CG_H_01 = row.get(
+        "CV_CG_H_01",
+        np.nan
+    )
+
+    Media_CG_H_01 = row.get(
+        "Media_CG_H_01",
+        np.nan
+    )
+
+    if pd.notna(CV_CG_H_01):
+
+        if CV_CG_H_01 > 2.00:
+
+            passou_filtro_lh = False
+
+    # =========================================
+    # 🚫 HOME ROCKET
+    # =========================================
+
+    def home_is_rocket():
+
+        return (
+            2.70 <= Media_CG_H_01 <= 3.00
+            and
+            CV_CG_H_01 <= 0.90
+        )
+
+    # =========================================
+    # 🚫 HOME VOLCANO
+    # =========================================
+
+    def home_is_volcano():
+
+        return (
+            2.80 <= Media_CG_H_01 <= 5.50
+            and
+            CV_CG_H_01 <= 0.80
+        )
+
+    if home_is_rocket():
+
+        passou_filtro_lh = False
+
+    if home_is_volcano():
+
+        passou_filtro_lh = False
 
     # =========================================
     # 🧠 TIER LAY AWAY
@@ -3876,13 +3970,13 @@ for _, row in df_clean.iterrows():
 
     tier_la = ""
 
-    if passou_filtro_300k:
+    if passou_filtro_la:
 
         if not df_rank_la.empty:
 
             home_key = (
 
-                str(row["Home_Team"])
+                str(row["Home"])
                 .strip()
                 .lower()
 
@@ -3905,27 +3999,14 @@ for _, row in df_clean.iterrows():
             else:
 
                 tier_la = "Sem Sinal"
-                
 
     # =========================================
-    # 🎯 LAY HOME
+    # 🧠 TIER LAY HOME
     # =========================================
-
-    def is_lay_home(x):
-
-        return (
-            isinstance(x, str)
-            and
-            "lay home" in x.lower()
-        )
 
     tier_lh = ""
 
-    if (
-        is_lay_home(dir_poisson)
-        and
-        is_lay_home(dir_ia)
-    ):
+    if passou_filtro_lh:
 
         if not df_rank_lh.empty:
 
