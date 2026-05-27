@@ -4026,7 +4026,7 @@ for _, row in df_clean.iterrows():
 
                     away_key = (
 
-                        str(row["Away_Team"])
+                        str(row["Visitor_Team"])
                         .strip()
                         .lower()
 
@@ -4046,6 +4046,7 @@ for _, row in df_clean.iterrows():
                             ""
                         )
 
+    
     # =========================================
     # 📋 APPEND FINAL
     # =========================================
