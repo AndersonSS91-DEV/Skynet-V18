@@ -3970,40 +3970,42 @@ for _, row in df_clean.iterrows():
 
     tier_la = ""
 
-    if "lay away" in dir_ia.lower():
+    if passou_filtro_la:
 
-        odd_home = row.get(
-            "Odds_Casa",
-            np.nan
-        )
+        if "lay away" in dir_ia.lower():
 
-        if pd.notna(odd_home):
+            odd_home = row.get(
+                "Odds_Casa",
+                np.nan
+            )
 
-            if odd_home > 1.13:
+            if pd.notna(odd_home):
 
-                if not df_rank_la.empty:
+                if odd_home > 1.13:
 
-                    home_key = (
+                    if not df_rank_la.empty:
 
-                        str(row["Home_Team"])
-                        .strip()
-                        .lower()
+                        home_key = (
 
-                    )
+                            str(row["Home_Team"])
+                            .strip()
+                            .lower()
 
-                    linha_rank = df_rank_la[
-
-                        df_rank_la["Home_Key"]
-                        == home_key
-
-                    ]
-
-                    if not linha_rank.empty:
-
-                        tier_la = linha_rank.iloc[0].get(
-                            "Tier_LA",
-                            ""
                         )
+
+                        linha_rank = df_rank_la[
+
+                            df_rank_la["Home_Key"]
+                            == home_key
+
+                        ]
+
+                        if not linha_rank.empty:
+
+                            tier_la = linha_rank.iloc[0].get(
+                                "Tier_LA",
+                                ""
+                            )
 
     # =========================================
     # 🧠 TIER LAY HOME
@@ -4011,40 +4013,42 @@ for _, row in df_clean.iterrows():
 
     tier_lh = ""
 
-    if "lay home" in dir_ia.lower():
+    if passou_filtro_lh:
 
-        odd_away = row.get(
-            "Odds_Visitante",
-            np.nan
-        )
+        if "lay home" in dir_ia.lower():
 
-        if pd.notna(odd_away):
+            odd_away = row.get(
+                "Odds_Visitante",
+                np.nan
+            )
 
-            if odd_away > 1.13:
+            if pd.notna(odd_away):
 
-                if not df_rank_lh.empty:
+                if odd_away > 1.13:
 
-                    away_key = (
+                    if not df_rank_lh.empty:
 
-                        str(row["Visitor_Team"])
-                        .strip()
-                        .lower()
+                        away_key = (
 
-                    )
+                            str(row["Visitor_Team"])
+                            .strip()
+                            .lower()
 
-                    linha_rank = df_rank_lh[
-
-                        df_rank_lh["Away_Key"]
-                        == away_key
-
-                    ]
-
-                    if not linha_rank.empty:
-
-                        tier_lh = linha_rank.iloc[0].get(
-                            "Tier_LH",
-                            ""
                         )
+
+                        linha_rank = df_rank_lh[
+
+                            df_rank_lh["Away_Key"]
+                            == away_key
+
+                        ]
+
+                        if not linha_rank.empty:
+
+                            tier_lh = linha_rank.iloc[0].get(
+                                "Tier_LH",
+                                ""
+                            )
 
     
     # =========================================
