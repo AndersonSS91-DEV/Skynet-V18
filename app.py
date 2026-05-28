@@ -4090,8 +4090,10 @@ for _, row in df_clean.iterrows():
         row.get("IA_Direcao", "")
     ).lower()
 
-    # 🚫 SOMENTE BLOQUEIA LAY HOME
+    # 🚫 NÃO PEGA LAY HOME
     if "lay home" not in dir_ia:
+
+        passou_filtro_lght = True
 
         # =====================================
         # 🚫 BLACKLIST
@@ -4118,16 +4120,10 @@ for _, row in df_clean.iterrows():
 
             "youth",
 
-            "mexico liga premier",
-
-            "nicaragua",
-
             "friendly",
             "amistoso"
 
         ]
-
-        passou_filtro_lght = True
 
         if any(
             word in league
@@ -4137,7 +4133,7 @@ for _, row in df_clean.iterrows():
             passou_filtro_lght = False
 
         # =====================================
-        # 📊 MÉTRICAS
+        # 📊 MÉTRICAS HT
         # =====================================
 
         MGF_HT_Away = row.get(
@@ -4145,18 +4141,8 @@ for _, row in df_clean.iterrows():
             np.nan
         )
 
-        FS_HT_A = row.get(
-            "FS_HT_A",
-            np.nan
-        )
-
         MGC_HT_Home = row.get(
             "MGC_HT_Home",
-            np.nan
-        )
-
-        Eficiencia_HT_H = row.get(
-            "Eficiência_HT_H",
             np.nan
         )
 
@@ -4167,9 +4153,7 @@ for _, row in df_clean.iterrows():
         if any(pd.isna(x) for x in [
 
             MGF_HT_Away,
-            FS_HT_A,
-            MGC_HT_Home,
-            Eficiencia_HT_H
+            MGC_HT_Home
 
         ]):
 
@@ -4185,11 +4169,9 @@ for _, row in df_clean.iterrows():
 
                 (MGF_HT_Away <= 0.90)
 
-                and (FS_HT_A <= 40)
+                and
 
-                and (MGC_HT_Home <= 0.80)
-
-                and (Eficiencia_HT_H >= 45)
+                (MGC_HT_Home <= 0.80)
 
             ):
 
