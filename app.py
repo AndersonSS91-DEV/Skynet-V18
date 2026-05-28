@@ -4082,7 +4082,6 @@ for _, row in df_clean.iterrows():
     # =========================================
     # 🧠 TIER LGAHT
     # =========================================
-
     tier_lght = ""
 
     dir_ia = str(
@@ -4166,11 +4165,8 @@ for _, row in df_clean.iterrows():
         if any(pd.isna(x) for x in [
 
             MGF_HT_Away,
-
             FS_HT_A,
-
             MGC_HT_Home,
-
             Eficiencia_HT_H
 
         ]):
@@ -4205,7 +4201,7 @@ for _, row in df_clean.iterrows():
 
             home_key = (
 
-                str(row["Home_Team"])
+                str(row["Home"])
                 .strip()
                 .lower()
 
@@ -4223,7 +4219,6 @@ for _, row in df_clean.iterrows():
                 if not linha_rank.empty:
 
                     tier_lght = "LGAHT🔥"
-
     
     # =========================================
     # 📋 APPEND FINAL
