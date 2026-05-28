@@ -4064,7 +4064,6 @@ for _, row in df_clean.iterrows():
         # 🔥 TIER
         "Tier_LA": tier_la,
         "Tier_LH": tier_lh,
-        "Tier_LGAHT": tier_lght,
 
         # 🔥 TIMES
         "Home_Team": row.get(
