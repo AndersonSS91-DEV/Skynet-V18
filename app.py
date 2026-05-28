@@ -374,6 +374,35 @@ else:
 
     df_rank_lh = pd.DataFrame()
 
+# =========================================================
+# 🧠 RANKING LGAHT
+# =========================================================
+
+RANKING_LGHT_PATH = (
+
+    "data/"
+    "ranking_times_base_lght_away.xlsx"
+
+)
+
+if os.path.exists(RANKING_LGHT_PATH):
+
+    df_rank_lght = pd.read_excel(
+        RANKING_LGHT_PATH
+    )
+
+    df_rank_lght["Home_Key"] = (
+
+        df_rank_lght["Home"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+
+    )
+
+else:
+
+    df_rank_lght = pd.DataFrame()
 
 # =========================================
 # LEITURA DAS ABAS
@@ -4050,6 +4079,151 @@ for _, row in df_clean.iterrows():
                                 ""
                             )
 
+    # =========================================
+    # 🧠 TIER LGAHT
+    # =========================================
+
+    tier_lght = ""
+
+    dir_ia = str(
+        row.get("IA_Direcao", "")
+    ).lower()
+
+    # 🚫 SEGURANÇA
+    if "lay home" not in dir_ia:
+
+        # =====================================
+        # 🚫 BLACKLIST
+        # =====================================
+
+        league = str(
+            row.get("League", "")
+        ).lower()
+
+        blacklist_keywords = [
+
+            "u17",
+            "u19",
+            "u20",
+            "u21",
+            "u23",
+
+            "women",
+            "woman",
+            "feminino",
+
+            "reserve",
+            "reserves",
+
+            "youth",
+
+            "mexico liga premier",
+
+            "nicaragua",
+
+            "friendly",
+            "amistoso"
+
+        ]
+
+        passou_filtro_lght = True
+
+        if any(
+            word in league
+            for word in blacklist_keywords
+        ):
+
+            passou_filtro_lght = False
+
+        # =====================================
+        # 📊 MÉTRICAS
+        # =====================================
+
+        MGF_HT_Away = row.get(
+            "MGF_HT_Away",
+            np.nan
+        )
+
+        FS_HT_A = row.get(
+            "FS_HT_A",
+            np.nan
+        )
+
+        MGC_HT_Home = row.get(
+            "MGC_HT_Home",
+            np.nan
+        )
+
+        Eficiencia_HT_H = row.get(
+            "Eficiência_HT_H",
+            np.nan
+        )
+
+        # =====================================
+        # 🚫 VALORES OBRIGATÓRIOS
+        # =====================================
+
+        if any(pd.isna(x) for x in [
+
+            MGF_HT_Away,
+
+            FS_HT_A,
+
+            MGC_HT_Home,
+
+            Eficiencia_HT_H
+
+        ]):
+
+            passou_filtro_lght = False
+
+        # =====================================
+        # 🔥 CORE
+        # =====================================
+
+        if passou_filtro_lght:
+
+            if not (
+
+                (MGF_HT_Away <= 0.90)
+
+                and (FS_HT_A <= 40)
+
+                and (MGC_HT_Home <= 0.80)
+
+                and (Eficiencia_HT_H >= 45)
+
+            ):
+
+                passou_filtro_lght = False
+
+        # =====================================
+        # 🎯 RANKING
+        # =====================================
+
+        if passou_filtro_lght:
+
+            home_key = (
+
+                str(row["Home_Team"])
+                .strip()
+                .lower()
+
+            )
+
+            if not df_rank_lght.empty:
+
+                linha_rank = df_rank_lght[
+
+                    df_rank_lght["Home_Key"]
+                    == home_key
+
+                ]
+
+                if not linha_rank.empty:
+
+                    tier_lght = "LGAHT🔥"
+
     
     # =========================================
     # 📋 APPEND FINAL
@@ -4063,6 +4237,7 @@ for _, row in df_clean.iterrows():
         # 🔥 TIER
         "Tier_LA": tier_la,
         "Tier_LH": tier_lh,
+        "Tier_LGAHT": tier_lght,
 
         # 🔥 TIMES
         "Home_Team": row.get(
