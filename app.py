@@ -4040,55 +4040,17 @@ for _, row in df_clean.iterrows():
     # 🧠 TIER LAY HOME
     # =========================================
 
-    tier_lh = ""
-
-    if passou_filtro_lh:
-
-        if "lay home" in dir_ia.lower():
-
-            odd_away = row.get(
-                "Odds_Visitante",
-                np.nan
-            )
-
-            if pd.notna(odd_away):
-
-                if odd_away > 1.13:
-
-                    if not df_rank_lh.empty:
-
-                        away_key = (
-
-                            str(row["Visitor_Team"])
-                            .strip()
-                            .lower()
-
-                        )
-
-                        linha_rank = df_rank_lh[
-
-                            df_rank_lh["Away_Key"]
-                            == away_key
-
-                        ]
-
-                        if not linha_rank.empty:
-
-                            tier_lh = linha_rank.iloc[0].get(
-                                "Tier_LH",
-                                ""
-                            )
-
     # =========================================
-    # 🧠 TIER LGAHT
+    # 🧠 TIER LGHT
     # =========================================
+
     tier_lght = ""
 
     dir_ia = str(
         row.get("IA_Direcao", "")
     ).lower()
 
-    # 🚫 SEGURANÇA
+    # 🚫 SOMENTE BLOQUEIA LAY HOME
     if "lay home" not in dir_ia:
 
         # =====================================
