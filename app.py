@@ -3194,24 +3194,34 @@ def classificar_jogo(row):
             classe = "B"
             motivo = "VR positivo sem suporte suficiente"
 
-    # =========================================
+# =========================================
 # 🟡🟡 HANDICAP VALUE
 # =========================================
 
-if (vr01 < 0
+if (
+
+    vr01 < 0
+
     and favorito < 2.20
+
     and (
         favorito_mgf - zebra_mgf
     ) >= 0.80
+
     and (
         favorito_mgf_ht - zebra_mgf_ht
     ) >= 0.60
+
     and (
         zebra_mgc - favorito_mgc
-    ) >= 0.20):
+    ) >= 0.20
 
-    tipo = "🟡🟡 HA Value"
-    entrada = "Jogo Mal Precificado"
+):
+
+    tipo = "🟡🟡 Handicap Value"
+
+    entrada = "Value Estrutural"
+
     classe = "A"
 
 
