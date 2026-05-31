@@ -3194,13 +3194,25 @@ def classificar_jogo(row):
             classe = "B"
             motivo = "VR positivo sem suporte suficiente"
 
-    # =========================================
-    # 🟡🟡 HANDICAP VALUE
-    # =========================================
-    elif vr01 < 0 and favorito < 2.2 and (time_A["mgf"] >= 1.5 or time_B["mgf"] >= 1.5):
-        tipo = "🟡🟡 Handicap Análise (Atlético x Barça)"
-        entrada = "Análise de Handcap"
-        classe = "A"
+# =========================================
+# 🟡🟡 HANDICAP VALUE
+# ========================================
+elif (
+    vr01 < 0
+    and favorito < 2.20
+    and (
+        favorito_mgf - zebra_mgf
+    ) >= 0.80
+    and (
+        favorito_mgf_ht - zebra_mgf_ht
+    ) >= 0.60
+    and (
+        zebra_mgc - favorito_mgc
+    ) >= 0.20):
+
+    tipo = "🟡🟡 Handicap Value"
+    entrada = "Favorito Dominante"
+    classe = "A"
 
     # =========================================
     # 🔵 UNDER INTELIGENTE
