@@ -4051,25 +4051,29 @@ for _, row in df_clean.iterrows():
                             )
 
     
-    # =========================================
+# =========================================
 # 🧠 TIER LGHT
 # =========================================
 
-tier_lght = ""
+passou_filtro_lght = True
 
 dir_ia = str(
     row.get("IA_Direcao", "")
 ).lower()
 
-# =========================================
-# 🎯 SOMENTE LAY AWAY
-# =========================================
+# =====================================
+# ✅ SOMENTE LAY AWAY
+# =====================================
 
-if "lay away" in dir_ia:
+if "lay away" not in dir_ia:
 
-    # =====================================
-    # 🚫 BLACKLIST
-    # =====================================
+    passou_filtro_lght = False
+
+# =====================================
+# 🚫 BLACKLIST
+# =====================================
+
+if passou_filtro_lght:
 
     league = str(
         row.get("League", "")
@@ -4101,8 +4105,6 @@ if "lay away" in dir_ia:
 
     ]
 
-    passou_filtro_lght = True
-
     if any(
         word in league
         for word in blacklist_keywords
@@ -4110,9 +4112,11 @@ if "lay away" in dir_ia:
 
         passou_filtro_lght = False
 
-    # =====================================
-    # 📊 MÉTRICAS
-    # =====================================
+# =====================================
+# 📊 MÉTRICAS
+# =====================================
+
+if passou_filtro_lght:
 
     MGF_HT_Away = row.get(
         "MGF_HT_Away",
@@ -4130,7 +4134,7 @@ if "lay away" in dir_ia:
     )
 
     Eficiencia_HT_H = row.get(
-        "Eficiencia_HT_H",
+        "Eficiência_HT_H",
         np.nan
     )
 
@@ -4139,13 +4143,8 @@ if "lay away" in dir_ia:
         np.nan
     )
 
-    Odd_Justa_A = row.get(
-        "Odd_Justa_A",
-        np.nan
-    )
-
     # =====================================
-    # 🚫 VALORES OBRIGATÓRIOS
+    # 🚫 NAN
     # =====================================
 
     if any(pd.isna(x) for x in [
@@ -4154,71 +4153,43 @@ if "lay away" in dir_ia:
         FS_HT_A,
         MGC_HT_Home,
         Eficiencia_HT_H,
-        Odd_A,
-        Odd_Justa_A
+        Odd_A
 
     ]):
 
         passou_filtro_lght = False
 
-    # =====================================
-    # 📈 RATIO
-    # =====================================
+# =====================================
+# 🔥 FILTRO ESTRUTURAL
+# =====================================
 
-    if passou_filtro_lght:
+if passou_filtro_lght:
 
-        ratio_away = (
-            Odd_A / Odd_Justa_A
-        )
+    if not (
 
-    # =====================================
-    # 🔥 FILTRO CORE
-    # =====================================
+        (MGF_HT_Away <= 0.90)
 
-    if passou_filtro_lght:
+        and (FS_HT_A <= 40)
 
-        passou_filtro_lght = (
+        and (MGC_HT_Home <= 0.80)
 
-            (MGF_HT_Away <= 0.40)
+        and (Eficiencia_HT_H >= 45)
 
-            and (FS_HT_A <= 40)
+        and (Odd_A >= 2.60)
 
-            and (MGC_HT_Home <= 0.80)
+    ):
 
-            and (Eficiencia_HT_H >= 60)
+        passou_filtro_lght = False
 
-            and (Odd_A >= 2.60)
+# =====================================
+# ✅ APPEND FINAL
+# =====================================
 
-            and (ratio_away >= 1.20)
+if passou_filtro_lght:
 
-        )
+    lista_lght.append(row)
 
-    # =====================================
-    # 🎯 RANKING
-    # =====================================
-
-    if passou_filtro_lght:
-
-        home_key = (
-
-            str(row["Home_Team"])
-            .strip()
-            .lower()
-
-        )
-
-        if not df_rank_lght.empty:
-
-            linha_rank = df_rank_lght[
-
-                df_rank_lght["Home_Key"]
-                == home_key
-
-            ]
-
-            if not linha_rank.empty:
-
-                tier_lght = "LGHT🔥"
+    
     # =========================================
     # 📋 APPEND FINAL
     # =========================================
