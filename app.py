@@ -3153,88 +3153,64 @@ def classificar_jogo(row):
                 "Risco": "Entrar sem valor"
             }
 
-# =========================================
-# 🔴 REVERSÃO
-# =========================================
-elif time_A["mgc"] > 1.5 and time_B["mgc"] > 1.5:
 
-    tipo = "🔴 Reversão (Heidenheim)"
-    entrada = "Over + Lay líder"
-    classe = "A"
-
-# =========================================
-# 🟢 DOMINÂNCIA (Del Valle)
-# =========================================
-elif vr01 > 0.16:
-
-    # 🔥 DEFINE FAVORITO PELO MERCADO
-    if time_A["odd"] < time_B["odd"]:
-        favorito = "Casa"
-    else:
-        favorito = "Visitante"
-
-    # 🔒 CONFIRMA SUPORTE ESTATÍSTICO
-    if favorito == "Casa" and time_A["mgf"] >= 1.5:
-
-        tipo = "🟢 Dominância Casa (Del Valle)"
-        entrada = "Lay empate / Back Casa"
-        momento = "Pré"
+    # =========================================
+    # 🔴 REVERSÃO
+    # =========================================
+    elif time_A["mgc"] > 1.5 and time_B["mgc"] > 1.5:
+        tipo = "🔴 Reversão (Heidenheim)"
+        entrada = "Over + Lay líder"
         classe = "A"
-        motivo = "Favorito forte + VR positivo"
 
-    elif favorito == "Visitante" and time_B["mgf"] >= 1.5:
+    # =========================================
+    # 🟢 DOMINÂNCIA (Del Valle)
+    # =========================================
+    elif vr01 > 0.16:
 
-        tipo = "🟢 Dominância Visitante (Del Valle)"
-        entrada = "Lay empate / Back Visitante"
-        momento = "Pré"
+        # 🔥 DEFINE FAVORITO PELO MERCADO
+        if time_A["odd"] < time_B["odd"]:
+            favorito = "Casa"
+        else:
+            favorito = "Visitante"
+
+        # 🔒 CONFIRMA SUPORTE ESTATÍSTICO
+        if favorito == "Casa" and time_A["mgf"] >= 1.5:
+            tipo = "🟢 Dominância Casa (Del Valle)"
+            entrada = "Lay empate / Back Casa"
+            momento = "Pré"
+            classe = "A"
+            motivo = "Favorito forte + VR positivo"
+
+        elif favorito == "Visitante" and time_B["mgf"] >= 1.5:
+            tipo = "🟢 Dominância Visitante (Del Valle)"
+            entrada = "Lay empate / Back Visitante"
+            momento = "Pré"
+            classe = "A"
+            motivo = "Favorito forte + VR positivo"
+
+        else:
+            tipo = "⚖️ Favorito sem confirmação"
+            entrada = "Evitar / Live"
+            momento = "-"
+            classe = "B"
+            motivo = "VR positivo sem suporte suficiente"
+
+    # =========================================
+    # 🟡🟡 HANDICAP VALUE
+    # =========================================
+    elif vr01 < 0 and favorito < 2.20 and (favorito_mgf - zebra_mgf
+    ) >= 0.80 and (favorito_mgf_ht - zebra_mgf_ht) >= 0.60 and (zebra_mgc - favorito_mgc) >= 0.20):
+        tipo = "🟡🟡 Jogo Mal Precificado (Atlético x Barça)"
+        entrada = "HA Análise"
         classe = "A"
-        motivo = "Favorito forte + VR positivo"
 
-    else:
-
-        tipo = "⚖️ Favorito sem confirmação"
-        entrada = "Evitar / Live"
-        momento = "-"
-        classe = "B"
-        motivo = "VR positivo sem suporte suficiente"
-
-# =========================================
-# 🟡🟡 HANDICAP VALUE
-# =========================================
-elif (
-
-    vr01 < 0
-
-    and favorito < 2.20
-
-    and (
-        favorito_mgf - zebra_mgf
-    ) >= 0.80
-
-    and (
-        favorito_mgf_ht - zebra_mgf_ht
-    ) >= 0.60
-
-    and (
-        zebra_mgc - favorito_mgc
-    ) >= 0.20
-
-):
-
-    tipo = "🟡🟡 Handicap Value"
-
-    entrada = "Value Estrutural"
-
-    classe = "A"
-
-# =========================================
-# 🔵 UNDER INTELIGENTE
-# =========================================
-elif coef_over < 1.9 and time_A["mgf"] < 2 and time_B["mgf"] < 2:
-
-    tipo = "🔵 Under Inteligente (Cerro / LDU)"
-    entrada = "Under 2.5"
-    classe = "A"
+    # =========================================
+    # 🔵 UNDER INTELIGENTE
+    # =========================================
+    elif coef_over < 1.9 and time_A["mgf"] < 2 and time_B["mgf"] < 2:
+        tipo = "🔵 Under Inteligente (Cerro / LDU)"
+        entrada = "Under 2.5"
+        classe = "A"
 
     # =========================================
     # 🔴 FAVORITO FALSO REAL
