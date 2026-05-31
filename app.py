@@ -3057,7 +3057,37 @@ def classificar_jogo(row):
 
     vr01 = g("VR01")
     coef_over = g("COEF_OVER1FT") if "COEF_OVER1FT" in row else g("Coeficiente_Over_1,5FT")
+# ===============================
+# ⭐ FAVORITO / ZEBRA
+# ===============================
 
+if time_A["odd"] < time_B["odd"]:
+
+    favorito = time_A["odd"]
+
+    favorito_mgf = time_A["mgf"]
+    zebra_mgf = time_B["mgf"]
+
+    favorito_mgc = time_A["mgc"]
+    zebra_mgc = time_B["mgc"]
+
+    favorito_mgf_ht = g("MGF_HT_Home")
+    zebra_mgf_ht = g("MGF_HT_Away")
+
+else:
+
+    favorito = time_B["odd"]
+
+    favorito_mgf = time_B["mgf"]
+    zebra_mgf = time_A["mgf"]
+
+    favorito_mgc = time_B["mgc"]
+    zebra_mgc = time_A["mgc"]
+
+    favorito_mgf_ht = g("MGF_HT_Away")
+    zebra_mgf_ht = g("MGF_HT_Home")
+
+    
     # =========================================
     # ⚫ FILTRO NO BET (ANTI-FORÇA DE ENTRADA)
     # =========================================
