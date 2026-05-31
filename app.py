@@ -3056,36 +3056,42 @@ def classificar_jogo(row):
     }
 
     vr01 = g("VR01")
-    coef_over = g("COEF_OVER1FT") if "COEF_OVER1FT" in row else g("Coeficiente_Over_1,5FT")
-# ===============================
-# ⭐ FAVORITO / ZEBRA
-# ===============================
 
-if time_A["odd"] < time_B["odd"]:
+    coef_over = (
+        g("COEF_OVER1FT")
+        if "COEF_OVER1FT" in row
+        else g("Coeficiente_Over_1,5FT")
+    )
 
-    favorito = time_A["odd"]
+    # ===============================
+    # ⭐ FAVORITO / ZEBRA
+    # ===============================
 
-    favorito_mgf = time_A["mgf"]
-    zebra_mgf = time_B["mgf"]
+    if time_A["odd"] < time_B["odd"]:
 
-    favorito_mgc = time_A["mgc"]
-    zebra_mgc = time_B["mgc"]
+        favorito = time_A["odd"]
 
-    favorito_mgf_ht = g("MGF_HT_Home")
-    zebra_mgf_ht = g("MGF_HT_Away")
+        favorito_mgf = time_A["mgf"]
+        zebra_mgf = time_B["mgf"]
 
-else:
+        favorito_mgc = time_A["mgc"]
+        zebra_mgc = time_B["mgc"]
 
-    favorito = time_B["odd"]
+        favorito_mgf_ht = g("MGF_HT_Home")
+        zebra_mgf_ht = g("MGF_HT_Away")
 
-    favorito_mgf = time_B["mgf"]
-    zebra_mgf = time_A["mgf"]
+    else:
 
-    favorito_mgc = time_B["mgc"]
-    zebra_mgc = time_A["mgc"]
+        favorito = time_B["odd"]
 
-    favorito_mgf_ht = g("MGF_HT_Away")
-    zebra_mgf_ht = g("MGF_HT_Home")
+        favorito_mgf = time_B["mgf"]
+        zebra_mgf = time_A["mgf"]
+
+        favorito_mgc = time_B["mgc"]
+        zebra_mgc = time_A["mgc"]
+
+        favorito_mgf_ht = g("MGF_HT_Away")
+        zebra_mgf_ht = g("MGF_HT_Home")
 
     
     # =========================================
