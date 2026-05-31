@@ -4094,8 +4094,187 @@ for _, row in df_clean.iterrows():
                                 ""
                             )
 
-    
-   
+    # =========================================
+    # 🧠 TIER HANDICAP VALUE
+    # =========================================
+
+    tier_ha = ""
+
+    score_zebra = np.nan
+
+    try:
+
+        vr01 = row.get(
+            "VR01",
+            np.nan
+        )
+
+        odd_home = row.get(
+            "Odds_Casa",
+            np.nan
+        )
+
+        odd_away = row.get(
+            "Odds_Visitante",
+            np.nan
+        )
+
+        mgf_h = row.get(
+            "MGF_H",
+            np.nan
+        )
+
+        mgf_a = row.get(
+            "MGF_A",
+            np.nan
+        )
+
+        mgc_h = row.get(
+            "MGC_H",
+            np.nan
+        )
+
+        mgc_a = row.get(
+            "MGC_A",
+            np.nan
+        )
+
+        ht_h = row.get(
+            "MGF_HT_Home",
+            np.nan
+        )
+
+        ht_a = row.get(
+            "MGF_HT_Away",
+            np.nan
+        )
+
+        # =====================================
+        # 🚫 SEGURANÇA
+        # =====================================
+
+        valores = [
+
+            vr01,
+
+            odd_home,
+            odd_away,
+
+            mgf_h,
+            mgf_a,
+
+            mgc_h,
+            mgc_a,
+
+            ht_h,
+            ht_a
+
+        ]
+
+        if not any(pd.isna(v) for v in valores):
+
+            # =====================================
+            # ⭐ DEFINE FAVORITO / ZEBRA
+            # =====================================
+
+            if odd_home < odd_away:
+
+                odd_fav = odd_home
+
+                favorito_mgf = mgf_h
+                zebra_mgf = mgf_a
+
+                favorito_mgc = mgc_h
+                zebra_mgc = mgc_a
+
+                favorito_ht = ht_h
+                zebra_ht = ht_a
+
+                zebra_nome = row.get(
+                    "Away",
+                    ""
+                )
+
+            else:
+
+                odd_fav = odd_away
+
+                favorito_mgf = mgf_a
+                zebra_mgf = mgf_h
+
+                favorito_mgc = mgc_a
+                zebra_mgc = mgc_h
+
+                favorito_ht = ht_a
+                zebra_ht = ht_h
+
+                zebra_nome = row.get(
+                    "Home",
+                    ""
+                )
+
+            # =====================================
+            # 🧠 SCORE ZEBRA
+            # =====================================
+
+            score_zebra = (
+
+                (abs(vr01) * 2.2)
+
+                +
+
+                (
+                    zebra_mgf
+                    - favorito_mgf
+                )
+
+                +
+
+                (
+                    (
+                        zebra_ht
+                        - favorito_ht
+                    ) * 1.4
+                )
+
+                +
+
+                (
+                    (
+                        favorito_mgc
+                        - zebra_mgc
+                    ) * 0.8
+                )
+
+            )
+
+            # =====================================
+            # 🔥 FILTRO BASE
+            # =====================================
+
+            if (
+
+                vr01 < 0
+
+                and odd_fav < 2.30
+
+            ):
+
+                if score_zebra >= 1.20:
+
+                    tier_ha = "🔥 HA+1.25 ELITE"
+
+                elif score_zebra >= 0.80:
+
+                    tier_ha = "🟢 HA+1.25 FORTE"
+
+                elif score_zebra >= 0.35:
+
+                    tier_ha = "🟡 HA+1.25 VALUE"
+
+    except:
+
+        pass
     # =========================================
     # 📋 APPEND FINAL
     # =========================================
@@ -4104,10 +4283,13 @@ for _, row in df_clean.iterrows():
 
         "Home": row["Home"],
         "Away": row["Away"],
-
+        
         # 🔥 TIER
         "Tier_LA": tier_la,
         "Tier_LH": tier_lh,
+        "Tier_HA": tier_ha,        
+        # 🔥 SCORE
+        "Score_Zebra": round(score_zebra, 2) if pd.notna(score_zebra) else "",
 
         # 🔥 TIMES
         "Home_Team": row.get(
