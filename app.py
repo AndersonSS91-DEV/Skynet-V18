@@ -4190,6 +4190,11 @@ for _, row in df_clean.iterrows():
                 favorito_ht = ht_h
                 zebra_ht = ht_a
 
+                zebra_nome = row.get(
+                    "Visitor_Team",
+                    ""
+                )
+
             else:
 
                 odd_fav = odd_away
@@ -4202,6 +4207,11 @@ for _, row in df_clean.iterrows():
 
                 favorito_ht = ht_a
                 zebra_ht = ht_h
+
+                zebra_nome = row.get(
+                    "Home_Team",
+                    ""
+                )
 
             # =====================================
             # 🧠 SCORE ZEBRA
@@ -4273,8 +4283,15 @@ for _, row in df_clean.iterrows():
 
     lista.append({
 
-        "Home": row["Home"],
-        "Away": row["Away"],
+        "Home": row.get(
+            "Home_Team",
+            ""
+        ),
+
+        "Away": row.get(
+            "Visitor_Team",
+            ""
+        ),
 
         # 🔥 TIER
         "Tier_LA": tier_la,
@@ -4372,7 +4389,9 @@ for _, row in df_clean.iterrows():
         "IA_Direcao": row.get(
             "IA_Direcao",
             ""
-        )})
+        )
+
+    })
 # =========================================
 # 📈 OUTPUT FINAL
 # =========================================
