@@ -4051,6 +4051,144 @@ for _, row in df_clean.iterrows():
                             )
 
     
+# =========================================
+# 🧠 TIER LGHT
+# =========================================
+
+passou_filtro_lght = True
+
+dir_ia = str(
+    row.get("IA_Direcao", "")
+).lower()
+
+# =====================================
+# ✅ SOMENTE LAY AWAY
+# =====================================
+
+if "lay away" not in dir_ia:
+
+    passou_filtro_lght = False
+
+# =====================================
+# 🚫 BLACKLIST
+# =====================================
+
+if passou_filtro_lght:
+
+    league = str(
+        row.get("League", "")
+    ).lower()
+
+    blacklist_keywords = [
+
+        "u17",
+        "u19",
+        "u20",
+        "u21",
+        "u23",
+
+        "women",
+        "woman",
+        "feminino",
+
+        "reserve",
+        "reserves",
+
+        "youth",
+
+        "mexico liga premier",
+
+        "nicaragua",
+
+        "friendly",
+        "amistoso"
+
+    ]
+
+    if any(
+        word in league
+        for word in blacklist_keywords
+    ):
+
+        passou_filtro_lght = False
+
+# =====================================
+# 📊 MÉTRICAS
+# =====================================
+
+if passou_filtro_lght:
+
+    MGF_HT_Away = row.get(
+        "MGF_HT_Away",
+        np.nan
+    )
+
+    FS_HT_A = row.get(
+        "FS_HT_A",
+        np.nan
+    )
+
+    MGC_HT_Home = row.get(
+        "MGC_HT_Home",
+        np.nan
+    )
+
+    Eficiencia_HT_H = row.get(
+        "Eficiência_HT_H",
+        np.nan
+    )
+
+    Odd_A = row.get(
+        "Odd_A",
+        np.nan
+    )
+
+    # =====================================
+    # 🚫 NAN
+    # =====================================
+
+    if any(pd.isna(x) for x in [
+
+        MGF_HT_Away,
+        FS_HT_A,
+        MGC_HT_Home,
+        Eficiencia_HT_H,
+        Odd_A
+
+    ]):
+
+        passou_filtro_lght = False
+
+# =====================================
+# 🔥 FILTRO ESTRUTURAL
+# =====================================
+
+if passou_filtro_lght:
+
+    if not (
+
+        (MGF_HT_Away <= 0.90)
+
+        and (FS_HT_A <= 40)
+
+        and (MGC_HT_Home <= 0.80)
+
+        and (Eficiencia_HT_H >= 45)
+
+        and (Odd_A >= 2.60)
+
+    ):
+
+        passou_filtro_lght = False
+
+# =====================================
+# ✅ APPEND FINAL
+# =====================================
+
+if passou_filtro_lght:
+
+    lista_lght.append(row)
+
     
     # =========================================
     # 📋 APPEND FINAL
