@@ -3224,14 +3224,25 @@ if (
 
     classe = "A"
 
+# =========================================
+# 🔵 UNDER INTELIGENTE
+# =========================================
 
-    # =========================================
-    # 🔵 UNDER INTELIGENTE
-    # =========================================
-    elif coef_over < 1.9 and time_A["mgf"] < 2 and time_B["mgf"] < 2:
-        tipo = "🔵 Under Inteligente (Cerro / LDU)"
-        entrada = "Under 2.5"
-        classe = "A"
+elif (
+    
+    coef_over < 1.9
+    
+    and time_A["mgf"] < 2
+    
+    and time_B["mgf"] < 2
+
+):
+
+    tipo = "🔵 Under Inteligente (Cerro / LDU)"
+
+    entrada = "Under 2.5"
+
+    classe = "A"
 
     # =========================================
     # 🔴 FAVORITO FALSO REAL
