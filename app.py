@@ -3608,8 +3608,16 @@ Home {home_emoji}   x   Away {away_emoji}
     ).merge(
         df_vg[["JOGO", "ExG_Home_VG", "ExG_Away_VG"]],
         on="JOGO",
-        how="left"
-    )
+        how="left")
+
+    
+    base_df = base_df.merge(
+        df_ht[[
+        "JOGO",
+        "MGF_HT_Home",
+        "MGF_HT_Away"]],
+        on="JOGO",
+        how="left")    
 
     # =========================================
     # 🔥 EXG CONSENSO
