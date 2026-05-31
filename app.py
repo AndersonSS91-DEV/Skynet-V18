@@ -3198,8 +3198,7 @@ def classificar_jogo(row):
     # =========================================
     # 🟡🟡 HANDICAP VALUE
     # =========================================
-    elif vr01 < 0 and favorito < 2.20 and (favorito_mgf - zebra_mgf
-    ) >= 0.80 and (favorito_mgf_ht - zebra_mgf_ht) >= 0.60 and (zebra_mgc - favorito_mgc) >= 0.20):
+    elif vr01 < 0 and favorito < 2.20 and (favorito_mgf - zebra_mgf) >= 0.80 and (favorito_mgf_ht - zebra_mgf_ht) >= 0.60 and (zebra_mgc - favorito_mgc) >= 0.20:
         tipo = "🟡🟡 Jogo Mal Precificado (Atlético x Barça)"
         entrada = "HA Análise"
         classe = "A"
