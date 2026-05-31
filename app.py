@@ -4291,15 +4291,8 @@ for _, row in df_clean.iterrows():
 
     lista.append({
 
-        "Home": row.get(
-            "Home_Team",
-            ""
-        ),
-
-        "Away": row.get(
-            "Visitor_Team",
-            ""
-        ),
+        "Home": row["Home"],
+        "Away": row["Away"],
 
         # 🔥 TIER
         "Tier_LA": tier_la,
