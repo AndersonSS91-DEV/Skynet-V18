@@ -4085,9 +4085,13 @@ for _, row in df_clean.iterrows():
 
             if not linha_rank.empty:
 
-                tier_original = linha_rank.iloc[0].get(
-                    "Tier_LA",
-                    ""
+                tier_original = str(
+
+                    linha_rank.iloc[0].get(
+                        "Tier_LA",
+                        ""
+                    )
+
                 )
 
                 if "🔥🔥🔥🔥🔥" in tier_original:
