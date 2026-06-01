@@ -4060,73 +4060,88 @@ if passou_filtro_la:
 
     tier_la = ""
 
-    if "lay away" in dir_ia.lower():
+    if passou_filtro_la:
 
-        odd_home = row.get(
-            "Odds_Casa",
-            np.nan
-        )
+        if "lay away" in dir_ia.lower():
 
-        if pd.notna(odd_home):
+            odd_home = row.get(
+                "Odds_Casa",
+                np.nan
+            )
 
-            if odd_home > 1.13:
+            if pd.notna(odd_home):
 
-                if not df_rank_la.empty:
+                if odd_home > 1.13:
 
-                    home_key = (
+                    if not df_rank_la.empty:
 
-                        str(row["Home_Team"])
-                        .strip()
-                        .lower()
+                        home_key = (
 
-                    )
+                            str(row["Home_Team"])
+                            .strip()
+                            .lower()
 
-                    linha_rank = df_rank_la[
+                        )
 
-                        df_rank_la["Home_Key"]
-                        == home_key
+                        linha_rank = df_rank_la[
 
-                    ]
+                            df_rank_la["Home_Key"]
+                            == home_key
 
-                    if not linha_rank.empty:
+                        ]
 
-                        # =====================================
-                        # ✅ PASSOU FILTRO NORMAL
-                        # =====================================
-
-                        if passou_filtro_la:
+                        if not linha_rank.empty:
 
                             tier_la = linha_rank.iloc[0].get(
                                 "Tier_LA",
                                 ""
                             )
 
-                        # =====================================
-                        # 💜 TOP600 BLOQUEADO
-                        # =====================================
+    # =========================================
+    # 💜 TOP600 BLOQUEADO
+    # =========================================
 
-                        else:
+    elif "lay away" in dir_ia.lower():
 
-                            tier_original = str(
+        if not df_rank_la.empty:
 
-                                linha_rank.iloc[0].get(
-                                    "Tier_LA",
-                                    ""
-                                )
+            home_key = (
 
-                            )
+                str(row["Home_Team"])
+                .strip()
+                .lower()
 
-                            if "⭐⭐⭐⭐⭐" in tier_original:
+            )
 
-                                tier_la = "LA💜💜💜💜💜"
+            linha_rank = df_rank_la[
 
-                            elif "⭐⭐⭐" in tier_original:
+                df_rank_la["Home_Key"]
+                == home_key
 
-                                tier_la = "LA💜💜💜"
+            ]
 
-                            elif "⭐" in tier_original:
+            if not linha_rank.empty:
 
-                                tier_la = "LA💜"
+                tier_original = str(
+
+                    linha_rank.iloc[0].get(
+                        "Tier_LA",
+                        ""
+                    )
+
+                )
+
+                if "⭐⭐⭐⭐⭐" in tier_original:
+
+                    tier_la = "LA💜💜💜💜💜"
+
+                elif "⭐⭐⭐" in tier_original:
+
+                    tier_la = "LA💜💜💜"
+
+                elif "⭐" in tier_original:
+
+                    tier_la = "LA💜"
 
     # =========================================
     # 🧠 TIER LAY HOME
