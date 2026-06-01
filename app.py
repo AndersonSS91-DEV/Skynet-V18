@@ -4017,12 +4017,85 @@ for _, row in df_clean.iterrows():
         passou_filtro_lh = False
 
     # =========================================
+    # 💜 FLAG ELITE BLOQUEADO
+    # =========================================
+
+    elite_bloqueado_la = False
+
+    if (
+
+        is_lay_away(dir_poisson)
+        or
+        is_lay_away(dir_ia)
+
+    ):
+
+        if not df_rank_la.empty:
+
+            home_key = (
+
+                str(row["Home_Team"])
+                .strip()
+                .lower()
+
+            )
+
+            linha_rank_elite = df_rank_la[
+
+                df_rank_la["Home_Key"]
+                == home_key
+
+            ]
+
+            if not linha_rank_elite.empty:
+
+                # =====================================
+                # 🚫 BLOQUEIOS ESPECÍFICOS
+                # =====================================
+
+                bloqueado_cv = (
+
+                    pd.notna(CV_CG_A_01)
+                    and
+                    CV_CG_A_01 > 2.00
+
+                )
+
+                bloqueado_rocket = away_is_rocket()
+
+                bloqueado_volcano = away_is_volcano()
+
+                if (
+
+                    not passou_filtro_la
+
+                    and
+
+                    (
+                        bloqueado_cv
+                        or
+                        bloqueado_rocket
+                        or
+                        bloqueado_volcano
+                    )
+
+                ):
+
+                    elite_bloqueado_la = True
+
+    # =========================================
     # 🧠 TIER LAY AWAY
     # =========================================
 
     tier_la = ""
 
-    if passou_filtro_la:
+    if (
+
+        passou_filtro_la
+        or
+        elite_bloqueado_la
+
+    ):
 
         if "lay away" in dir_ia.lower():
 
@@ -4054,11 +4127,36 @@ for _, row in df_clean.iterrows():
 
                         if not linha_rank.empty:
 
-                            tier_la = linha_rank.iloc[0].get(
+                            tier_original = linha_rank.iloc[0].get(
                                 "Tier_LA",
                                 ""
                             )
 
+                            # =============================
+                            # ✅ FILTRO NORMAL
+                            # =============================
+
+                            if passou_filtro_la:
+
+                                tier_la = tier_original
+
+                            # =============================
+                            # 💜 ELITE BLOQUEADO
+                            # =============================
+
+                            else:
+
+                                if "⭐⭐⭐⭐⭐" in tier_original:
+
+                                    tier_la = "LA💜💜💜💜💜"
+
+                                elif "⭐⭐⭐" in tier_original:
+
+                                    tier_la = "LA💜💜💜"
+
+                                elif "⭐" in tier_original:
+
+                                    tier_la = "LA💜"
     # =========================================
     # 🧠 TIER LAY HOME
     # =========================================
