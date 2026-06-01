@@ -3964,58 +3964,63 @@ for _, row in df_clean.iterrows():
 
         passou_filtro_la = False
 
-    # =========================================
-    # 🚫 CV HOME
-    # =========================================
+# =========================================
+# 🚫 CV HOME
+# =========================================
 
-    CV_CG_H_01 = row.get(
-        "CV_CG_H_01",
-        np.nan
-    )
+CV_CG_H_01 = row.get(
+    "CV_CG_H_01",
+    np.nan
+)
 
-    Media_CG_H_01 = row.get(
-        "Media_CG_H_01",
-        np.nan
-    )
+Media_CG_H_01 = row.get(
+    "Media_CG_H_01",
+    np.nan
+)
 
-    if pd.notna(CV_CG_H_01):
+if pd.notna(CV_CG_H_01):
 
-        if CV_CG_H_01 > 2.00:
-
-            passou_filtro_lh = False
-
-    # =========================================
-    # 🚫 HOME ROCKET
-    # =========================================
-
-    def home_is_rocket():
-
-        return (
-            2.70 <= Media_CG_H_01 <= 3.00
-            and
-            CV_CG_H_01 <= 0.90
-        )
-
-    # =========================================
-    # 🚫 HOME VOLCANO
-    # =========================================
-
-    def home_is_volcano():
-
-        return (
-            2.80 <= Media_CG_H_01 <= 5.50
-            and
-            CV_CG_H_01 <= 0.80
-        )
-
-    if home_is_rocket():
+    if CV_CG_H_01 > 2.00:
 
         passou_filtro_lh = False
 
-    if home_is_volcano():
+# =========================================
+# 🚫 HOME ROCKET
+# =========================================
 
-        passou_filtro_lh = False
-        
+def home_is_rocket():
+
+    return (
+        2.70 <= Media_CG_H_01 <= 3.00
+        and
+        CV_CG_H_01 <= 0.90
+    )
+
+# =========================================
+# 🚫 HOME VOLCANO
+# =========================================
+
+def home_is_volcano():
+
+    return (
+        2.80 <= Media_CG_H_01 <= 5.50
+        and
+        CV_CG_H_01 <= 0.80
+    )
+
+if home_is_rocket():
+
+    passou_filtro_lh = False
+
+if home_is_volcano():
+
+    passou_filtro_lh = False
+
+# =========================================
+# 🧠 TIER LAY AWAY
+# =========================================
+
+tier_la = ""
 
 if passou_filtro_la:
 
@@ -4051,92 +4056,51 @@ if passou_filtro_la:
 
                         tier_la = linha_rank.iloc[0].get(
                             "Tier_LA",
-                            "")    
-                        
-      # =========================================
-    # 🧠 TIER LAY AWAY
-    # =========================================
-
-    tier_la = ""
-
-    if passou_filtro_la:
-
-        if "lay away" in dir_ia.lower():
-
-            odd_home = row.get(
-                "Odds_Casa",
-                np.nan
-            )
-
-            if pd.notna(odd_home):
-
-                if odd_home > 1.13:
-
-                    if not df_rank_la.empty:
-
-                        home_key = (
-
-                            str(row["Home_Team"])
-                            .strip()
-                            .lower()
-
+                            ""
                         )
 
-                        linha_rank = df_rank_la[
+# =========================================
+# 🧠 TIER LAY HOME
+# =========================================
 
-                            df_rank_la["Home_Key"]
-                            == home_key
+tier_lh = ""
 
-                        ]
+if passou_filtro_lh:
 
-                        if not linha_rank.empty:
+    if "lay home" in dir_ia.lower():
 
-                            tier_la = linha_rank.iloc[0].get(
-                                "Tier_LA",
-                                ""
-                            )
-    # =========================================
-    # 🧠 TIER LAY HOME
-    # =========================================
+        odd_away = row.get(
+            "Odds_Visitante",
+            np.nan
+        )
 
-    tier_lh = ""
+        if pd.notna(odd_away):
 
-    if passou_filtro_lh:
+            if odd_away > 1.13:
 
-        if "lay home" in dir_ia.lower():
+                if not df_rank_lh.empty:
 
-            odd_away = row.get(
-                "Odds_Visitante",
-                np.nan
-            )
+                    away_key = (
 
-            if pd.notna(odd_away):
+                        str(row["Visitor_Team"])
+                        .strip()
+                        .lower()
 
-                if odd_away > 1.13:
+                    )
 
-                    if not df_rank_lh.empty:
+                    linha_rank = df_rank_lh[
 
-                        away_key = (
+                        df_rank_lh["Away_Key"]
+                        == away_key
 
-                            str(row["Visitor_Team"])
-                            .strip()
-                            .lower()
+                    ]
 
+                    if not linha_rank.empty:
+
+                        tier_lh = linha_rank.iloc[0].get(
+                            "Tier_LH",
+                            ""
                         )
-
-                        linha_rank = df_rank_lh[
-
-                            df_rank_lh["Away_Key"]
-                            == away_key
-
-                        ]
-
-                        if not linha_rank.empty:
-
-                            tier_lh = linha_rank.iloc[0].get(
-                                "Tier_LH",
-                                ""
-                            )
 
     # =========================================
     # 🧠 TIER HANDICAP VALUE
