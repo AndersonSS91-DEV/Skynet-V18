@@ -3964,143 +3964,143 @@ for _, row in df_clean.iterrows():
 
         passou_filtro_la = False
 
-# =========================================
-# 🚫 CV HOME
-# =========================================
+    # =========================================
+    # 🚫 CV HOME
+    # =========================================
 
-CV_CG_H_01 = row.get(
-    "CV_CG_H_01",
-    np.nan
-)
+    CV_CG_H_01 = row.get(
+        "CV_CG_H_01",
+        np.nan
+    )
 
-Media_CG_H_01 = row.get(
-    "Media_CG_H_01",
-    np.nan
-)
+    Media_CG_H_01 = row.get(
+        "Media_CG_H_01",
+        np.nan
+    )
 
-if pd.notna(CV_CG_H_01):
+    if pd.notna(CV_CG_H_01):
 
-    if CV_CG_H_01 > 2.00:
+        if CV_CG_H_01 > 2.00:
+
+            passou_filtro_lh = False
+
+    # =========================================
+    # 🚫 HOME ROCKET
+    # =========================================
+
+    def home_is_rocket():
+
+        return (
+            2.70 <= Media_CG_H_01 <= 3.00
+            and
+            CV_CG_H_01 <= 0.90
+        )
+
+    # =========================================
+    # 🚫 HOME VOLCANO
+    # =========================================
+
+    def home_is_volcano():
+
+        return (
+            2.80 <= Media_CG_H_01 <= 5.50
+            and
+            CV_CG_H_01 <= 0.80
+        )
+
+    if home_is_rocket():
 
         passou_filtro_lh = False
 
-# =========================================
-# 🚫 HOME ROCKET
-# =========================================
+    if home_is_volcano():
 
-def home_is_rocket():
+        passou_filtro_lh = False
 
-    return (
-        2.70 <= Media_CG_H_01 <= 3.00
-        and
-        CV_CG_H_01 <= 0.90
-    )
+    # =========================================
+    # 🧠 TIER LAY AWAY
+    # =========================================
 
-# =========================================
-# 🚫 HOME VOLCANO
-# =========================================
+    tier_la = ""
 
-def home_is_volcano():
+    if passou_filtro_la:
 
-    return (
-        2.80 <= Media_CG_H_01 <= 5.50
-        and
-        CV_CG_H_01 <= 0.80
-    )
+        if "lay away" in dir_ia.lower():
 
-if home_is_rocket():
+            odd_home = row.get(
+                "Odds_Casa",
+                np.nan
+            )
 
-    passou_filtro_lh = False
+            if pd.notna(odd_home):
 
-if home_is_volcano():
+                if odd_home > 1.13:
 
-    passou_filtro_lh = False
+                    if not df_rank_la.empty:
 
-# =========================================
-# 🧠 TIER LAY AWAY
-# =========================================
+                        home_key = (
 
-tier_la = ""
+                            str(row["Home_Team"])
+                            .strip()
+                            .lower()
 
-if passou_filtro_la:
-
-    if "lay away" in dir_ia.lower():
-
-        odd_home = row.get(
-            "Odds_Casa",
-            np.nan
-        )
-
-        if pd.notna(odd_home):
-
-            if odd_home > 1.13:
-
-                if not df_rank_la.empty:
-
-                    home_key = (
-
-                        str(row["Home_Team"])
-                        .strip()
-                        .lower()
-
-                    )
-
-                    linha_rank = df_rank_la[
-
-                        df_rank_la["Home_Key"]
-                        == home_key
-
-                    ]
-
-                    if not linha_rank.empty:
-
-                        tier_la = linha_rank.iloc[0].get(
-                            "Tier_LA",
-                            ""
                         )
 
-# =========================================
-# 🧠 TIER LAY HOME
-# =========================================
+                        linha_rank = df_rank_la[
 
-tier_lh = ""
+                            df_rank_la["Home_Key"]
+                            == home_key
 
-if passou_filtro_lh:
+                        ]
 
-    if "lay home" in dir_ia.lower():
+                        if not linha_rank.empty:
 
-        odd_away = row.get(
-            "Odds_Visitante",
-            np.nan
-        )
+                            tier_la = linha_rank.iloc[0].get(
+                                "Tier_LA",
+                                ""
+                            )
 
-        if pd.notna(odd_away):
+    # =========================================
+    # 🧠 TIER LAY HOME
+    # =========================================
 
-            if odd_away > 1.13:
+    tier_lh = ""
 
-                if not df_rank_lh.empty:
+    if passou_filtro_lh:
 
-                    away_key = (
+        if "lay home" in dir_ia.lower():
 
-                        str(row["Visitor_Team"])
-                        .strip()
-                        .lower()
+            odd_away = row.get(
+                "Odds_Visitante",
+                np.nan
+            )
 
-                    )
+            if pd.notna(odd_away):
 
-                    linha_rank = df_rank_lh[
+                if odd_away > 1.13:
 
-                        df_rank_lh["Away_Key"]
-                        == away_key
+                    if not df_rank_lh.empty:
 
-                    ]
+                        away_key = (
 
-                    if not linha_rank.empty:
+                            str(row["Visitor_Team"])
+                            .strip()
+                            .lower()
 
-                        tier_lh = linha_rank.iloc[0].get(
-                            "Tier_LH",
-                            ""
                         )
+
+                        linha_rank = df_rank_lh[
+
+                            df_rank_lh["Away_Key"]
+                            == away_key
+
+                        ]
+
+                        if not linha_rank.empty:
+
+                            tier_lh = linha_rank.iloc[0].get(
+                                "Tier_LH",
+                                ""
+                            )
 
     # =========================================
     # 🧠 TIER HANDICAP VALUE
@@ -4199,7 +4199,7 @@ if passou_filtro_lh:
                 zebra_ht = ht_a
 
                 zebra_nome = row.get(
-                    "Visitor_Team",
+                    "Away",
                     ""
                 )
 
@@ -4217,7 +4217,7 @@ if passou_filtro_lh:
                 zebra_ht = ht_h
 
                 zebra_nome = row.get(
-                    "Home_Team",
+                    "Home",
                     ""
                 )
 
@@ -4283,8 +4283,6 @@ if passou_filtro_lh:
     except:
 
         pass
-
-
     # =========================================
     # 📋 APPEND FINAL
     # =========================================
@@ -4293,17 +4291,13 @@ if passou_filtro_lh:
 
         "Home": row["Home"],
         "Away": row["Away"],
-
+        
         # 🔥 TIER
         "Tier_LA": tier_la,
         "Tier_LH": tier_lh,
-        "Tier_HA": tier_ha,
-
+        "Tier_HA": tier_ha,        
         # 🔥 SCORE
-        "Score_Zebra": round(
-            score_zebra,
-            2
-        ) if pd.notna(score_zebra) else "",
+        "Score_Zebra": round(score_zebra, 2) if pd.notna(score_zebra) else "",
 
         # 🔥 TIMES
         "Home_Team": row.get(
@@ -4391,8 +4385,8 @@ if passou_filtro_lh:
             "IA_Direcao",
             ""
         )
-
     })
+
 # =========================================
 # 📈 OUTPUT FINAL
 # =========================================
