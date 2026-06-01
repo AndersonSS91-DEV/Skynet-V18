@@ -4382,8 +4382,6 @@ for _, row in df_clean.iterrows():
 
         pass
 
-
-    ```python
     # =========================================
     # 💰 STAKE
     # =========================================
@@ -4647,7 +4645,7 @@ for _, row in df_clean.iterrows():
 
         "Home": row["Home"],
         "Away": row["Away"],
-        "Stake": stake,
+        "Stake": Stake,
         
         # 🔥 TIER
         "Tier_LA": tier_la,
