@@ -4051,9 +4051,8 @@ if passou_filtro_la:
 
                         tier_la = linha_rank.iloc[0].get(
                             "Tier_LA",
-                            ""
-                        )
-
+                            "")    
+                        
     # =========================================
     # 🧠 TIER LAY AWAY
     # =========================================
@@ -4096,52 +4095,6 @@ if passou_filtro_la:
                                 "Tier_LA",
                                 ""
                             )
-
-    # =========================================
-    # 💜 TOP600 BLOQUEADO
-    # =========================================
-
-    elif "lay away" in dir_ia.lower():
-
-        if not df_rank_la.empty:
-
-            home_key = (
-
-                str(row["Home_Team"])
-                .strip()
-                .lower()
-
-            )
-
-            linha_rank = df_rank_la[
-
-                df_rank_la["Home_Key"]
-                == home_key
-
-            ]
-
-            if not linha_rank.empty:
-
-                tier_original = str(
-
-                    linha_rank.iloc[0].get(
-                        "Tier_LA",
-                        ""
-                    )
-
-                )
-
-                if "⭐⭐⭐⭐⭐" in tier_original:
-
-                    tier_la = "LA💜💜💜💜💜"
-
-                elif "⭐⭐⭐" in tier_original:
-
-                    tier_la = "LA💜💜💜"
-
-                elif "⭐" in tier_original:
-
-                    tier_la = "LA💜"
 
     # =========================================
     # 🧠 TIER LAY HOME
