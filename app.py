@@ -4101,7 +4101,54 @@ for _, row in df_clean.iterrows():
                                 "Tier_LH",
                                 ""
                             )
+    # =========================================
+    # ⚖️ ELITE BLOQUEADO
+    # =========================================
 
+    elif (
+
+        not passou_filtro_la
+
+        and "lay away" in dir_ia.lower()
+
+    ):
+
+        if not df_rank_la.empty:
+
+            home_key = (
+
+                str(row["Home_Team"])
+                .strip()
+                .lower()
+
+            )
+
+            linha_rank = df_rank_la[
+
+                df_rank_la["Home_Key"]
+                == home_key
+
+            ]
+
+            if not linha_rank.empty:
+
+                ranking = linha_rank.iloc[0].get(
+                    "Ranking",
+                    999
+                )
+
+                if ranking <= 200:
+
+                    tier_la = "LA💜💜💜💜💜"
+
+                elif ranking <= 400:
+
+                    tier_la = "LA💜💜💜"
+
+                elif ranking <= 600:
+
+                    tier_la = "LA💜"
+                    
     # =========================================
     # 🧠 TIER HANDICAP VALUE
     # =========================================
