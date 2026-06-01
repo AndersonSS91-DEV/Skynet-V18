@@ -4015,6 +4015,7 @@ for _, row in df_clean.iterrows():
     if home_is_volcano():
 
         passou_filtro_lh = False
+        
 
     # =========================================
     # 🧠 TIER LAY AWAY
@@ -4022,42 +4023,75 @@ for _, row in df_clean.iterrows():
 
     tier_la = ""
 
-    if passou_filtro_la:
+    if "lay away" in dir_ia.lower():
 
-        if "lay away" in dir_ia.lower():
+        odd_home = row.get(
+            "Odds_Casa",
+            np.nan
+        )
 
-            odd_home = row.get(
-                "Odds_Casa",
-                np.nan
-            )
+        if pd.notna(odd_home):
 
-            if pd.notna(odd_home):
+            if odd_home > 1.13:
 
-                if odd_home > 1.13:
+                if not df_rank_la.empty:
 
-                    if not df_rank_la.empty:
+                    home_key = (
 
-                        home_key = (
+                        str(row["Home_Team"])
+                        .strip()
+                        .lower()
 
-                            str(row["Home_Team"])
-                            .strip()
-                            .lower()
+                    )
 
+                    linha_rank = df_rank_la[
+
+                        df_rank_la["Home_Key"]
+                        == home_key
+
+                    ]
+
+                    # =====================================
+                    # ✅ PASSOU FILTRO NORMAL
+                    # =====================================
+
+                    if (
+
+                        passou_filtro_la
+
+                        and
+
+                        not linha_rank.empty
+
+                    ):
+
+                        tier_la = linha_rank.iloc[0].get(
+                            "Tier_LA",
+                            ""
                         )
 
-                        linha_rank = df_rank_la[
+                    # =====================================
+                    # 💜 ELITE BLOQUEADO
+                    # =====================================
 
-                            df_rank_la["Home_Key"]
-                            == home_key
+                    elif not linha_rank.empty:
 
-                        ]
+                        ranking = linha_rank.iloc[0].get(
+                            "Ranking",
+                            999
+                        )
 
-                        if not linha_rank.empty:
+                        if ranking <= 200:
 
-                            tier_la = linha_rank.iloc[0].get(
-                                "Tier_LA",
-                                ""
-                            )
+                            tier_la = "LA💜💜💜💜💜"
+
+                        elif ranking <= 400:
+
+                            tier_la = "LA💜💜💜"
+
+                        elif ranking <= 600:
+
+                            tier_la = "LA💜"
 
     # =========================================
     # 🧠 TIER LAY HOME
@@ -4101,54 +4135,7 @@ for _, row in df_clean.iterrows():
                                 "Tier_LH",
                                 ""
                             )
-    # =========================================
-    # ⚖️ ELITE BLOQUEADO
-    # =========================================
-
-    elif (
-
-        not passou_filtro_la
-
-        and "lay away" in dir_ia.lower()
-
-    ):
-
-        if not df_rank_la.empty:
-
-            home_key = (
-
-                str(row["Home_Team"])
-                .strip()
-                .lower()
-
-            )
-
-            linha_rank = df_rank_la[
-
-                df_rank_la["Home_Key"]
-                == home_key
-
-            ]
-
-            if not linha_rank.empty:
-
-                ranking = linha_rank.iloc[0].get(
-                    "Ranking",
-                    999
-                )
-
-                if ranking <= 200:
-
-                    tier_la = "LA💜💜💜💜💜"
-
-                elif ranking <= 400:
-
-                    tier_la = "LA💜💜💜"
-
-                elif ranking <= 600:
-
-                    tier_la = "LA💜"
-                    
+    
     # =========================================
     # 🧠 TIER HANDICAP VALUE
     # =========================================
