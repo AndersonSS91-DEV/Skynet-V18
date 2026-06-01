@@ -4054,51 +4054,79 @@ if passou_filtro_la:
                             ""
                         )
 
-# =========================================
-# 💜 BLOQUEADO MAS TOP600
-# =========================================
+    # =========================================
+    # 🧠 TIER LAY AWAY
+    # =========================================
 
-elif "lay away" in dir_ia.lower():
+    tier_la = ""
 
-    if not df_rank_la.empty:
+    if "lay away" in dir_ia.lower():
 
-        home_key = (
-
-            str(row["Home_Team"])
-            .strip()
-            .lower()
-
+        odd_home = row.get(
+            "Odds_Casa",
+            np.nan
         )
 
-        linha_rank = df_rank_la[
+        if pd.notna(odd_home):
 
-            df_rank_la["Home_Key"]
-            == home_key
+            if odd_home > 1.13:
 
-        ]
+                if not df_rank_la.empty:
 
-        if not linha_rank.empty:
+                    home_key = (
 
-            tier_original = str(
+                        str(row["Home_Team"])
+                        .strip()
+                        .lower()
 
-                linha_rank.iloc[0].get(
-                    "Tier_LA",
-                    ""
-                )
+                    )
 
-            )
+                    linha_rank = df_rank_la[
 
-            if "⭐⭐⭐⭐⭐" in tier_original:
+                        df_rank_la["Home_Key"]
+                        == home_key
 
-                tier_la = "LA💜💜💜💜💜"
+                    ]
 
-            elif "⭐⭐⭐" in tier_original:
+                    if not linha_rank.empty:
 
-                tier_la = "LA💜💜💜"
+                        # =====================================
+                        # ✅ PASSOU FILTRO NORMAL
+                        # =====================================
 
-            elif "⭐" in tier_original:
+                        if passou_filtro_la:
 
-                tier_la = "LA💜"
+                            tier_la = linha_rank.iloc[0].get(
+                                "Tier_LA",
+                                ""
+                            )
+
+                        # =====================================
+                        # 💜 TOP600 BLOQUEADO
+                        # =====================================
+
+                        else:
+
+                            tier_original = str(
+
+                                linha_rank.iloc[0].get(
+                                    "Tier_LA",
+                                    ""
+                                )
+
+                            )
+
+                            if "⭐⭐⭐⭐⭐" in tier_original:
+
+                                tier_la = "LA💜💜💜💜💜"
+
+                            elif "⭐⭐⭐" in tier_original:
+
+                                tier_la = "LA💜💜💜"
+
+                            elif "⭐" in tier_original:
+
+                                tier_la = "LA💜"
 
     # =========================================
     # 🧠 TIER LAY HOME
