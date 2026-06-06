@@ -1476,7 +1476,7 @@ with tab1:
         st.metric("CV_GF_H", get_val(linha_mgf, "CV_GF_H", "{:.2f}"))
         st.metric("MGF_HT_Home", get_val(linha_ht, "MGF_HT_Home", "{:.2f}"))
         st.metric("CV_MGF_HT_Home", get_val(linha_ht, "CV_MGF_HT_Home", "{:.2f}"))
-        st.metric("Eficiência_HT_H", get_val(linha_csv,"Eficiência_HT_H","{:.2f}"))
+        st.metric("Eficiência_2nd_H", get_val(linha_csv,"Eficiência_2nd_H","{:.2f}"))
     
 
     with c4:
@@ -1487,7 +1487,7 @@ with tab1:
         st.metric("CV_GF_A", get_val(linha_mgf, "CV_GF_A", "{:.2f}"))
         st.metric("MGF_HT_Away", get_val(linha_ht, "MGF_HT_Away", "{:.2f}"))
         st.metric("CV_MGF_HT_Away", get_val(linha_ht, "CV_MGF_HT_Away", "{:.2f}"))
-        st.metric("Eficiência_HT_A", get_val(linha_csv,"Eficiência_HT_A","{:.2f}"))
+        st.metric("Eficiência_2nd_A", get_val(linha_csv,"Eficiência_2nd_A","{:.2f}"))
                   
     with c5:
         st.metric("Força Defesa Home (%)", get_val(linha_exg, "FDH", "{:.2f}"))
