@@ -1452,8 +1452,7 @@ with tab1:
         st.metric("Media_CG_H_01", get_val(linha_mgf, "Media_CG_H_01", "{:.2f}"))
         st.metric("CV_CG_H_01", get_val(linha_mgf, "CV_CG_H_01", "{:.2f}"))
         st.metric("Media_CG_H_02", get_val(linha_mgf, "Media_CG_H_02", "{:.2f}"))
-        st.metric("CV_CG_H_02", get_val(linha_mgf, "CV_CG_H_02", "{:.2f}"))
-        st.metric("Home Goleou", get_val(linha_csv,"Win4_H","{:.2f}"))
+        st.metric("Home Marcou 1° e Venceu", get_val(linha_csv,"FS_Win_H","{:.2f}"))
         st.metric("Home Foi Goleado", get_val(linha_csv,"Los4_H","{:.2f}"))
         st.metric("Eficiência_HT_H", get_val(linha_csv,"Eficiência_HT_H","{:.2f}"))
         
@@ -1464,8 +1463,7 @@ with tab1:
         st.metric("CV_CG_A_01", get_val(linha_mgf, "CV_CG_A_01", "{:.2f}"))
         st.metric("Media_CG_A_02", get_val(linha_mgf, "Media_CG_A_02", "{:.2f}"))
         st.metric("CV_CG_A_02", get_val(linha_mgf, "CV_CG_A_02", "{:.2f}"))
-        st.metric("Away Goleou", get_val(linha_csv,"Win4_A","{:.2f}"))
-        st.metric("Away Foi Goleado", get_val(linha_csv,"Los4_A","{:.2f}"))
+        st.metric("Away Marcou 1° e Venceu", get_val(linha_csv,"FS_Win_A","{:.2f}"))
         st.metric("Eficiência_HT_A", get_val(linha_csv,"Eficiência_HT_A","{:.2f}"))
         
     with c3:
@@ -1477,7 +1475,7 @@ with tab1:
         st.metric("MGF_HT_Home", get_val(linha_ht, "MGF_HT_Home", "{:.2f}"))
         st.metric("CV_MGF_HT_Home", get_val(linha_ht, "CV_MGF_HT_Home", "{:.2f}"))
         st.metric("Eficiência_2nd_H", get_val(linha_csv,"Eficiência_2nd_H","{:.2f}"))
-    
+        st.metric("Home Goleou", get_val(linha_csv,"Win4_H","{:.2f}"))
 
     with c4:
         st.metric("Força Ataque Away (%)", get_val(linha_exg, "FAA", "{:.2f}"))
@@ -1488,7 +1486,8 @@ with tab1:
         st.metric("MGF_HT_Away", get_val(linha_ht, "MGF_HT_Away", "{:.2f}"))
         st.metric("CV_MGF_HT_Away", get_val(linha_ht, "CV_MGF_HT_Away", "{:.2f}"))
         st.metric("Eficiência_2nd_A", get_val(linha_csv,"Eficiência_2nd_A","{:.2f}"))
-                  
+        st.metric("Away Goleou", get_val(linha_csv,"Win4_A","{:.2f}"))
+        
     with c5:
         st.metric("Força Defesa Home (%)", get_val(linha_exg, "FDH", "{:.2f}"))
         st.metric("Clean Games Home (%)", get_val(linha_exg, "Clean_Games_H"))
@@ -1498,6 +1497,7 @@ with tab1:
         st.metric("MGC_HT_Home", get_val(linha_ht, "MGC_HT_Home", "{:.2f}"))
         st.metric("CV_MGC_HT_Home", get_val(linha_ht, "CV_MGC_HT_Home", "{:.2f}"))
         st.metric("Eficiência_FT_H", get_val(linha_csv,"Eficiência_H","{:.2f}"))
+        st.metric("CV_CG_H_02", get_val(linha_mgf, "CV_CG_H_02", "{:.2f}"))
         
     with c6:
         st.metric("Força Defesa Away (%)", get_val(linha_exg, "FDA", "{:.2f}"))
@@ -1508,6 +1508,7 @@ with tab1:
         st.metric("MGC_HT_Away", get_val(linha_ht, "MGC_HT_Away", "{:.2f}"))
         st.metric("CV_MGC_HT_Away", get_val(linha_ht, "CV_MGC_HT_Away", "{:.2f}"))
         st.metric("Eficiência_FT_A", get_val(linha_csv,"Eficiência_A","{:.2f}"))
+        st.metric("Away Foi Goleado", get_val(linha_csv,"Los4_A","{:.2f}"))
         
     st.markdown("---")
 
