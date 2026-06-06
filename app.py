@@ -319,6 +319,30 @@ else:
     st.stop()
     
 # =========================================
+# 🧠 csv - BASE DE DADOS
+# =========================================
+CSV_BASE = "data/CSV_LIMPO.csv"
+
+if os.path.exists(CSV_BASE):
+
+    df_base = pd.read_csv(
+        CSV_BASE,
+        sep=";",
+        encoding="utf-8-sig",
+        low_memory=False
+    )
+
+    df_base["JOGO"] = (
+        df_base["Home_Team"].astype(str)
+        + " x " +
+        df_base["Visitor_Team"].astype(str)
+    )
+
+else:
+
+    df_base = pd.DataFrame()
+    
+# =========================================
 # 🧠 RANKING LAY AWAY 300K
 # =========================================
 RANKING_PATH = (
@@ -451,9 +475,15 @@ linha_exg = df_exg[df_exg["JOGO"] == jogo].iloc[0]
 linha_vg  = df_vg[df_vg["JOGO"] == jogo].iloc[0]
 linha_ht  = df_ht[df_ht["JOGO"] == jogo].iloc[0]  
 linha_cantos = df_cantos[df_cantos["JOGO"] == jogo].iloc[0]
-linha_consenso = df_consenso[df_consenso["JOGO"] == jogo].iloc[0] # ✅ ADICIONE ESTA
+linha_consenso = df_consenso[df_consenso["JOGO"] == jogo].iloc[0] 
 
+linha_csv = pd.Series() # ✅ ADICIONE ESTA
+if not df_base.empty:
+    tmp = df_base[df_base["JOGO"] == jogo]
+    if not tmp.empty:
+        linha_csv = tmp.iloc[0]    
 st.session_state["jogo"] = jogo
+
 # =========================================
 # FUNÇÕES AUX
 # =========================================
@@ -1423,6 +1453,7 @@ with tab1:
         st.metric("CV_CG_H_01", get_val(linha_mgf, "CV_CG_H_01", "{:.2f}"))
         st.metric("Media_CG_H_02", get_val(linha_mgf, "Media_CG_H_02", "{:.2f}"))
         st.metric("CV_CG_H_02", get_val(linha_mgf, "CV_CG_H_02", "{:.2f}"))
+        st.metric("Eficiência_HT_H", get_val(linha_csv,"Eficiência_HT_H","{:.2f}"))
         
     with c2:
         st.metric("Posse Away (%)", get_val(linha_exg, "Posse_Bola_Away", "{:.2f}"))
@@ -1431,6 +1462,7 @@ with tab1:
         st.metric("CV_CG_A_01", get_val(linha_mgf, "CV_CG_A_01", "{:.2f}"))
         st.metric("Media_CG_A_02", get_val(linha_mgf, "Media_CG_A_02", "{:.2f}"))
         st.metric("CV_CG_A_02", get_val(linha_mgf, "CV_CG_A_02", "{:.2f}"))
+        st.metric("Eficiência_HT_A", get_val(linha_csv,"Eficiência_HT_A","{:.2f}"))
         
     with c3:
         st.metric("Força Ataque Home (%)", get_val(linha_exg, "FAH", "{:.2f}"))
