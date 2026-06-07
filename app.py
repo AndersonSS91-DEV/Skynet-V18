@@ -481,17 +481,7 @@ linha_csv = pd.Series()
 
 if not df_base.empty:
 
-    tmp = df_base[
-
-        (df_base["Home_Team"].astype(str).str.strip().str.lower()
-         == home.strip().lower())
-
-        &
-
-        (df_base["Visitor_Team"].astype(str).str.strip().str.lower()
-         == away.strip().lower())
-
-    ]
+    tmp = df_base[df_base["JOGO"] == jogo]
 
     if not tmp.empty:
 
