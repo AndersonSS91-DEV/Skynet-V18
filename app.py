@@ -319,10 +319,9 @@ else:
     st.stop()
     
 # =========================================
-# 🧠 csv - BASE DE DADOS
+# 🧠 CSV - BASE DE DADOS
 # =========================================
 CSV_BASE = "data/CSV_LIMPO.csv"
-
 if os.path.exists(CSV_BASE):
 
     df_base = pd.read_csv(
@@ -332,14 +331,51 @@ if os.path.exists(CSV_BASE):
         low_memory=False
     )
 
+    # =====================================
+    # CORRIGE COLUNAS NUMÉRICAS
+    # =====================================
+    for col in [
+
+        "FS_Win_H",
+        "FS_Win_A",
+        "Win4_H",
+        "Win4_A",
+        "Los4_H",
+        "Los4_A",
+        "Eficiência_HT_H",
+        "Eficiência_HT_A",
+        "Eficiência_2nd_H",
+        "Eficiência_2nd_A",
+        "Eficiência_H",
+        "Eficiência_A"
+
+    ]:
+        if col in df_base.columns:
+
+            df_base[col] = pd.to_numeric(
+                df_base[col],
+                errors="coerce"
+            )
+
+    # =====================================
+    # CHAVE DO JOGO
+    # =====================================
     df_base["JOGO"] = (
-        df_base["Home_Team"].astype(str)
-        + " x " +
-        df_base["Visitor_Team"].astype(str)
+        df_base["Home_Team"]
+        .astype(str)
+        .str.strip()
+
+        +
+
+        " x "
+
+        +
+
+        df_base["Visitor_Team"]
+        .astype(str)
+        .str.strip()
     )
-
 else:
-
     df_base = pd.DataFrame()
     
 # =========================================
