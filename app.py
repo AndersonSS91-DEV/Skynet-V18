@@ -477,11 +477,15 @@ linha_ht  = df_ht[df_ht["JOGO"] == jogo].iloc[0]
 linha_cantos = df_cantos[df_cantos["JOGO"] == jogo].iloc[0]
 linha_consenso = df_consenso[df_consenso["JOGO"] == jogo].iloc[0] 
 
-linha_csv = pd.Series() # ✅ ADICIONE ESTA
+linha_csv = pd.Series()
 if not df_base.empty:
-    tmp = df_base[df_base["JOGO"] == jogo]
+    tmp = df_base[(df_base["Home_Team"].astype(str).str.strip().str.lower()
+         == home.strip().lower())
+        &
+        (df_base["Visitor_Team"].astype(str).str.strip().str.lower()
+         == away.strip().lower())]
     if not tmp.empty:
-        linha_csv = tmp.iloc[0]    
+        linha_csv = tmp.iloc[0]
 st.session_state["jogo"] = jogo
 
 # =========================================
