@@ -1389,7 +1389,8 @@ desvio_score = df_mgf["Score_Ofensivo"].std()
 # =========================================
 # ABAS
 # =========================================
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+tab0, tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+"🚀 SaaS",
 "📊🧠 Resumo",
 "📁🧠 Dados",
 "📊⚽ MGF",
@@ -1412,7 +1413,161 @@ def to_int_safe(v):
     except:
         return "-"
 
+# ==========================================
+# TAB 0 — SaaS
+# ==========================================
+with tab0:
 
+    st.markdown(f"""
+    <div style="
+        background:linear-gradient(135deg,#00C6FF,#0072FF);
+        padding:25px;
+        border-radius:18px;
+        margin-bottom:15px;
+        text-align:center;
+    ">
+
+    <h1 style="margin:0;color:white;">
+    ⚽ {home} vs {away}
+    </h1>
+
+    <p style="
+        margin-top:8px;
+        color:white;
+        font-size:16px;
+    ">
+    Poisson Engine Pro
+    </p>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    c1,c2,c3 = st.columns(3)
+
+    with c1:
+        st.markdown(card_html(
+            "Intensidade",
+            f"{score_ofensivo:.0f}",
+            label_intensidade,
+            cor_intensidade,
+            "🔥"
+        ), unsafe_allow_html=True)
+
+    with c2:
+        st.markdown(card_html(
+            "Entrada Principal",
+            entrada,
+            f"Classe {classe}",
+            "#58a6ff",
+            "🎯"
+        ), unsafe_allow_html=True)
+
+    with c3:
+        st.markdown(card_html(
+            "Confiança",
+            confianca_txt,
+            risco_txt,
+            "#3fb950",
+            "🤖"
+        ), unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    m1,m2,m3,m4 = st.columns(4)
+
+    with m1:
+        st.metric("ExG Casa", f"{lambda_home:.2f}")
+
+    with m2:
+        st.metric("ExG Fora", f"{lambda_away:.2f}")
+
+    with m3:
+        st.metric("BTTS", f"{btts_pct:.0f}%")
+
+    with m4:
+        st.metric("Over 2.5", f"{over25:.0f}%")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    p1,p2,p3 = st.columns(3)
+
+    with p1:
+        st.metric(
+            "🏠 Vitória Casa",
+            f"{home_win*100:.1f}%"
+        )
+
+    with p2:
+        st.metric(
+            "🤝 Empate",
+            f"{draw_pct*100:.1f}%"
+        )
+
+    with p3:
+        st.metric(
+            "✈️ Vitória Fora",
+            f"{away_win*100:.1f}%"
+        )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    r1,r2 = st.columns([1.2,1])
+
+    with r1:
+
+        fig_r = radar_fig(
+            radar_home,
+            radar_away,
+            home,
+            away
+        )
+
+        st.pyplot(
+            fig_r,
+            use_container_width=True
+        )
+
+        plt.close(fig_r)
+
+    with r2:
+
+        st.markdown(placar_html(
+            melhor["sc"],
+            melhor["prob"],
+            outros
+        ), unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    st.markdown(value_bets_html([
+        (
+            "🎯",
+            "#1a2e1a",
+            entrada,
+            profile_type,
+            confianca_txt,
+            "TOP",
+            "#3fb950",
+            "#102910"
+        )
+    ]), unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    st.markdown(
+        poisson_consenso_card_html(
+            p_score,
+            leitura_score,
+            est,
+            merc,
+            dire,
+            dir_ia,
+            cons
+        ),
+        unsafe_allow_html=True
+    )
+
+    footer_saas()
 # =========================================
 # ABA 1 — RESUMO
 # =========================================
