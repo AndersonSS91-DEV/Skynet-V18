@@ -392,6 +392,18 @@ if os.path.exists(RANKING_PATH):
         RANKING_PATH
     )
 
+    st.write(
+    df_rank_la[
+        df_rank_la["Home"]
+        .astype(str)
+        .str.contains(
+            "Maguary",
+            case=False,
+            na=False
+        )
+    ]
+)
+
     # 🔑 NORMALIZA
     df_rank_la["Home_Key"] = (
 
