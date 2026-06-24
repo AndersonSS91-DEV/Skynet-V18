@@ -4208,47 +4208,53 @@ for _, row in df_clean.iterrows():
 
                         ]
 
-                        if not linha_rank.empty:
+if not linha_rank.empty:
 
-tier_original = linha_rank.iloc[0].get(
-    "Tier_LA",
-    ""
-)
+    tier_original = linha_rank.iloc[0].get(
+        "Tier_LA",
+        ""
+    )
 
-if pd.isna(tier_original):
-    tier_original = ""
+    if pd.isna(tier_original):
+        tier_original = ""
 
-tier_original = str(tier_original).strip()
+    tier_original = str(tier_original).strip()
 
-# =============================
-# ✅ FILTRO NORMAL
-# =============================
+    # =============================
+    # ✅ FILTRO NORMAL
+    # =============================
 
-if passou_filtro_la:
+    if passou_filtro_la:
 
-    tier_la = tier_original
+        tier_la = tier_original
 
-# =============================
-# 💜 ELITE BLOQUEADO
-# =============================
-
-else:
-
-    if "⭐⭐⭐⭐⭐" in tier_original:
-
-        tier_la = "LA💜💜💜💜💜"
-
-    elif "⭐⭐⭐" in tier_original:
-
-        tier_la = "LA💜💜💜"
-
-    elif "⭐" in tier_original:
-
-        tier_la = "LA💜"
+    # =============================
+    # 💜 ELITE BLOQUEADO
+    # =============================
 
     else:
 
-        tier_la = ""
+        if "⭐⭐⭐⭐⭐" in tier_original:
+
+            tier_la = "LA💜💜💜💜💜"
+
+        elif "⭐⭐⭐" in tier_original:
+
+            tier_la = "LA💜💜💜"
+
+        elif "⭐" in tier_original:
+
+            tier_la = "LA💜"
+
+        else:
+
+            tier_la = ""
+
+else:
+
+    tier_la = ""
+
+
     # =========================================
     # 🧠 TIER LAY HOME
     # =========================================
