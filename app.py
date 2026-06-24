@@ -4215,6 +4215,18 @@ for _, row in df_clean.iterrows():
                                 ""
                             )
 
+                            if tier_original is None:
+
+                                tier_original = ""
+
+                            elif pd.isna(tier_original):
+
+                                tier_original = ""
+
+                            tier_original = str(
+                                tier_original
+                            ).strip()
+
                             # =============================
                             # ✅ FILTRO NORMAL
                             # =============================
@@ -4240,6 +4252,11 @@ for _, row in df_clean.iterrows():
                                 elif "⭐" in tier_original:
 
                                     tier_la = "LA💜"
+
+                                else:
+
+                                    tier_la = ""
+                                    
     # =========================================
     # 🧠 TIER LAY HOME
     # =========================================
