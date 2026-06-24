@@ -4220,41 +4220,32 @@ if not linha_rank.empty:
 
     tier_original = str(tier_original).strip()
 
-    # =============================
-    # ✅ FILTRO NORMAL
-    # =============================
 
-    if passou_filtro_la:
+                            # =============================
+                            # ✅ FILTRO NORMAL
+                            # =============================
 
-        tier_la = tier_original
+                            if passou_filtro_la:
 
-    # =============================
-    # 💜 ELITE BLOQUEADO
-    # =============================
+                                tier_la = tier_original
 
-    else:
+                            # =============================
+                            # 💜 ELITE BLOQUEADO
+                            # =============================
 
-        if "⭐⭐⭐⭐⭐" in tier_original:
+                            else:
 
-            tier_la = "LA💜💜💜💜💜"
+                                if "⭐⭐⭐⭐⭐" in tier_original:
 
-        elif "⭐⭐⭐" in tier_original:
+                                    tier_la = "LA💜💜💜💜💜"
 
-            tier_la = "LA💜💜💜"
+                                elif "⭐⭐⭐" in tier_original:
 
-        elif "⭐" in tier_original:
+                                    tier_la = "LA💜💜💜"
 
-            tier_la = "LA💜"
+                                elif "⭐" in tier_original:
 
-        else:
-
-            tier_la = ""
-
-else:
-
-    tier_la = ""
-
-
+                                    tier_la = "LA💜"
     # =========================================
     # 🧠 TIER LAY HOME
     # =========================================
