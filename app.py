@@ -392,6 +392,18 @@ if os.path.exists(RANKING_PATH):
         RANKING_PATH
     )
 
+    st.write(
+    df_rank_la[
+        df_rank_la["Home"]
+        .astype(str)
+        .str.contains(
+            "Maguary",
+            case=False,
+            na=False
+        )
+    ]
+)
+
     # 🔑 NORMALIZA
     df_rank_la["Home_Key"] = (
 
@@ -4208,12 +4220,58 @@ for _, row in df_clean.iterrows():
 
                         ]
 
+                        if row["Home_Team"] == "Maguary PE":
+
+                            st.write(
+                                "HOME_TEAM:",
+                                row["Home_Team"]
+                            )
+
+                            st.write(
+                                "HOME_KEY JOGO:",
+                                home_key
+                            )
+
+                            tmp = df_rank_la[
+
+                                df_rank_la["Home"]
+                                .astype(str)
+                                .str.contains(
+                                    "Maguary",
+                                    case=False,
+                                    na=False
+                                )
+
+                            ]
+
+                            st.write(
+                                tmp[
+                                    [
+                                        "Home",
+                                        "Home_Key",
+                                        "Tier_LA"
+                                    ]
+                                ]
+                            )
+
                         if not linha_rank.empty:
 
                             tier_original = linha_rank.iloc[0].get(
                                 "Tier_LA",
                                 ""
                             )
+
+                            if tier_original is None:
+
+                                tier_original = ""
+
+                            elif pd.isna(tier_original):
+
+                                tier_original = ""
+
+                            tier_original = str(
+                                tier_original
+                            ).strip()
 
                             # =============================
                             # ✅ FILTRO NORMAL
@@ -4240,6 +4298,11 @@ for _, row in df_clean.iterrows():
                                 elif "⭐" in tier_original:
 
                                     tier_la = "LA💜"
+
+                                else:
+
+                                    tier_la = ""
+                                    
     # =========================================
     # 🧠 TIER LAY HOME
     # =========================================
