@@ -4220,6 +4220,44 @@ for _, row in df_clean.iterrows():
 
                         ]
 
+
+                                                if row["Home_Team"] == "Maguary PE":
+
+                            st.write(
+                                "HOME_TEAM:",
+                                row["Home_Team"]
+                            )
+
+                            st.write(
+                                "HOME_KEY JOGO:",
+                                home_key
+                            )
+
+                            tmp = df_rank_la[
+
+                                df_rank_la["Home"]
+                                .astype(str)
+                                .str.contains(
+                                    "Maguary",
+                                    case=False,
+                                    na=False
+                                )
+
+                            ]
+
+                            st.write(
+
+                                tmp[
+                                    [
+                                        "Home",
+                                        "Home_Key",
+                                        "Tier_LA"
+                                    ]
+                                ]
+
+                            )
+
+                        
                         if not linha_rank.empty:
 
                             tier_original = linha_rank.iloc[0].get(
