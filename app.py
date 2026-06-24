@@ -4208,18 +4208,26 @@ for _, row in df_clean.iterrows():
 
                         ]
 
-if not linha_rank.empty:
+                        linha_rank = df_rank_la[
 
-    tier_original = linha_rank.iloc[0].get(
-        "Tier_LA",
-        ""
-    )
+                            df_rank_la["Home_Key"]
+                            == home_key
 
-    if pd.isna(tier_original):
-        tier_original = ""
+                        ]
 
-    tier_original = str(tier_original).strip()
+                        if not linha_rank.empty:
 
+                            tier_original = linha_rank.iloc[0].get(
+                                "Tier_LA",
+                                ""
+                            )
+
+                            if pd.isna(tier_original):
+                                tier_original = ""
+
+                            tier_original = str(
+                                tier_original
+                            ).strip()
 
                             # =============================
                             # ✅ FILTRO NORMAL
@@ -4246,6 +4254,10 @@ if not linha_rank.empty:
                                 elif "⭐" in tier_original:
 
                                     tier_la = "LA💜"
+
+                                else:
+
+                                    tier_la = ""
     # =========================================
     # 🧠 TIER LAY HOME
     # =========================================
