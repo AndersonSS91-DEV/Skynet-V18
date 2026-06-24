@@ -4220,8 +4220,7 @@ for _, row in df_clean.iterrows():
 
                         ]
 
-
-                                                if row["Home_Team"] == "Maguary PE":
+                        if row["Home_Team"] == "Maguary PE":
 
                             st.write(
                                 "HOME_TEAM:",
@@ -4246,7 +4245,6 @@ for _, row in df_clean.iterrows():
                             ]
 
                             st.write(
-
                                 tmp[
                                     [
                                         "Home",
@@ -4254,8 +4252,9 @@ for _, row in df_clean.iterrows():
                                         "Tier_LA"
                                     ]
                                 ]
-
                             )
+
+                        if not linha_rank.empty:
 
                         
                         if not linha_rank.empty:
