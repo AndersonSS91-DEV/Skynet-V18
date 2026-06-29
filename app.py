@@ -1794,6 +1794,47 @@ jogos_semelhantes = jogos_semelhantes.sort_values(
 ).reset_index(drop=True)
 
 # =========================================
+# CS INTELLIGENCE
+# =========================================
+
+MERCADOS_CS = {
+    "Lay 0x0": "LAY00",
+    "Lay 0x1": "LAY01",
+    "Lay 1x0": "LAY10",
+    "Lay 2x2": "LAY22",
+    "Lay Goleada Home": "LAYGH",
+    "Lay Goleada Away": "LAYGA"
+}
+
+resultado_cs = []
+
+for mercado, coluna in MERCADOS_CS.items():
+
+    if coluna not in jogos_semelhantes.columns:
+        continue
+
+    total = len(jogos_semelhantes)
+
+    greens = int(jogos_semelhantes[coluna].sum())
+    reds = total - greens
+
+    winrate = 0
+
+    if total > 0:
+        winrate = greens / total * 100
+
+    resultado_cs.append({
+
+        "Mercado": mercado,
+        "Greens": greens,
+        "Reds": reds,
+        "Winrate": round(winrate, 2)
+
+    })
+
+df_cs = pd.DataFrame(resultado_cs)
+
+# =========================================
 # ABAS
 # =========================================
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
@@ -7348,5 +7389,15 @@ with tab9:
         )
 
     st.markdown("---")
+
+st.markdown("---")
+
+st.subheader("🎯 CS Intelligence")
+
+st.dataframe(
+    df_cs,
+    use_container_width=True,
+    hide_index=True
+)
 
        
