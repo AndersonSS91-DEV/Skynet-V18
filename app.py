@@ -1672,25 +1672,30 @@ FEATURES_ML = [
 # =========================================
 def preparar_base_ml(df_base):
 
-    # Mantém apenas as colunas necessárias
+    df = df_base.copy()
+
+    # garante que TODAS as features existam
+    for col in FEATURES_ML:
+
+        if col not in df.columns:
+            df[col] = np.nan
+
     cols = FEATURES_ML + [
+
         "LAY00",
         "LAY01",
         "LAY10",
         "LAY22",
         "LAYGH",
         "LAYGA",
+
         "Home_Team",
         "Visitor_Team",
         "League"
+
     ]
 
-    cols = [c for c in cols if c in df_base.columns]
-
-    df = df_base[cols].copy()
-
-    # Remove linhas incompletas
-    df = df.dropna()
+    df = df[cols]
 
     return df.reset_index(drop=True)
     
@@ -1705,7 +1710,7 @@ from sklearn.preprocessing import StandardScaler
 scaler_ml = StandardScaler()
 
 # Matriz de Features
-X_ml = df_ml[FEATURES_ML].copy()
+X_ml = df_ml[FEATURES_ML].fillna(0)
 
 # Normaliza todas as variáveis
 X_scaled = scaler_ml.fit_transform(X_ml)
