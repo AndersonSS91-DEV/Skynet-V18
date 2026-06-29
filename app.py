@@ -1757,8 +1757,50 @@ from sklearn.preprocessing import StandardScaler
 
 scaler_ml = StandardScaler()
 
-X_ml = df_ml[FEATURES_VALIDAS]
+# =========================================
+# MATRIZ DE FEATURES
+# =========================================
 
+X_ml = df_ml[FEATURES_VALIDAS].copy()
+
+# Converte TODAS as colunas para numérico
+for col in X_ml.columns:
+
+    X_ml[col] = pd.to_numeric(
+        X_ml[col],
+        errors="coerce"
+    )
+
+# Remove colunas totalmente vazias
+X_ml = X_ml.dropna(
+    axis=1,
+    how="all"
+)
+
+# Atualiza lista de features válidas
+FEATURES_VALIDAS = X_ml.columns.tolist()
+
+# Se não sobrou nenhuma feature, interrompe
+if len(FEATURES_VALIDAS) == 0:
+
+    raise Exception(
+        "Nenhuma feature numérica encontrada para o Machine Learning."
+    )
+
+# Preenche NaN pela mediana
+for col in FEATURES_VALIDAS:
+
+    mediana = X_ml[col].median()
+
+    if pd.isna(mediana):
+        mediana = 0
+
+    X_ml[col] = X_ml[col].fillna(mediana)
+
+# Garante float
+X_ml = X_ml.astype(float)
+
+# Normalização
 X_scaled = scaler_ml.fit_transform(X_ml)
 
 # =========================================
