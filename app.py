@@ -1924,30 +1924,32 @@ def preparar_jogo_ml(linha_csv):
     for col in FEATURES_VALIDAS:
 
         if col in linha_csv.index:
-
-            dados[col] = pd.to_numeric(
-                linha_csv[col],
-                errors="coerce"
-            )
-
+            dados[col] = linha_csv[col]
         else:
-
             dados[col] = np.nan
 
     jogo = pd.DataFrame([dados])
 
+    jogo = jogo.reindex(
+        columns=FEATURES_VALIDAS,
+        fill_value=np.nan
+    )
+
     for col in FEATURES_VALIDAS:
 
-        mediana = df_ml[col].median()
+        jogo[col] = pd.to_numeric(
+            jogo[col],
+            errors="coerce"
+        )
+
+        mediana = X_ml[col].median()
 
         if pd.isna(mediana):
             mediana = 0
 
         jogo[col] = jogo[col].fillna(mediana)
 
-    jogo = jogo.astype(float)
-
-    return jogo
+    return jogo.astype(float)
 
 # =========================================
 # JOGO NORMALIZADO
@@ -1968,18 +1970,6 @@ else:
     else:
 
         jogo_scaled = scaler_ml.transform(jogo_ml)
-
-
-# =========================================
-# VETOR DO JOGO
-# =========================================
-jogo_ml = preparar_jogo_ml(linha_csv)
-
-# mesma ordem das features
-jogo_ml = jogo_ml[FEATURES_ML]
-
-# normaliza usando o mesmo scaler da base
-jogo_scaled = scaler_ml.transform(jogo_ml)
 
 # =========================================
 # KNN - SIMILAR GAMES ENGINE
