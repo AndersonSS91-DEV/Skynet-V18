@@ -7279,133 +7279,73 @@ with tab8:
 # =========================================
 with tab9:
 
-    st.title("🧪 Machine Learning")
-
-    st.info("""
-    🚧 Laboratório de Machine Learning
-
-    Nesta aba serão desenvolvidos:
-
-    • Similar Games Engine
-    • CS Intelligence
-    • Feature Engineering
-    • Machine Learning
-    • Ensemble Models
-    • Explainable AI
-    """)
+    # =====================================
+    # RESULTADO DO SIMILAR GAMES
+    # =====================================
 
     st.markdown("---")
 
-    st.subheader("⚽ Jogo Selecionado")
+    st.subheader("🔎 Similar Games Engine")
 
-    st.success(jogo)
+    total = len(jogos_semelhantes)
 
-    st.markdown("---")
+    st.metric("Jogos semelhantes encontrados", total)
 
-# =====================================
-# RESULTADO DO SIMILAR GAMES
-# =====================================
+    if total == 0:
 
-st.subheader("🔎 Similar Games Engine")
+        st.warning("Nenhum jogo semelhante encontrado.")
 
-total = len(jogos_semelhantes)
+    else:
 
-st.metric("Jogos semelhantes encontrados", total)
+        greens = int(jogos_semelhantes["LAY00"].sum())
+        reds = total - greens
+        winrate = greens / total * 100
 
-if total == 0:
+        col1, col2, col3 = st.columns(3)
 
-    st.warning("Nenhum jogo semelhante encontrado com os filtros atuais.")
+        col1.metric("Greens", greens)
+        col2.metric("Reds", reds)
+        col3.metric("Winrate Lay 0x0", f"{winrate:.2f}%")
 
-else:
+        st.markdown("### Jogos semelhantes")
 
-    greens = int(jogos_semelhantes["LAY00"].sum())
-    reds = total - greens
-    winrate = greens / total * 100
+        colunas = [
 
-    col1, col2, col3 = st.columns(3)
+            "SIMILARIDADE",
 
-    col1.metric("Greens Lay 0x0", greens)
-    col2.metric("Reds Lay 0x0", reds)
-    col3.metric("Winrate", f"{winrate:.2f}%")
+            "League",
 
-    st.markdown("### Primeiros jogos encontrados")
+            "Home_Team",
+            "Visitor_Team",
 
-colunas = [
+            "Odds_Casa",
 
-    "SIMILARIDADE",
+            "FAH",
+            "FDA",
 
-    "League",
+            "PPJH",
+            "PPJA",
 
-    "Home_Team",
-    "Visitor_Team",
+            "LAY00",
+            "LAY01",
+            "LAY10",
+            "LAY22",
+            "LAYGH",
+            "LAYGA"
 
-    "Odds_Casa",
+        ]
 
-    "FAH",
-    "FDA",
+        colunas = [
+            c for c in colunas
+            if c in jogos_semelhantes.columns
+        ]
 
-    "PPJH",
-    "PPJA",
-
-    "LAY0x0",
-    "LAY0x1",
-    "LAY1x0",
-    "LAY2x2",
-    "LAYGH",
-    "LAYGA"
-
-]
-
-    colunas = [c for c in colunas if c in jogos_semelhantes.columns]
-
-    st.dataframe(
-        jogos_semelhantes[colunas],
-        use_container_width=True,
-        hide_index=True
-    )
+        st.dataframe(
+            jogos_semelhantes[colunas],
+            use_container_width=True,
+            hide_index=True
+        )
 
     st.markdown("---")
-
-    st.subheader("🎯 CS Intelligence")
-
-    mercados = {
-        "Lay 0x0": "-",
-        "Lay 0x1": "-",
-        "Lay 1x0": "-",
-        "Lay 2x2": "-",
-        "Lay Goleada Home": "-",
-        "Lay Goleada Away": "-"
-    }
-
-    df_score = pd.DataFrame(
-        list(mercados.items()),
-        columns=["Mercado", "Score"]
-    )
-
-    st.dataframe(
-        df_score,
-        use_container_width=True,
-        hide_index=True
-    )
-
-    st.markdown("---")
-
-    st.subheader("🧠 Explicabilidade")
-
-    st.info("""
-A IA ainda não foi treinada.
-
-Em breve esta seção mostrará:
-
-• Jogos semelhantes encontrados
-
-• Principais fatores
-
-• Feature Importance
-
-• SHAP Values
-
-• Explicação da decisão
-""")
 
        
