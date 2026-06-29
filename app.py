@@ -1389,7 +1389,7 @@ desvio_score = df_mgf["Score_Ofensivo"].std()
 # =========================================
 # ABAS
 # =========================================
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
 "📊🧠 Resumo",
 "📁🧠 Dados",
 "📊⚽ MGF",
@@ -1397,7 +1397,8 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
 "💎⚽ VG",
 "🚩 Escanteios",
 "🤖 IA",
-"👾📡 CS_Score"
+"👾📡 CS_Score",
+"🧪 Machine Learning"
 ])
 
 
@@ -6866,5 +6867,115 @@ with tab8:
 
         hide_index=True
     )
-        
+
+# =========================================
+# 🧪 AI LAB
+# =========================================
+with tab9:
+
+    st.title("🧪 AI Lab - Poisson Skynet V30")
+
+    st.info(
+        """
+        🚧 Laboratório de Machine Learning
+
+        Nesta aba serão desenvolvidos:
+
+        • Similar Games Engine
+        • CS Intelligence
+        • Feature Engineering
+        • Machine Learning
+        • Ensemble Models
+        • Explainable AI
+        """
+    )
+
+    st.markdown("---")
+
+    st.subheader("⚽ Jogo Selecionado")
+
+    st.success(jogo)
+
+    st.markdown("---")
+
+    st.subheader("🚀 Em desenvolvimento...")
+
+st.markdown("---")
+
+st.subheader("📊 Dados do jogo")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric("Odd Casa", linha_exg["Odds_Casa"])
+    st.metric("Odd Empate", linha_exg["Odds_Empate"])
+    st.metric("Odd Visitante", linha_exg["Odds_Visitante"])
+
+with col2:
+    st.metric("ExG Home", round(linha_consenso["ExG_Home"],2))
+    st.metric("ExG Away", round(linha_consenso["ExG_Away"],2))
+    st.metric("ExG Total", round(linha_consenso["ExG_Total"],2))
+
+with col3:
+    st.metric("FAH", round(linha_consenso["FAH"],1))
+    st.metric("FAA", round(linha_consenso["FAA"],1))
+    st.metric("FDA", round(linha_consenso["FDA"],1))
+
+st.markdown("---")
+
+st.subheader("🔎 Similar Games Engine")
+
+st.warning("🚧 Em desenvolvimento")
+
+col1,col2,col3,col4=st.columns(4)
+
+col1.metric("Jogos semelhantes","-")
+col2.metric("Winrate","-")
+col3.metric("Greens","-")
+col4.metric("Reds","-")
+
+
+st.markdown("---")
+st.subheader("🎯 CS Intelligence")
+
+mercados = {
+    "Lay 0x0":"-",
+    "Lay 0x1":"-",
+    "Lay 1x0":"-",
+    "Lay 2x2":"-",
+    "Lay Goleada Home":"-",
+    "Lay Goleada Away":"-"
+}
+
+df_score = pd.DataFrame(
+    list(mercados.items()),
+    columns=["Mercado","Score"]
+)
+
+st.dataframe(
+    df_score,
+    use_container_width=True,
+    hide_index=True
+)
+st.markdown("---")
+
+st.subheader("🧠 Explicabilidade")
+
+st.info("""
+A IA ainda não foi treinada.
+
+Em breve esta seção mostrará:
+
+• Jogos semelhantes encontrados
+
+• Principais fatores
+
+• Feature Importance
+
+• SHAP Values
+
+• Explicação da decisão
+""")
+
+
        
