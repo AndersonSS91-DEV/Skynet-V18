@@ -325,6 +325,7 @@ else:
 # 🧠 CSV - BASE DE DADOS
 # =========================================
 CSV_BASE = "data/CSV_LIMPO.csv"
+
 if os.path.exists(CSV_BASE):
 
     df_base = pd.read_csv(
@@ -339,66 +340,57 @@ if os.path.exists(CSV_BASE):
     # =====================================
     for col in [
 
-    "FS_Win_H",
-    "FS_Win_A",
-    "Win4_H",
-    "Win4_A",
-    "Los4_H",
-    "Los4_A",
-    "Eficiência_HT_H",
-    "Eficiência_HT_A",
-    "Eficiência_2nd_H",
-    "Eficiência_2nd_A",
-    "Eficiência_H",
-    "Eficiência_A",
+        "FS_Win_H",
+        "FS_Win_A",
+        "Win4_H",
+        "Win4_A",
+        "Los4_H",
+        "Los4_A",
+        "Eficiência_HT_H",
+        "Eficiência_HT_A",
+        "Eficiência_2nd_H",
+        "Eficiência_2nd_A",
+        "Eficiência_H",
+        "Eficiência_A",
 
-    # Machine Learning
-    "Odds_Casa",
-    "Odds_Empate",
-    "Odds_Visitante",
-    "Odds_Over_2,5FT",
-    "EXP_GOL_PRE",
-    "FAH",
-    "FAA",
-    "FDH",
-    "FDA",
-    "PPJH",
-    "PPJA",
-    "MGFH",
-    "MGFA",
-    "MGCH",
-    "MGCA",
-    "MG_Global",
-    "BTTS"
+        "Odds_Casa",
+        "Odds_Empate",
+        "Odds_Visitante",
+        "Odds_Over_2,5FT",
+        "EXP_GOL_PRE",
+        "FAH",
+        "FAA",
+        "FDH",
+        "FDA",
+        "PPJH",
+        "PPJA",
+        "MGFH",
+        "MGFA",
+        "MGCH",
+        "MGCA",
+        "MG_Global",
+        "BTTS"
 
-]:
+    ]:
 
-    if col in df_base.columns:
+        if col in df_base.columns:
 
-        df_base[col] = pd.to_numeric(
-            df_base[col],
-            errors="coerce"
-        )
+            df_base[col] = pd.to_numeric(
+                df_base[col],
+                errors="coerce"
+            )
 
     # =====================================
     # CHAVE DO JOGO
     # =====================================
     df_base["JOGO"] = (
-        df_base["Home_Team"]
-        .astype(str)
-        .str.strip()
-
-        +
-
-        " x "
-
-        +
-
-        df_base["Visitor_Team"]
-        .astype(str)
-        .str.strip()
+        df_base["Home_Team"].astype(str).str.strip()
+        + " x " +
+        df_base["Visitor_Team"].astype(str).str.strip()
     )
+
 else:
+
     df_base = pd.DataFrame()
 
 # =========================================
