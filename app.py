@@ -18,6 +18,9 @@ from PIL import Image
 import base64
 from pathlib import Path
 import unicodedata
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import NearestNeighbors
+
 # =========================================
 # CONFIG  
 # =========================================
@@ -1596,9 +1599,199 @@ def buscar_jogos_semelhantes(df_base, linha_csv):
                 ppja + 0.30
             )
         ]
+    # =====================================
+    # SCORE DE SIMILARIDADE
+    # =====================================
+
+    df["SIMILARIDADE"] = 100.0
+
+    # Odd Casa
+    df["SIMILARIDADE"] -= (
+        (df["Odds_Casa"] - linha_csv["Odds_Casa"]).abs() * 40
+    )
+
+    # ExG Pré
+    df["SIMILARIDADE"] -= (
+        (df["EXP_GOL_PRE"] - linha_csv["EXP_GOL_PRE"]).abs() * 20
+    )
+
+    # FDA
+    df["SIMILARIDADE"] -= (
+        (df["FDA"] - linha_csv["FDA"]).abs() * 0.8
+    )
+
+    # FAH
+    df["SIMILARIDADE"] -= (
+        (df["FAH"] - linha_csv["FAH"]).abs() * 0.8
+    )
+
+    # PPJ Home
+    df["SIMILARIDADE"] -= (
+        (df["PPJH"] - linha_csv["PPJH"]).abs() * 8
+    )
+
+    # PPJ Away
+    df["SIMILARIDADE"] -= (
+        (df["PPJA"] - linha_csv["PPJA"]).abs() * 8
+    )
+
+    # Ordena do mais parecido para o menos parecido
+    df = df.sort_values(
+        "SIMILARIDADE",
+        ascending=False
+    )
+
+    return df.reset_index(drop=True)
+
+FEATURES_ML = [
+
+    "Odds_Casa",
+    "Odds_Empate",
+    "Odds_Visitante",
+    "Odds_Over_2,5FT",
+
+    "FAH",
+    "FAA",
+    "FDH",
+    "FDA",
+
+    "PPJH",
+    "PPJA",
+
+    "MGFH",
+    "MGFA",
+    "MGCH",
+    "MGCA",
+
+    "MG_Global",
+
+    "BTTS"]
+
+# =========================================
+# PREPARA BASE MACHINE LEARNING
+# =========================================
+def preparar_base_ml(df_base):
+
+    # Mantém apenas as colunas necessárias
+    cols = FEATURES_ML + [
+        "LAY00",
+        "LAY01",
+        "LAY10",
+        "LAY22",
+        "LAYGH",
+        "LAYGA",
+        "Home_Team",
+        "Visitor_Team",
+        "League"
+    ]
+
+    cols = [c for c in cols if c in df_base.columns]
+
+    df = df_base[cols].copy()
+
+    # Remove linhas incompletas
+    df = df.dropna()
 
     return df.reset_index(drop=True)
     
+# Base pronta para IA
+df_ml = preparar_base_ml(df_base)
+
+# =========================================
+# STANDARD SCALER
+# =========================================
+from sklearn.preprocessing import StandardScaler
+
+scaler_ml = StandardScaler()
+
+# Matriz de Features
+X_ml = df_ml[FEATURES_ML].copy()
+
+# Normaliza todas as variáveis
+X_scaled = scaler_ml.fit_transform(X_ml)
+
+# =========================================
+# PREPARA JOGO ATUAL
+# =========================================
+def preparar_jogo_ml(linha_csv):
+
+    dados = {}
+
+    for col in FEATURES_ML:
+
+        if col in linha_csv.index:
+            dados[col] = linha_csv[col]
+        else:
+            dados[col] = np.nan
+
+    jogo = pd.DataFrame([dados])
+
+    return jogo
+
+# =========================================
+# VETOR DO JOGO
+# =========================================
+jogo_ml = preparar_jogo_ml(linha_csv)
+
+# mesma ordem das features
+jogo_ml = jogo_ml[FEATURES_ML]
+
+# normaliza usando o mesmo scaler da base
+jogo_scaled = scaler_ml.transform(jogo_ml)
+
+# =========================================
+# KNN - SIMILAR GAMES ENGINE
+# =========================================
+
+# Número máximo de jogos semelhantes
+N_VIZINHOS = 100
+
+# Evita pedir mais vizinhos do que existem na base
+n_vizinhos = min(N_VIZINHOS, len(df_ml))
+
+knn = NearestNeighbors(
+    n_neighbors=n_vizinhos,
+    metric="euclidean"
+)
+
+knn.fit(X_scaled)
+
+distancias, indices = knn.kneighbors(jogo_scaled)
+
+# Jogos semelhantes
+jogos_semelhantes = (
+    df_ml
+    .iloc[indices[0]]
+    .copy()
+    .reset_index(drop=True)
+)
+
+# Distância
+jogos_semelhantes["DISTANCIA"] = distancias[0]
+
+# Similaridade (0–100)
+dist_max = jogos_semelhantes["DISTANCIA"].max()
+
+if dist_max > 0:
+
+    jogos_semelhantes["SIMILARIDADE"] = (
+        100
+        * (
+            1
+            - jogos_semelhantes["DISTANCIA"] / dist_max
+        )
+    )
+
+else:
+
+    jogos_semelhantes["SIMILARIDADE"] = 100
+
+# Ordena do mais parecido para o menos parecido
+jogos_semelhantes = jogos_semelhantes.sort_values(
+    "SIMILARIDADE",
+    ascending=False
+).reset_index(drop=True)
+
 # =========================================
 # ABAS
 # =========================================
@@ -7107,13 +7300,6 @@ with tab9:
 
     st.success(jogo)
 
-    # =====================================
-    # BUSCA JOGOS SEMELHANTES
-    # =====================================
-    jogos_semelhantes = buscar_jogos_semelhantes(
-    df_base,
-    linha_csv)
-
     st.markdown("---")
 
 # =====================================
@@ -7144,18 +7330,31 @@ else:
 
     st.markdown("### Primeiros jogos encontrados")
 
-    colunas = [
-        "League",
-        "Home_Team",
-        "Visitor_Team",
-        "Odds_Casa",
-        "EXP_GOL_PRE",
-        "FAH",
-        "FDA",
-        "PPJH",
-        "PPJA",
-        "LAY00"
-    ]
+colunas = [
+
+    "SIMILARIDADE",
+
+    "League",
+
+    "Home_Team",
+    "Visitor_Team",
+
+    "Odds_Casa",
+
+    "FAH",
+    "FDA",
+
+    "PPJH",
+    "PPJA",
+
+    "LAY0x0",
+    "LAY0x1",
+    "LAY1x0",
+    "LAY2x2",
+    "LAYGH",
+    "LAYGA"
+
+]
 
     colunas = [c for c in colunas if c in jogos_semelhantes.columns]
 
