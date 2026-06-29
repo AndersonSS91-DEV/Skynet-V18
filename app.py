@@ -1757,7 +1757,6 @@ def preparar_base_ml(df_base):
 
     # =====================================
     # CONVERTE FEATURES NUMÉRICAS
-    # (League e Country ficam como texto)
     # =====================================
     for col in FEATURES_ML:
 
@@ -1786,28 +1785,28 @@ def preparar_base_ml(df_base):
         if col not in df.columns:
             df[col] = np.nan
 
-# =====================================
-# COLUNAS AUXILIARES
-# =====================================
-extras = [
-    "Home_Team",
-    "Visitor_Team"
-]
+    # =====================================
+    # COLUNAS AUXILIARES
+    # =====================================
+    extras = [
+        "Home_Team",
+        "Visitor_Team"
+    ]
 
-for col in extras:
+    for col in extras:
 
-    if col not in df.columns:
-        df[col] = ""
+        if col not in df.columns:
+            df[col] = ""
 
-# =====================================
-# MONTA BASE ML
-# =====================================
-cols = FEATURES_ML + targets + extras
+    # =====================================
+    # MONTA BASE ML
+    # =====================================
+    cols = FEATURES_ML + targets + extras
 
-# Remove possíveis duplicidades mantendo a primeira ocorrência
-cols = list(dict.fromkeys(cols))
+    # Remove duplicidades preservando a ordem
+    cols = list(dict.fromkeys(cols))
 
-df_ml = df[cols].copy()
+    df_ml = df[cols].copy()
 
     # =====================================
     # FEATURES VÁLIDAS
@@ -1822,13 +1821,7 @@ df_ml = df[cols].copy()
         if col not in df_ml.columns:
             continue
 
-        serie = df_ml[col]
-
-        if isinstance(serie, pd.DataFrame):
-            serie = serie.iloc[:, 0]
-
-        if serie.notna().sum() > 0:
-
+        if df_ml[col].notna().sum() > 0:
             features_validas.append(col)
 
     # =====================================
