@@ -1635,29 +1635,105 @@ def buscar_jogos_semelhantes(df_base, linha_csv):
 
     return df.reset_index(drop=True)
 
+# =========================================
+# FEATURES MACHINE LEARNING V30.1
+# =========================================
+
 FEATURES_ML = [
+
+    # =====================================
+    # MERCADO ⭐⭐⭐⭐⭐
+    # =====================================
 
     "Odds_Casa",
     "Odds_Empate",
     "Odds_Visitante",
-    "Odds_Over_2,5FT",
 
-    "FAH",
-    "FAA",
-    "FDH",
-    "FDA",
+    "Odds_Over_2,5FT",
+    "Odds_Under_2,5FT",
+
+    "Odd_Over_1,5FT",
+    "Odd_BTTS_YES",
+
+    # =====================================
+    # CONTEXTO ⭐⭐⭐⭐
+    # =====================================
+
+    "League",
+    "Country",
+
+    # =====================================
+    # FORÇA ⭐⭐⭐⭐
+    # =====================================
 
     "PPJH",
     "PPJA",
 
+    "FAH",
+    "FAA",
+
+    "FDH",
+    "FDA",
+
+    # =====================================
+    # POISSON ⭐⭐⭐⭐
+    # =====================================
+
+    "EXP_GOL_PRE",
+
     "MGFH",
     "MGFA",
+
     "MGCH",
     "MGCA",
 
     "MG_Global",
 
-    "BTTS"]
+    # =====================================
+    # PRIMEIRO TEMPO ⭐⭐⭐
+    # =====================================
+
+    "MGF_HT_Home",
+    "MGF_HT_Away",
+
+    "MGC_HT_Home",
+    "MGC_HT_Away",
+
+    # =====================================
+    # FORMA ⭐⭐⭐
+    # =====================================
+
+    "Win4_H",
+    "Win4_A",
+
+    "Los4_H",
+    "Los4_A",
+
+    "Eficiência_H",
+    "Eficiência_A",
+
+    "Eficiência_HT_H",
+    "Eficiência_HT_A",
+
+    "Eficiência_2nd_H",
+    "Eficiência_2nd_A",
+
+    # =====================================
+    # ATAQUE ⭐⭐⭐
+    # =====================================
+
+    "Precisao_CG_H",
+    "Precisao_CG_A",
+
+    "FS_Win_H",
+    "FS_Win_A",
+
+    "Scored_First_H",
+    "Scored_First_A",
+
+    "Conceded_First_H",
+    "Conceded_First_A"
+]
 
 # =========================================
 # PREPARA BASE MACHINE LEARNING
