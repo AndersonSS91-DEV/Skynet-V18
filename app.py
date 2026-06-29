@@ -7116,75 +7116,53 @@ with tab9:
 
     st.markdown("---")
 
-    st.subheader("📊 Dados do jogo")
+# =====================================
+# RESULTADO DO SIMILAR GAMES
+# =====================================
 
-col1, col2, col3, col4 = st.columns(4)
+st.subheader("🔎 Similar Games Engine")
 
 total = len(jogos_semelhantes)
 
-col1.metric(
-    "Jogos semelhantes",
-    total
-)
+st.metric("Jogos semelhantes encontrados", total)
 
-if total > 0:
+if total == 0:
+
+    st.warning("Nenhum jogo semelhante encontrado com os filtros atuais.")
+
+else:
 
     greens = int(jogos_semelhantes["LAY00"].sum())
     reds = total - greens
     winrate = greens / total * 100
 
-    col2.metric(
-        "Winrate Lay 0x0",
-        f"{winrate:.1f}%"
-    )
+    col1, col2, col3 = st.columns(3)
 
-    col3.metric(
-        "Greens",
-        greens
-    )
+    col1.metric("Greens Lay 0x0", greens)
+    col2.metric("Reds Lay 0x0", reds)
+    col3.metric("Winrate", f"{winrate:.2f}%")
 
-    col4.metric(
-        "Reds",
-        reds
-    )
+    st.markdown("### Primeiros jogos encontrados")
 
-else:
+    colunas = [
+        "League",
+        "Home_Team",
+        "Visitor_Team",
+        "Odds_Casa",
+        "EXP_GOL_PRE",
+        "FAH",
+        "FDA",
+        "PPJH",
+        "PPJA",
+        "LAY00"
+    ]
 
-    col2.metric("Winrate Lay 0x0", "-")
-    col3.metric("Greens", "-")
-    col4.metric("Reds", "-")
+    colunas = [c for c in colunas if c in jogos_semelhantes.columns]
 
-    
-    st.markdown("---")
-
-    st.subheader("🔎 Similar Games Engine")
-
-    col1, col2, col3, col4 = st.columns(4)
-
-    col1.metric(
-    "Jogos semelhantes",
-    len(jogos_semelhantes)
-)
-
-if len(jogos_semelhantes):
-
-    greens = int(jogos_semelhantes["LAY00"].sum())
-    reds = len(jogos_semelhantes) - greens
-    winrate = greens / len(jogos_semelhantes) * 100
-
-    col2.metric(
-        "Winrate Lay 0x0",
-        f"{winrate:.1f}%"
-    )
-
-    col3.metric(
-        "Greens",
-        greens
-    )
-
-    col4.metric(
-        "Reds",
-        reds
+    st.dataframe(
+        jogos_semelhantes[colunas],
+        use_container_width=True,
+        hide_index=True
     )
 
     st.markdown("---")
