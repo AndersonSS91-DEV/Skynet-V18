@@ -1840,13 +1840,6 @@ jogos_semelhantes = (
 # Distância
 jogos_semelhantes["DISTANCIA"] = distancias[0]
 
-jogos_semelhantes = jogos_semelhantes[
-    ~(
-        (jogos_semelhantes["Home_Team"] == linha_csv["Home_Team"]) &
-        (jogos_semelhantes["Visitor_Team"] == linha_csv["Visitor_Team"])
-    )
-].reset_index(drop=True)
-
 # =========================================
 # SIMILARIDADE
 # =========================================
