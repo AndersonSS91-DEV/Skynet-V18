@@ -9,3 +9,4 @@ openpyxl
 xlsxwriter
 streamlit-autorefresh
 plotly
+scikit-learn
