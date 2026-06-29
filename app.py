@@ -18,6 +18,9 @@ from PIL import Image
 import base64
 from pathlib import Path
 import unicodedata
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import NearestNeighbors
+
 # =========================================
 # CONFIG  
 # =========================================
@@ -322,6 +325,7 @@ else:
 # 🧠 CSV - BASE DE DADOS
 # =========================================
 CSV_BASE = "data/CSV_LIMPO.csv"
+
 if os.path.exists(CSV_BASE):
 
     df_base = pd.read_csv(
@@ -347,9 +351,28 @@ if os.path.exists(CSV_BASE):
         "Eficiência_2nd_H",
         "Eficiência_2nd_A",
         "Eficiência_H",
-        "Eficiência_A"
+        "Eficiência_A",
+
+        "Odds_Casa",
+        "Odds_Empate",
+        "Odds_Visitante",
+        "Odds_Over_2,5FT",
+        "EXP_GOL_PRE",
+        "FAH",
+        "FAA",
+        "FDH",
+        "FDA",
+        "PPJH",
+        "PPJA",
+        "MGFH",
+        "MGFA",
+        "MGCH",
+        "MGCA",
+        "MG_Global",
+        "BTTS"
 
     ]:
+
         if col in df_base.columns:
 
             df_base[col] = pd.to_numeric(
@@ -361,22 +384,105 @@ if os.path.exists(CSV_BASE):
     # CHAVE DO JOGO
     # =====================================
     df_base["JOGO"] = (
-        df_base["Home_Team"]
-        .astype(str)
-        .str.strip()
-
-        +
-
-        " x "
-
-        +
-
-        df_base["Visitor_Team"]
-        .astype(str)
-        .str.strip()
+        df_base["Home_Team"].astype(str).str.strip()
+        + " x " +
+        df_base["Visitor_Team"].astype(str).str.strip()
     )
+
 else:
+
     df_base = pd.DataFrame()
+
+# =========================================
+# 🧪 TARGETS MACHINE LEARNING (V30)
+# =========================================
+
+if not df_base.empty:
+
+    # =====================================
+    # GARANTE COLUNAS NUMÉRICAS
+    # =====================================
+    df_base["Result Home"] = pd.to_numeric(
+        df_base["Result Home"],
+        errors="coerce"
+    )
+
+    df_base["Result Visitor"] = pd.to_numeric(
+        df_base["Result Visitor"],
+        errors="coerce"
+    )
+
+    # =====================================
+    # LAY 0x0
+    # =====================================
+    df_base["LAY00"] = np.where(
+        (df_base["Result Home"] == 0) &
+        (df_base["Result Visitor"] == 0),
+        0,
+        1
+    )
+
+    # =====================================
+    # LAY 0x1
+    # =====================================
+    df_base["LAY01"] = np.where(
+        (df_base["Result Home"] == 0) &
+        (df_base["Result Visitor"] == 1),
+        0,
+        1
+    )
+
+    # =====================================
+    # LAY 1x0
+    # =====================================
+    df_base["LAY10"] = np.where(
+        (df_base["Result Home"] == 1) &
+        (df_base["Result Visitor"] == 0),
+        0,
+        1
+    )
+
+    # =====================================
+    # LAY 2x2
+    # =====================================
+    df_base["LAY22"] = np.where(
+        (df_base["Result Home"] == 2) &
+        (df_base["Result Visitor"] == 2),
+        0,
+        1
+    )
+
+    # =====================================
+    # LAY GOLEADA HOME
+    # (4+ gols e diferença mínima de 3)
+    # =====================================
+    df_base["LAYGH"] = np.where(
+        (
+            (df_base["Result Home"] >= 4) &
+            (
+                (df_base["Result Home"] -
+                 df_base["Result Visitor"]) >= 3
+            )
+        ),
+        0,
+        1
+    )
+
+    # =====================================
+    # LAY GOLEADA AWAY
+    # (4+ gols e diferença mínima de 3)
+    # =====================================
+    df_base["LAYGA"] = np.where(
+        (
+            (df_base["Result Visitor"] >= 4) &
+            (
+                (df_base["Result Visitor"] -
+                 df_base["Result Home"]) >= 3
+            )
+        ),
+        0,
+        1
+    )
     
 # =========================================
 # 🧠 RANKING LAY AWAY 300K
@@ -1386,10 +1492,311 @@ def mostrar_card(df_base, jogo):
 media_score = df_mgf["Score_Ofensivo"].mean()
 desvio_score = df_mgf["Score_Ofensivo"].std()
 
+
+# =========================================
+# 🧪 SIMILAR GAMES ENGINE V30
+# =========================================
+def buscar_jogos_semelhantes(df_base, linha_csv):
+
+    if df_base.empty or linha_csv is None:
+        return pd.DataFrame()
+
+    df = df_base.copy()
+
+    # ==============================
+    # FILTRO 1 - MESMA LIGA
+    # ==============================
+    if "League" in df.columns:
+        df = df[df["League"] == linha_csv["League"]]
+
+    # ==============================
+    # FILTRO 2 - ODD CASA
+    # ==============================
+    if "Odds_Casa" in df.columns:
+        odd = float(linha_csv["Odds_Casa"])
+
+        df = df[
+            df["Odds_Casa"].between(
+                odd - 0.20,
+                odd + 0.20
+            )
+        ]
+
+    # ==============================
+    # FILTRO 3 - EXPECTATIVA DE GOLS
+    # ==============================
+    if "EXP_GOL_PRE" in df.columns:
+
+        exg = float(linha_csv["EXP_GOL_PRE"])
+
+        df = df[
+            df["EXP_GOL_PRE"].between(
+                exg - 0.30,
+                exg + 0.30
+            )
+        ]
+
+    # ==============================
+    # FILTRO 4 - FDA
+    # ==============================
+    if "FDA" in df.columns:
+
+        fda = float(linha_csv["FDA"])
+
+        df = df[
+            df["FDA"].between(
+                fda - 10,
+                fda + 10
+            )
+        ]
+
+    # ==============================
+    # FILTRO 5 - FAH
+    # ==============================
+    if "FAH" in df.columns:
+
+        fah = float(linha_csv["FAH"])
+
+        df = df[
+            df["FAH"].between(
+                fah - 10,
+                fah + 10
+            )
+        ]
+
+    # ==============================
+    # FILTRO 6 - PPJ HOME
+    # ==============================
+    if "PPJH" in df.columns:
+
+        ppjh = float(linha_csv["PPJH"])
+
+        df = df[
+            df["PPJH"].between(
+                ppjh - 0.30,
+                ppjh + 0.30
+            )
+        ]
+
+    # ==============================
+    # FILTRO 7 - PPJ AWAY
+    # ==============================
+    if "PPJA" in df.columns:
+
+        ppja = float(linha_csv["PPJA"])
+
+        df = df[
+            df["PPJA"].between(
+                ppja - 0.30,
+                ppja + 0.30
+            )
+        ]
+    # =====================================
+    # SCORE DE SIMILARIDADE
+    # =====================================
+
+    df["SIMILARIDADE"] = 100.0
+
+    # Odd Casa
+    df["SIMILARIDADE"] -= (
+        (df["Odds_Casa"] - linha_csv["Odds_Casa"]).abs() * 40
+    )
+
+    # ExG Pré
+    df["SIMILARIDADE"] -= (
+        (df["EXP_GOL_PRE"] - linha_csv["EXP_GOL_PRE"]).abs() * 20
+    )
+
+    # FDA
+    df["SIMILARIDADE"] -= (
+        (df["FDA"] - linha_csv["FDA"]).abs() * 0.8
+    )
+
+    # FAH
+    df["SIMILARIDADE"] -= (
+        (df["FAH"] - linha_csv["FAH"]).abs() * 0.8
+    )
+
+    # PPJ Home
+    df["SIMILARIDADE"] -= (
+        (df["PPJH"] - linha_csv["PPJH"]).abs() * 8
+    )
+
+    # PPJ Away
+    df["SIMILARIDADE"] -= (
+        (df["PPJA"] - linha_csv["PPJA"]).abs() * 8
+    )
+
+    # Ordena do mais parecido para o menos parecido
+    df = df.sort_values(
+        "SIMILARIDADE",
+        ascending=False
+    )
+
+    return df.reset_index(drop=True)
+
+FEATURES_ML = [
+
+    "Odds_Casa",
+    "Odds_Empate",
+    "Odds_Visitante",
+    "Odds_Over_2,5FT",
+
+    "FAH",
+    "FAA",
+    "FDH",
+    "FDA",
+
+    "PPJH",
+    "PPJA",
+
+    "MGFH",
+    "MGFA",
+    "MGCH",
+    "MGCA",
+
+    "MG_Global",
+
+    "BTTS"]
+
+# =========================================
+# PREPARA BASE MACHINE LEARNING
+# =========================================
+def preparar_base_ml(df_base):
+
+    df = df_base.copy()
+
+    # Garante que todas as features existam
+    for col in FEATURES_ML:
+        if col not in df.columns:
+            df[col] = np.nan
+
+    cols = FEATURES_ML + [
+
+        "LAY00",
+        "LAY01",
+        "LAY10",
+        "LAY22",
+        "LAYGH",
+        "LAYGA",
+
+        "Home_Team",
+        "Visitor_Team",
+        "League"
+
+    ]
+
+    # Garante que todas as colunas existam
+    for col in cols:
+        if col not in df.columns:
+            df[col] = np.nan
+
+    df = df[cols]
+
+    return df.reset_index(drop=True)
+
+# Base pronta para IA
+df_ml = preparar_base_ml(df_base)
+
+# =========================================
+# STANDARD SCALER
+# =========================================
+from sklearn.preprocessing import StandardScaler
+
+scaler_ml = StandardScaler()
+
+# Matriz de Features
+X_ml = df_ml[FEATURES_ML].fillna(0)
+
+# Normaliza todas as variáveis
+X_scaled = scaler_ml.fit_transform(X_ml)
+
+# =========================================
+# PREPARA JOGO ATUAL
+# =========================================
+def preparar_jogo_ml(linha_csv):
+
+    dados = {}
+
+    for col in FEATURES_ML:
+
+        if col in linha_csv.index:
+            dados[col] = linha_csv[col]
+        else:
+            dados[col] = np.nan
+
+    jogo = pd.DataFrame([dados])
+
+    return jogo
+
+# =========================================
+# VETOR DO JOGO
+# =========================================
+jogo_ml = preparar_jogo_ml(linha_csv)
+
+# mesma ordem das features
+jogo_ml = jogo_ml[FEATURES_ML]
+
+# normaliza usando o mesmo scaler da base
+jogo_scaled = scaler_ml.transform(jogo_ml)
+
+# =========================================
+# KNN - SIMILAR GAMES ENGINE
+# =========================================
+
+# Número máximo de jogos semelhantes
+N_VIZINHOS = 100
+
+# Evita pedir mais vizinhos do que existem na base
+n_vizinhos = min(N_VIZINHOS, len(df_ml))
+
+knn = NearestNeighbors(
+    n_neighbors=n_vizinhos,
+    metric="euclidean"
+)
+
+knn.fit(X_scaled)
+
+distancias, indices = knn.kneighbors(jogo_scaled)
+
+# Jogos semelhantes
+jogos_semelhantes = (
+    df_ml
+    .iloc[indices[0]]
+    .copy()
+    .reset_index(drop=True)
+)
+
+# Distância
+jogos_semelhantes["DISTANCIA"] = distancias[0]
+
+# Similaridade (0–100)
+dist_max = jogos_semelhantes["DISTANCIA"].max()
+
+if dist_max > 0:
+
+    jogos_semelhantes["SIMILARIDADE"] = (
+        100
+        * (
+            1
+            - jogos_semelhantes["DISTANCIA"] / dist_max
+        )
+    )
+
+else:
+
+    jogos_semelhantes["SIMILARIDADE"] = 100
+
+# Ordena do mais parecido para o menos parecido
+jogos_semelhantes = jogos_semelhantes.sort_values(
+    "SIMILARIDADE",
+    ascending=False
+).reset_index(drop=True)
+
 # =========================================
 # ABAS
 # =========================================
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
 "📊🧠 Resumo",
 "📁🧠 Dados",
 "📊⚽ MGF",
@@ -1397,7 +1804,8 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
 "💎⚽ VG",
 "🚩 Escanteios",
 "🤖 IA",
-"👾📡 CS_Score"
+"👾📡 CS_Score",
+"🧪 Machine Learning"
 ])
 
 
@@ -6866,5 +7274,79 @@ with tab8:
 
         hide_index=True
     )
-        
+
+# =========================================
+# 🧪 MACHINE LEARNING
+# =========================================
+with tab9:
+
+    # =====================================
+    # RESULTADO DO SIMILAR GAMES
+    # =====================================
+
+    st.markdown("---")
+
+    st.subheader("🔎 Similar Games Engine")
+
+    total = len(jogos_semelhantes)
+
+    st.metric("Jogos semelhantes encontrados", total)
+
+    if total == 0:
+
+        st.warning("Nenhum jogo semelhante encontrado.")
+
+    else:
+
+        greens = int(jogos_semelhantes["LAY00"].sum())
+        reds = total - greens
+        winrate = greens / total * 100
+
+        col1, col2, col3 = st.columns(3)
+
+        col1.metric("Greens", greens)
+        col2.metric("Reds", reds)
+        col3.metric("Winrate Lay 0x0", f"{winrate:.2f}%")
+
+        st.markdown("### Jogos semelhantes")
+
+        colunas = [
+
+            "SIMILARIDADE",
+
+            "League",
+
+            "Home_Team",
+            "Visitor_Team",
+
+            "Odds_Casa",
+
+            "FAH",
+            "FDA",
+
+            "PPJH",
+            "PPJA",
+
+            "LAY00",
+            "LAY01",
+            "LAY10",
+            "LAY22",
+            "LAYGH",
+            "LAYGA"
+
+        ]
+
+        colunas = [
+            c for c in colunas
+            if c in jogos_semelhantes.columns
+        ]
+
+        st.dataframe(
+            jogos_semelhantes[colunas],
+            use_container_width=True,
+            hide_index=True
+        )
+
+    st.markdown("---")
+
        
