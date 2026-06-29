@@ -1786,29 +1786,28 @@ def preparar_base_ml(df_base):
         if col not in df.columns:
             df[col] = np.nan
 
-    # =====================================
-    # COLUNAS AUXILIARES
-    # =====================================
-    extras = [
-        "League",
-        "Country",
-        "Home_Team",
-        "Visitor_Team"
-    ]
+# =====================================
+# COLUNAS AUXILIARES
+# =====================================
+extras = [
+    "Home_Team",
+    "Visitor_Team"
+]
 
-    for col in extras:
+for col in extras:
 
-        if col not in df.columns:
-            df[col] = ""
+    if col not in df.columns:
+        df[col] = ""
 
-    # =====================================
-    # MONTA BASE ML
-    # =====================================
-    df_ml = df[
-        FEATURES_ML +
-        targets +
-        extras
-    ].copy()
+# =====================================
+# MONTA BASE ML
+# =====================================
+cols = FEATURES_ML + targets + extras
+
+# Remove possíveis duplicidades mantendo a primeira ocorrência
+cols = list(dict.fromkeys(cols))
+
+df_ml = df[cols].copy()
 
     # =====================================
     # FEATURES VÁLIDAS
@@ -2027,9 +2026,6 @@ if X_scaled is not None and jogo_scaled is not None:
                 (jogos_semelhantes["Visitor_Team"] == linha_csv["Visitor_Team"])
             )
 
-            jogos_semelhantes = jogos_semelhantes.loc[~mask].copy()
-
-        jogos_semelhantes.reset_index(drop=True, inplace=True)
 
         # =====================================
         # AJUSTA DISTÂNCIAS
