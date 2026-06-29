@@ -337,7 +337,7 @@ if os.path.exists(CSV_BASE):
     # =====================================
     # CORRIGE COLUNAS NUMÉRICAS
     # =====================================
-for col in [
+    for col in [
 
     "FS_Win_H",
     "FS_Win_A",
@@ -1674,9 +1674,8 @@ def preparar_base_ml(df_base):
 
     df = df_base.copy()
 
-    # garante que TODAS as features existam
+    # Garante que todas as features existam
     for col in FEATURES_ML:
-
         if col not in df.columns:
             df[col] = np.nan
 
@@ -1695,13 +1694,14 @@ def preparar_base_ml(df_base):
 
     ]
 
-faltando = [c for c in cols if c not in df.columns]
+    # Garante que todas as colunas existam
+    for col in cols:
+        if col not in df.columns:
+            df[col] = np.nan
 
-if faltando:
-    raise Exception(f"Colunas inexistentes: {faltando}")
+    df = df[cols]
 
-df = df[cols]
-
+    return df.reset_index(drop=True)
 
 # Base pronta para IA
 df_ml = preparar_base_ml(df_base)
