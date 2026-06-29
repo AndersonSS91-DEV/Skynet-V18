@@ -1743,12 +1743,26 @@ def preparar_base_ml(df_base):
     df = df_base.copy()
 
     # =====================================
-    # GARANTE QUE TODAS AS FEATURES EXISTAM
+    # REMOVE COLUNAS DUPLICADAS
+    # =====================================
+    df = df.loc[:, ~df.columns.duplicated()]
+
+    # =====================================
+    # GARANTE FEATURES
     # =====================================
     for col in FEATURES_ML:
 
         if col not in df.columns:
             df[col] = np.nan
+
+    # =====================================
+    # CONVERTE FEATURES NUMÉRICAS
+    # (League e Country ficam como texto)
+    # =====================================
+    for col in FEATURES_ML:
+
+        if col in ["League", "Country"]:
+            continue
 
         df[col] = pd.to_numeric(
             df[col],
@@ -1777,6 +1791,7 @@ def preparar_base_ml(df_base):
     # =====================================
     extras = [
         "League",
+        "Country",
         "Home_Team",
         "Visitor_Team"
     ]
@@ -1787,7 +1802,7 @@ def preparar_base_ml(df_base):
             df[col] = ""
 
     # =====================================
-    # MONTA DF ML
+    # MONTA BASE ML
     # =====================================
     df_ml = df[
         FEATURES_ML +
@@ -1796,25 +1811,38 @@ def preparar_base_ml(df_base):
     ].copy()
 
     # =====================================
-    # REMOVE FEATURES VAZIAS
+    # FEATURES VÁLIDAS
     # =====================================
     features_validas = []
 
     for col in FEATURES_ML:
 
-        if df_ml[col].notna().sum() > 0:
+        if col in ["League", "Country"]:
+            continue
+
+        if col not in df_ml.columns:
+            continue
+
+        serie = df_ml[col]
+
+        if isinstance(serie, pd.DataFrame):
+            serie = serie.iloc[:, 0]
+
+        if serie.notna().sum() > 0:
 
             features_validas.append(col)
 
     # =====================================
     # PREENCHE NaN
     # =====================================
-    df_ml[features_validas] = (
-        df_ml[features_validas]
-        .fillna(
-            df_ml[features_validas].median()
-        )
-    )
+    for col in features_validas:
+
+        mediana = df_ml[col].median()
+
+        if pd.isna(mediana):
+            mediana = 0
+
+        df_ml[col] = df_ml[col].fillna(mediana)
 
     return df_ml, features_validas
 
