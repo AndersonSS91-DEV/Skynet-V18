@@ -1695,10 +1695,14 @@ def preparar_base_ml(df_base):
 
     ]
 
-    df = df[cols]
+faltando = [c for c in cols if c not in df.columns]
 
-    return df.reset_index(drop=True)
-    
+if faltando:
+    raise Exception(f"Colunas inexistentes: {faltando}")
+
+df = df[cols]
+
+
 # Base pronta para IA
 df_ml = preparar_base_ml(df_base)
 
