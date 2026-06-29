@@ -1763,7 +1763,7 @@ scaler_ml = StandardScaler()
 
 X_ml = df_ml[FEATURES_VALIDAS].copy()
 
-# Converte TODAS as colunas para numérico
+# Converte tudo para numérico
 for col in X_ml.columns:
 
     X_ml[col] = pd.to_numeric(
@@ -1780,33 +1780,40 @@ X_ml = X_ml.dropna(
 # Atualiza lista de features válidas
 FEATURES_VALIDAS = X_ml.columns.tolist()
 
-# Se não sobrou nenhuma feature, interrompe
+# =========================================
+# PREPARA MATRIZ
+# =========================================
+
 if len(FEATURES_VALIDAS) == 0:
 
-    raise Exception(
-        "Nenhuma feature numérica encontrada para o Machine Learning."
-    )
+    X_scaled = None
 
-# Preenche NaN pela mediana
-for col in FEATURES_VALIDAS:
+else:
 
-    mediana = X_ml[col].median()
+    # Preenche NaN pela mediana
+    for col in FEATURES_VALIDAS:
 
-    if pd.isna(mediana):
-        mediana = 0
+        mediana = X_ml[col].median()
 
-    X_ml[col] = X_ml[col].fillna(mediana)
+        if pd.isna(mediana):
+            mediana = 0
 
-# Garante float
-X_ml = X_ml.astype(float)
+        X_ml[col] = X_ml[col].fillna(mediana)
 
-# Normalização
-X_scaled = scaler_ml.fit_transform(X_ml)
+    # Garante float
+    X_ml = X_ml.astype(float)
+
+    # Normaliza
+    X_scaled = scaler_ml.fit_transform(X_ml)
 
 # =========================================
 # PREPARA JOGO
 # =========================================
+
 def preparar_jogo_ml(linha_csv):
+
+    if len(FEATURES_VALIDAS) == 0:
+        return None
 
     dados = {}
 
@@ -1825,16 +1832,39 @@ def preparar_jogo_ml(linha_csv):
 
     jogo = pd.DataFrame([dados])
 
-    jogo = jogo.fillna(
-        df_ml[FEATURES_VALIDAS].median()
-    )
+    for col in FEATURES_VALIDAS:
+
+        mediana = df_ml[col].median()
+
+        if pd.isna(mediana):
+            mediana = 0
+
+        jogo[col] = jogo[col].fillna(mediana)
+
+    jogo = jogo.astype(float)
 
     return jogo
 
+# =========================================
+# JOGO NORMALIZADO
+# =========================================
 
-jogo_ml = preparar_jogo_ml(linha_csv)
+if X_scaled is None:
 
-jogo_scaled = scaler_ml.transform(jogo_ml)
+    jogo_scaled = None
+
+else:
+
+    jogo_ml = preparar_jogo_ml(linha_csv)
+
+    if jogo_ml is None:
+
+        jogo_scaled = None
+
+    else:
+
+        jogo_scaled = scaler_ml.transform(jogo_ml)
+
 
 # =========================================
 # VETOR DO JOGO
@@ -1851,65 +1881,98 @@ jogo_scaled = scaler_ml.transform(jogo_ml)
 # KNN - SIMILAR GAMES ENGINE
 # =========================================
 
-# Número máximo de jogos semelhantes
-N_VIZINHOS = 100
+from sklearn.neighbors import NearestNeighbors
 
-n_vizinhos = min(N_VIZINHOS, len(df_ml))
+# DataFrame padrão
+jogos_semelhantes = pd.DataFrame()
 
-knn = NearestNeighbors(
-    n_neighbors=n_vizinhos,
-    metric="euclidean"
-)
+# Só executa se existir base para ML
+if X_scaled is not None and jogo_scaled is not None:
 
-knn.fit(X_scaled)
+    # Número máximo de vizinhos
+    N_VIZINHOS = min(100, len(df_ml))
 
-distancias, indices = knn.kneighbors(jogo_scaled)
+    if N_VIZINHOS > 0:
 
-# =========================================
-# JOGOS SEMELHANTES
-# =========================================
-jogos_semelhantes = (df_ml.iloc[indices[0]].copy().reset_index(drop=True))
-
-
-# Jogos semelhantes
-jogos_semelhantes = (
-    df_ml
-    .iloc[indices[0]]
-    .copy()
-    .reset_index(drop=True)
-)
-
-# Distância
-jogos_semelhantes["DISTANCIA"] = distancias[0]
-
-# =========================================
-# SIMILARIDADE
-# =========================================
-
-dist_max = jogos_semelhantes["DISTANCIA"].max()
-
-if dist_max > 0:
-
-    jogos_semelhantes["SIMILARIDADE"] = (
-        100
-        * (
-            1
-            - jogos_semelhantes["DISTANCIA"] / dist_max
+        knn = NearestNeighbors(
+            n_neighbors=N_VIZINHOS,
+            metric="euclidean"
         )
-    )
 
-else:
+        knn.fit(X_scaled)
 
-    jogos_semelhantes["SIMILARIDADE"] = 100
+        distancias, indices = knn.kneighbors(jogo_scaled)
 
-# =========================================
-# ORDENA
-# =========================================
+        # =====================================
+        # JOGOS SEMELHANTES
+        # =====================================
 
-jogos_semelhantes = jogos_semelhantes.sort_values(
-    "SIMILARIDADE",
-    ascending=False
-).reset_index(drop=True)
+        jogos_semelhantes = (
+            df_ml
+            .iloc[indices[0]]
+            .copy()
+            .reset_index(drop=True)
+        )
+
+        # Distância
+        jogos_semelhantes["DISTANCIA"] = distancias[0]
+
+        # =====================================
+        # REMOVE O PRÓPRIO JOGO (SE EXISTIR)
+        # =====================================
+
+        if (
+            "Home_Team" in jogos_semelhantes.columns
+            and "Visitor_Team" in jogos_semelhantes.columns
+            and "Home_Team" in linha_csv.index
+            and "Visitor_Team" in linha_csv.index
+        ):
+
+            mask = (
+                (jogos_semelhantes["Home_Team"] == linha_csv["Home_Team"]) &
+                (jogos_semelhantes["Visitor_Team"] == linha_csv["Visitor_Team"])
+            )
+
+            jogos_semelhantes = jogos_semelhantes.loc[~mask].copy()
+
+        jogos_semelhantes.reset_index(drop=True, inplace=True)
+
+        # =====================================
+        # AJUSTA DISTÂNCIAS
+        # =====================================
+
+        jogos_semelhantes["DISTANCIA"] = distancias[0][:len(jogos_semelhantes)]
+
+        # =====================================
+        # SIMILARIDADE
+        # =====================================
+
+        if len(jogos_semelhantes) > 0:
+
+            dist_max = jogos_semelhantes["DISTANCIA"].max()
+
+            if dist_max > 0:
+
+                jogos_semelhantes["SIMILARIDADE"] = (
+                    100
+                    * (
+                        1
+                        - jogos_semelhantes["DISTANCIA"] / dist_max
+                    )
+                )
+
+            else:
+
+                jogos_semelhantes["SIMILARIDADE"] = 100
+
+            jogos_semelhantes = (
+                jogos_semelhantes
+                .sort_values(
+                    "SIMILARIDADE",
+                    ascending=False
+                )
+                .reset_index(drop=True)
+            )
 
 # =========================================
 # CS INTELLIGENCE
