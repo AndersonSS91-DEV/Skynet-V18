@@ -1498,7 +1498,6 @@ media_score = df_mgf["Score_Ofensivo"].mean()
 desvio_score = df_mgf["Score_Ofensivo"].std()
 
 
-st.write(df_base.dtypes["EXP_GOL_PRE"])
 # =========================================
 # 🧪 SIMILAR GAMES ENGINE V30
 # =========================================
