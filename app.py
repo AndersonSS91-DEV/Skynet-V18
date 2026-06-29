@@ -1745,10 +1745,9 @@ jogo_scaled = scaler_ml.transform(jogo_ml)
 # =========================================
 
 # Número máximo de jogos semelhantes
-N_VIZINHOS = 100
+MAX_VIZINHOS = 300
 
-# Evita pedir mais vizinhos do que existem na base
-n_vizinhos = min(N_VIZINHOS, len(df_ml))
+n_vizinhos = min(MAX_VIZINHOS, len(df_ml))
 
 knn = NearestNeighbors(
     n_neighbors=n_vizinhos,
@@ -1759,7 +1758,10 @@ knn.fit(X_scaled)
 
 distancias, indices = knn.kneighbors(jogo_scaled)
 
-# Jogos semelhantes
+# =========================================
+# JOGOS SEMELHANTES
+# =========================================
+
 jogos_semelhantes = (
     df_ml
     .iloc[indices[0]]
@@ -1770,7 +1772,10 @@ jogos_semelhantes = (
 # Distância
 jogos_semelhantes["DISTANCIA"] = distancias[0]
 
-# Similaridade (0–100)
+# =========================================
+# SIMILARIDADE
+# =========================================
+
 dist_max = jogos_semelhantes["DISTANCIA"].max()
 
 if dist_max > 0:
@@ -1787,11 +1792,24 @@ else:
 
     jogos_semelhantes["SIMILARIDADE"] = 100
 
-# Ordena do mais parecido para o menos parecido
+# =========================================
+# ORDENA
+# =========================================
+
 jogos_semelhantes = jogos_semelhantes.sort_values(
     "SIMILARIDADE",
     ascending=False
 ).reset_index(drop=True)
+
+# =========================================
+# FILTRO DE SIMILARIDADE
+# =========================================
+
+SIMILARIDADE_MINIMA = 90
+
+jogos_semelhantes = jogos_semelhantes[
+    jogos_semelhantes["SIMILARIDADE"] >= SIMILARIDADE_MINIMA
+].reset_index(drop=True)
 
 # =========================================
 # CS INTELLIGENCE
