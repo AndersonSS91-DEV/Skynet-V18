@@ -1828,12 +1828,24 @@ distancias, indices = knn.kneighbors(jogo_scaled)
 # =========================================
 jogos_semelhantes = (df_ml.iloc[indices[0]].copy().reset_index(drop=True))
 
-jogos_semelhantes = jogos_semelhantes[
-    ~((jogos_semelhantes["Home_Team"] == linha_csv["Home_Team"]) & (jogos_semelhantes["Visitor_Team"] == linha_csv["Visitor_Team"]))
-].reset_index(drop=True)
+
+# Jogos semelhantes
+jogos_semelhantes = (
+    df_ml
+    .iloc[indices[0]]
+    .copy()
+    .reset_index(drop=True)
+)
 
 # Distância
 jogos_semelhantes["DISTANCIA"] = distancias[0]
+
+jogos_semelhantes = jogos_semelhantes[
+    ~(
+        (jogos_semelhantes["Home_Team"] == linha_csv["Home_Team"]) &
+        (jogos_semelhantes["Visitor_Team"] == linha_csv["Visitor_Team"])
+    )
+].reset_index(drop=True)
 
 # =========================================
 # SIMILARIDADE
