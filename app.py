@@ -1666,68 +1666,133 @@ def preparar_base_ml(df_base):
 
     df = df_base.copy()
 
-    # Garante que todas as features existam
+    # =====================================
+    # GARANTE QUE TODAS AS FEATURES EXISTAM
+    # =====================================
     for col in FEATURES_ML:
+
         if col not in df.columns:
             df[col] = np.nan
 
-    cols = FEATURES_ML + [
+        df[col] = pd.to_numeric(
+            df[col],
+            errors="coerce"
+        )
 
+    # =====================================
+    # GARANTE TARGETS
+    # =====================================
+    targets = [
         "LAY00",
         "LAY01",
         "LAY10",
         "LAY22",
         "LAYGH",
-        "LAYGA",
-
-        "Home_Team",
-        "Visitor_Team",
-        "League"
-
+        "LAYGA"
     ]
 
-    # Garante que todas as colunas existam
-    for col in cols:
+    for col in targets:
+
         if col not in df.columns:
             df[col] = np.nan
 
-    df = df[cols]
+    # =====================================
+    # COLUNAS AUXILIARES
+    # =====================================
+    extras = [
+        "League",
+        "Home_Team",
+        "Visitor_Team"
+    ]
 
-    return df.reset_index(drop=True)
+    for col in extras:
 
-# Base pronta para IA
-df_ml = preparar_base_ml(df_base)
+        if col not in df.columns:
+            df[col] = ""
+
+    # =====================================
+    # MONTA DF ML
+    # =====================================
+    df_ml = df[
+        FEATURES_ML +
+        targets +
+        extras
+    ].copy()
+
+    # =====================================
+    # REMOVE FEATURES VAZIAS
+    # =====================================
+    features_validas = []
+
+    for col in FEATURES_ML:
+
+        if df_ml[col].notna().sum() > 0:
+
+            features_validas.append(col)
+
+    # =====================================
+    # PREENCHE NaN
+    # =====================================
+    df_ml[features_validas] = (
+        df_ml[features_validas]
+        .fillna(
+            df_ml[features_validas].median()
+        )
+    )
+
+    return df_ml, features_validas
+
+
+# =========================================
+# BASE ML
+# =========================================
+
+df_ml, FEATURES_VALIDAS = preparar_base_ml(df_base)
 
 # =========================================
 # STANDARD SCALER
 # =========================================
+
 from sklearn.preprocessing import StandardScaler
 
 scaler_ml = StandardScaler()
 
-# Matriz de Features
-X_ml = df_ml[FEATURES_ML].fillna(0)
+X_ml = df_ml[FEATURES_VALIDAS]
 
-# Normaliza todas as variáveis
 X_scaled = scaler_ml.fit_transform(X_ml)
 
 # =========================================
-# PREPARA JOGO ATUAL
+# PREPARA JOGO
 # =========================================
 def preparar_jogo_ml(linha_csv):
 
     dados = {}
 
-    for col in FEATURES_ML:
+    for col in FEATURES_VALIDAS:
 
         if col in linha_csv.index:
-            dados[col] = linha_csv[col]
+
+            dados[col] = pd.to_numeric(
+                linha_csv[col],
+                errors="coerce"
+            )
+
         else:
+
             dados[col] = np.nan
 
     jogo = pd.DataFrame([dados])
 
+    jogo = jogo.fillna(
+        df_ml[FEATURES_VALIDAS].median()
+    )
+
     return jogo
+
+
+jogo_ml = preparar_jogo_ml(linha_csv)
+
+jogo_scaled = scaler_ml.transform(jogo_ml)
 
 # =========================================
 # VETOR DO JOGO
