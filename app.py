@@ -377,6 +377,97 @@ if os.path.exists(CSV_BASE):
     )
 else:
     df_base = pd.DataFrame()
+
+# =========================================
+# 🧪 TARGETS MACHINE LEARNING (V30)
+# =========================================
+
+if not df_base.empty:
+
+    # =====================================
+    # GARANTE COLUNAS NUMÉRICAS
+    # =====================================
+    df_base["Result Home"] = pd.to_numeric(
+        df_base["Result Home"],
+        errors="coerce"
+    )
+
+    df_base["Result Visitor"] = pd.to_numeric(
+        df_base["Result Visitor"],
+        errors="coerce"
+    )
+
+    # =====================================
+    # LAY 0x0
+    # =====================================
+    df_base["LAY00"] = np.where(
+        (df_base["Result Home"] == 0) &
+        (df_base["Result Visitor"] == 0),
+        0,
+        1
+    )
+
+    # =====================================
+    # LAY 0x1
+    # =====================================
+    df_base["LAY01"] = np.where(
+        (df_base["Result Home"] == 0) &
+        (df_base["Result Visitor"] == 1),
+        0,
+        1
+    )
+
+    # =====================================
+    # LAY 1x0
+    # =====================================
+    df_base["LAY10"] = np.where(
+        (df_base["Result Home"] == 1) &
+        (df_base["Result Visitor"] == 0),
+        0,
+        1
+    )
+
+    # =====================================
+    # LAY 2x2
+    # =====================================
+    df_base["LAY22"] = np.where(
+        (df_base["Result Home"] == 2) &
+        (df_base["Result Visitor"] == 2),
+        0,
+        1
+    )
+
+    # =====================================
+    # LAY GOLEADA HOME
+    # (4+ gols e diferença mínima de 3)
+    # =====================================
+    df_base["LAYGH"] = np.where(
+        (
+            (df_base["Result Home"] >= 4) &
+            (
+                (df_base["Result Home"] -
+                 df_base["Result Visitor"]) >= 3
+            )
+        ),
+        0,
+        1
+    )
+
+    # =====================================
+    # LAY GOLEADA AWAY
+    # (4+ gols e diferença mínima de 3)
+    # =====================================
+    df_base["LAYGA"] = np.where(
+        (
+            (df_base["Result Visitor"] >= 4) &
+            (
+                (df_base["Result Visitor"] -
+                 df_base["Result Home"]) >= 3
+            )
+        ),
+        0,
+        1
+    )
     
 # =========================================
 # 🧠 RANKING LAY AWAY 300K
@@ -1386,6 +1477,107 @@ def mostrar_card(df_base, jogo):
 media_score = df_mgf["Score_Ofensivo"].mean()
 desvio_score = df_mgf["Score_Ofensivo"].std()
 
+# =========================================
+# 🧪 SIMILAR GAMES ENGINE V30
+# =========================================
+def buscar_jogos_semelhantes(df_base, linha_csv):
+
+    if df_base.empty or linha_csv is None:
+        return pd.DataFrame()
+
+    df = df_base.copy()
+
+    # ==============================
+    # FILTRO 1 - MESMA LIGA
+    # ==============================
+    if "League" in df.columns:
+        df = df[df["League"] == linha_csv["League"]]
+
+    # ==============================
+    # FILTRO 2 - ODD CASA
+    # ==============================
+    if "Odds_Casa" in df.columns:
+        odd = float(linha_csv["Odds_Casa"])
+
+        df = df[
+            df["Odds_Casa"].between(
+                odd - 0.20,
+                odd + 0.20
+            )
+        ]
+
+    # ==============================
+    # FILTRO 3 - EXPECTATIVA DE GOLS
+    # ==============================
+    if "EXP_GOL_PRE" in df.columns:
+
+        exg = float(linha_csv["EXP_GOL_PRE"])
+
+        df = df[
+            df["EXP_GOL_PRE"].between(
+                exg - 0.30,
+                exg + 0.30
+            )
+        ]
+
+    # ==============================
+    # FILTRO 4 - FDA
+    # ==============================
+    if "FDA" in df.columns:
+
+        fda = float(linha_csv["FDA"])
+
+        df = df[
+            df["FDA"].between(
+                fda - 10,
+                fda + 10
+            )
+        ]
+
+    # ==============================
+    # FILTRO 5 - FAH
+    # ==============================
+    if "FAH" in df.columns:
+
+        fah = float(linha_csv["FAH"])
+
+        df = df[
+            df["FAH"].between(
+                fah - 10,
+                fah + 10
+            )
+        ]
+
+    # ==============================
+    # FILTRO 6 - PPJ HOME
+    # ==============================
+    if "PPJH" in df.columns:
+
+        ppjh = float(linha_csv["PPJH"])
+
+        df = df[
+            df["PPJH"].between(
+                ppjh - 0.30,
+                ppjh + 0.30
+            )
+        ]
+
+    # ==============================
+    # FILTRO 7 - PPJ AWAY
+    # ==============================
+    if "PPJA" in df.columns:
+
+        ppja = float(linha_csv["PPJA"])
+
+        df = df[
+            df["PPJA"].between(
+                ppja - 0.30,
+                ppja + 0.30
+            )
+        ]
+
+    return df.reset_index(drop=True)
+    
 # =========================================
 # ABAS
 # =========================================
@@ -6869,26 +7061,24 @@ with tab8:
     )
 
 # =========================================
-# 🧪 AI LAB
+# 🧪 MACHINE LEARNING
 # =========================================
 with tab9:
 
-    st.title("🧪 AI Lab - Poisson Skynet V30")
+    st.title("🧪 Machine Learning")
 
-    st.info(
-        """
-        🚧 Laboratório de Machine Learning
+    st.info("""
+    🚧 Laboratório de Machine Learning
 
-        Nesta aba serão desenvolvidos:
+    Nesta aba serão desenvolvidos:
 
-        • Similar Games Engine
-        • CS Intelligence
-        • Feature Engineering
-        • Machine Learning
-        • Ensemble Models
-        • Explainable AI
-        """
-    )
+    • Similar Games Engine
+    • CS Intelligence
+    • Feature Engineering
+    • Machine Learning
+    • Ensemble Models
+    • Explainable AI
+    """)
 
     st.markdown("---")
 
@@ -6896,72 +7086,115 @@ with tab9:
 
     st.success(jogo)
 
+    # =====================================
+    # BUSCA JOGOS SEMELHANTES
+    # =====================================
+    jogos_semelhantes = buscar_jogos_semelhantes(
+    df_base,
+    linha_csv)
+
     st.markdown("---")
 
-    st.subheader("🚀 Em desenvolvimento...")
+    st.subheader("📊 Dados do jogo")
 
-st.markdown("---")
+col1, col2, col3, col4 = st.columns(4)
 
-st.subheader("📊 Dados do jogo")
+total = len(jogos_semelhantes)
 
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.metric("Odd Casa", linha_exg["Odds_Casa"])
-    st.metric("Odd Empate", linha_exg["Odds_Empate"])
-    st.metric("Odd Visitante", linha_exg["Odds_Visitante"])
-
-with col2:
-    st.metric("ExG Home", round(linha_consenso["ExG_Home"],2))
-    st.metric("ExG Away", round(linha_consenso["ExG_Away"],2))
-    st.metric("ExG Total", round(linha_consenso["ExG_Total"],2))
-
-with col3:
-    st.metric("FAH", round(linha_consenso["FAH"],1))
-    st.metric("FAA", round(linha_consenso["FAA"],1))
-    st.metric("FDA", round(linha_consenso["FDA"],1))
-
-st.markdown("---")
-
-st.subheader("🔎 Similar Games Engine")
-
-st.warning("🚧 Em desenvolvimento")
-
-col1,col2,col3,col4=st.columns(4)
-
-col1.metric("Jogos semelhantes","-")
-col2.metric("Winrate","-")
-col3.metric("Greens","-")
-col4.metric("Reds","-")
-
-
-st.markdown("---")
-st.subheader("🎯 CS Intelligence")
-
-mercados = {
-    "Lay 0x0":"-",
-    "Lay 0x1":"-",
-    "Lay 1x0":"-",
-    "Lay 2x2":"-",
-    "Lay Goleada Home":"-",
-    "Lay Goleada Away":"-"
-}
-
-df_score = pd.DataFrame(
-    list(mercados.items()),
-    columns=["Mercado","Score"]
+col1.metric(
+    "Jogos semelhantes",
+    total
 )
 
-st.dataframe(
-    df_score,
-    use_container_width=True,
-    hide_index=True
+if total > 0:
+
+    greens = int(jogos_semelhantes["LAY00"].sum())
+    reds = total - greens
+    winrate = greens / total * 100
+
+    col2.metric(
+        "Winrate Lay 0x0",
+        f"{winrate:.1f}%"
+    )
+
+    col3.metric(
+        "Greens",
+        greens
+    )
+
+    col4.metric(
+        "Reds",
+        reds
+    )
+
+else:
+
+    col2.metric("Winrate Lay 0x0", "-")
+    col3.metric("Greens", "-")
+    col4.metric("Reds", "-")
+
+    
+    st.markdown("---")
+
+    st.subheader("🔎 Similar Games Engine")
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    col1.metric(
+    "Jogos semelhantes",
+    len(jogos_semelhantes)
 )
-st.markdown("---")
 
-st.subheader("🧠 Explicabilidade")
+if len(jogos_semelhantes):
 
-st.info("""
+    greens = int(jogos_semelhantes["LAY00"].sum())
+    reds = len(jogos_semelhantes) - greens
+    winrate = greens / len(jogos_semelhantes) * 100
+
+    col2.metric(
+        "Winrate Lay 0x0",
+        f"{winrate:.1f}%"
+    )
+
+    col3.metric(
+        "Greens",
+        greens
+    )
+
+    col4.metric(
+        "Reds",
+        reds
+    )
+
+    st.markdown("---")
+
+    st.subheader("🎯 CS Intelligence")
+
+    mercados = {
+        "Lay 0x0": "-",
+        "Lay 0x1": "-",
+        "Lay 1x0": "-",
+        "Lay 2x2": "-",
+        "Lay Goleada Home": "-",
+        "Lay Goleada Away": "-"
+    }
+
+    df_score = pd.DataFrame(
+        list(mercados.items()),
+        columns=["Mercado", "Score"]
+    )
+
+    st.dataframe(
+        df_score,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.markdown("---")
+
+    st.subheader("🧠 Explicabilidade")
+
+    st.info("""
 A IA ainda não foi treinada.
 
 Em breve esta seção mostrará:
@@ -6976,6 +7209,5 @@ Em breve esta seção mostrará:
 
 • Explicação da decisão
 """)
-
 
        
