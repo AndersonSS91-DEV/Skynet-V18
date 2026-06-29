@@ -334,28 +334,48 @@ if os.path.exists(CSV_BASE):
     # =====================================
     # CORRIGE COLUNAS NUMÉRICAS
     # =====================================
-    for col in [
+for col in [
 
-        "FS_Win_H",
-        "FS_Win_A",
-        "Win4_H",
-        "Win4_A",
-        "Los4_H",
-        "Los4_A",
-        "Eficiência_HT_H",
-        "Eficiência_HT_A",
-        "Eficiência_2nd_H",
-        "Eficiência_2nd_A",
-        "Eficiência_H",
-        "Eficiência_A"
+    "FS_Win_H",
+    "FS_Win_A",
+    "Win4_H",
+    "Win4_A",
+    "Los4_H",
+    "Los4_A",
+    "Eficiência_HT_H",
+    "Eficiência_HT_A",
+    "Eficiência_2nd_H",
+    "Eficiência_2nd_A",
+    "Eficiência_H",
+    "Eficiência_A",
 
-    ]:
-        if col in df_base.columns:
+    # Machine Learning
+    "Odds_Casa",
+    "Odds_Empate",
+    "Odds_Visitante",
+    "Odds_Over_2,5FT",
+    "EXP_GOL_PRE",
+    "FAH",
+    "FAA",
+    "FDH",
+    "FDA",
+    "PPJH",
+    "PPJA",
+    "MGFH",
+    "MGFA",
+    "MGCH",
+    "MGCA",
+    "MG_Global",
+    "BTTS"
 
-            df_base[col] = pd.to_numeric(
-                df_base[col],
-                errors="coerce"
-            )
+]:
+
+    if col in df_base.columns:
+
+        df_base[col] = pd.to_numeric(
+            df_base[col],
+            errors="coerce"
+        )
 
     # =====================================
     # CHAVE DO JOGO
@@ -1477,6 +1497,8 @@ def mostrar_card(df_base, jogo):
 media_score = df_mgf["Score_Ofensivo"].mean()
 desvio_score = df_mgf["Score_Ofensivo"].std()
 
+
+st.write(df_base.dtypes["EXP_GOL_PRE"])
 # =========================================
 # 🧪 SIMILAR GAMES ENGINE V30
 # =========================================
