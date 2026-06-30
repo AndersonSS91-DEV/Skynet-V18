@@ -1747,13 +1747,6 @@ def preparar_base_ml(df_base):
     # =====================================
     df = df.loc[:, ~df.columns.duplicated()]
 
-    # =====================================
-    # GARANTE FEATURES
-    # =====================================
-    for col in FEATURES_ML:
-
-        if col not in df.columns:
-            df[col] = np.nan
 
     # =====================================
     # CONVERTE FEATURES NUMÉRICAS
@@ -1811,18 +1804,14 @@ def preparar_base_ml(df_base):
     # =====================================
     # FEATURES VÁLIDAS
     # =====================================
-    features_validas = []
 
-    for col in FEATURES_ML:
+    FEATURES_VALIDAS = [
 
-        if col in ["League", "Country"]:
-            continue
+        col
+        for col in FEATURES_ML
+        if col in df.columns
 
-        if col not in df_ml.columns:
-            continue
-
-        if df_ml[col].notna().sum() > 0:
-            features_validas.append(col)
+    ]
 
     # =====================================
     # PREENCHE NaN
@@ -1839,11 +1828,17 @@ def preparar_base_ml(df_base):
     return df_ml, features_validas
 
 
-# =========================================
-# BASE ML
-# =========================================
+    # =====================================
+    # BASE ML
+    # =====================================
 
-df_ml, FEATURES_VALIDAS = preparar_base_ml(df_base)
+    df_ml = df[
+        FEATURES_VALIDAS +
+        targets +
+        extras
+    ].copy()
+
+    return df_ml, FEATURES_VALIDAS
 
 # =========================================
 # STANDARD SCALER
@@ -7496,7 +7491,7 @@ with tab8:
     )
 
 # =========================================
-# 🧪 MACHINE LEARNING
+# 🧪 ABA 9 - MACHINE LEARNING
 # =========================================
 with tab9:
 
