@@ -7648,19 +7648,16 @@ with tab9:
         st.dataframe(
             jogos_semelhantes[colunas],
             use_container_width=True,
-            hide_index=True
-        )
+            hide_index=True)
 
     st.markdown("---")
 
-st.markdown("---")
+    st.subheader("🎯 CS Intelligence")
 
-st.subheader("🎯 CS Intelligence")
-
-st.dataframe(
-    df_cs,
-    use_container_width=True,
-    hide_index=True
-)
+    st.dataframe(
+        df_cs,
+        use_container_width=True,
+        hide_index=True
+    )
 
        
