@@ -2002,26 +2002,6 @@ if X_scaled is not None and jogo_scaled is not None:
         jogos_semelhantes["DISTANCIA"] = distancias[0]
 
         # =====================================
-        # REMOVE O PRÓPRIO JOGO
-        # =====================================
-
-        if (
-            "Home_Team" in jogos_semelhantes.columns
-            and "Visitor_Team" in jogos_semelhantes.columns
-            and "Home_Team" in linha_csv.index
-            and "Visitor_Team" in linha_csv.index
-        ):
-
-            mask = (
-                (jogos_semelhantes["Home_Team"] == linha_csv["Home_Team"]) &
-                (jogos_semelhantes["Visitor_Team"] == linha_csv["Visitor_Team"])
-            )
-
-            jogos_semelhantes = jogos_semelhantes.loc[
-                ~mask
-            ].reset_index(drop=True)
-
-        # =====================================
         # RECALCULA DISTÂNCIA
         # =====================================
 
