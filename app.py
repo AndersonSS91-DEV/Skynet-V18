@@ -7520,12 +7520,16 @@ with tab9:
     colunas_exibir = [
 
         "SIMILARIDADE",
-
+        
         "League",
-
         "Home_Team",
         "Visitor_Team",
-
+                
+        "Result Home",
+        "Result Visitor",
+        "Result Home HT",
+        "Result Visitor HT",
+     
         # Mercado
         "Odds_Casa",
         "Odds_Empate",
