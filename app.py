@@ -7610,56 +7610,6 @@ with tab9:
 
     tabela = jogos_semelhantes.copy()
 
-    # -----------------------------
-    # PLACAR HT
-    # -----------------------------
-    if (
-        "Result_Home_HT" in tabela.columns and
-        "Result_Visitor_HT" in tabela.columns
-    ):
-
-        tabela["HT"] = np.where(
-
-            tabela["Result_Home_HT"].isna() |
-            tabela["Result_Visitor_HT"].isna(),
-
-            "None",
-
-            tabela["Result_Home_HT"]
-                .astype(int)
-                .astype(str)
-            + "x" +
-            tabela["Result_Visitor_HT"]
-                .astype(int)
-                .astype(str)
-
-        )
-
-    # -----------------------------
-    # PLACAR FT
-    # -----------------------------
-    if (
-        "Result Home" in tabela.columns and
-        "Result Visitor" in tabela.columns
-    ):
-
-        tabela["FT"] = np.where(
-
-            tabela["Result Home"].isna() |
-            tabela["Result Visitor"].isna(),
-
-            "None",
-
-            tabela["Result Home"]
-                .astype(int)
-                .astype(str)
-            + "x" +
-            tabela["Result Visitor"]
-                .astype(int)
-                .astype(str)
-
-        )
-
     # Apenas colunas existentes
     colunas_exibir = [
         c
@@ -7682,4 +7632,3 @@ with tab9:
         use_container_width=True,
         hide_index=True
     )
-       
