@@ -5591,7 +5591,6 @@ for _, row in df_clean.iterrows():
 # =========================================
 # 📈 OUTPUT FINAL
 # =========================================
-
 if lista:
 
     df_final_aba7 = pd.DataFrame(lista)
