@@ -1635,29 +1635,105 @@ def buscar_jogos_semelhantes(df_base, linha_csv):
 
     return df.reset_index(drop=True)
 
+# =========================================
+# FEATURES MACHINE LEARNING V30.1
+# =========================================
+
 FEATURES_ML = [
+
+    # =====================================
+    # MERCADO ⭐⭐⭐⭐⭐
+    # =====================================
 
     "Odds_Casa",
     "Odds_Empate",
     "Odds_Visitante",
-    "Odds_Over_2,5FT",
 
-    "FAH",
-    "FAA",
-    "FDH",
-    "FDA",
+    "Odds_Over_2,5FT",
+    "Odds_Under_2,5FT",
+
+    "Odd_Over_1,5FT",
+    "Odd_BTTS_YES",
+
+    # =====================================
+    # CONTEXTO ⭐⭐⭐⭐
+    # =====================================
+
+    "League",
+    "Country",
+
+    # =====================================
+    # FORÇA ⭐⭐⭐⭐
+    # =====================================
 
     "PPJH",
     "PPJA",
 
+    "FAH",
+    "FAA",
+
+    "FDH",
+    "FDA",
+
+    # =====================================
+    # POISSON ⭐⭐⭐⭐
+    # =====================================
+
+    "EXP_GOL_PRE",
+
     "MGFH",
     "MGFA",
+
     "MGCH",
     "MGCA",
 
     "MG_Global",
 
-    "BTTS"]
+    # =====================================
+    # PRIMEIRO TEMPO ⭐⭐⭐
+    # =====================================
+
+    "MGF_HT_Home",
+    "MGF_HT_Away",
+
+    "MGC_HT_Home",
+    "MGC_HT_Away",
+
+    # =====================================
+    # FORMA ⭐⭐⭐
+    # =====================================
+
+    "Win4_H",
+    "Win4_A",
+
+    "Los4_H",
+    "Los4_A",
+
+    "Eficiência_H",
+    "Eficiência_A",
+
+    "Eficiência_HT_H",
+    "Eficiência_HT_A",
+
+    "Eficiência_2nd_H",
+    "Eficiência_2nd_A",
+
+    # =====================================
+    # ATAQUE ⭐⭐⭐
+    # =====================================
+
+    "Precisao_CG_H",
+    "Precisao_CG_A",
+
+    "FS_Win_H",
+    "FS_Win_A",
+
+    "Scored_First_H",
+    "Scored_First_A",
+
+    "Conceded_First_H",
+    "Conceded_First_A"
+]
 
 # =========================================
 # PREPARA BASE MACHINE LEARNING
@@ -1667,12 +1743,25 @@ def preparar_base_ml(df_base):
     df = df_base.copy()
 
     # =====================================
-    # GARANTE QUE TODAS AS FEATURES EXISTAM
+    # REMOVE COLUNAS DUPLICADAS
+    # =====================================
+    df = df.loc[:, ~df.columns.duplicated()]
+
+    # =====================================
+    # GARANTE FEATURES
     # =====================================
     for col in FEATURES_ML:
 
         if col not in df.columns:
             df[col] = np.nan
+
+    # =====================================
+    # CONVERTE FEATURES NUMÉRICAS
+    # =====================================
+    for col in FEATURES_ML:
+
+        if col in ["League", "Country"]:
+            continue
 
         df[col] = pd.to_numeric(
             df[col],
@@ -1700,7 +1789,6 @@ def preparar_base_ml(df_base):
     # COLUNAS AUXILIARES
     # =====================================
     extras = [
-        "League",
         "Home_Team",
         "Visitor_Team"
     ]
@@ -1711,34 +1799,42 @@ def preparar_base_ml(df_base):
             df[col] = ""
 
     # =====================================
-    # MONTA DF ML
+    # MONTA BASE ML
     # =====================================
-    df_ml = df[
-        FEATURES_ML +
-        targets +
-        extras
-    ].copy()
+    cols = FEATURES_ML + targets + extras
+
+    # Remove duplicidades preservando a ordem
+    cols = list(dict.fromkeys(cols))
+
+    df_ml = df[cols].copy()
 
     # =====================================
-    # REMOVE FEATURES VAZIAS
+    # FEATURES VÁLIDAS
     # =====================================
     features_validas = []
 
     for col in FEATURES_ML:
 
-        if df_ml[col].notna().sum() > 0:
+        if col in ["League", "Country"]:
+            continue
 
+        if col not in df_ml.columns:
+            continue
+
+        if df_ml[col].notna().sum() > 0:
             features_validas.append(col)
 
     # =====================================
     # PREENCHE NaN
     # =====================================
-    df_ml[features_validas] = (
-        df_ml[features_validas]
-        .fillna(
-            df_ml[features_validas].median()
-        )
-    )
+    for col in features_validas:
+
+        mediana = df_ml[col].median()
+
+        if pd.isna(mediana):
+            mediana = 0
+
+        df_ml[col] = df_ml[col].fillna(mediana)
 
     return df_ml, features_validas
 
@@ -1757,117 +1853,209 @@ from sklearn.preprocessing import StandardScaler
 
 scaler_ml = StandardScaler()
 
-X_ml = df_ml[FEATURES_VALIDAS]
+# =========================================
+# MATRIZ DE FEATURES
+# =========================================
 
-X_scaled = scaler_ml.fit_transform(X_ml)
+X_ml = df_ml[FEATURES_VALIDAS].copy()
+
+# Converte tudo para numérico
+for col in X_ml.columns:
+
+    X_ml[col] = pd.to_numeric(
+        X_ml[col],
+        errors="coerce"
+    )
+
+# Remove colunas totalmente vazias
+X_ml = X_ml.dropna(
+    axis=1,
+    how="all"
+)
+
+# Atualiza lista de features válidas
+FEATURES_VALIDAS = X_ml.columns.tolist()
+
+# =========================================
+# PREPARA MATRIZ
+# =========================================
+
+if len(FEATURES_VALIDAS) == 0:
+
+    X_scaled = None
+
+else:
+
+    # Preenche NaN pela mediana
+    for col in FEATURES_VALIDAS:
+
+        mediana = X_ml[col].median()
+
+        if pd.isna(mediana):
+            mediana = 0
+
+        X_ml[col] = X_ml[col].fillna(mediana)
+
+    # Garante float
+    X_ml = X_ml.astype(float)
+
+    # Normaliza
+    X_scaled = scaler_ml.fit_transform(X_ml)
 
 # =========================================
 # PREPARA JOGO
 # =========================================
+
 def preparar_jogo_ml(linha_csv):
+
+    if len(FEATURES_VALIDAS) == 0:
+        return None
 
     dados = {}
 
     for col in FEATURES_VALIDAS:
 
         if col in linha_csv.index:
-
-            dados[col] = pd.to_numeric(
-                linha_csv[col],
-                errors="coerce"
-            )
-
+            dados[col] = linha_csv[col]
         else:
-
             dados[col] = np.nan
 
     jogo = pd.DataFrame([dados])
 
-    jogo = jogo.fillna(
-        df_ml[FEATURES_VALIDAS].median()
+    jogo = jogo.reindex(
+        columns=FEATURES_VALIDAS,
+        fill_value=np.nan
     )
 
-    return jogo
+    for col in FEATURES_VALIDAS:
 
+        jogo[col] = pd.to_numeric(
+            jogo[col],
+            errors="coerce"
+        )
 
-jogo_ml = preparar_jogo_ml(linha_csv)
+        mediana = X_ml[col].median()
 
-jogo_scaled = scaler_ml.transform(jogo_ml)
+        if pd.isna(mediana):
+            mediana = 0
+
+        jogo[col] = jogo[col].fillna(mediana)
+
+    return jogo.astype(float)
 
 # =========================================
-# VETOR DO JOGO
+# JOGO NORMALIZADO
 # =========================================
-jogo_ml = preparar_jogo_ml(linha_csv)
 
-# mesma ordem das features
-jogo_ml = jogo_ml[FEATURES_ML]
+if X_scaled is None:
 
-# normaliza usando o mesmo scaler da base
-jogo_scaled = scaler_ml.transform(jogo_ml)
+    jogo_scaled = None
+
+else:
+
+    jogo_ml = preparar_jogo_ml(linha_csv)
+
+    if jogo_ml is None:
+
+        jogo_scaled = None
+
+    else:
+
+        jogo_scaled = scaler_ml.transform(jogo_ml)
 
 # =========================================
 # KNN - SIMILAR GAMES ENGINE
 # =========================================
 
-# Número máximo de jogos semelhantes
-N_VIZINHOS = 100
+from sklearn.neighbors import NearestNeighbors
 
-n_vizinhos = min(N_VIZINHOS, len(df_ml))
+# DataFrame padrão
+jogos_semelhantes = pd.DataFrame()
 
-knn = NearestNeighbors(
-    n_neighbors=n_vizinhos,
-    metric="euclidean"
-)
+# Só executa se existir base para ML
+if X_scaled is not None and jogo_scaled is not None:
 
-knn.fit(X_scaled)
+    # Número máximo de vizinhos
+    N_VIZINHOS = min(100, len(df_ml))
 
-distancias, indices = knn.kneighbors(jogo_scaled)
+    if N_VIZINHOS > 0:
 
-# =========================================
-# JOGOS SEMELHANTES
-# =========================================
-jogos_semelhantes = (df_ml.iloc[indices[0]].copy().reset_index(drop=True))
-
-
-# Jogos semelhantes
-jogos_semelhantes = (
-    df_ml
-    .iloc[indices[0]]
-    .copy()
-    .reset_index(drop=True)
-)
-
-# Distância
-jogos_semelhantes["DISTANCIA"] = distancias[0]
-
-# =========================================
-# SIMILARIDADE
-# =========================================
-
-dist_max = jogos_semelhantes["DISTANCIA"].max()
-
-if dist_max > 0:
-
-    jogos_semelhantes["SIMILARIDADE"] = (
-        100
-        * (
-            1
-            - jogos_semelhantes["DISTANCIA"] / dist_max
+        knn = NearestNeighbors(
+            n_neighbors=N_VIZINHOS,
+            metric="euclidean"
         )
-    )
 
-else:
+        knn.fit(X_scaled)
 
-    jogos_semelhantes["SIMILARIDADE"] = 100
+        distancias, indices = knn.kneighbors(jogo_scaled)
 
-# =========================================
-# ORDENA
-# =========================================
+        # =====================================
+        # JOGOS SEMELHANTES
+        # =====================================
 
-jogos_semelhantes = jogos_semelhantes.sort_values(
-    "SIMILARIDADE",
-    ascending=False
-).reset_index(drop=True)
+        jogos_semelhantes = (
+            df_ml
+            .iloc[indices[0]]
+            .copy()
+            .reset_index(drop=True)
+        )
+
+        # Distância
+        jogos_semelhantes["DISTANCIA"] = distancias[0]
+
+        # =====================================
+        # REMOVE O PRÓPRIO JOGO (SE EXISTIR)
+        # =====================================
+
+        if (
+            "Home_Team" in jogos_semelhantes.columns
+            and "Visitor_Team" in jogos_semelhantes.columns
+            and "Home_Team" in linha_csv.index
+            and "Visitor_Team" in linha_csv.index
+        ):
+
+            mask = (
+                (jogos_semelhantes["Home_Team"] == linha_csv["Home_Team"]) &
+                (jogos_semelhantes["Visitor_Team"] == linha_csv["Visitor_Team"])
+            )
+
+
+        # =====================================
+        # AJUSTA DISTÂNCIAS
+        # =====================================
+
+        jogos_semelhantes["DISTANCIA"] = distancias[0][:len(jogos_semelhantes)]
+
+        # =====================================
+        # SIMILARIDADE
+        # =====================================
+
+        if len(jogos_semelhantes) > 0:
+
+            dist_max = jogos_semelhantes["DISTANCIA"].max()
+
+            if dist_max > 0:
+
+                jogos_semelhantes["SIMILARIDADE"] = (
+                    100
+                    * (
+                        1
+                        - jogos_semelhantes["DISTANCIA"] / dist_max
+                    )
+                )
+
+            else:
+
+                jogos_semelhantes["SIMILARIDADE"] = 100
+
+            jogos_semelhantes = (
+                jogos_semelhantes
+                .sort_values(
+                    "SIMILARIDADE",
+                    ascending=False
+                )
+                .reset_index(drop=True)
+            )
 
 # =========================================
 # CS INTELLIGENCE
@@ -4366,1063 +4554,978 @@ Home {home_emoji}   x   Away {away_emoji}
         except:
             return ""
             
-# =========================================
-# 🧠 LISTA FINAL
-# =========================================
-
-lista = []
-
-for _, row in df_clean.iterrows():
-
     # =========================================
-    # 🧠 CLASSIFICAÇÃO
+    # 🧠 LISTA FINAL
     # =========================================
+    lista = []
 
-    res = classificar_jogo(row)
+    for _, row in df_clean.iterrows():
 
-    if not res:
-        continue
+        # =========================================
+        # 🧠 CLASSIFICAÇÃO
+        # =========================================
+        res = classificar_jogo(row)
 
-    # =========================================
-    # 🎯 DIREÇÕES
-    # =========================================
+        if not res:
+            continue
 
-    dir_poisson = str(
-        row.get("Poisson_Direcao", "")
-    )
+        # =========================================
+        # 🎯 DIREÇÕES
+        # =========================================
+        dir_poisson = str(row.get("Poisson_Direcao", ""))
+        dir_ia = str(row.get("IA_Direcao", ""))
+        
+        # =========================================
+        # 🎯 FUNÇÕES
+        # =========================================
+        def is_lay_away(x):
+            return (
+                isinstance(x, str)
+                and "lay away" in x.lower()
+            )
+        def is_lay_home(x):
+            return (
+                isinstance(x, str)
+                and "lay home" in x.lower())
 
-    dir_ia = str(
-        row.get("IA_Direcao", "")
-    )
+        # =========================================
+        # 🎯 FLAGS
+        # =========================================
+        passou_filtro_la = True
+        passou_filtro_lh = True
 
-    # =========================================
-    # 🎯 FUNÇÕES
-    # =========================================
+        # =========================================
+        # 🚫 CONFLITOS
+        # =========================================
 
-    def is_lay_away(x):
-
-        return (
-            isinstance(x, str)
-            and
-            "lay away" in x.lower()
-        )
-
-    def is_lay_home(x):
-
-        return (
-            isinstance(x, str)
-            and
-            "lay home" in x.lower()
-        )
-
-    # =========================================
-    # 🎯 FLAGS
-    # =========================================
-
-    passou_filtro_la = True
-    passou_filtro_lh = True
-
-    # =========================================
-    # 🚫 CONFLITOS
-    # =========================================
-
-    if "conflito" in dir_poisson.lower():
-
-        passou_filtro_la = False
-        passou_filtro_lh = False
-
-    if "conflito" in dir_ia.lower():
-
-        passou_filtro_la = False
-        passou_filtro_lh = False
-
-    if "analisar" in dir_ia.lower():
-
-        passou_filtro_la = False
-        passou_filtro_lh = False
-
-    # =========================================
-    # 🚫 NÃO É LAY AWAY
-    # =========================================
-
-    if not (
-        is_lay_away(dir_poisson)
-        or
-        is_lay_away(dir_ia)
-    ):
-
-        passou_filtro_la = False
-
-    # =========================================
-    # 🚫 NÃO É LAY HOME
-    # =========================================
-
-    if not (
-        is_lay_home(dir_poisson)
-        or
-        is_lay_home(dir_ia)
-    ):
-
-        passou_filtro_lh = False
-
-    # =========================================
-    # 🚫 BLACKLIST
-    # =========================================
-
-    league = str(
-        row.get("League", "")
-    ).lower()
-
-    blacklist_keywords = [
-
-        "u17",
-        "u19",
-        "u20",
-        "u21",
-        "u23",
-        "youth",
-        "juniores",
-        "juvenil",
-
-        "women",
-        "woman",
-        "feminino",
-        "fem",
-
-        "reserve",
-        "reserves",
-
-        "friendly",
-        "amistoso"
-    ]
-
-    if any(
-        word in league
-        for word in blacklist_keywords
-    ):
-
-        passou_filtro_la = False
-        passou_filtro_lh = False
-
-    # =========================================
-    # 🚫 UNDER 2.5
-    # =========================================
-
-    odd_under25 = row.get(
-        "Odds_Under_2,5FT",
-        np.nan
-    )
-
-    if pd.notna(odd_under25):
-
-        if odd_under25 > 8.50:
+        if "conflito" in dir_poisson.lower():
 
             passou_filtro_la = False
             passou_filtro_lh = False
 
-    # =========================================
-    # 🚫 CV AWAY
-    # =========================================
+        if "conflito" in dir_ia.lower():
 
-    CV_CG_A_01 = row.get(
-        "CV_CG_A_01",
-        np.nan
-    )
+            passou_filtro_la = False
+            passou_filtro_lh = False
 
-    Media_CG_A_01 = row.get(
-        "Media_CG_A_01",
-        np.nan
-    )
+        if "analisar" in dir_ia.lower():
 
-    if pd.notna(CV_CG_A_01):
+            passou_filtro_la = False
+            passou_filtro_lh = False
 
-        if CV_CG_A_01 > 2.00:
+        # =========================================
+        # 🚫 NÃO É LAY AWAY
+        # =========================================
+
+        if not (
+            is_lay_away(dir_poisson)
+            or
+            is_lay_away(dir_ia)
+        ):
 
             passou_filtro_la = False
 
-    # =========================================
-    # 🚫 AWAY ROCKET
-    # =========================================
+        # =========================================
+        # 🚫 NÃO É LAY HOME
+        # =========================================
 
-    def away_is_rocket():
-
-        return (
-            2.70 <= Media_CG_A_01 <= 3.00
-            and
-            CV_CG_A_01 <= 0.90
-        )
-
-    # =========================================
-    # 🚫 AWAY VOLCANO
-    # =========================================
-
-    def away_is_volcano():
-
-        return (
-            2.80 <= Media_CG_A_01 <= 5.50
-            and
-            CV_CG_A_01 <= 0.80
-        )
-
-    if away_is_rocket():
-
-        passou_filtro_la = False
-
-    if away_is_volcano():
-
-        passou_filtro_la = False
-
-    # =========================================
-    # 🚫 CV HOME
-    # =========================================
-
-    CV_CG_H_01 = row.get(
-        "CV_CG_H_01",
-        np.nan
-    )
-
-    Media_CG_H_01 = row.get(
-        "Media_CG_H_01",
-        np.nan
-    )
-
-    if pd.notna(CV_CG_H_01):
-
-        if CV_CG_H_01 > 2.00:
+        if not (
+            is_lay_home(dir_poisson)
+            or
+            is_lay_home(dir_ia)
+        ):
 
             passou_filtro_lh = False
 
-    # =========================================
-    # 🚫 HOME ROCKET
-    # =========================================
+        # =========================================
+        # 🚫 BLACKLIST
+        # =========================================
 
-    def home_is_rocket():
+        league = str(
+            row.get("League", "")
+        ).lower()
 
-        return (
-            2.70 <= Media_CG_H_01 <= 3.00
-            and
-            CV_CG_H_01 <= 0.90
+        blacklist_keywords = [
+
+            "u17",
+            "u19",
+            "u20",
+            "u21",
+            "u23",
+            "youth",
+            "juniores",
+            "juvenil",
+
+            "women",
+            "woman",
+            "feminino",
+            "fem",
+
+            "reserve",
+            "reserves",
+
+            "friendly",
+            "amistoso"
+        ]
+
+        if any(
+            word in league
+            for word in blacklist_keywords
+        ):
+
+            passou_filtro_la = False
+            passou_filtro_lh = False
+
+        # =========================================
+        # 🚫 UNDER 2.5
+        # =========================================
+
+        odd_under25 = row.get(
+            "Odds_Under_2,5FT",
+            np.nan
         )
 
-    # =========================================
-    # 🚫 HOME VOLCANO
-    # =========================================
+        if pd.notna(odd_under25):
 
-    def home_is_volcano():
+            if odd_under25 > 8.50:
 
-        return (
-            2.80 <= Media_CG_H_01 <= 5.50
-            and
-            CV_CG_H_01 <= 0.80
+                passou_filtro_la = False
+                passou_filtro_lh = False
+
+        # =========================================
+        # 🚫 CV AWAY
+        # =========================================
+
+        CV_CG_A_01 = row.get(
+            "CV_CG_A_01",
+            np.nan
         )
 
-    if home_is_rocket():
+        Media_CG_A_01 = row.get(
+            "Media_CG_A_01",
+            np.nan
+        )
 
-        passou_filtro_lh = False
+        if pd.notna(CV_CG_A_01):
 
-    if home_is_volcano():
+            if CV_CG_A_01 > 2.00:
 
-        passou_filtro_lh = False
+                passou_filtro_la = False
 
-    # =========================================
-    # 💜 FLAG ELITE BLOQUEADO
-    # =========================================
+        # =========================================
+        # 🚫 AWAY ROCKET
+        # =========================================
 
-    elite_bloqueado_la = False
+        def away_is_rocket():
 
-    if (
-
-        is_lay_away(dir_poisson)
-        or
-        is_lay_away(dir_ia)
-
-    ):
-
-        if not df_rank_la.empty:
-
-            home_key = (
-
-                str(row["Home_Team"])
-                .strip()
-                .lower()
-
+            return (
+                2.70 <= Media_CG_A_01 <= 3.00
+                and
+                CV_CG_A_01 <= 0.90
             )
 
-            linha_rank_elite = df_rank_la[
+        # =========================================
+        # 🚫 AWAY VOLCANO
+        # =========================================
 
-                df_rank_la["Home_Key"]
-                == home_key
+        def away_is_volcano():
 
-            ]
+            return (
+                2.80 <= Media_CG_A_01 <= 5.50
+                and
+                CV_CG_A_01 <= 0.80
+            )
 
-            if not linha_rank_elite.empty:
+        if away_is_rocket():
 
-                # =====================================
-                # 🚫 BLOQUEIOS ESPECÍFICOS
-                # =====================================
+            passou_filtro_la = False
 
-                bloqueado_cv = (
+        if away_is_volcano():
 
-                    pd.notna(CV_CG_A_01)
-                    and
-                    CV_CG_A_01 > 2.00
+            passou_filtro_la = False
+
+        # =========================================
+        # 🚫 CV HOME
+        # =========================================
+
+        CV_CG_H_01 = row.get(
+            "CV_CG_H_01",
+            np.nan
+        )
+
+        Media_CG_H_01 = row.get(
+            "Media_CG_H_01",
+            np.nan
+        )
+
+        if pd.notna(CV_CG_H_01):
+
+            if CV_CG_H_01 > 2.00:
+
+                passou_filtro_lh = False
+
+        # =========================================
+        # 🚫 HOME ROCKET
+        # =========================================
+
+        def home_is_rocket():
+
+            return (
+                2.70 <= Media_CG_H_01 <= 3.00
+                and
+                CV_CG_H_01 <= 0.90
+            )
+
+        # =========================================
+        # 🚫 HOME VOLCANO
+        # =========================================
+
+        def home_is_volcano():
+
+            return (
+                2.80 <= Media_CG_H_01 <= 5.50
+                and
+                CV_CG_H_01 <= 0.80
+            )
+
+        if home_is_rocket():
+
+            passou_filtro_lh = False
+
+        if home_is_volcano():
+
+            passou_filtro_lh = False
+
+        # =========================================
+        # 💜 FLAG ELITE BLOQUEADO
+        # =========================================
+
+        elite_bloqueado_la = False
+
+        if (
+
+            is_lay_away(dir_poisson)
+            or
+            is_lay_away(dir_ia)
+
+        ):
+
+            if not df_rank_la.empty:
+
+                home_key = (
+
+                    str(row["Home_Team"])
+                    .strip()
+                    .lower()
 
                 )
 
-                bloqueado_rocket = away_is_rocket()
+                linha_rank_elite = df_rank_la[
 
-                bloqueado_volcano = away_is_volcano()
+                    df_rank_la["Home_Key"]
+                    == home_key
 
-                if (
+                ]
 
-                    not passou_filtro_la
+                if not linha_rank_elite.empty:
 
-                    and
+                    # =====================================
+                    # 🚫 BLOQUEIOS ESPECÍFICOS
+                    # =====================================
 
-                    (
-                        bloqueado_cv
-                        or
-                        bloqueado_rocket
-                        or
-                        bloqueado_volcano
+                    bloqueado_cv = (
+
+                        pd.notna(CV_CG_A_01)
+                        and
+                        CV_CG_A_01 > 2.00
+
                     )
 
-                ):
+                    bloqueado_rocket = away_is_rocket()
 
-                    elite_bloqueado_la = True
+                    bloqueado_volcano = away_is_volcano()
 
-    # =========================================
-    # 🧠 TIER LAY AWAY
-    # =========================================
+                    if (
 
-    tier_la = ""
+                        not passou_filtro_la
 
-    if (
+                        and
 
-        passou_filtro_la
-        or
-        elite_bloqueado_la
+                        (
+                            bloqueado_cv
+                            or
+                            bloqueado_rocket
+                            or
+                            bloqueado_volcano
+                        )
 
-    ):
+                    ):
 
-        if "lay away" in dir_ia.lower():
+                        elite_bloqueado_la = True
+
+        # =========================================
+        # 🧠 TIER LAY AWAY
+        # =========================================
+
+        tier_la = ""
+
+        if (
+
+            passou_filtro_la
+            or
+            elite_bloqueado_la
+
+        ):
+
+            if "lay away" in dir_ia.lower():
+
+                odd_home = row.get(
+                    "Odds_Casa",
+                    np.nan
+                )
+
+                if pd.notna(odd_home):
+
+                    if odd_home > 1.13:
+
+                        if not df_rank_la.empty:
+
+                            home_key = (
+
+                                str(row["Home_Team"])
+                                .strip()
+                                .lower()
+
+                            )
+
+                            linha_rank = df_rank_la[
+
+                                df_rank_la["Home_Key"]
+                                == home_key
+
+                            ]
+                            
+                            if not linha_rank.empty:
+
+                                tier_original = linha_rank.iloc[0].get(
+                                    "Tier_LA",
+                                    ""
+                                )
+
+                                if tier_original is None:
+
+                                    tier_original = ""
+
+                                elif pd.isna(tier_original):
+
+                                    tier_original = ""
+
+                                tier_original = str(
+                                    tier_original
+                                ).strip()
+
+                                # =============================
+                                # ✅ FILTRO NORMAL
+                                # =============================
+
+                                if passou_filtro_la:
+
+                                    tier_la = tier_original
+
+                                # =============================
+                                # 💜 ELITE BLOQUEADO
+                                # =============================
+
+                                else:
+
+                                    if "⭐⭐⭐⭐⭐" in tier_original:
+
+                                        tier_la = "LA💜💜💜💜💜"
+
+                                    elif "⭐⭐⭐" in tier_original:
+
+                                        tier_la = "LA💜💜💜"
+
+                                    elif "⭐" in tier_original:
+
+                                        tier_la = "LA💜"
+
+                                    else:
+
+                                        tier_la = ""
+
+        # =========================================
+        # 🧠 TIER LAY HOME
+        # =========================================
+
+        tier_lh = ""
+
+        if passou_filtro_lh:
+
+            if "lay home" in dir_ia.lower():
+
+                odd_away = row.get(
+                    "Odds_Visitante",
+                    np.nan
+                )
+
+                if pd.notna(odd_away):
+
+                    if odd_away > 1.13:
+
+                        if not df_rank_lh.empty:
+
+                            away_key = (
+
+                                str(row["Visitor_Team"])
+                                .strip()
+                                .lower()
+
+                            )
+
+                            linha_rank = df_rank_lh[
+
+                                df_rank_lh["Away_Key"]
+                                == away_key
+
+                            ]
+
+                            if not linha_rank.empty:
+
+                                tier_lh = linha_rank.iloc[0].get(
+                                    "Tier_LH",
+                                    ""
+                                )
+
+        # =========================================
+        # 🧠 TIER HANDICAP VALUE
+        # =========================================
+
+        tier_ha = ""
+
+        score_zebra = np.nan
+
+        try:
+
+            vr01 = row.get(
+                "VR01",
+                np.nan
+            )
 
             odd_home = row.get(
                 "Odds_Casa",
                 np.nan
             )
 
-            if pd.notna(odd_home):
-
-                if odd_home > 1.13:
-
-                    if not df_rank_la.empty:
-
-                        home_key = (
-
-                            str(row["Home_Team"])
-                            .strip()
-                            .lower()
-
-                        )
-
-                        linha_rank = df_rank_la[
-
-                            df_rank_la["Home_Key"]
-                            == home_key
-
-                        ]
-
-                        if row["Home_Team"] == "Maguary PE":
-
-                            st.write(
-                                "HOME_TEAM:",
-                                row["Home_Team"]
-                            )
-
-                            st.write(
-                                "HOME_KEY JOGO:",
-                                home_key
-                            )
-
-                            tmp = df_rank_la[
-
-                                df_rank_la["Home"]
-                                .astype(str)
-                                .str.contains(
-                                    "Maguary",
-                                    case=False,
-                                    na=False
-                                )
-
-                            ]
-
-                            st.write(
-                                tmp[
-                                    [
-                                        "Home",
-                                        "Home_Key",
-                                        "Tier_LA"
-                                    ]
-                                ]
-                            )
-
-                        if not linha_rank.empty:
-
-                            tier_original = linha_rank.iloc[0].get(
-                                "Tier_LA",
-                                ""
-                            )
-
-                            if tier_original is None:
-
-                                tier_original = ""
-
-                            elif pd.isna(tier_original):
-
-                                tier_original = ""
-
-                            tier_original = str(
-                                tier_original
-                            ).strip()
-
-                            # =============================
-                            # ✅ FILTRO NORMAL
-                            # =============================
-
-                            if passou_filtro_la:
-
-                                tier_la = tier_original
-
-                            # =============================
-                            # 💜 ELITE BLOQUEADO
-                            # =============================
-
-                            else:
-
-                                if "⭐⭐⭐⭐⭐" in tier_original:
-
-                                    tier_la = "LA💜💜💜💜💜"
-
-                                elif "⭐⭐⭐" in tier_original:
-
-                                    tier_la = "LA💜💜💜"
-
-                                elif "⭐" in tier_original:
-
-                                    tier_la = "LA💜"
-
-                                else:
-
-                                    tier_la = ""
-                                    
-    # =========================================
-    # 🧠 TIER LAY HOME
-    # =========================================
-
-    tier_lh = ""
-
-    if passou_filtro_lh:
-
-        if "lay home" in dir_ia.lower():
-
             odd_away = row.get(
                 "Odds_Visitante",
                 np.nan
             )
 
-            if pd.notna(odd_away):
+            mgf_h = row.get(
+                "MGF_H",
+                np.nan
+            )
 
-                if odd_away > 1.13:
+            mgf_a = row.get(
+                "MGF_A",
+                np.nan
+            )
 
-                    if not df_rank_lh.empty:
+            mgc_h = row.get(
+                "MGC_H",
+                np.nan
+            )
 
-                        away_key = (
+            mgc_a = row.get(
+                "MGC_A",
+                np.nan
+            )
 
-                            str(row["Visitor_Team"])
-                            .strip()
-                            .lower()
+            ht_h = row.get(
+                "MGF_HT_Home",
+                np.nan
+            )
 
-                        )
+            ht_a = row.get(
+                "MGF_HT_Away",
+                np.nan
+            )
 
-                        linha_rank = df_rank_lh[
+            # =====================================
+            # 🚫 SEGURANÇA
+            # =====================================
 
-                            df_rank_lh["Away_Key"]
-                            == away_key
+            valores = [
 
-                        ]
+                vr01,
 
-                        if not linha_rank.empty:
+                odd_home,
+                odd_away,
 
-                            tier_lh = linha_rank.iloc[0].get(
-                                "Tier_LH",
-                                ""
-                            )
-    # =========================================
-    # 🧠 TIER HANDICAP VALUE
-    # =========================================
+                mgf_h,
+                mgf_a,
 
-    tier_ha = ""
+                mgc_h,
+                mgc_a,
 
-    score_zebra = np.nan
+                ht_h,
+                ht_a
 
-    try:
+            ]
+ 
+            if not any(pd.isna(v) for v in valores):
+                
+           # =====================================
+           # ⭐ DEFINE FAVORITO / ZEBRA
+           # =====================================
+                if odd_home < odd_away:
 
-        vr01 = row.get(
-            "VR01",
-            np.nan
-        )
+                    odd_fav = odd_home
+
+                    favorito_mgf = mgf_h
+                    zebra_mgf = mgf_a
+
+                    favorito_mgc = mgc_h
+                    zebra_mgc = mgc_a
+
+                    favorito_ht = ht_h
+                    zebra_ht = ht_a
+
+                    zebra_nome = row.get("Away", "")
+
+                else:
+
+                    odd_fav = odd_away
+
+                    favorito_mgf = mgf_a
+                    zebra_mgf = mgf_h
+
+                    favorito_mgc = mgc_a
+                    zebra_mgc = mgc_h
+
+                    favorito_ht = ht_a
+                    zebra_ht = ht_h
+
+                    zebra_nome = row.get("Home", "")
+
+        # =====================================
+        # 🧠 SCORE ZEBRA
+        # =====================================
+                score_zebra = (
+
+                    (abs(vr01) * 2.2)
+
+                    +
+
+                    (zebra_mgf - favorito_mgf)
+
+                    +
+
+                    ((zebra_ht - favorito_ht) * 1.4)
+
+                    +
+
+                    ((favorito_mgc - zebra_mgc) * 0.8))
+                
+        # =====================================
+        # 🧠 SCORE ZEBRA
+        # =====================================
+                if (vr01 < 0
+                    and odd_fav < 2.30):
+
+                    if score_zebra >= 1.20:
+
+                        tier_ha = "🔥 HA+1.25 ELITE"
+
+                    elif score_zebra >= 0.80:
+
+                        tier_ha = "🟢 HA+1.25 FORTE"
+
+                    elif score_zebra >= 0.35:
+
+                        tier_ha = "🟡 HA+1.25 VALUE"
+
+        except:
+
+            pass
+
+        # =========================================
+        # 💰 STAKE
+        # =========================================
+
+        stake = 0
 
         odd_home = row.get(
             "Odds_Casa",
             np.nan
         )
 
-        odd_away = row.get(
-            "Odds_Visitante",
-            np.nan
-        )
+        # =========================================
+        # ⭐ LAY AWAY
+        # =========================================
 
-        mgf_h = row.get(
-            "MGF_H",
-            np.nan
-        )
-
-        mgf_a = row.get(
-            "MGF_A",
-            np.nan
-        )
-
-        mgc_h = row.get(
-            "MGC_H",
-            np.nan
-        )
-
-        mgc_a = row.get(
-            "MGC_A",
-            np.nan
-        )
-
-        ht_h = row.get(
-            "MGF_HT_Home",
-            np.nan
-        )
-
-        ht_a = row.get(
-            "MGF_HT_Away",
-            np.nan
-        )
-
-        # =====================================
-        # 🚫 SEGURANÇA
-        # =====================================
-
-        valores = [
-
-            vr01,
-
-            odd_home,
-            odd_away,
-
-            mgf_h,
-            mgf_a,
-
-            mgc_h,
-            mgc_a,
-
-            ht_h,
-            ht_a
-
-        ]
-
-        if not any(pd.isna(v) for v in valores):
+        if isinstance(tier_la, str):
 
             # =====================================
-            # ⭐ DEFINE FAVORITO / ZEBRA
+            # ⭐⭐⭐⭐⭐
             # =====================================
 
-            if odd_home < odd_away:
+            if "⭐⭐⭐⭐⭐" in tier_la:
 
-                odd_fav = odd_home
+                if odd_home < 1.12:
+                    stake = 25
 
-                favorito_mgf = mgf_h
-                zebra_mgf = mgf_a
+                elif odd_home < 1.20:
+                    stake = 45
 
-                favorito_mgc = mgc_h
-                zebra_mgc = mgc_a
+                elif odd_home < 1.30:
+                    stake = 55
 
-                favorito_ht = ht_h
-                zebra_ht = ht_a
+                elif odd_home < 1.40:
+                    stake = 60
 
-                zebra_nome = row.get(
-                    "Away",
-                    ""
-                )
+                elif odd_home < 1.50:
+                    stake = 40
 
-            else:
+                elif odd_home < 1.60:
+                    stake = 55
 
-                odd_fav = odd_away
+                elif odd_home < 1.70:
+                    stake = 85
 
-                favorito_mgf = mgf_a
-                zebra_mgf = mgf_h
+                elif odd_home < 1.80:
+                    stake = 70
 
-                favorito_mgc = mgc_a
-                zebra_mgc = mgc_h
+                elif odd_home < 1.90:
+                    stake = 60
 
-                favorito_ht = ht_a
-                zebra_ht = ht_h
+                elif odd_home < 2.00:
+                    stake = 40
 
-                zebra_nome = row.get(
-                    "Home",
-                    ""
-                )
+                elif odd_home < 2.20:
+                    stake = 75
 
-            # =====================================
-            # 🧠 SCORE ZEBRA
-            # =====================================
+                elif odd_home < 2.50:
+                    stake = 120
 
-            score_zebra = (
+                elif odd_home < 3.00:
+                    stake = 70
 
-                (abs(vr01) * 2.2)
+                elif odd_home <= 5:
+                    stake = 100
 
-                +
-
-                (
-                    zebra_mgf
-                    - favorito_mgf
-                )
-
-                +
-
-                (
-                    (
-                        zebra_ht
-                        - favorito_ht
-                    ) * 1.4
-                )
-
-                +
-
-                (
-                    (
-                        favorito_mgc
-                        - zebra_mgc
-                    ) * 0.8
-                )
-
-            )
+                else:
+                    stake = 45
 
             # =====================================
-            # 🔥 FILTRO BASE
+            # ⭐⭐⭐
             # =====================================
 
-            if (
+            elif "⭐⭐⭐" in tier_la:
 
-                vr01 < 0
+                if odd_home < 1.12:
+                    stake = 18
 
-                and odd_fav < 2.30
+                elif odd_home < 1.20:
+                    stake = 34
 
-            ):
+                elif odd_home < 1.30:
+                    stake = 41
 
-                if score_zebra >= 1.20:
+                elif odd_home < 1.40:
+                    stake = 45
 
-                    tier_ha = "🔥 HA+1.25 ELITE"
+                elif odd_home < 1.50:
+                    stake = 30
 
-                elif score_zebra >= 0.80:
+                elif odd_home < 1.60:
+                    stake = 41
 
-                    tier_ha = "🟢 HA+1.25 FORTE"
+                elif odd_home < 1.70:
+                    stake = 64
 
-                elif score_zebra >= 0.35:
+                elif odd_home < 1.80:
+                    stake = 52
 
-                    tier_ha = "🟡 HA+1.25 VALUE"
+                elif odd_home < 1.90:
+                    stake = 45
 
-    except:
+                elif odd_home < 2.00:
+                    stake = 30
 
-        pass
+                elif odd_home < 2.20:
+                    stake = 56
 
-    # =========================================
-    # 💰 STAKE
-    # =========================================
+                elif odd_home < 2.50:
+                    stake = 90
 
-    stake = 0
+                elif odd_home < 3.00:
+                    stake = 52
 
-    odd_home = row.get(
-        "Odds_Casa",
-        np.nan
-    )
+                elif odd_home <= 5:
+                    stake = 75
 
-    # =========================================
-    # ⭐ LAY AWAY
-    # =========================================
+                else:
+                    stake = 34
 
-    if isinstance(tier_la, str):
+            # =====================================
+            # ⭐
+            # =====================================
 
-        # =====================================
-        # ⭐⭐⭐⭐⭐
-        # =====================================
+            elif "⭐" in tier_la:
 
-        if "⭐⭐⭐⭐⭐" in tier_la:
+                if odd_home < 1.12:
+                    stake = 12
 
-            if odd_home < 1.12:
-                stake = 25
+                elif odd_home < 1.20:
+                    stake = 22
 
-            elif odd_home < 1.20:
-                stake = 45
+                elif odd_home < 1.30:
+                    stake = 28
 
-            elif odd_home < 1.30:
-                stake = 55
+                elif odd_home < 1.40:
+                    stake = 30
 
-            elif odd_home < 1.40:
-                stake = 60
+                elif odd_home < 1.50:
+                    stake = 20
 
-            elif odd_home < 1.50:
-                stake = 40
+                elif odd_home < 1.60:
+                    stake = 28
 
-            elif odd_home < 1.60:
-                stake = 55
+                elif odd_home < 1.70:
+                    stake = 42
 
-            elif odd_home < 1.70:
-                stake = 85
+                elif odd_home < 1.80:
+                    stake = 35
 
-            elif odd_home < 1.80:
-                stake = 70
+                elif odd_home < 1.90:
+                    stake = 30
 
-            elif odd_home < 1.90:
-                stake = 60
+                elif odd_home < 2.00:
+                    stake = 20
 
-            elif odd_home < 2.00:
-                stake = 40
+                elif odd_home < 2.20:
+                    stake = 38
 
-            elif odd_home < 2.20:
-                stake = 75
+                elif odd_home < 2.50:
+                    stake = 60
 
-            elif odd_home < 2.50:
-                stake = 120
+                elif odd_home < 3.00:
+                    stake = 35
 
-            elif odd_home < 3.00:
-                stake = 70
+                elif odd_home <= 5:
+                    stake = 50
 
-            elif odd_home <= 5:
-                stake = 100
+                else:
+                    stake = 22
 
-            else:
-                stake = 45
+            # =====================================
+            # 💜💜💜💜💜
+            # =====================================
 
-        # =====================================
-        # ⭐⭐⭐
-        # =====================================
+            elif "💜💜💜💜💜" in tier_la:
 
-        elif "⭐⭐⭐" in tier_la:
+                if odd_home < 1.12:
+                    stake = 15
 
-            if odd_home < 1.12:
-                stake = 18
+                elif odd_home < 1.20:
+                    stake = 25
 
-            elif odd_home < 1.20:
-                stake = 34
+                elif odd_home < 1.30:
+                    stake = 30
 
-            elif odd_home < 1.30:
-                stake = 41
+                elif odd_home < 1.40:
+                    stake = 35
 
-            elif odd_home < 1.40:
-                stake = 45
+                elif odd_home < 1.50:
+                    stake = 25
 
-            elif odd_home < 1.50:
-                stake = 30
+                elif odd_home < 1.60:
+                    stake = 35
 
-            elif odd_home < 1.60:
-                stake = 41
+                elif odd_home < 1.70:
+                    stake = 50
 
-            elif odd_home < 1.70:
-                stake = 64
+                elif odd_home < 1.80:
+                    stake = 45
 
-            elif odd_home < 1.80:
-                stake = 52
+                elif odd_home < 1.90:
+                    stake = 35
 
-            elif odd_home < 1.90:
-                stake = 45
+                elif odd_home < 2.00:
+                    stake = 25
 
-            elif odd_home < 2.00:
-                stake = 30
+                elif odd_home < 2.20:
+                    stake = 45
 
-            elif odd_home < 2.20:
-                stake = 56
+                elif odd_home < 2.50:
+                    stake = 70
 
-            elif odd_home < 2.50:
-                stake = 90
+                elif odd_home < 3.00:
+                    stake = 45
 
-            elif odd_home < 3.00:
-                stake = 52
+                elif odd_home <= 5:
+                    stake = 60
 
-            elif odd_home <= 5:
-                stake = 75
+                else:
+                    stake = 25
 
-            else:
-                stake = 34
+            # =====================================
+            # 💜💜💜
+            # =====================================
 
-        # =====================================
-        # ⭐
-        # =====================================
+            elif "💜💜💜" in tier_la:
 
-        elif "⭐" in tier_la:
-
-            if odd_home < 1.12:
-                stake = 12
-
-            elif odd_home < 1.20:
-                stake = 22
-
-            elif odd_home < 1.30:
-                stake = 28
-
-            elif odd_home < 1.40:
-                stake = 30
-
-            elif odd_home < 1.50:
-                stake = 20
-
-            elif odd_home < 1.60:
-                stake = 28
-
-            elif odd_home < 1.70:
-                stake = 42
-
-            elif odd_home < 1.80:
                 stake = 35
 
-            elif odd_home < 1.90:
-                stake = 30
+            # =====================================
+            # 💜
+            # =====================================
 
-            elif odd_home < 2.00:
-                stake = 20
+            elif "💜" in tier_la:
 
-            elif odd_home < 2.20:
-                stake = 38
-
-            elif odd_home < 2.50:
-                stake = 60
-
-            elif odd_home < 3.00:
-                stake = 35
-
-            elif odd_home <= 5:
-                stake = 50
-
-            else:
-                stake = 22
-
-        # =====================================
-        # 💜💜💜💜💜
-        # =====================================
-
-        elif "💜💜💜💜💜" in tier_la:
-
-            if odd_home < 1.12:
                 stake = 15
+                
+        # =========================================
+        # 🟡 HANDICAP
+        # =========================================
+        if isinstance(tier_ha, str):
 
-            elif odd_home < 1.20:
-                stake = 25
-
-            elif odd_home < 1.30:
-                stake = 30
-
-            elif odd_home < 1.40:
-                stake = 35
-
-            elif odd_home < 1.50:
-                stake = 25
-
-            elif odd_home < 1.60:
-                stake = 35
-
-            elif odd_home < 1.70:
+            if "ELITE" in tier_ha:
                 stake = 50
 
-            elif odd_home < 1.80:
-                stake = 45
-
-            elif odd_home < 1.90:
+            elif "FORTE" in tier_ha:
                 stake = 35
 
-            elif odd_home < 2.00:
-                stake = 25
+            elif "VALUE" in tier_ha:
+                stake = 20
 
-            elif odd_home < 2.20:
-                stake = 45
+        # =========================================
+        # 📋 APPEND FINAL
+        # =========================================
 
-            elif odd_home < 2.50:
-                stake = 70
+        lista.append({
 
-            elif odd_home < 3.00:
-                stake = 45
+            "Home": row["Home"],
+            "Away": row["Away"],
+            "Stake": stake,
 
-            elif odd_home <= 5:
-                stake = 60
+            # 🔥 TIER
+            "Tier_LA": tier_la,
+            "Tier_LH": tier_lh,
+            "Tier_HA": tier_ha,
 
-            else:
-                stake = 25
+            # 🔥 SCORE
+            "Score_Zebra": round(score_zebra, 2) if pd.notna(score_zebra) else "",
 
-        # =====================================
-        # 💜💜💜
-        # =====================================
+            # 🔥 TIMES
+            "Home_Team": row.get(
+                "Home_Team",
+                ""
+            ),
 
-        elif "💜💜💜" in tier_la:
+            "Away_Team": row.get(
+                "Visitor_Team",
+                ""
+            ),
 
-            stake = 35
+            # 🔥 RESULTADOS
+            "Result Home": row.get(
+                "Result Home",
+                ""
+            ),
 
-        # =====================================
-        # 💜
-        # =====================================
+            "Result Visitor": row.get(
+                "Result Visitor",
+                ""
+            ),
 
-        elif "💜" in tier_la:
+            "Result_Home_HT": row.get(
+                "Result_Home_HT",
+                ""
+            ),
 
-            stake = 15
+            "Result_Visitor_HT": row.get(
+                "Result_Visitor_HT",
+                ""
+            ),
+
+            # 🔥 ODDS
+            "Odds_Casa": row.get(
+                "Odds_Casa",
+                ""
+            ),
+
+            "Odds_Empate": row.get(
+                "Odds_Empate",
+                ""
+            ),
+
+            "Odds_Visitante": row.get(
+                "Odds_Visitante",
+                ""
+            ),
+
+            "Odd_Over_1,5FT": row.get(
+                "Odd_Over_1,5FT",
+                ""
+            ),
+
+            "Odds_Over_2,5FT": row.get(
+                "Odds_Over_2,5FT",
+                ""
+            ),
+
+            "Odds_Under_2,5FT": row.get(
+                "Odds_Under_2,5FT",
+                ""
+            ),
+
+            "Odd_BTTS_YES": row.get(
+                "Odd_BTTS_YES",
+                ""
+            ),
+
+            # 🔥 MODELO
+            "Tipo": res["Tipo"],
+            "Entrada": res["Entrada"],
+            "Classe": res["Classe"],
+
+            "LAY": definir_lay(row),
+
+            "Modelo": classificar_sniper_core(row),
+
+            "Poisson_Direcao": row.get(
+                "Poisson_Direcao",
+                ""
+            ),
+
+            "IA_Direcao": row.get(
+                "IA_Direcao",
+                ""
+            )})
 
     # =========================================
-    # 🟡 HANDICAP
+    # 📈 OUTPUT FINAL
     # =========================================
 
-    if isinstance(tier_ha, str):
+    if lista:
 
-        if "ELITE" in tier_ha:
+        df_final_aba7 = pd.DataFrame(lista)
 
-            stake = 50
+        st.dataframe(
+            df_final_aba7,
+            use_container_width=True,
+            hide_index=True)
 
-        elif "FORTE" in tier_ha:
+    else:
 
-            stake = 35
-
-        elif "VALUE" in tier_ha:
-
-            stake = 20
-
-    # =========================================
-    # 📋 APPEND FINAL
-    # =========================================
-
-    lista.append({
-
-        "Home": row["Home"],
-        "Away": row["Away"],
-        "Stake": stake,
-        
-        # 🔥 TIER
-        "Tier_LA": tier_la,
-        "Tier_LH": tier_lh,
-        "Tier_HA": tier_ha,        
-        # 🔥 SCORE
-        "Score_Zebra": round(score_zebra, 2) if pd.notna(score_zebra) else "",
-
-        # 🔥 TIMES
-        "Home_Team": row.get(
-            "Home_Team",
-            ""
-        ),
-
-        "Away_Team": row.get(
-            "Visitor_Team",
-            ""
-        ),
-
-        # 🔥 RESULTADOS
-        "Result Home": row.get(
-            "Result Home",
-            ""
-        ),
-
-        "Result Visitor": row.get(
-            "Result Visitor",
-            ""
-        ),
-
-        "Result_Home_HT": row.get(
-            "Result_Home_HT",
-            ""
-        ),
-
-        "Result_Visitor_HT": row.get(
-            "Result_Visitor_HT",
-            ""
-        ),
-
-        # 🔥 ODDS
-        "Odds_Casa": row.get(
-            "Odds_Casa",
-            ""
-        ),
-
-        "Odds_Empate": row.get(
-            "Odds_Empate",
-            ""
-        ),
-
-        "Odds_Visitante": row.get(
-            "Odds_Visitante",
-            ""
-        ),
-
-        "Odd_Over_1,5FT": row.get(
-            "Odd_Over_1,5FT",
-            ""
-        ),
-
-        "Odds_Over_2,5FT": row.get(
-            "Odds_Over_2,5FT",
-            ""
-        ),
-
-        "Odds_Under_2,5FT": row.get(
-            "Odds_Under_2,5FT",
-            ""
-        ),
-
-        "Odd_BTTS_YES": row.get(
-            "Odd_BTTS_YES",
-            ""
-        ),
-
-        # 🔥 MODELO
-        "Tipo": res["Tipo"],
-        "Entrada": res["Entrada"],
-        "Classe": res["Classe"],
-
-        "LAY": definir_lay(row),
-
-        "Modelo": classificar_sniper_core(row),
-
-        "Poisson_Direcao": row.get(
-            "Poisson_Direcao",
-            ""
-        ),
-
-        "IA_Direcao": row.get(
-            "IA_Direcao",
-            ""
-        )
-    })
-
-# =========================================
-# 📈 OUTPUT FINAL
-# =========================================
-
-if lista:
-
-    df_final_aba7 = pd.DataFrame(lista)
-
-    st.dataframe(
-        df_final_aba7,
-        use_container_width=True,
-        hide_index=True
-    )
-
-else:
-
-    st.info("Sem jogos válidos após filtro")
-
+        st.info("Sem jogos válidos após filtro")
 
 # =========================================
 # ABA 8 — CLEAN SHEET (CS)
 # =========================================
-
 with tab8:
 
     st.warning("🚧 Em desenvolvimento")
@@ -7427,53 +7530,112 @@ with tab9:
 
         st.markdown("### Jogos semelhantes")
 
-        colunas = [
+    colunas_exibir = [
 
-            "SIMILARIDADE",
+        "SIMILARIDADE",
 
-            "League",
+        "League",
 
-            "Home_Team",
-            "Visitor_Team",
+        "Home_Team",
+        "Visitor_Team",
 
-            "Odds_Casa",
+        # Mercado
+        "Odds_Casa",
+        "Odds_Empate",
+        "Odds_Visitante",
 
-            "FAH",
-            "FDA",
+        "Odds_Over_2,5FT",
+        "Odds_Under_2,5FT",
 
-            "PPJH",
-            "PPJA",
+        "Odd_Over_1,5FT",
+        "Odd_BTTS_YES",
 
-            "LAY00",
-            "LAY01",
-            "LAY10",
-            "LAY22",
-            "LAYGH",
-            "LAYGA"
+        # Força
+        "PPJH",
+        "PPJA",
 
-        ]
+        "FAH",
+        "FAA",
 
-        colunas = [
-            c for c in colunas
-            if c in jogos_semelhantes.columns
-        ]
+        "FDH",
+        "FDA",
 
-        st.dataframe(
-            jogos_semelhantes[colunas],
-            use_container_width=True,
-            hide_index=True
-        )
+        # Poisson
+        "EXP_GOL_PRE",
+
+        "MGFH",
+        "MGFA",
+
+        "MGCH",
+        "MGCA",
+
+        "MG_Global",
+
+        # HT
+        "MGF_HT_Home",
+        "MGF_HT_Away",
+
+        "MGC_HT_Home",
+        "MGC_HT_Away",
+
+        # Forma
+        "Win4_H",
+        "Win4_A",
+
+        "Los4_H",
+        "Los4_A",
+
+        "Eficiência_H",
+        "Eficiência_A",
+
+        "Eficiência_HT_H",
+        "Eficiência_HT_A",
+
+        "Eficiência_2nd_H",
+        "Eficiência_2nd_A",
+
+        # Ataque
+        "Precisao_CG_H",
+        "Precisao_CG_A",
+
+        "FS_Win_H",
+        "FS_Win_A",
+
+        "Scored_First_H",
+        "Scored_First_A",
+
+        "Conceded_First_H",
+        "Conceded_First_A",
+
+        # Targets
+        "LAY00",
+        "LAY01",
+        "LAY10",
+        "LAY22",
+        "LAYGH",
+        "LAYGA"
+
+    ]
+
+    colunas_exibir = [
+        c for c in colunas_exibir
+        if c in jogos_semelhantes.columns
+    ]
+
+    st.dataframe(
+        jogos_semelhantes[colunas_exibir],
+        use_container_width=True,
+        hide_index=True
+    )
 
     st.markdown("---")
 
-st.markdown("---")
+    st.subheader("🎯 CS Intelligence")
 
-st.subheader("🎯 CS Intelligence")
-
-st.dataframe(
-    df_cs,
-    use_container_width=True,
-    hide_index=True
-)
+    st.dataframe(
+        df_cs,
+        use_container_width=True,
+        hide_index=True
+    )
 
        
