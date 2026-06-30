@@ -7532,60 +7532,82 @@ with tab9:
 
     colunas_exibir = [
 
-        # Similaridade
         "SIMILARIDADE",
 
-        # Identificação
         "League",
+
         "Home_Team",
         "Visitor_Team",
 
-        # Odds
+        # Mercado
         "Odds_Casa",
         "Odds_Empate",
         "Odds_Visitante",
 
-        # ExG
-        "ExG_Home_Consenso",
-        "ExG_Away_Consenso",
+        "Odds_Over_2,5FT",
+        "Odds_Under_2,5FT",
 
-        # Poisson
-        "Odd_Justa_Home",
-        "Odd_Justa_Draw",
-        "Odd_Justa_Away",
+        "Odd_Over_1,5FT",
+        "Odd_BTTS_YES",
 
-        # Mercado
-        "Odds_BTTS_Yes",
-        "Odds_Over_2.5FT",
-
-        # Ataque x Defesa
-        "FAH",
-        "FDA",
-
-        "Forca_Ataque_Home",
-        "Forca_Defesa_Home",
-        "Forca_Ataque_Away",
-        "Forca_Defesa_Away",
-
-        # Forma
+        # Força
         "PPJH",
         "PPJA",
 
-        # MGF
-        "MGF_H",
-        "MGF_A",
+        "FAH",
+        "FAA",
 
-        # VG
-        "VG_Home",
-        "VG_Away",
+        "FDH",
+        "FDA",
 
-        # CS
-        "CS_SCORE",
+        # Poisson
+        "EXP_GOL_PRE",
 
-        # IA
-        "IA_SCORE",
+        "MGFH",
+        "MGFA",
 
-        # Mercados
+        "MGCH",
+        "MGCA",
+
+        "MG_Global",
+
+        # HT
+        "MGF_HT_Home",
+        "MGF_HT_Away",
+
+        "MGC_HT_Home",
+        "MGC_HT_Away",
+
+        # Forma
+        "Win4_H",
+        "Win4_A",
+
+        "Los4_H",
+        "Los4_A",
+
+        "Eficiência_H",
+        "Eficiência_A",
+
+        "Eficiência_HT_H",
+        "Eficiência_HT_A",
+
+        "Eficiência_2nd_H",
+        "Eficiência_2nd_A",
+
+        # Ataque
+        "Precisao_CG_H",
+        "Precisao_CG_A",
+
+        "FS_Win_H",
+        "FS_Win_A",
+
+        "Scored_First_H",
+        "Scored_First_A",
+
+        "Conceded_First_H",
+        "Conceded_First_A",
+
+        # Targets
         "LAY00",
         "LAY01",
         "LAY10",
