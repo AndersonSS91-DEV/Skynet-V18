@@ -5584,27 +5584,21 @@ for _, row in df_clean.iterrows():
 
         "IA_Direcao": row.get(
             "IA_Direcao",
-            ""
-        )
-    })
+            "")})
 
 # =========================================
 # 📈 OUTPUT FINAL
 # =========================================
-if lista:
+    if lista:
+        df_final_aba7 = pd.DataFrame(lista)
 
-    df_final_aba7 = pd.DataFrame(lista)
-
-    st.dataframe(
-        df_final_aba7,
-        use_container_width=True,
-        hide_index=True
-    )
-
-else:
-
-    st.info("Sem jogos válidos após filtro")
-
+        st.dataframe(
+            df_final_aba7,
+            use_container_width=True,
+            hide_index=True)
+        
+    else:
+        st.info("Sem jogos válidos após filtro")
 
 # =========================================
 # ABA 8 — CLEAN SHEET (CS)
