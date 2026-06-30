@@ -5107,9 +5107,12 @@ Home {home_emoji}   x   Away {away_emoji}
                 ht_a
 
             ]
-
+ 
             if not any(pd.isna(v) for v in valores):
-
+                
+           # =====================================
+           # ⭐ DEFINE FAVORITO / ZEBRA
+           # =====================================
                 if odd_home < odd_away:
 
                     odd_fav = odd_home
@@ -5140,6 +5143,9 @@ Home {home_emoji}   x   Away {away_emoji}
 
                     zebra_nome = row.get("Home", "")
 
+        # =====================================
+        # 🧠 SCORE ZEBRA
+        # =====================================
                 score_zebra = (
 
                     (abs(vr01) * 2.2)
@@ -5154,17 +5160,13 @@ Home {home_emoji}   x   Away {away_emoji}
 
                     +
 
-                    ((favorito_mgc - zebra_mgc) * 0.8)
-
-                )
-
-                if (
-
-                    vr01 < 0
-
-                    and odd_fav < 2.30
-
-                ):
+                    ((favorito_mgc - zebra_mgc) * 0.8))
+                
+        # =====================================
+        # 🧠 SCORE ZEBRA
+        # =====================================
+                if (vr01 < 0
+                    and odd_fav < 2.30):
 
                     if score_zebra >= 1.20:
 
@@ -5199,25 +5201,94 @@ Home {home_emoji}   x   Away {away_emoji}
 
         if isinstance(tier_la, str):
 
-            # ... TODA A SUA LÓGICA DE STAKE ...
-            # (mantém exatamente igual, apenas com +4 espaços)
+            # =====================================
+            # ⭐⭐⭐⭐⭐
+            # =====================================
 
-        # =========================================
-        # 🟡 HANDICAP
-        # =========================================
+            if "⭐⭐⭐⭐⭐" in tier_la:
 
-        if isinstance(tier_ha, str):
+                if odd_home < 1.12:
+                    stake = 25
 
-            if "ELITE" in tier_ha:
+                elif odd_home < 1.20:
+                    stake = 45
 
-                stake = 50
+                elif odd_home < 1.30:
+                    stake = 55
 
-            elif "FORTE" in tier_ha:
+                elif odd_home < 1.40:
+                    stake = 60
+
+                elif odd_home < 1.50:
+                    stake = 40
+
+                elif odd_home < 1.60:
+                    stake = 55
+
+                elif odd_home < 1.70:
+                    stake = 85
+
+                elif odd_home < 1.80:
+                    stake = 70
+
+                elif odd_home < 1.90:
+                    stake = 60
+
+                elif odd_home < 2.00:
+                    stake = 40
+
+                elif odd_home < 2.20:
+                    stake = 75
+
+                elif odd_home < 2.50:
+                    stake = 120
+
+                elif odd_home < 3.00:
+                    stake = 70
+
+                elif odd_home <= 5:
+                    stake = 100
+
+                else:
+                    stake = 45
+
+            # =====================================
+            # ⭐⭐⭐
+            # =====================================
+
+            elif "⭐⭐⭐" in tier_la:
+
+                ...
+                # (o restante permanece EXATAMENTE igual)
+
+            elif "⭐" in tier_la:
+
+                ...
+
+            elif "💜💜💜💜💜" in tier_la:
+
+                ...
+
+            elif "💜💜💜" in tier_la:
 
                 stake = 35
 
-            elif "VALUE" in tier_ha:
+            elif "💜" in tier_la:
 
+                stake = 15
+                
+        # =========================================
+        # 🟡 HANDICAP
+        # =========================================
+        if isinstance(tier_ha, str):
+
+            if "ELITE" in tier_ha:
+                stake = 50
+
+            elif "FORTE" in tier_ha:
+                stake = 35
+
+            elif "VALUE" in tier_ha:
                 stake = 20
 
         # =========================================
