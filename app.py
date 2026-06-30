@@ -1808,13 +1808,29 @@ def preparar_base_ml(df_base):
     # =====================================
     # BASE ML
     # =====================================
-    cols = FEATURES_VALIDAS + targets + extras
+
+    cols = (
+        FEATURES_VALIDAS
+        + targets
+        + extras
+        + [
+            "Result Home",
+            "Result Visitor",
+            "Result_Home_HT",
+            "Result_Visitor_HT"
+        ]
+    )
 
     # Remove possíveis duplicidades
     cols = list(dict.fromkeys(cols))
 
-    df_ml = df[cols].copy()
+    # Mantém apenas colunas existentes
+    cols = [
+        c for c in cols
+        if c in df.columns
+    ]
 
+    df_ml = df[cols].copy()
     # =====================================
     # PREENCHE NaN
     # =====================================
@@ -7524,12 +7540,12 @@ with tab9:
         "League",
         "Home_Team",
         "Visitor_Team",
-                
+        
         "Result Home",
-        "Result Visitor",
-        "Result Home HT",
-        "Result Visitor HT",
-     
+        "Result Visitor",     
+        "Result_Home_HT",
+        "Result_Visitor_HT",
+        
         # Mercado
         "Odds_Casa",
         "Odds_Empate",
