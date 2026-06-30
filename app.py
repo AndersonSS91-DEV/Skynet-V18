@@ -7530,41 +7530,81 @@ with tab9:
 
         st.markdown("### Jogos semelhantes")
 
-        colunas = [
+    colunas_exibir = [
 
-            "SIMILARIDADE",
+        # Similaridade
+        "SIMILARIDADE",
 
-            "League",
+        # Identificação
+        "League",
+        "Home_Team",
+        "Visitor_Team",
 
-            "Home_Team",
-            "Visitor_Team",
+        # Odds
+        "Odds_Casa",
+        "Odds_Empate",
+        "Odds_Visitante",
 
-            "Odds_Casa",
+        # ExG
+        "ExG_Home_Consenso",
+        "ExG_Away_Consenso",
 
-            "FAH",
-            "FDA",
+        # Poisson
+        "Odd_Justa_Home",
+        "Odd_Justa_Draw",
+        "Odd_Justa_Away",
 
-            "PPJH",
-            "PPJA",
+        # Mercado
+        "Odds_BTTS_Yes",
+        "Odds_Over_2.5FT",
 
-            "LAY00",
-            "LAY01",
-            "LAY10",
-            "LAY22",
-            "LAYGH",
-            "LAYGA"
+        # Ataque x Defesa
+        "FAH",
+        "FDA",
 
-        ]
+        "Forca_Ataque_Home",
+        "Forca_Defesa_Home",
+        "Forca_Ataque_Away",
+        "Forca_Defesa_Away",
 
-        colunas = [
-            c for c in colunas
-            if c in jogos_semelhantes.columns
-        ]
+        # Forma
+        "PPJH",
+        "PPJA",
 
-        st.dataframe(
-            jogos_semelhantes[colunas],
-            use_container_width=True,
-            hide_index=True)
+        # MGF
+        "MGF_H",
+        "MGF_A",
+
+        # VG
+        "VG_Home",
+        "VG_Away",
+
+        # CS
+        "CS_SCORE",
+
+        # IA
+        "IA_SCORE",
+
+        # Mercados
+        "LAY00",
+        "LAY01",
+        "LAY10",
+        "LAY22",
+        "LAYGH",
+        "LAYGA"
+
+    ]
+
+    colunas_exibir = [
+        c for c in colunas_exibir
+        if c in jogos_semelhantes.columns
+    ]
+
+    st.dataframe(
+        jogos_semelhantes[colunas_exibir],
+        use_container_width=True,
+        hide_index=True
+    )
 
     st.markdown("---")
 
