@@ -4557,36 +4557,27 @@ Home {home_emoji}   x   Away {away_emoji}
     # =========================================
     # 🧠 LISTA FINAL
     # =========================================
-
     lista = []
 
     for _, row in df_clean.iterrows():
 
-    # =========================================
-    # 🧠 CLASSIFICAÇÃO
-    # =========================================
+        # =========================================
+        # 🧠 CLASSIFICAÇÃO
+        # =========================================
+        res = classificar_jogo(row)
 
-    res = classificar_jogo(row)
+        if not res:
+            continue
 
-    if not res:
-        continue
-
-    # =========================================
-    # 🎯 DIREÇÕES
-    # =========================================
-
-    dir_poisson = str(
-        row.get("Poisson_Direcao", "")
-    )
-
-    dir_ia = str(
-        row.get("IA_Direcao", "")
-    )
-
+        # =========================================
+        # 🎯 DIREÇÕES
+        # =========================================
+        dir_poisson = str(row.get("Poisson_Direcao", ""))
+        dir_ia = str(row.get("IA_Direcao", ""))
+        
     # =========================================
     # 🎯 FUNÇÕES
     # =========================================
-
     def is_lay_away(x):
 
         return (
