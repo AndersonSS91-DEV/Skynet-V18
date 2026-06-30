@@ -1747,19 +1747,33 @@ def preparar_base_ml(df_base):
     # =====================================
     df = df.loc[:, ~df.columns.duplicated()]
 
+    # =====================================
+    # FEATURES VÁLIDAS
+    # =====================================
+    FEATURES_VALIDAS = []
 
-    # =====================================
-    # CONVERTE FEATURES NUMÉRICAS
-    # =====================================
     for col in FEATURES_ML:
 
-        if col in ["League", "Country"]:
+        # Ignora colunas inexistentes
+        if col not in df.columns:
             continue
 
+        # League e Country permanecem texto
+        if col in ["League", "Country"]:
+
+            FEATURES_VALIDAS.append(col)
+            continue
+
+        # Converte para numérico
         df[col] = pd.to_numeric(
             df[col],
             errors="coerce"
         )
+
+        # Só utiliza colunas que possuem algum dado
+        if df[col].notna().sum() > 0:
+
+            FEATURES_VALIDAS.append(col)
 
     # =====================================
     # GARANTE TARGETS
@@ -1792,31 +1806,22 @@ def preparar_base_ml(df_base):
             df[col] = ""
 
     # =====================================
-    # MONTA BASE ML
+    # BASE ML
     # =====================================
-    cols = FEATURES_ML + targets + extras
+    cols = FEATURES_VALIDAS + targets + extras
 
-    # Remove duplicidades preservando a ordem
+    # Remove possíveis duplicidades
     cols = list(dict.fromkeys(cols))
 
     df_ml = df[cols].copy()
 
     # =====================================
-    # FEATURES VÁLIDAS
-    # =====================================
-
-    FEATURES_VALIDAS = [
-
-        col
-        for col in FEATURES_ML
-        if col in df.columns
-
-    ]
-
-    # =====================================
     # PREENCHE NaN
     # =====================================
-    for col in features_validas:
+    for col in FEATURES_VALIDAS:
+
+        if col in ["League", "Country"]:
+            continue
 
         mediana = df_ml[col].median()
 
@@ -1825,20 +1830,14 @@ def preparar_base_ml(df_base):
 
         df_ml[col] = df_ml[col].fillna(mediana)
 
-    return df_ml, features_validas
-
-
-    # =====================================
-    # BASE ML
-    # =====================================
-
-    df_ml = df[
-        FEATURES_VALIDAS +
-        targets +
-        extras
-    ].copy()
-
     return df_ml, FEATURES_VALIDAS
+
+
+# =========================================
+# BASE ML
+# =========================================
+
+df_ml, FEATURES_VALIDAS = preparar_base_ml(df_base)
 
 # =========================================
 # STANDARD SCALER
@@ -1854,26 +1853,22 @@ scaler_ml = StandardScaler()
 
 X_ml = df_ml[FEATURES_VALIDAS].copy()
 
-# Converte tudo para numérico
-for col in X_ml.columns:
+for col in FEATURES_VALIDAS:
+
+    if col in ["League", "Country"]:
+        continue
 
     X_ml[col] = pd.to_numeric(
         X_ml[col],
         errors="coerce"
     )
 
-# Remove colunas totalmente vazias
-X_ml = X_ml.dropna(
-    axis=1,
-    how="all"
+X_ml = X_ml.drop(
+    columns=["League", "Country"],
+    errors="ignore"
 )
 
-# Atualiza lista de features válidas
 FEATURES_VALIDAS = X_ml.columns.tolist()
-
-# =========================================
-# PREPARA MATRIZ
-# =========================================
 
 if len(FEATURES_VALIDAS) == 0:
 
@@ -1881,7 +1876,6 @@ if len(FEATURES_VALIDAS) == 0:
 
 else:
 
-    # Preenche NaN pela mediana
     for col in FEATURES_VALIDAS:
 
         mediana = X_ml[col].median()
@@ -1891,11 +1885,10 @@ else:
 
         X_ml[col] = X_ml[col].fillna(mediana)
 
-    # Garante float
     X_ml = X_ml.astype(float)
 
-    # Normaliza
     X_scaled = scaler_ml.fit_transform(X_ml)
+
 
 # =========================================
 # PREPARA JOGO
@@ -1903,7 +1896,7 @@ else:
 
 def preparar_jogo_ml(linha_csv):
 
-    if len(FEATURES_VALIDAS) == 0:
+    if X_scaled is None:
         return None
 
     dados = {}
@@ -1911,23 +1904,19 @@ def preparar_jogo_ml(linha_csv):
     for col in FEATURES_VALIDAS:
 
         if col in linha_csv.index:
-            dados[col] = linha_csv[col]
+
+            dados[col] = pd.to_numeric(
+                linha_csv[col],
+                errors="coerce"
+            )
+
         else:
+
             dados[col] = np.nan
 
     jogo = pd.DataFrame([dados])
 
-    jogo = jogo.reindex(
-        columns=FEATURES_VALIDAS,
-        fill_value=np.nan
-    )
-
     for col in FEATURES_VALIDAS:
-
-        jogo[col] = pd.to_numeric(
-            jogo[col],
-            errors="coerce"
-        )
 
         mediana = X_ml[col].median()
 
@@ -1937,6 +1926,7 @@ def preparar_jogo_ml(linha_csv):
         jogo[col] = jogo[col].fillna(mediana)
 
     return jogo.astype(float)
+
 
 # =========================================
 # JOGO NORMALIZADO
@@ -1958,19 +1948,17 @@ else:
 
         jogo_scaled = scaler_ml.transform(jogo_ml)
 
+
 # =========================================
 # KNN - SIMILAR GAMES ENGINE
 # =========================================
 
 from sklearn.neighbors import NearestNeighbors
 
-# DataFrame padrão
 jogos_semelhantes = pd.DataFrame()
 
-# Só executa se existir base para ML
 if X_scaled is not None and jogo_scaled is not None:
 
-    # Número máximo de vizinhos
     N_VIZINHOS = min(100, len(df_ml))
 
     if N_VIZINHOS > 0:
@@ -1995,11 +1983,10 @@ if X_scaled is not None and jogo_scaled is not None:
             .reset_index(drop=True)
         )
 
-        # Distância
         jogos_semelhantes["DISTANCIA"] = distancias[0]
 
         # =====================================
-        # REMOVE O PRÓPRIO JOGO (SE EXISTIR)
+        # REMOVE O PRÓPRIO JOGO
         # =====================================
 
         if (
@@ -2014,85 +2001,45 @@ if X_scaled is not None and jogo_scaled is not None:
                 (jogos_semelhantes["Visitor_Team"] == linha_csv["Visitor_Team"])
             )
 
+            jogos_semelhantes = jogos_semelhantes.loc[
+                ~mask
+            ].reset_index(drop=True)
 
         # =====================================
-        # AJUSTA DISTÂNCIAS
+        # RECALCULA DISTÂNCIA
         # =====================================
 
-        jogos_semelhantes["DISTANCIA"] = distancias[0][:len(jogos_semelhantes)]
+        jogos_semelhantes["DISTANCIA"] = (
+            jogos_semelhantes["DISTANCIA"]
+            .rank(method="first")
+        )
 
-        # =====================================
-        # SIMILARIDADE
-        # =====================================
+        dist_max = jogos_semelhantes["DISTANCIA"].max()
 
-        if len(jogos_semelhantes) > 0:
+        if dist_max > 0:
 
-            dist_max = jogos_semelhantes["DISTANCIA"].max()
-
-            if dist_max > 0:
-
-                jogos_semelhantes["SIMILARIDADE"] = (
-                    100
-                    * (
-                        1
-                        - jogos_semelhantes["DISTANCIA"] / dist_max
-                    )
+            jogos_semelhantes["SIMILARIDADE"] = (
+                100
+                * (
+                    1
+                    - (
+                        jogos_semelhantes["DISTANCIA"] - 1
+                    ) / dist_max
                 )
-
-            else:
-
-                jogos_semelhantes["SIMILARIDADE"] = 100
-
-            jogos_semelhantes = (
-                jogos_semelhantes
-                .sort_values(
-                    "SIMILARIDADE",
-                    ascending=False
-                )
-                .reset_index(drop=True)
             )
 
-# =========================================
-# CS INTELLIGENCE
-# =========================================
+        else:
 
-MERCADOS_CS = {
-    "Lay 0x0": "LAY00",
-    "Lay 0x1": "LAY01",
-    "Lay 1x0": "LAY10",
-    "Lay 2x2": "LAY22",
-    "Lay Goleada Home": "LAYGH",
-    "Lay Goleada Away": "LAYGA"
-}
+            jogos_semelhantes["SIMILARIDADE"] = 100
 
-resultado_cs = []
-
-for mercado, coluna in MERCADOS_CS.items():
-
-    if coluna not in jogos_semelhantes.columns:
-        continue
-
-    total = len(jogos_semelhantes)
-
-    greens = int(jogos_semelhantes[coluna].sum())
-    reds = total - greens
-
-    winrate = 0
-
-    if total > 0:
-        winrate = greens / total * 100
-
-    resultado_cs.append({
-
-        "Mercado": mercado,
-        "Greens": greens,
-        "Reds": reds,
-        "Winrate": round(winrate, 2)
-
-    })
-
-df_cs = pd.DataFrame(resultado_cs)
-
+        jogos_semelhantes = (
+            jogos_semelhantes
+            .sort_values(
+                "SIMILARIDADE",
+                ascending=False
+            )
+            .reset_index(drop=True)
+        )
 # =========================================
 # ABAS
 # =========================================
