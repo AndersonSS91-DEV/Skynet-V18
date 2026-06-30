@@ -7608,44 +7608,44 @@ with tab9:
 
     ]
 
-# =====================================
-# TABELA PARA EXIBIÇÃO
-# =====================================
+    # =====================================
+    # TABELA PARA EXIBIÇÃO
+    # =====================================
 
-tabela = jogos_semelhantes.copy()
+    tabela = jogos_semelhantes.copy()
 
-if (
-    "Result_Home_HT" in tabela.columns and
-    "Result_Visitor_HT" in tabela.columns
-):
+    if (
+        "Result_Home_HT" in tabela.columns and
+        "Result_Visitor_HT" in tabela.columns
+    ):
 
-    tabela["HT"] = (
-        tabela["Result_Home_HT"].astype(int).astype(str)
-        + "x" +
-        tabela["Result_Visitor_HT"].astype(int).astype(str)
+        tabela["HT"] = (
+            tabela["Result_Home_HT"].astype(int).astype(str)
+            + "x" +
+            tabela["Result_Visitor_HT"].astype(int).astype(str)
+        )
+
+    if (
+        "Result Home" in tabela.columns and
+        "Result Visitor" in tabela.columns
+    ):
+
+        tabela["FT"] = (
+            tabela["Result Home"].astype(int).astype(str)
+            + "x" +
+            tabela["Result Visitor"].astype(int).astype(str)
+        )
+
+    colunas_exibir = [
+        c for c in colunas_exibir
+        if c in tabela.columns
+    ]
+
+    st.dataframe(
+        tabela[colunas_exibir],
+        use_container_width=True,
+        hide_index=True
     )
-
-if (
-    "Result Home" in tabela.columns and
-    "Result Visitor" in tabela.columns
-):
-
-    tabela["FT"] = (
-        tabela["Result Home"].astype(int).astype(str)
-        + "x" +
-        tabela["Result Visitor"].astype(int).astype(str)
-    )
-
-colunas_exibir = [
-    c for c in colunas_exibir
-    if c in tabela.columns
-]
-
-st.dataframe(
-    tabela[colunas_exibir],
-    use_container_width=True,
-    hide_index=True
-)
 
     st.markdown("---")
 
@@ -7656,5 +7656,4 @@ st.dataframe(
         use_container_width=True,
         hide_index=True
     )
-
        
