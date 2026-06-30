@@ -5226,9 +5226,104 @@ Home {home_emoji}   x   Away {away_emoji}
 
         lista.append({
 
-            # ... seu dicionário inteiro exatamente igual ...
+            "Home": row["Home"],
+            "Away": row["Away"],
+            "Stake": stake,
 
-        })
+            # 🔥 TIER
+            "Tier_LA": tier_la,
+            "Tier_LH": tier_lh,
+            "Tier_HA": tier_ha,
+
+            # 🔥 SCORE
+            "Score_Zebra": round(score_zebra, 2) if pd.notna(score_zebra) else "",
+
+            # 🔥 TIMES
+            "Home_Team": row.get(
+                "Home_Team",
+                ""
+            ),
+
+            "Away_Team": row.get(
+                "Visitor_Team",
+                ""
+            ),
+
+            # 🔥 RESULTADOS
+            "Result Home": row.get(
+                "Result Home",
+                ""
+            ),
+
+            "Result Visitor": row.get(
+                "Result Visitor",
+                ""
+            ),
+
+            "Result_Home_HT": row.get(
+                "Result_Home_HT",
+                ""
+            ),
+
+            "Result_Visitor_HT": row.get(
+                "Result_Visitor_HT",
+                ""
+            ),
+
+            # 🔥 ODDS
+            "Odds_Casa": row.get(
+                "Odds_Casa",
+                ""
+            ),
+
+            "Odds_Empate": row.get(
+                "Odds_Empate",
+                ""
+            ),
+
+            "Odds_Visitante": row.get(
+                "Odds_Visitante",
+                ""
+            ),
+
+            "Odd_Over_1,5FT": row.get(
+                "Odd_Over_1,5FT",
+                ""
+            ),
+
+            "Odds_Over_2,5FT": row.get(
+                "Odds_Over_2,5FT",
+                ""
+            ),
+
+            "Odds_Under_2,5FT": row.get(
+                "Odds_Under_2,5FT",
+                ""
+            ),
+
+            "Odd_BTTS_YES": row.get(
+                "Odd_BTTS_YES",
+                ""
+            ),
+
+            # 🔥 MODELO
+            "Tipo": res["Tipo"],
+            "Entrada": res["Entrada"],
+            "Classe": res["Classe"],
+
+            "LAY": definir_lay(row),
+
+            "Modelo": classificar_sniper_core(row),
+
+            "Poisson_Direcao": row.get(
+                "Poisson_Direcao",
+                ""
+            ),
+
+            "IA_Direcao": row.get(
+                "IA_Direcao",
+                ""
+            )})
 
     # =========================================
     # 📈 OUTPUT FINAL
@@ -5241,8 +5336,7 @@ Home {home_emoji}   x   Away {away_emoji}
         st.dataframe(
             df_final_aba7,
             use_container_width=True,
-            hide_index=True
-        )
+            hide_index=True)
 
     else:
 
@@ -5251,7 +5345,6 @@ Home {home_emoji}   x   Away {away_emoji}
 # =========================================
 # ABA 8 — CLEAN SHEET (CS)
 # =========================================
-
 with tab8:
 
     st.warning("🚧 Em desenvolvimento")
