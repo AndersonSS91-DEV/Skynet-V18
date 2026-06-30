@@ -5581,6 +5581,7 @@ Home {home_emoji}   x   Away {away_emoji}
 # 📈 OUTPUT FINAL
 # =========================================
     if lista:
+
         df_final_aba7 = pd.DataFrame(lista)
 
         st.dataframe(
@@ -5588,7 +5589,9 @@ Home {home_emoji}   x   Away {away_emoji}
             use_container_width=True,
             hide_index=True
         )
+
     else:
+
         st.info("Sem jogos válidos após filtro")
 
 # =========================================
