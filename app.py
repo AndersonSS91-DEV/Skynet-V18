@@ -1641,6 +1641,8 @@ def buscar_jogos_semelhantes(df_base, linha_csv):
 
 FEATURES_ML = [
 
+
+    
     # =====================================
     # MERCADO ⭐⭐⭐⭐⭐
     # =====================================
@@ -1796,9 +1798,17 @@ def preparar_base_ml(df_base):
     # COLUNAS AUXILIARES
     # =====================================
     extras = [
-        "Home_Team",
-        "Visitor_Team"
-    ]
+
+    "Home_Team",
+    "Visitor_Team",
+
+    "Result Home",
+    "Result Visitor",
+
+    "Result Home HT",
+    "Result Visitor HT"
+
+]
 
     for col in extras:
 
