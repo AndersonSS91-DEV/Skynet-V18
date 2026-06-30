@@ -4554,13 +4554,13 @@ Home {home_emoji}   x   Away {away_emoji}
         except:
             return ""
             
-# =========================================
-# 🧠 LISTA FINAL
-# =========================================
+    # =========================================
+    # 🧠 LISTA FINAL
+    # =========================================
 
-lista = []
+    lista = []
 
-for _, row in df_clean.iterrows():
+    for _, row in df_clean.iterrows():
 
     # =========================================
     # 🧠 CLASSIFICAÇÃO
@@ -5595,8 +5595,8 @@ for _, row in df_clean.iterrows():
         st.dataframe(
             df_final_aba7,
             use_container_width=True,
-            hide_index=True)
-        
+            hide_index=True
+        )
     else:
         st.info("Sem jogos válidos após filtro")
 
