@@ -1971,50 +1971,7 @@ if X_scaled is not None and jogo_scaled is not None:
         knn.fit(X_scaled)
 
         distancias, indices = knn.kneighbors(jogo_scaled)
-# =========================================
-# CS INTELLIGENCE
-# =========================================
 
-df_cs = pd.DataFrame()
-
-MERCADOS_CS = {
-    "Lay 0x0": "LAY00",
-    "Lay 0x1": "LAY01",
-    "Lay 1x0": "LAY10",
-    "Lay 2x2": "LAY22",
-    "Lay Goleada Home": "LAYGH",
-    "Lay Goleada Away": "LAYGA"
-}
-
-resultado_cs = []
-
-if not jogos_semelhantes.empty:
-
-    for mercado, coluna in MERCADOS_CS.items():
-
-        if coluna not in jogos_semelhantes.columns:
-            continue
-
-        total = len(jogos_semelhantes)
-
-        greens = int(jogos_semelhantes[coluna].sum())
-        reds = total - greens
-
-        winrate = 0
-
-        if total > 0:
-            winrate = greens / total * 100
-
-        resultado_cs.append({
-
-            "Mercado": mercado,
-            "Greens": greens,
-            "Reds": reds,
-            "Winrate": round(winrate, 2)
-
-        })
-
-df_cs = pd.DataFrame(resultado_cs)
         # =====================================
         # JOGOS SEMELHANTES
         # =====================================
@@ -2083,6 +2040,51 @@ df_cs = pd.DataFrame(resultado_cs)
             )
             .reset_index(drop=True)
         )
+
+# =========================================
+# CS INTELLIGENCE
+# =========================================
+
+df_cs = pd.DataFrame()
+
+MERCADOS_CS = {
+    "Lay 0x0": "LAY00",
+    "Lay 0x1": "LAY01",
+    "Lay 1x0": "LAY10",
+    "Lay 2x2": "LAY22",
+    "Lay Goleada Home": "LAYGH",
+    "Lay Goleada Away": "LAYGA"
+}
+
+resultado_cs = []
+
+if not jogos_semelhantes.empty:
+
+    for mercado, coluna in MERCADOS_CS.items():
+
+        if coluna not in jogos_semelhantes.columns:
+            continue
+
+        total = len(jogos_semelhantes)
+
+        greens = int(jogos_semelhantes[coluna].sum())
+        reds = total - greens
+
+        winrate = 0
+
+        if total > 0:
+            winrate = greens / total * 100
+
+        resultado_cs.append({
+
+            "Mercado": mercado,
+            "Greens": greens,
+            "Reds": reds,
+            "Winrate": round(winrate, 2)
+
+        })
+
+df_cs = pd.DataFrame(resultado_cs)
 # =========================================
 # ABAS
 # =========================================
