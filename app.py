@@ -2219,7 +2219,7 @@ if not df_scanner.empty:
         df_scanner[mercados].mean(axis=1) * 0.70
         + df_scanner["Similaridade Média"] * 0.30
     )
-
+    # =====================================
     # =====================================
     # RENOMEIA COLUNAS
     # =====================================
@@ -2240,36 +2240,6 @@ if not df_scanner.empty:
     )
 
     # =====================================
-    # FORMATA LAYS
-    # =====================================
-
-    for col in [
-
-        "Lay 0x0",
-        "Lay 0x1",
-        "Lay 1x0",
-        "Lay 2x2",
-        "Lay GH",
-        "Lay GA"
-
-    ]:
-
-        df_scanner[col] = (
-
-            pd.to_numeric(
-                df_scanner[col],
-                errors="coerce"
-            )
-
-            .round(1)
-
-            .astype(str)
-
-            + "%"
-
-        )
-
-    # =====================================
     # ORDENA
     # =====================================
 
@@ -2288,6 +2258,7 @@ if not df_scanner.empty:
         .reset_index(drop=True)
 
     )
+    
 # =========================================
 # ABAS
 # =========================================
@@ -7841,14 +7812,26 @@ with tab9:
 
     else:
 
-        st.dataframe(
+    st.dataframe(
 
-            df_scanner,
+        df_scanner.style.format(
 
-            use_container_width=True,
+            {
 
-            hide_index=True
+                "Lay 0x0": "{:.1f}%",
+                "Lay 0x1": "{:.1f}%",
+                "Lay 1x0": "{:.1f}%",
+                "Lay 2x2": "{:.1f}%",
+                "Lay GH": "{:.1f}%",
+                "Lay GA": "{:.1f}%"
 
-        )
+            }
 
+        ),
+
+        use_container_width=True,
+
+        hide_index=True
+
+    )
 
