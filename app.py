@@ -2011,13 +2011,6 @@ def buscar_similares(linha_csv):
 
 
 # =========================================
-# JOGO SELECIONADO
-# =========================================
-
-jogos_semelhantes = buscar_similares(linha_csv)
-
-
-# =========================================
 # KNN - SIMILAR GAMES ENGINE
 # =========================================
 
@@ -2041,57 +2034,10 @@ if X_scaled is not None:
         knn.fit(X_scaled)
 
 # =========================================
-# JOGO ATUAL
+# JOGO SELECIONADO
 # =========================================
 
-if knn is not None and jogo_scaled is not None:
-
-    distancias, indices = knn.kneighbors(jogo_scaled)
-
-    jogos_semelhantes = (
-        df_ml
-        .iloc[indices[0]]
-        .copy()
-        .reset_index(drop=True)
-    )
-
-    jogos_semelhantes["DISTANCIA"] = distancias[0]
-
-    dist_max = jogos_semelhantes["DISTANCIA"].max()
-    dist_min = jogos_semelhantes["DISTANCIA"].min()
-
-    if dist_max > dist_min:
-
-        jogos_semelhantes["SIMILARIDADE"] = (
-            100
-            * (
-                1
-                - (
-                    jogos_semelhantes["DISTANCIA"] - dist_min
-                )
-                / (
-                    dist_max - dist_min
-                )
-            )
-        )
-
-    else:
-
-        jogos_semelhantes["SIMILARIDADE"] = 100.0
-
-    jogos_semelhantes["SIMILARIDADE"] = (
-        jogos_semelhantes["SIMILARIDADE"]
-        .round(2)
-    )
-
-    jogos_semelhantes = (
-        jogos_semelhantes
-        .sort_values(
-            "SIMILARIDADE",
-            ascending=False
-        )
-        .reset_index(drop=True)
-    )
+jogos_semelhantes = buscar_similares(linha_csv)
 
 # =========================================
 # CS INTELLIGENCE
