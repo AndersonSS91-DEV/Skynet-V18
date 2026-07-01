@@ -2096,12 +2096,55 @@ if knn is not None:
 
     for _, jogo_dia in df_consenso.iterrows():
 
-        semelhantes = buscar_similares(jogo_dia)
+        jogo_ml = preparar_jogo_ml(jogo_dia)
 
-        if semelhantes.empty:
+        if jogo_ml is None:
             continue
 
+        jogo_scaled = scaler_ml.transform(jogo_ml)
+
+        distancias, indices = knn.kneighbors(jogo_scaled)
+
+        semelhantes = (
+            df_ml
+            .iloc[indices[0]]
+            .copy()
+            .reset_index(drop=True)
+        )
+
+        semelhantes["DISTANCIA"] = distancias[0]
+
+        dist_max = semelhantes["DISTANCIA"].max()
+        dist_min = semelhantes["DISTANCIA"].min()
+
+        if dist_max > dist_min:
+
+            semelhantes["SIMILARIDADE"] = (
+                100
+                * (
+                    1
+                    - (
+                        semelhantes["DISTANCIA"] - dist_min
+                    )
+                    / (
+                        dist_max - dist_min
+                    )
+                )
+            )
+
+        else:
+
+            semelhantes["SIMILARIDADE"] = 100.0
+
+        semelhantes["SIMILARIDADE"] = (
+            semelhantes["SIMILARIDADE"]
+            .round(2)
+        )
+
         total = len(semelhantes)
+
+        if total == 0:
+            continue
 
         wr = {}
 
@@ -2185,7 +2228,6 @@ if not df_scanner.empty:
         )
         .reset_index(drop=True)
     )
-    
 # =========================================
 # ABAS
 # =========================================
