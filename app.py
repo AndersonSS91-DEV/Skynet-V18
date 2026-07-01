@@ -2092,9 +2092,9 @@ df_cs = pd.DataFrame(resultado_cs)
 
 scanner_global = []
 
-if X_scaled is not None and len(df_v_teams) > 0:
+if X_scaled is not None and knn is not None:
 
-    for _, jogo in df_v_teams.iterrows():
+    for _, jogo in BASE_JOGOS_DO_DIA.iterrows():
 
         jogo_ml = preparar_jogo_ml(jogo)
 
@@ -2111,6 +2111,7 @@ if X_scaled is not None and len(df_v_teams) > 0:
             .copy()
             .reset_index(drop=True)
         )
+
 
         semelhantes["DISTANCIA"] = distancias[0]
 
