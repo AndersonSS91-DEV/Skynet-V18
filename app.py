@@ -7812,26 +7812,26 @@ with tab9:
 
     else:
 
-    st.dataframe(
+        st.dataframe(
 
-        df_scanner.style.format(
+            df_scanner.style.format(
 
-            {
+                {
 
-                "Lay 0x0": "{:.1f}%",
-                "Lay 0x1": "{:.1f}%",
-                "Lay 1x0": "{:.1f}%",
-                "Lay 2x2": "{:.1f}%",
-                "Lay GH": "{:.1f}%",
-                "Lay GA": "{:.1f}%"
+                    "Lay 0x0": "{:.1f}%",
+                    "Lay 0x1": "{:.1f}%",
+                    "Lay 1x0": "{:.1f}%",
+                    "Lay 2x2": "{:.1f}%",
+                    "Lay GH": "{:.1f}%",
+                    "Lay GA": "{:.1f}%"
 
-            }
+                }
 
-        ),
+            ),
 
-        use_container_width=True,
+            use_container_width=True,
 
-        hide_index=True
+            hide_index=True
 
-    )
+        )
 
