@@ -1945,69 +1945,24 @@ def preparar_jogo_ml(linha_csv):
 
 
 # =========================================
-# BUSCA JOGOS SEMELHANTES
+# JOGO NORMALIZADO
 # =========================================
 
-def buscar_similares(linha_csv):
+if X_scaled is None:
 
-    if knn is None or X_scaled is None:
-        return pd.DataFrame()
+    jogo_scaled = None
+
+else:
 
     jogo_ml = preparar_jogo_ml(linha_csv)
 
     if jogo_ml is None:
-        return pd.DataFrame()
 
-    jogo_scaled = scaler_ml.transform(jogo_ml)
-
-    distancias, indices = knn.kneighbors(jogo_scaled)
-
-    semelhantes = (
-        df_ml
-        .iloc[indices[0]]
-        .copy()
-        .reset_index(drop=True)
-    )
-
-    semelhantes["DISTANCIA"] = distancias[0]
-
-    dist_max = semelhantes["DISTANCIA"].max()
-    dist_min = semelhantes["DISTANCIA"].min()
-
-    if dist_max > dist_min:
-
-        semelhantes["SIMILARIDADE"] = (
-            100
-            * (
-                1
-                - (
-                    semelhantes["DISTANCIA"] - dist_min
-                )
-                / (
-                    dist_max - dist_min
-                )
-            )
-        )
+        jogo_scaled = None
 
     else:
 
-        semelhantes["SIMILARIDADE"] = 100.0
-
-    semelhantes["SIMILARIDADE"] = (
-        semelhantes["SIMILARIDADE"]
-        .round(2)
-    )
-
-    semelhantes = (
-        semelhantes
-        .sort_values(
-            "SIMILARIDADE",
-            ascending=False
-        )
-        .reset_index(drop=True)
-    )
-
-    return semelhantes
+        jogo_scaled = scaler_ml.transform(jogo_ml)
 
 
 # =========================================
@@ -2034,10 +1989,57 @@ if X_scaled is not None:
         knn.fit(X_scaled)
 
 # =========================================
-# JOGO SELECIONADO
+# JOGO ATUAL
 # =========================================
 
-jogos_semelhantes = buscar_similares(linha_csv)
+if knn is not None and jogo_scaled is not None:
+
+    distancias, indices = knn.kneighbors(jogo_scaled)
+
+    jogos_semelhantes = (
+        df_ml
+        .iloc[indices[0]]
+        .copy()
+        .reset_index(drop=True)
+    )
+
+    jogos_semelhantes["DISTANCIA"] = distancias[0]
+
+    dist_max = jogos_semelhantes["DISTANCIA"].max()
+    dist_min = jogos_semelhantes["DISTANCIA"].min()
+
+    if dist_max > dist_min:
+
+        jogos_semelhantes["SIMILARIDADE"] = (
+            100
+            * (
+                1
+                - (
+                    jogos_semelhantes["DISTANCIA"] - dist_min
+                )
+                / (
+                    dist_max - dist_min
+                )
+            )
+        )
+
+    else:
+
+        jogos_semelhantes["SIMILARIDADE"] = 100.0
+
+    jogos_semelhantes["SIMILARIDADE"] = (
+        jogos_semelhantes["SIMILARIDADE"]
+        .round(2)
+    )
+
+    jogos_semelhantes = (
+        jogos_semelhantes
+        .sort_values(
+            "SIMILARIDADE",
+            ascending=False
+        )
+        .reset_index(drop=True)
+    )
 
 # =========================================
 # CS INTELLIGENCE
