@@ -7728,146 +7728,134 @@ with tab9:
         sg_score = (
 
             (
-
-                wr00
-                + wr01
-                + wr10
-                + wr22
-                + wrgh
-                + wrga
-
+                wr00 +
+                wr01 +
+                wr10 +
+                wr22 +
+                wrgh +
+                wrga
             ) / 6
 
         ) * 0.70 + similaridade * 0.30
 
-        confianca = sg_score
+        melhor = {
 
-        if sg_score >= 95:
+            "Lay 0x0": wr00,
+            "Lay 0x1": wr01,
+            "Lay 1x0": wr10,
+            "Lay 2x2": wr22,
+            "Lay GH": wrgh,
+            "Lay GA": wrga
 
-            status = "🟢 FAVORITO MUITO FORTE"
+        }
 
-        elif sg_score >= 90:
+        ranking = sorted(
 
-            status = "🟢 FAVORITO FORTE"
+            melhor.items(),
 
-        elif sg_score >= 85:
+            key=lambda x: x[1],
 
-            status = "🟡 FAVORITO MODERADO"
+            reverse=True
 
-        elif sg_score >= 80:
+        )
 
-            status = "🟠 JOGO DE ATENÇÃO"
+        c1, c2, c3 = st.columns(
 
-        else:
+            [1.2, 1.4, 1.2]
 
-            status = "🔴 JOGO PERIGOSO"
+        )
 
-        st.markdown("## ⚽ {} x {}".format(
+        with c1:
 
-            linha_csv["Home_Team"],
-            linha_csv["Visitor_Team"]
+            st.markdown("### ⚽ Jogo")
 
-        ))
+            st.markdown(
 
-        st.success(status)
+                f"""
 
-        st.progress(wr00 / 100)
+**{linha_csv["Home_Team"]}**
 
-        st.write(f"Lay 0x0   **{wr00:.1f}%**")
+vs
 
-        st.progress(wr01 / 100)
+**{linha_csv["Visitor_Team"]}**
 
-        st.write(f"Lay 0x1   **{wr01:.1f}%**")
+"""
 
-        st.progress(wr10 / 100)
+            )
 
-        st.write(f"Lay 1x0   **{wr10:.1f}%**")
+        with c2:
 
-        st.progress(wr22 / 100)
+            st.markdown("### 📊 Mercados")
 
-        st.write(f"Lay 2x2   **{wr22:.1f}%**")
+            st.write(f"Lay 0x0  •  {wr00:.1f}%")
 
-        st.progress(wrgh / 100)
+            st.write(f"Lay 0x1  •  {wr01:.1f}%")
 
-        st.write(f"Lay GH   **{wrgh:.1f}%**")
+            st.write(f"Lay 1x0  •  {wr10:.1f}%")
 
-        st.progress(wrga / 100)
+            st.write(f"Lay 2x2  •  {wr22:.1f}%")
 
-        st.write(f"Lay GA   **{wrga:.1f}%**")
+            st.write(f"Lay GH   •  {wrgh:.1f}%")
+
+            st.write(f"Lay GA   •  {wrga:.1f}%")
+
+        with c3:
+
+            st.markdown("### 📈 Resumo")
+
+            st.metric(
+
+                "Similaridade",
+
+                f"{similaridade:.1f}%"
+
+            )
+
+            st.metric(
+
+                "SG Score",
+
+                f"{sg_score:.1f}"
+
+            )
+
+            st.metric(
+
+                "Similares",
+
+                total
+
+            )
+
+            st.markdown("---")
+
+            st.markdown(
+
+                f"""
+
+🥇 **{ranking[0][0]}**
+
+**{ranking[0][1]:.1f}%**
+
+---
+
+🥈 **{ranking[1][0]}**
+
+**{ranking[1][1]:.1f}%**
+
+---
+
+🥉 **{ranking[2][0]}**
+
+**{ranking[2][1]:.1f}%**
+
+"""
+
+            )
 
         st.markdown("---")
 
-        c1, c2 = st.columns(2)
-
-        c1.metric(
-
-            "🔍 Similaridade Média",
-
-            f"{similaridade:.1f}%"
-
-        )
-
-        c1.metric(
-
-            "📊 Jogos Semelhantes",
-
-            total
-
-        )
-
-        c2.metric(
-
-            "🧠 SG Score",
-
-            f"{sg_score:.1f}"
-
-        )
-
-        c2.metric(
-
-            "🤖 Confiança IA",
-
-            f"{confianca:.1f}%"
-
-        )
-
-        if sg_score >= 95:
-
-            st.success("⭐⭐⭐⭐⭐ ENTRADA PREMIUM")
-
-        elif sg_score >= 90:
-
-            st.info("⭐⭐⭐⭐ ENTRADA FORTE")
-
-        elif sg_score >= 85:
-
-            st.warning("⭐⭐⭐ ENTRADA MODERADA")
-
-        else:
-
-            st.error("⭐⭐ EVITAR ENTRADA")
-
-        st.markdown("### Motivos da recomendação")
-
-        st.write(f"✔ {total} jogos historicamente semelhantes")
-
-        st.write(f"✔ Similaridade média de {similaridade:.1f}%")
-
-        if wr00 >= 90:
-
-            st.write(f"✔ Lay 0x0 com {wr00:.1f}% de Greens")
-
-        if wrgh >= 90:
-
-            st.write(f"✔ Lay GH com {wrgh:.1f}% de Greens")
-
-        st.write("✔ Favorito dominante no modelo")
-
-        st.write("✔ ExG compatível")
-
-        st.write("✔ Odds compatíveis")
-
-        st.write("### Jogos semelhantes")
+        st.markdown("### Jogos semelhantes")
 
     
 
