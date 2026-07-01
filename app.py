@@ -7775,46 +7775,4 @@ with tab9:
 
     st.markdown("---")
 
-    st.subheader("📊 Scanner Global V30.1.5")
 
-    if df_scanner.empty:
-
-        st.warning("Scanner Global não gerado.")
-
-    else:
-
-        colunas_scanner = [
-
-            "League",
-            "Home_Team",
-            "Visitor_Team",
-
-            "Similares",
-            "Similaridade Média",
-
-            "LAY00",
-            "LAY01",
-            "LAY10",
-            "LAY22",
-            "LAYGH",
-            "LAYGA",
-
-            "SG_SCORE"
-
-        ]
-
-        colunas_scanner = [
-            c
-            for c in colunas_scanner
-            if c in df_scanner.columns
-        ]
-
-        st.dataframe(
-
-            df_scanner[colunas_scanner],
-
-            use_container_width=True,
-
-            hide_index=True
-
-        )
