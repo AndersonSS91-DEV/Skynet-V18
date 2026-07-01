@@ -1973,7 +1973,9 @@ from sklearn.neighbors import NearestNeighbors
 
 jogos_semelhantes = pd.DataFrame()
 
-if X_scaled is not None and jogo_scaled is not None:
+knn = None
+
+if X_scaled is not None:
 
     N_VIZINHOS = min(100, len(df_ml))
 
@@ -1986,61 +1988,59 @@ if X_scaled is not None and jogo_scaled is not None:
 
         knn.fit(X_scaled)
 
-        distancias, indices = knn.kneighbors(jogo_scaled)
+# =========================================
+# JOGO ATUAL
+# =========================================
 
-        # =====================================
-        # JOGOS SEMELHANTES
-        # =====================================
+if knn is not None and jogo_scaled is not None:
 
-        jogos_semelhantes = (
-            df_ml
-            .iloc[indices[0]]
-            .copy()
-            .reset_index(drop=True)
-        )
+    distancias, indices = knn.kneighbors(jogo_scaled)
 
-        jogos_semelhantes["DISTANCIA"] = distancias[0]
+    jogos_semelhantes = (
+        df_ml
+        .iloc[indices[0]]
+        .copy()
+        .reset_index(drop=True)
+    )
 
-        # =====================================
-        # SIMILARIDADE REAL
-        # =====================================
+    jogos_semelhantes["DISTANCIA"] = distancias[0]
 
-        dist_max = jogos_semelhantes["DISTANCIA"].max()
-        dist_min = jogos_semelhantes["DISTANCIA"].min()
+    dist_max = jogos_semelhantes["DISTANCIA"].max()
+    dist_min = jogos_semelhantes["DISTANCIA"].min()
 
-        if dist_max > dist_min:
-
-            jogos_semelhantes["SIMILARIDADE"] = (
-                100
-                * (
-                    1
-                    - (
-                        jogos_semelhantes["DISTANCIA"] - dist_min
-                    )
-                    / (
-                        dist_max - dist_min
-                    )
-                )
-            )
-
-        else:
-
-            jogos_semelhantes["SIMILARIDADE"] = 100.0
+    if dist_max > dist_min:
 
         jogos_semelhantes["SIMILARIDADE"] = (
-            jogos_semelhantes["SIMILARIDADE"]
-            .round(2)
+            100
+            * (
+                1
+                - (
+                    jogos_semelhantes["DISTANCIA"] - dist_min
+                )
+                / (
+                    dist_max - dist_min
+                )
+            )
         )
 
-        jogos_semelhantes = (
-            jogos_semelhantes
-            .sort_values(
-                "SIMILARIDADE",
-                ascending=False
-            )
-            .reset_index(drop=True)
+    else:
+
+        jogos_semelhantes["SIMILARIDADE"] = 100.0
+
+    jogos_semelhantes["SIMILARIDADE"] = (
+        jogos_semelhantes["SIMILARIDADE"]
+        .round(2)
+    )
+
+    jogos_semelhantes = (
+        jogos_semelhantes
+        .sort_values(
+            "SIMILARIDADE",
+            ascending=False
         )
-        
+        .reset_index(drop=True)
+    )
+
 # =========================================
 # CS INTELLIGENCE
 # =========================================
@@ -2085,6 +2085,154 @@ if not jogos_semelhantes.empty:
         })
 
 df_cs = pd.DataFrame(resultado_cs)
+
+# =========================================
+# SCANNER GLOBAL V30.1.5
+# =========================================
+
+scanner_global = []
+
+if X_scaled is not None and len(df_v_teams) > 0:
+
+    for _, jogo in df_v_teams.iterrows():
+
+        jogo_ml = preparar_jogo_ml(jogo)
+
+        if jogo_ml is None:
+            continue
+
+        jogo_scaled = scaler_ml.transform(jogo_ml)
+
+        distancias, indices = knn.kneighbors(jogo_scaled)
+
+        semelhantes = (
+            df_ml
+            .iloc[indices[0]]
+            .copy()
+            .reset_index(drop=True)
+        )
+
+        semelhantes["DISTANCIA"] = distancias[0]
+
+        dist_max = semelhantes["DISTANCIA"].max()
+        dist_min = semelhantes["DISTANCIA"].min()
+
+        if dist_max > dist_min:
+
+            semelhantes["SIMILARIDADE"] = (
+                100
+                * (
+                    1
+                    - (
+                        semelhantes["DISTANCIA"] - dist_min
+                    )
+                    / (
+                        dist_max - dist_min
+                    )
+                )
+            )
+
+        else:
+
+            semelhantes["SIMILARIDADE"] = 100.0
+
+        semelhantes["SIMILARIDADE"] = (
+            semelhantes["SIMILARIDADE"]
+            .round(2)
+        )
+
+        total = len(semelhantes)
+
+        if total == 0:
+            continue
+
+        wr = {}
+
+        for mercado in [
+            "LAY00",
+            "LAY01",
+            "LAY10",
+            "LAY22",
+            "LAYGH",
+            "LAYGA"
+        ]:
+
+            if mercado in semelhantes.columns:
+
+                wr[mercado] = round(
+                    semelhantes[mercado].mean(),
+                    2
+                )
+
+            else:
+
+                wr[mercado] = np.nan
+
+        scanner_global.append({
+
+            "League": jogo["League"],
+
+            "Home_Team": jogo["Home_Team"],
+
+            "Visitor_Team": jogo["Visitor_Team"],
+
+            "Similares": total,
+
+            "Similaridade Média": round(
+                semelhantes["SIMILARIDADE"].mean(),
+                2
+            ),
+
+            "LAY00": wr["LAY00"],
+
+            "LAY01": wr["LAY01"],
+
+            "LAY10": wr["LAY10"],
+
+            "LAY22": wr["LAY22"],
+
+            "LAYGH": wr["LAYGH"],
+
+            "LAYGA": wr["LAYGA"]
+
+        })
+
+df_scanner = pd.DataFrame(scanner_global)
+
+if not df_scanner.empty:
+
+    df_scanner["SG_SCORE"] = (
+
+        df_scanner[
+            [
+                "LAY00",
+                "LAY01",
+                "LAY10",
+                "LAY22",
+                "LAYGH",
+                "LAYGA"
+            ]
+        ]
+        .mean(axis=1)
+
+        * 0.70
+
+        +
+
+        df_scanner["Similaridade Média"]
+
+        * 0.30
+
+    )
+
+    df_scanner = (
+        df_scanner
+        .sort_values(
+            "SG_SCORE",
+            ascending=False
+        )
+        .reset_index(drop=True)
+    )
     
 # =========================================
 # ABAS
