@@ -2220,13 +2220,73 @@ if not df_scanner.empty:
         + df_scanner["Similaridade Média"] * 0.30
     )
 
-    df_scanner = (
-        df_scanner
-        .sort_values(
-            "SG_SCORE",
-            ascending=False
+    # =====================================
+    # RENOMEIA COLUNAS
+    # =====================================
+
+    df_scanner = df_scanner.rename(
+
+        columns={
+
+            "LAY00": "Lay 0x0",
+            "LAY01": "Lay 0x1",
+            "LAY10": "Lay 1x0",
+            "LAY22": "Lay 2x2",
+            "LAYGH": "Lay GH",
+            "LAYGA": "Lay GA"
+
+        }
+
+    )
+
+    # =====================================
+    # FORMATA LAYS
+    # =====================================
+
+    for col in [
+
+        "Lay 0x0",
+        "Lay 0x1",
+        "Lay 1x0",
+        "Lay 2x2",
+        "Lay GH",
+        "Lay GA"
+
+    ]:
+
+        df_scanner[col] = (
+
+            pd.to_numeric(
+                df_scanner[col],
+                errors="coerce"
+            )
+
+            .round(1)
+
+            .astype(str)
+
+            + "%"
+
         )
+
+    # =====================================
+    # ORDENA
+    # =====================================
+
+    df_scanner = (
+
+        df_scanner
+
+        .sort_values(
+
+            "SG_SCORE",
+
+            ascending=False
+
+        )
+
         .reset_index(drop=True)
+
     )
 # =========================================
 # ABAS
