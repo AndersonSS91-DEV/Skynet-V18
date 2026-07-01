@@ -1945,24 +1945,76 @@ def preparar_jogo_ml(linha_csv):
 
 
 # =========================================
-# JOGO NORMALIZADO
+# BUSCA JOGOS SEMELHANTES
 # =========================================
 
-if X_scaled is None:
+def buscar_similares(linha_csv):
 
-    jogo_scaled = None
-
-else:
+    if knn is None or X_scaled is None:
+        return pd.DataFrame()
 
     jogo_ml = preparar_jogo_ml(linha_csv)
 
     if jogo_ml is None:
+        return pd.DataFrame()
 
-        jogo_scaled = None
+    jogo_scaled = scaler_ml.transform(jogo_ml)
+
+    distancias, indices = knn.kneighbors(jogo_scaled)
+
+    semelhantes = (
+        df_ml
+        .iloc[indices[0]]
+        .copy()
+        .reset_index(drop=True)
+    )
+
+    semelhantes["DISTANCIA"] = distancias[0]
+
+    dist_max = semelhantes["DISTANCIA"].max()
+    dist_min = semelhantes["DISTANCIA"].min()
+
+    if dist_max > dist_min:
+
+        semelhantes["SIMILARIDADE"] = (
+            100
+            * (
+                1
+                - (
+                    semelhantes["DISTANCIA"] - dist_min
+                )
+                / (
+                    dist_max - dist_min
+                )
+            )
+        )
 
     else:
 
-        jogo_scaled = scaler_ml.transform(jogo_ml)
+        semelhantes["SIMILARIDADE"] = 100.0
+
+    semelhantes["SIMILARIDADE"] = (
+        semelhantes["SIMILARIDADE"]
+        .round(2)
+    )
+
+    semelhantes = (
+        semelhantes
+        .sort_values(
+            "SIMILARIDADE",
+            ascending=False
+        )
+        .reset_index(drop=True)
+    )
+
+    return semelhantes
+
+
+# =========================================
+# JOGO SELECIONADO
+# =========================================
+
+jogos_semelhantes = buscar_similares(linha_csv)
 
 
 # =========================================
@@ -2092,60 +2144,16 @@ df_cs = pd.DataFrame(resultado_cs)
 
 scanner_global = []
 
-if X_scaled is not None and knn is not None:
+if knn is not None:
 
-    # Jogos do dia
     for _, jogo_dia in df_consenso.iterrows():
 
-        jogo_ml = preparar_jogo_ml(jogo_dia)
+        semelhantes = buscar_similares(jogo_dia)
 
-        if jogo_ml is None:
+        if semelhantes.empty:
             continue
-
-        jogo_scaled = scaler_ml.transform(jogo_ml)
-
-        distancias, indices = knn.kneighbors(jogo_scaled)
-
-        semelhantes = (
-            df_ml
-            .iloc[indices[0]]
-            .copy()
-            .reset_index(drop=True)
-        )
-
-        semelhantes["DISTANCIA"] = distancias[0]
-
-        dist_max = semelhantes["DISTANCIA"].max()
-        dist_min = semelhantes["DISTANCIA"].min()
-
-        if dist_max > dist_min:
-
-            semelhantes["SIMILARIDADE"] = (
-                100
-                * (
-                    1
-                    - (
-                        semelhantes["DISTANCIA"] - dist_min
-                    )
-                    / (
-                        dist_max - dist_min
-                    )
-                )
-            )
-
-        else:
-
-            semelhantes["SIMILARIDADE"] = 100.0
-
-        semelhantes["SIMILARIDADE"] = (
-            semelhantes["SIMILARIDADE"]
-            .round(2)
-        )
 
         total = len(semelhantes)
-
-        if total == 0:
-            continue
 
         wr = {}
 
@@ -2171,11 +2179,11 @@ if X_scaled is not None and knn is not None:
 
         scanner_global.append({
 
-            "League": jogo_dia["League"],
+            "League": jogo_dia.get("League"),
 
-            "Home_Team": jogo_dia["Home_Team"],
+            "Home_Team": jogo_dia.get("Home_Team"),
 
-            "Visitor_Team": jogo_dia["Visitor_Team"],
+            "Visitor_Team": jogo_dia.get("Visitor_Team"),
 
             "Similares": total,
 
@@ -7774,5 +7782,23 @@ with tab9:
     )
 
     st.markdown("---")
+
+    st.subheader("📊 Scanner Global V30.1.5")
+
+    if df_scanner.empty:
+
+        st.warning("Scanner Global não gerado.")
+
+    else:
+
+        st.dataframe(
+
+            df_scanner,
+
+            use_container_width=True,
+
+            hide_index=True
+
+        )
 
 
