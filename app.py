@@ -2094,7 +2094,8 @@ scanner_global = []
 
 if X_scaled is not None and knn is not None:
 
-    for _, jogo in BASE_JOGOS_DO_DIA.iterrows():
+    # Jogos do dia
+    for _, jogo in df_consenso.iterrows():
 
         jogo_ml = preparar_jogo_ml(jogo)
 
@@ -2111,7 +2112,6 @@ if X_scaled is not None and knn is not None:
             .copy()
             .reset_index(drop=True)
         )
-
 
         semelhantes["DISTANCIA"] = distancias[0]
 
@@ -2172,9 +2172,7 @@ if X_scaled is not None and knn is not None:
         scanner_global.append({
 
             "League": jogo["League"],
-
             "Home_Team": jogo["Home_Team"],
-
             "Visitor_Team": jogo["Visitor_Team"],
 
             "Similares": total,
@@ -2185,15 +2183,10 @@ if X_scaled is not None and knn is not None:
             ),
 
             "LAY00": wr["LAY00"],
-
             "LAY01": wr["LAY01"],
-
             "LAY10": wr["LAY10"],
-
             "LAY22": wr["LAY22"],
-
             "LAYGH": wr["LAYGH"],
-
             "LAYGA": wr["LAYGA"]
 
         })
@@ -2202,36 +2195,28 @@ df_scanner = pd.DataFrame(scanner_global)
 
 if not df_scanner.empty:
 
+    mercados = [
+        "LAY00",
+        "LAY01",
+        "LAY10",
+        "LAY22",
+        "LAYGH",
+        "LAYGA"
+    ]
+
+    df_scanner[mercados] = (
+        df_scanner[mercados]
+        .apply(pd.to_numeric, errors="coerce")
+    )
+
     df_scanner["SG_SCORE"] = (
-
-        df_scanner[
-            [
-                "LAY00",
-                "LAY01",
-                "LAY10",
-                "LAY22",
-                "LAYGH",
-                "LAYGA"
-            ]
-        ]
-        .mean(axis=1)
-
-        * 0.70
-
-        +
-
-        df_scanner["Similaridade Média"]
-
-        * 0.30
-
+        df_scanner[mercados].mean(axis=1) * 0.70
+        + df_scanner["Similaridade Média"] * 0.30
     )
 
     df_scanner = (
         df_scanner
-        .sort_values(
-            "SG_SCORE",
-            ascending=False
-        )
+        .sort_values("SG_SCORE", ascending=False)
         .reset_index(drop=True)
     )
     
