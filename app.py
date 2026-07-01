@@ -2202,26 +2202,58 @@ df_scanner = pd.DataFrame(scanner_global)
 if not df_scanner.empty:
 
     mercados = [
+
         "LAY00",
         "LAY01",
         "LAY10",
         "LAY22",
         "LAYGH",
         "LAYGA"
+
     ]
 
+    # =====================================
+    # CONVERTE PARA %
+    # =====================================
+
     df_scanner[mercados] = (
+
         df_scanner[mercados]
-        .apply(pd.to_numeric, errors="coerce")
+
+        .apply(
+
+            pd.to_numeric,
+
+            errors="coerce"
+
+        )
+
+        * 100
+
     )
 
+    # =====================================
+    # SCORE
+    # =====================================
+
     df_scanner["SG_SCORE"] = (
-        df_scanner[mercados].mean(axis=1) * 0.70
-        + df_scanner["Similaridade Média"] * 0.30
+
+        df_scanner[mercados]
+
+        .mean(axis=1)
+
+        * 0.70
+
+        +
+
+        df_scanner["Similaridade Média"]
+
+        * 0.30
+
     )
+
     # =====================================
-    # =====================================
-    # RENOMEIA COLUNAS
+    # RENOMEIA
     # =====================================
 
     df_scanner = df_scanner.rename(
@@ -2229,10 +2261,15 @@ if not df_scanner.empty:
         columns={
 
             "LAY00": "Lay 0x0",
+
             "LAY01": "Lay 0x1",
+
             "LAY10": "Lay 1x0",
+
             "LAY22": "Lay 2x2",
+
             "LAYGH": "Lay GH",
+
             "LAYGA": "Lay GA"
 
         }
@@ -2258,7 +2295,6 @@ if not df_scanner.empty:
         .reset_index(drop=True)
 
     )
-    
 # =========================================
 # ABAS
 # =========================================
@@ -7823,7 +7859,9 @@ with tab9:
                     "Lay 1x0": "{:.1f}%",
                     "Lay 2x2": "{:.1f}%",
                     "Lay GH": "{:.1f}%",
-                    "Lay GA": "{:.1f}%"
+                    "Lay GA": "{:.1f}%",
+                    "Similaridade Média": "{:.2f}",
+                    "SG_SCORE": "{:.2f}"
 
                 }
 
