@@ -2002,31 +2002,35 @@ if X_scaled is not None and jogo_scaled is not None:
         jogos_semelhantes["DISTANCIA"] = distancias[0]
 
         # =====================================
-        # RECALCULA DISTÂNCIA
+        # SIMILARIDADE REAL
         # =====================================
 
-        jogos_semelhantes["DISTANCIA"] = (
-            jogos_semelhantes["DISTANCIA"]
-            .rank(method="first")
-        )
-
         dist_max = jogos_semelhantes["DISTANCIA"].max()
+        dist_min = jogos_semelhantes["DISTANCIA"].min()
 
-        if dist_max > 0:
+        if dist_max > dist_min:
 
             jogos_semelhantes["SIMILARIDADE"] = (
                 100
                 * (
                     1
                     - (
-                        jogos_semelhantes["DISTANCIA"] - 1
-                    ) / dist_max
+                        jogos_semelhantes["DISTANCIA"] - dist_min
+                    )
+                    / (
+                        dist_max - dist_min
+                    )
                 )
             )
 
         else:
 
-            jogos_semelhantes["SIMILARIDADE"] = 100
+            jogos_semelhantes["SIMILARIDADE"] = 100.0
+
+        jogos_semelhantes["SIMILARIDADE"] = (
+            jogos_semelhantes["SIMILARIDADE"]
+            .round(2)
+        )
 
         jogos_semelhantes = (
             jogos_semelhantes
@@ -2036,7 +2040,7 @@ if X_scaled is not None and jogo_scaled is not None:
             )
             .reset_index(drop=True)
         )
-
+        
 # =========================================
 # CS INTELLIGENCE
 # =========================================
