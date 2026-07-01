@@ -2095,9 +2095,9 @@ scanner_global = []
 if X_scaled is not None and knn is not None:
 
     # Jogos do dia
-    for _, jogo in df_consenso.iterrows():
+    for _, jogo_dia in df_consenso.iterrows():
 
-        jogo_ml = preparar_jogo_ml(jogo)
+        jogo_ml = preparar_jogo_ml(jogo_dia)
 
         if jogo_ml is None:
             continue
@@ -2171,9 +2171,11 @@ if X_scaled is not None and knn is not None:
 
         scanner_global.append({
 
-            "League": jogo["League"],
-            "Home_Team": jogo["Home_Team"],
-            "Visitor_Team": jogo["Visitor_Team"],
+            "League": jogo_dia["League"],
+
+            "Home_Team": jogo_dia["Home_Team"],
+
+            "Visitor_Team": jogo_dia["Visitor_Team"],
 
             "Similares": total,
 
@@ -2183,10 +2185,15 @@ if X_scaled is not None and knn is not None:
             ),
 
             "LAY00": wr["LAY00"],
+
             "LAY01": wr["LAY01"],
+
             "LAY10": wr["LAY10"],
+
             "LAY22": wr["LAY22"],
+
             "LAYGH": wr["LAYGH"],
+
             "LAYGA": wr["LAYGA"]
 
         })
@@ -2216,7 +2223,10 @@ if not df_scanner.empty:
 
     df_scanner = (
         df_scanner
-        .sort_values("SG_SCORE", ascending=False)
+        .sort_values(
+            "SG_SCORE",
+            ascending=False
+        )
         .reset_index(drop=True)
     )
     
