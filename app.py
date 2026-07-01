@@ -2085,10 +2085,11 @@ if not jogos_semelhantes.empty:
         })
 
 df_cs = pd.DataFrame(resultado_cs)
+    
 # =========================================
 # ABAS
 # =========================================
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
 "📊🧠 Resumo",
 "📁🧠 Dados",
 "📊⚽ MGF",
@@ -2097,7 +2098,8 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
 "🚩 Escanteios",
 "🤖 IA",
 "👾📡 CS_Score",
-"🧪 Machine Learning"
+"📡 Similar Games Intelligence",
+"🤖📊👾 Machine Learning"
 ])
 
 
