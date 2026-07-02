@@ -1398,3 +1398,306 @@ for t in TARGETS:
         f"{t:18}",
         df_ml[t].value_counts().to_dict()
     )
+
+# ============================================================
+# BLOCO 13 — TRATAMENTO FINAL + EXPORTAÇÃO
+# ============================================================
+
+print("\n" + "=" * 80)
+print("BLOCO 13 - BASE FINAL ML")
+print("=" * 80)
+
+# ============================================================
+# REMOVER COLUNAS QUE NÃO ENTRAM NO ML
+# ============================================================
+
+COLUNAS_REMOVER = [
+
+    "Country",
+    "League",
+
+    "Home_Team",
+    "Visitor_Team",
+
+    "Hour",
+
+    "Interpretacao",
+
+    "CS"
+
+]
+
+COLUNAS_REMOVER = [
+
+    c for c in COLUNAS_REMOVER
+
+    if c in df_ml.columns
+
+]
+
+df_ml.drop(
+    columns=COLUNAS_REMOVER,
+    inplace=True
+)
+
+# ============================================================
+# TRATAMENTO DE NaN
+# ============================================================
+
+df_ml.replace(
+
+    [np.inf, -np.inf],
+
+    np.nan,
+
+    inplace=True
+
+)
+
+# Numéricas
+
+COL_NUM = df_ml.select_dtypes(
+
+    include=np.number
+
+).columns
+
+for c in COL_NUM:
+
+    mediana = df_ml[c].median()
+
+    df_ml[c] = df_ml[c].fillna(mediana)
+
+# Texto
+
+COL_TXT = df_ml.select_dtypes(
+
+    exclude=np.number
+
+).columns
+
+for c in COL_TXT:
+
+    df_ml[c] = df_ml[c].fillna("")
+
+# ============================================================
+# REMOVER DUPLICADOS
+# ============================================================
+
+df_ml = (
+
+    df_ml
+
+    .drop_duplicates()
+
+    .reset_index(drop=True)
+
+)
+
+# ============================================================
+# LISTA DE FEATURES
+# ============================================================
+
+TARGETS = [
+
+    "TARGET_LAY00",
+    "TARGET_LAY01",
+    "TARGET_LAY10",
+    "TARGET_LAY22",
+    "TARGET_LAYGH",
+    "TARGET_LAYGA"
+
+]
+
+FEATURES = [
+
+    c
+
+    for c in df_ml.columns
+
+    if c not in TARGETS
+
+]
+
+print("\nFeatures:", len(FEATURES))
+
+print("Targets :", len(TARGETS))
+
+# ============================================================
+# EXPORTAÇÃO
+# ============================================================
+
+df_ml.to_csv(
+
+    "BASE_ML.csv",
+
+    sep=";",
+
+    index=False,
+
+    encoding="utf-8-sig"
+
+)
+
+print("\nBASE_ML.csv exportada com sucesso.")
+
+print("\nShape:", df_ml.shape)
+
+print("=" * 80)
+print("ETAPA 2 FINALIZADA")
+print("=" * 80)
+
+# ============================================================
+# BLOCO 14 — CATBOOST (LAY00)
+# ============================================================
+
+print("\n" + "=" * 80)
+print("BLOCO 14 - CATBOOST LAY00")
+print("=" * 80)
+
+from catboost import CatBoostClassifier
+
+from sklearn.model_selection import train_test_split
+
+from sklearn.metrics import (
+
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+    confusion_matrix
+
+)
+
+# ============================================================
+# FEATURES
+# ============================================================
+
+X = df_ml[FEATURES]
+
+# ============================================================
+# TARGET
+# ============================================================
+
+y = df_ml["TARGET_LAY00"]
+
+# ============================================================
+# TRAIN / TEST
+# ============================================================
+
+X_train, X_test, y_train, y_test = train_test_split(
+
+    X,
+    y,
+
+    test_size=0.20,
+
+    random_state=42,
+
+    stratify=y
+
+)
+
+# ============================================================
+# MODELO
+# ============================================================
+
+modelo_lay00 = CatBoostClassifier(
+
+    iterations=1000,
+
+    learning_rate=0.03,
+
+    depth=6,
+
+    loss_function="Logloss",
+
+    eval_metric="AUC",
+
+    random_seed=42,
+
+    verbose=100
+
+)
+
+modelo_lay00.fit(
+
+    X_train,
+    y_train,
+
+    eval_set=(X_test, y_test),
+
+    use_best_model=True
+
+)
+
+# ============================================================
+# PREVISÕES
+# ============================================================
+
+pred = modelo_lay00.predict(X_test)
+
+prob = modelo_lay00.predict_proba(X_test)[:,1]
+
+# ============================================================
+# MÉTRICAS
+# ============================================================
+
+print("\nAccuracy :", accuracy_score(y_test,pred))
+
+print("Precision:", precision_score(y_test,pred))
+
+print("Recall   :", recall_score(y_test,pred))
+
+print("F1 Score :", f1_score(y_test,pred))
+
+print("ROC AUC  :", roc_auc_score(y_test,prob))
+
+print("\nConfusion Matrix")
+
+print(
+
+    confusion_matrix(
+
+        y_test,
+
+        pred
+
+    )
+
+)
+
+# ============================================================
+# IMPORTÂNCIA
+# ============================================================
+
+FI = (
+
+    pd.DataFrame({
+
+        "Feature":FEATURES,
+
+        "Importance":
+
+        modelo_lay00.feature_importances_
+
+    })
+
+    .sort_values(
+
+        "Importance",
+
+        ascending=False
+
+    )
+
+)
+
+print("\nTOP 30 FEATURES")
+
+display(
+
+    FI.head(30)
+
+)
