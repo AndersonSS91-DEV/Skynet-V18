@@ -872,27 +872,52 @@ for idx, row in df_v_teams.iterrows():
         continue
 
 # ============================================================
-# BLOCO 07.6 — FINALIZAÇÃO
+# BLOCO 07.6 — FINALIZAÇÃO DA ETAPA 1
 # ============================================================
 
-BASE_ML = pd.DataFrame(lista_resultados)
+df_resultados = pd.DataFrame(lista_resultados)
 
-BASE_ML.replace([np.inf, -np.inf], np.nan, inplace=True)
-
-for coluna in BASE_ML.columns:
-    if pd.api.types.is_numeric_dtype(BASE_ML[coluna]):
-        if not BASE_ML[coluna].isna().all():
-            BASE_ML[coluna] = BASE_ML[coluna].fillna(BASE_ML[coluna].median())
-    else:
-        BASE_ML[coluna] = BASE_ML[coluna].fillna("")
-
-BASE_ML = BASE_ML.drop_duplicates().reset_index(drop=True)
-
-BASE_ML.to_csv(
-    "BASE_ML.csv",
-    sep=";",
-    index=False,
-    encoding="utf-8-sig"
+df_resultados.replace(
+    [np.inf, -np.inf],
+    np.nan,
+    inplace=True
 )
 
-print("BASE_ML.csv exportada com sucesso.")
+for coluna in df_resultados.columns:
+
+    if pd.api.types.is_numeric_dtype(df_resultados[coluna]):
+
+        if not df_resultados[coluna].isna().all():
+
+            df_resultados[coluna] = (
+                df_resultados[coluna]
+                .fillna(df_resultados[coluna].median())
+            )
+
+    else:
+
+        df_resultados[coluna] = (
+            df_resultados[coluna]
+            .fillna("")
+        )
+
+df_resultados = (
+    df_resultados
+    .drop_duplicates()
+    .reset_index(drop=True)
+)
+
+df_resultados.to_excel(
+    "POISSON_RESULTADOS.xlsx",
+    index=False
+)
+
+print("\n" + "=" * 80)
+print("ETAPA 1 FINALIZADA")
+print("=" * 80)
+
+print(f"Jogos processados : {len(df_resultados):,}")
+print(f"Colunas geradas   : {len(df_resultados.columns):,}")
+
+print("\nArquivo gerado:")
+print("POISSON_RESULTADOS.xlsx")
