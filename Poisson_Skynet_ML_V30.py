@@ -1962,6 +1962,87 @@ linha_consenso.update({
     'Defesa_Home': defesa_home,
     'Defesa_Away': defesa_away,
 
+# =========================================================
+# OVER / UNDER
+# =========================================================
+
+for linha in [
+
+    0.5,
+
+    1.5,
+
+    2.5,
+
+    3.5,
+
+    4.5
+
+]:
+
+    over,
+
+    under = calcular_over_under(
+
+        exg_home_consenso,
+
+        exg_away_consenso,
+
+        linha
+
+    )
+
+    linha_consenso[
+
+        f"Over_{linha}"
+
+    ] = over
+
+    linha_consenso[
+
+        f"Under_{linha}"
+
+    ] = under
+
+
+# =========================================================
+# BTTS
+# =========================================================
+
+linha_consenso["BTTS_%"] = calcular_btts(
+
+    exg_home_consenso,
+
+    exg_away_consenso
+
+)
+
+# ============================================================
+# ODDS JUSTAS
+# ============================================================
+
+(
+
+    odd_home,
+
+    odd_draw,
+
+    odd_away
+
+) = calcular_odds_justas(
+
+    exg_home_consenso,
+
+    exg_away_consenso
+
+)
+
+linha_consenso["Odd_Justa_Home"] = odd_home
+
+linha_consenso["Odd_Justa_Draw"] = odd_draw
+
+linha_consenso["Odd_Justa_Away"] = odd_away
+
     # =====================================================
     # CONSENSO TEMPORAL
     # =====================================================
@@ -2111,5 +2192,288 @@ saida_consenso.append(
 
 )
 
+# =========================================================
+# OVER / UNDER
+# =========================================================
+
+def calcular_over_under(
+
+    exg_home,
+
+    exg_away,
+
+    limite
+
+):
+
+    if pd.isna(exg_home) or pd.isna(exg_away):
+
+        return np.nan, np.nan
+
+    lam = exg_home + exg_away
+
+    under = poisson.cdf(
+
+        int(limite),
+
+        lam
+
+    )
+
+    over = 1 - under
+
+    return (
+
+        round(over * 100, 2),
+
+        round(under * 100, 2)
+
+    )
 
 
+# =========================================================
+# BTTS
+# =========================================================
+
+def calcular_btts(
+
+    exg_home,
+
+    exg_away
+
+):
+
+    if pd.isna(exg_home) or pd.isna(exg_away):
+
+        return np.nan
+
+    p_h0 = poisson.pmf(
+
+        0,
+
+        exg_home
+
+    )
+
+    p_a0 = poisson.pmf(
+
+        0,
+
+        exg_away
+
+    )
+
+    btts = (
+
+        1
+
+        - p_h0
+
+        - p_a0
+
+        + (p_h0 * p_a0)
+
+    )
+
+    return round(
+
+        btts * 100,
+
+        2
+
+    )
+# ============================================================
+# ODDS JUSTAS
+# ============================================================
+
+def calcular_odds_justas(
+
+    exg_home,
+
+    exg_away
+
+):
+
+    if pd.isna(exg_home):
+
+        return np.nan, np.nan, np.nan
+
+    if pd.isna(exg_away):
+
+        return np.nan, np.nan, np.nan
+
+    matriz = matriz_poisson(
+
+        exg_home,
+
+        exg_away
+
+    )
+
+    prob_home = np.tril(
+
+        matriz,
+
+        -1
+
+    ).sum()
+
+    prob_draw = np.trace(
+
+        matriz
+
+    )
+
+    prob_away = np.triu(
+
+        matriz,
+
+        1
+
+    ).sum()
+
+    odd_home = safe_odds(
+
+        prob_home
+
+    )
+
+    odd_draw = safe_odds(
+
+        prob_draw
+
+    )
+
+    odd_away = safe_odds(
+
+        prob_away
+
+    )
+
+    return (
+
+        odd_home,
+
+        odd_draw,
+
+        odd_away
+
+    )
+
+# ============================================================
+# BLOCO IA 09 - VALUE INDICATORS
+# ============================================================
+
+# ------------------------------------------------------------
+# VALUE HOME
+# ------------------------------------------------------------
+
+if (
+
+    pd.notna(jogo.get("Odds_Casa"))
+
+    and
+
+    pd.notna(linha_consenso["Odd_Justa_Home"])
+
+):
+
+    linha_consenso["Value_Home"] = round(
+
+        jogo["Odds_Casa"]
+
+        /
+
+        linha_consenso["Odd_Justa_Home"],
+
+        3
+
+    )
+
+else:
+
+    linha_consenso["Value_Home"] = np.nan
+
+
+# ------------------------------------------------------------
+# VALUE DRAW
+# ------------------------------------------------------------
+
+if (
+
+    pd.notna(jogo.get("Odds_Empate"))
+
+    and
+
+    pd.notna(linha_consenso["Odd_Justa_Draw"])
+
+):
+
+    linha_consenso["Value_Draw"] = round(
+
+        jogo["Odds_Empate"]
+
+        /
+
+        linha_consenso["Odd_Justa_Draw"],
+
+        3
+
+    )
+
+else:
+
+    linha_consenso["Value_Draw"] = np.nan
+
+
+# ------------------------------------------------------------
+# VALUE AWAY
+# ------------------------------------------------------------
+
+if (
+
+    pd.notna(jogo.get("Odds_Visitante"))
+
+    and
+
+    pd.notna(linha_consenso["Odd_Justa_Away"])
+
+):
+
+    linha_consenso["Value_Away"] = round(
+
+        jogo["Odds_Visitante"]
+
+        /
+
+        linha_consenso["Odd_Justa_Away"],
+
+        3
+
+    )
+
+else:
+
+    linha_consenso["Value_Away"] = np.nan
+
+# ============================================================
+# BLOCO IA 10 - EDGE
+# ============================================================
+
+linha_consenso["Edge_Home"] = (
+
+    linha_consenso["Value_Home"] - 1
+
+) * 100
+
+linha_consenso["Edge_Draw"] = (
+
+    linha_consenso["Value_Draw"] - 1
+
+) * 100
+
+linha_consenso["Edge_Away"] = (
+
+    linha_consenso["Value_Away"] - 1
+
+) * 100
