@@ -921,3 +921,480 @@ print(f"Colunas geradas   : {len(df_resultados.columns):,}")
 
 print("\nArquivo gerado:")
 print("POISSON_RESULTADOS.xlsx")
+
+# ============================================================
+# BLOCO 08 — LEITURA DA BASE POISSON
+# ============================================================
+ARQUIVO_PADRAO = "data/POISSON_RESULTADOS.xlsx"
+
+arquivo = st.file_uploader(
+    "Selecione o arquivo Poisson",
+    type=["xlsx"]
+)
+
+if arquivo is None:
+    df_ml = pd.read_excel(ARQUIVO_PADRAO)
+else:
+    df_ml = pd.read_excel(arquivo)
+
+# ============================================================
+# BLOCO 09 — ENGENHARIA DE FEATURES
+# ============================================================
+
+print("\n" + "=" * 80)
+print("BLOCO 09 - ENGENHARIA DE FEATURES")
+print("=" * 80)
+
+# ============================================================
+# DIFERENÇAS DE ExG
+# ============================================================
+
+df_ml["Diff_ExG_MGF"] = (
+    df_ml["ExG_Home_MGF"] -
+    df_ml["ExG_Away_MGF"]
+)
+
+df_ml["Diff_ExG_ATKDEF"] = (
+    df_ml["ExG_Home_ATKDEF"] -
+    df_ml["ExG_Away_ATKDEF"]
+)
+
+df_ml["Diff_ExG_VG"] = (
+    df_ml["ExG_Home_VG"] -
+    df_ml["ExG_Away_VG"]
+)
+
+df_ml["Diff_ExG_Consenso"] = (
+    df_ml["ExG_Home_Consenso"] -
+    df_ml["ExG_Away_Consenso"]
+)
+
+# ============================================================
+# SOMA ExG
+# ============================================================
+
+df_ml["Total_ExG_MGF"] = (
+    df_ml["ExG_Home_MGF"] +
+    df_ml["ExG_Away_MGF"]
+)
+
+df_ml["Total_ExG_ATKDEF"] = (
+    df_ml["ExG_Home_ATKDEF"] +
+    df_ml["ExG_Away_ATKDEF"]
+)
+
+df_ml["Total_ExG_VG"] = (
+    df_ml["ExG_Home_VG"] +
+    df_ml["ExG_Away_VG"]
+)
+
+df_ml["Total_ExG_Consenso"] = (
+    df_ml["ExG_Home_Consenso"] +
+    df_ml["ExG_Away_Consenso"]
+)
+
+# ============================================================
+# RAZÕES ExG
+# ============================================================
+
+EPS = 1e-6
+
+df_ml["Ratio_ExG_MGF"] = (
+    df_ml["ExG_Home_MGF"] /
+    (df_ml["ExG_Away_MGF"] + EPS)
+)
+
+df_ml["Ratio_ExG_ATKDEF"] = (
+    df_ml["ExG_Home_ATKDEF"] /
+    (df_ml["ExG_Away_ATKDEF"] + EPS)
+)
+
+df_ml["Ratio_ExG_VG"] = (
+    df_ml["ExG_Home_VG"] /
+    (df_ml["ExG_Away_VG"] + EPS)
+)
+
+df_ml["Ratio_ExG_Consenso"] = (
+    df_ml["ExG_Home_Consenso"] /
+    (df_ml["ExG_Away_Consenso"] + EPS)
+)
+
+# ============================================================
+# DIFERENÇA DAS ODDS JUSTAS
+# ============================================================
+
+df_ml["Diff_Odd_Justa"] = (
+    df_ml["Odd_Justa_Home"] -
+    df_ml["Odd_Justa_Away"]
+)
+
+# ============================================================
+# VALUE
+# ============================================================
+
+df_ml["Max_Value"] = df_ml[
+    [
+        "Value_Home",
+        "Value_Draw",
+        "Value_Away"
+    ]
+].max(axis=1)
+
+# ============================================================
+# EDGE
+# ============================================================
+
+df_ml["Max_Edge"] = df_ml[
+    [
+        "Edge_Home",
+        "Edge_Draw",
+        "Edge_Away"
+    ]
+].max(axis=1)
+
+# ============================================================
+# RESUMO
+# ============================================================
+
+print("\nFeatures criadas com sucesso.")
+
+print(f"Total de colunas: {len(df_ml.columns)}")
+
+# ============================================================
+# BLOCO 10 — FEATURES ESTATÍSTICAS
+# ============================================================
+
+print("\n" + "=" * 80)
+print("BLOCO 10 - FEATURES ESTATÍSTICAS")
+print("=" * 80)
+
+EPS = 1e-6
+
+# ============================================================
+# PPJ
+# ============================================================
+
+df_ml["Diff_PPJ"] = (
+    df_ml["PPJH"] -
+    df_ml["PPJA"]
+)
+
+df_ml["Ratio_PPJ"] = (
+    df_ml["PPJH"] /
+    (df_ml["PPJA"] + EPS)
+)
+
+# ============================================================
+# FORÇA ATAQUE
+# ============================================================
+
+df_ml["Diff_FA"] = (
+    df_ml["FAH"] -
+    df_ml["FAA"]
+)
+
+df_ml["Ratio_FA"] = (
+    df_ml["FAH"] /
+    (df_ml["FAA"] + EPS)
+)
+
+# ============================================================
+# FORÇA DEFESA
+# ============================================================
+
+df_ml["Diff_FD"] = (
+    df_ml["FDH"] -
+    df_ml["FDA"]
+)
+
+df_ml["Ratio_FD"] = (
+    df_ml["FDH"] /
+    (df_ml["FDA"] + EPS)
+)
+
+# ============================================================
+# MGF / MGC
+# ============================================================
+
+df_ml["Diff_MGF"] = (
+    df_ml["MGF_H"] -
+    df_ml["MGF_A"]
+)
+
+df_ml["Diff_MGC"] = (
+    df_ml["MGC_A"] -
+    df_ml["MGC_H"]
+)
+
+df_ml["Ratio_MGF"] = (
+    df_ml["MGF_H"] /
+    (df_ml["MGF_A"] + EPS)
+)
+
+df_ml["Ratio_MGC"] = (
+    df_ml["MGC_A"] /
+    (df_ml["MGC_H"] + EPS)
+)
+
+# ============================================================
+# ATAQUE x DEFESA
+# ============================================================
+
+df_ml["Attack_Index"] = (
+    df_ml["MGF_H"] *
+    df_ml["MGC_A"]
+)
+
+df_ml["Defense_Index"] = (
+    df_ml["MGF_A"] *
+    df_ml["MGC_H"]
+)
+
+# ============================================================
+# EXPECTATIVA TOTAL
+# ============================================================
+
+df_ml["Expected_Goals"] = (
+    df_ml["ExG_Home_Consenso"] +
+    df_ml["ExG_Away_Consenso"]
+)
+
+# ============================================================
+# DOMÍNIO OFENSIVO
+# ============================================================
+
+df_ml["Dominio_Ofensivo"] = np.where(
+
+    df_ml["Diff_ExG_Consenso"] > 0.40,
+    "HOME",
+
+    np.where(
+        df_ml["Diff_ExG_Consenso"] < -0.40,
+        "AWAY",
+        "BALANCED"
+    )
+
+)
+
+# ============================================================
+# FAVORITISMO
+# ============================================================
+
+df_ml["Favorito"] = np.where(
+
+    df_ml["Odd_Justa_Home"] <
+    df_ml["Odd_Justa_Away"],
+
+    "HOME",
+    "AWAY"
+
+)
+
+# ============================================================
+# RESUMO
+# ============================================================
+
+print("\nFeatures estatísticas concluídas.")
+
+print(f"Total de colunas: {len(df_ml.columns)}")
+
+# ============================================================
+# BLOCO 11 — SIMILAR GAMES
+# ============================================================
+
+print("\n" + "=" * 80)
+print("BLOCO 11 - SIMILAR GAMES")
+print("=" * 80)
+
+FEATURES_SIMILAR = [
+
+    "Odds_Casa",
+    "Odds_Empate",
+    "Odds_Visitante",
+
+    "ExG_Home_Consenso",
+    "ExG_Away_Consenso",
+
+    "Diff_ExG_Consenso",
+
+    "PPJH",
+    "PPJA",
+
+    "FAH",
+    "FAA",
+
+    "FDH",
+    "FDA"
+
+]
+
+# ============================================================
+# MATRIZ
+# ============================================================
+
+X_similar = (
+    df_ml[FEATURES_SIMILAR]
+    .fillna(0)
+    .copy()
+)
+
+# ============================================================
+# NORMALIZAÇÃO
+# ============================================================
+
+scaler = StandardScaler()
+
+X_scaled = scaler.fit_transform(X_similar)
+
+# ============================================================
+# KNN
+# ============================================================
+
+knn = NearestNeighbors(
+
+    n_neighbors=11,
+    metric="euclidean"
+
+)
+
+knn.fit(X_scaled)
+
+distancias, indices = knn.kneighbors(X_scaled)
+
+# ============================================================
+# FEATURES
+# ============================================================
+
+similaridade_media = []
+
+quantidade_similares = []
+
+for d in distancias:
+
+    media = np.mean(d[1:])
+
+    similaridade = 1 / (1 + media)
+
+    similaridade_media.append(
+        round(similaridade, 4)
+    )
+
+    quantidade_similares.append(10)
+
+df_ml["Similaridade_Media"] = similaridade_media
+
+df_ml["Jogos_Semelhantes"] = quantidade_similares
+
+# ============================================================
+# SCORE DE SIMILARIDADE
+# ============================================================
+
+df_ml["Score_Similaridade"] = (
+
+    df_ml["Similaridade_Media"] * 100
+
+).round(2)
+
+print("\nSimilar Games concluído.")
+
+print(
+
+    "Similaridade média:",
+
+    round(
+        df_ml["Similaridade_Media"].mean(),
+        4
+    )
+
+)
+# ============================================================
+# BLOCO 12 — TARGETS
+# ============================================================
+
+print("\n" + "=" * 80)
+print("BLOCO 12 - TARGETS")
+print("=" * 80)
+
+# ============================================================
+# PLACAR FINAL
+# ============================================================
+
+df_ml["FT_Home"] = (
+    pd.to_numeric(
+        df_ml["Result Home"],
+        errors="coerce"
+    )
+)
+
+df_ml["FT_Away"] = (
+    pd.to_numeric(
+        df_ml["Result Visitor"],
+        errors="coerce"
+    )
+)
+
+# ============================================================
+# CORRECT SCORE
+# ============================================================
+
+df_ml["CS"] = (
+    df_ml["FT_Home"].astype(int).astype(str)
+    + "x" +
+    df_ml["FT_Away"].astype(int).astype(str)
+)
+
+# ============================================================
+# TARGETS LAY
+# ============================================================
+
+df_ml["TARGET_LAY00"] = (
+    df_ml["CS"] != "0x0"
+).astype(int)
+
+df_ml["TARGET_LAY01"] = (
+    df_ml["CS"] != "0x1"
+).astype(int)
+
+df_ml["TARGET_LAY10"] = (
+    df_ml["CS"] != "1x0"
+).astype(int)
+
+df_ml["TARGET_LAY22"] = (
+    df_ml["CS"] != "2x2"
+).astype(int)
+
+# ============================================================
+# GOLEADAS
+# ============================================================
+
+df_ml["TARGET_LAYGH"] = (
+    (df_ml["FT_Home"] < 4)
+).astype(int)
+
+df_ml["TARGET_LAYGA"] = (
+    (df_ml["FT_Away"] < 4)
+).astype(int)
+
+# ============================================================
+# RESUMO
+# ============================================================
+
+TARGETS = [
+
+    "TARGET_LAY00",
+    "TARGET_LAY01",
+    "TARGET_LAY10",
+    "TARGET_LAY22",
+    "TARGET_LAYGH",
+    "TARGET_LAYGA"
+
+]
+
+print("\nDistribuição dos Targets")
+
+for t in TARGETS:
+
+    print(
+        f"{t:18}",
+        df_ml[t].value_counts().to_dict()
+    )
