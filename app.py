@@ -1945,76 +1945,24 @@ def preparar_jogo_ml(linha_csv):
 
 
 # =========================================
-# BUSCA JOGOS SEMELHANTES
+# JOGO NORMALIZADO
 # =========================================
 
-def buscar_similares(linha_csv):
+if X_scaled is None:
 
-    if knn is None or X_scaled is None:
-        return pd.DataFrame()
+    jogo_scaled = None
+
+else:
 
     jogo_ml = preparar_jogo_ml(linha_csv)
 
     if jogo_ml is None:
-        return pd.DataFrame()
 
-    jogo_scaled = scaler_ml.transform(jogo_ml)
-
-    distancias, indices = knn.kneighbors(jogo_scaled)
-
-    semelhantes = (
-        df_ml
-        .iloc[indices[0]]
-        .copy()
-        .reset_index(drop=True)
-    )
-
-    semelhantes["DISTANCIA"] = distancias[0]
-
-    dist_max = semelhantes["DISTANCIA"].max()
-    dist_min = semelhantes["DISTANCIA"].min()
-
-    if dist_max > dist_min:
-
-        semelhantes["SIMILARIDADE"] = (
-            100
-            * (
-                1
-                - (
-                    semelhantes["DISTANCIA"] - dist_min
-                )
-                / (
-                    dist_max - dist_min
-                )
-            )
-        )
+        jogo_scaled = None
 
     else:
 
-        semelhantes["SIMILARIDADE"] = 100.0
-
-    semelhantes["SIMILARIDADE"] = (
-        semelhantes["SIMILARIDADE"]
-        .round(2)
-    )
-
-    semelhantes = (
-        semelhantes
-        .sort_values(
-            "SIMILARIDADE",
-            ascending=False
-        )
-        .reset_index(drop=True)
-    )
-
-    return semelhantes
-
-
-# =========================================
-# JOGO SELECIONADO
-# =========================================
-
-jogos_semelhantes = buscar_similares(linha_csv)
+        jogo_scaled = scaler_ml.transform(jogo_ml)
 
 
 # =========================================
@@ -2148,12 +2096,55 @@ if knn is not None:
 
     for _, jogo_dia in df_consenso.iterrows():
 
-        semelhantes = buscar_similares(jogo_dia)
+        jogo_ml = preparar_jogo_ml(jogo_dia)
 
-        if semelhantes.empty:
+        if jogo_ml is None:
             continue
 
+        jogo_scaled = scaler_ml.transform(jogo_ml)
+
+        distancias, indices = knn.kneighbors(jogo_scaled)
+
+        semelhantes = (
+            df_ml
+            .iloc[indices[0]]
+            .copy()
+            .reset_index(drop=True)
+        )
+
+        semelhantes["DISTANCIA"] = distancias[0]
+
+        dist_max = semelhantes["DISTANCIA"].max()
+        dist_min = semelhantes["DISTANCIA"].min()
+
+        if dist_max > dist_min:
+
+            semelhantes["SIMILARIDADE"] = (
+                100
+                * (
+                    1
+                    - (
+                        semelhantes["DISTANCIA"] - dist_min
+                    )
+                    / (
+                        dist_max - dist_min
+                    )
+                )
+            )
+
+        else:
+
+            semelhantes["SIMILARIDADE"] = 100.0
+
+        semelhantes["SIMILARIDADE"] = (
+            semelhantes["SIMILARIDADE"]
+            .round(2)
+        )
+
         total = len(semelhantes)
+
+        if total == 0:
+            continue
 
         wr = {}
 
@@ -2211,33 +2202,99 @@ df_scanner = pd.DataFrame(scanner_global)
 if not df_scanner.empty:
 
     mercados = [
+
         "LAY00",
         "LAY01",
         "LAY10",
         "LAY22",
         "LAYGH",
         "LAYGA"
+
     ]
 
+    # =====================================
+    # CONVERTE PARA %
+    # =====================================
+
     df_scanner[mercados] = (
+
         df_scanner[mercados]
-        .apply(pd.to_numeric, errors="coerce")
+
+        .apply(
+
+            pd.to_numeric,
+
+            errors="coerce"
+
+        )
+
+        * 100
+
     )
+
+    # =====================================
+    # SCORE
+    # =====================================
 
     df_scanner["SG_SCORE"] = (
-        df_scanner[mercados].mean(axis=1) * 0.70
-        + df_scanner["Similaridade Média"] * 0.30
+
+        df_scanner[mercados]
+
+        .mean(axis=1)
+
+        * 0.70
+
+        +
+
+        df_scanner["Similaridade Média"]
+
+        * 0.30
+
     )
 
-    df_scanner = (
-        df_scanner
-        .sort_values(
-            "SG_SCORE",
-            ascending=False
-        )
-        .reset_index(drop=True)
+    # =====================================
+    # RENOMEIA
+    # =====================================
+
+    df_scanner = df_scanner.rename(
+
+        columns={
+
+            "LAY00": "Lay 0x0",
+
+            "LAY01": "Lay 0x1",
+
+            "LAY10": "Lay 1x0",
+
+            "LAY22": "Lay 2x2",
+
+            "LAYGH": "Lay GH",
+
+            "LAYGA": "Lay GA"
+
+        }
+
     )
-    
+
+    # =====================================
+    # ORDENA
+    # =====================================
+
+    df_scanner = (
+
+        df_scanner
+
+        .sort_values(
+
+            "SG_SCORE",
+
+            ascending=False
+
+        )
+
+        .reset_index(drop=True)
+
+    )
 # =========================================
 # ABAS
 # =========================================
@@ -7659,17 +7716,13 @@ with tab9:
 
     else:
 
-        greens = int(jogos_semelhantes["LAY00"].sum())
-        reds = total - greens
-        winrate = greens / total * 100
+        st.info(f"🔍 {total} jogos semelhantes encontrados")
 
-        col1, col2, col3 = st.columns(3)
-
-        col1.metric("Greens", greens)
-        col2.metric("Reds", reds)
-        col3.metric("Winrate Lay 0x0", f"{winrate:.2f}%")
+        st.markdown("---")
 
         st.markdown("### Jogos semelhantes")
+
+    
 
     colunas_exibir = [
 
@@ -7793,12 +7846,26 @@ with tab9:
 
         st.dataframe(
 
-            df_scanner,
+            df_scanner.style.format(
+
+                {
+
+                    "Lay 0x0": "{:.1f}%",
+                    "Lay 0x1": "{:.1f}%",
+                    "Lay 1x0": "{:.1f}%",
+                    "Lay 2x2": "{:.1f}%",
+                    "Lay GH": "{:.1f}%",
+                    "Lay GA": "{:.1f}%",
+                    "Similaridade Média": "{:.2f}",
+                    "SG_SCORE": "{:.2f}"
+
+                }
+
+            ),
 
             use_container_width=True,
 
             hide_index=True
 
         )
-
 
