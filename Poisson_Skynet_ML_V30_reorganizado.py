@@ -422,31 +422,454 @@ for idx, row in df_v_teams.iterrows():
         }
 
         # =====================================================
-        # 07.2 MGF
+        # BLOCO 07.2 — POISSON MGF
         # =====================================================
-        # <<< COLAR O BLOCO MGF AQUI >>>
+
+        ExG_Home_MGF = np.sqrt(MGF_H * MGC_A)
+        ExG_Away_MGF = np.sqrt(MGF_A * MGC_H)
+
+        ExG_Home_MGF = min(ExG_Home_MGF, 5)
+        ExG_Away_MGF = min(ExG_Away_MGF, 5)
+
+        resultado["ExG_Home_MGF"] = round(ExG_Home_MGF, 3)
+        resultado["ExG_Away_MGF"] = round(ExG_Away_MGF, 3)
+
+        matriz_mgf = matriz_poisson(
+            ExG_Home_MGF,
+            ExG_Away_MGF
+        )
+
+        pH, pD, pA = calcular_probabilidades_ft(
+            ExG_Home_MGF,
+            ExG_Away_MGF,
+            MAX_GOLS
+        )
+
+        resultado["Odd_Justa_Home_MGF"] = safe_odds(pH)
+        resultado["Odd_Justa_Draw_MGF"] = safe_odds(pD)
+        resultado["Odd_Justa_Away_MGF"] = safe_odds(pA)
+
+        # -----------------------------
+        # Over / Under
+        # -----------------------------
+
+        for linha in [0.5, 1.5, 2.5, 3.5, 4.5]:
+
+            over, under = calcular_over_under(
+                ExG_Home_MGF,
+                ExG_Away_MGF,
+                linha
+            )
+
+            resultado[f"MGF_Over_{linha}"] = over
+            resultado[f"MGF_Under_{linha}"] = under
+
+        # -----------------------------
+        # BTTS
+        # -----------------------------
+
+        resultado["MGF_BTTS"] = calcular_btts(
+            ExG_Home_MGF,
+            ExG_Away_MGF
+        )
+
+        # -----------------------------
+        # Clean Sheet
+        # -----------------------------
+
+        resultado["MGF_CleanSheet_Home"] = round(
+            poisson.pmf(0, ExG_Away_MGF) * 100,
+            2
+        )
+
+        resultado["MGF_CleanSheet_Away"] = round(
+            poisson.pmf(0, ExG_Home_MGF) * 100,
+            2
+        )
+
+        # -----------------------------
+        # Primeiro Gol
+        # -----------------------------
+
+        pg_home, pg_away = calcular_primeiro_gol(
+            ExG_Home_MGF,
+            ExG_Away_MGF,
+            matriz_mgf,
+            row.get("CHM"),
+            row.get("CAM")
+        )
+
+        resultado["MGF_PrimeiroGol_Home"] = pg_home
+        resultado["MGF_PrimeiroGol_Away"] = pg_away
+        
 
         # =====================================================
-        # 07.3 ATKDEF
+        # BLOCO 07.3 — POISSON ATK × DEF
         # =====================================================
-        # <<< COLAR O BLOCO ATKDEF AQUI >>>
+
+        ExG_Home_ATKDEF = (MGF_H + MGC_A) / 2
+        ExG_Away_ATKDEF = (MGF_A + MGC_H) / 2
+
+        ExG_Home_ATKDEF = min(ExG_Home_ATKDEF, 5)
+        ExG_Away_ATKDEF = min(ExG_Away_ATKDEF, 5)
+
+        resultado["ExG_Home_ATKDEF"] = round(ExG_Home_ATKDEF, 3)
+        resultado["ExG_Away_ATKDEF"] = round(ExG_Away_ATKDEF, 3)
+
+        matriz_atkdef = matriz_poisson(
+            ExG_Home_ATKDEF,
+            ExG_Away_ATKDEF
+        )
+
+        pH, pD, pA = calcular_probabilidades_ft(
+            ExG_Home_ATKDEF,
+            ExG_Away_ATKDEF,
+            MAX_GOLS
+        )
+
+        resultado["Odd_Justa_Home_ATKDEF"] = safe_odds(pH)
+        resultado["Odd_Justa_Draw_ATKDEF"] = safe_odds(pD)
+        resultado["Odd_Justa_Away_ATKDEF"] = safe_odds(pA)
+
+        # -----------------------------
+        # Over / Under
+        # -----------------------------
+
+        for linha in [0.5, 1.5, 2.5, 3.5, 4.5]:
+
+            over, under = calcular_over_under(
+                ExG_Home_ATKDEF,
+                ExG_Away_ATKDEF,
+                linha
+            )
+
+            resultado[f"ATKDEF_Over_{linha}"] = over
+            resultado[f"ATKDEF_Under_{linha}"] = under
+
+        # -----------------------------
+        # BTTS
+        # -----------------------------
+
+        resultado["ATKDEF_BTTS"] = calcular_btts(
+            ExG_Home_ATKDEF,
+            ExG_Away_ATKDEF
+        )
+
+        # -----------------------------
+        # Clean Sheet
+        # -----------------------------
+
+        resultado["ATKDEF_CleanSheet_Home"] = round(
+            poisson.pmf(0, ExG_Away_ATKDEF) * 100,
+            2
+        )
+
+        resultado["ATKDEF_CleanSheet_Away"] = round(
+            poisson.pmf(0, ExG_Home_ATKDEF) * 100,
+            2
+        )
+
+        # -----------------------------
+        # Primeiro Gol
+        # -----------------------------
+
+        pg_home, pg_away = calcular_primeiro_gol(
+            ExG_Home_ATKDEF,
+            ExG_Away_ATKDEF,
+            matriz_atkdef,
+            row.get("CHM"),
+            row.get("CAM")
+        )
+
+        resultado["ATKDEF_PrimeiroGol_Home"] = pg_home
+        resultado["ATKDEF_PrimeiroGol_Away"] = pg_away
+
+        
+        # =====================================================
+        # BLOCO 07.4 — POISSON VG
+        # =====================================================
+
+        ExG_Home_VG = row.get("Media_VG_H")
+        ExG_Away_VG = row.get("Media_VG_A")
+
+        if pd.isna(ExG_Home_VG) or pd.isna(ExG_Away_VG):
+
+            resultado["ExG_Home_VG"] = np.nan
+            resultado["ExG_Away_VG"] = np.nan
+
+            resultado["Odd_Justa_Home_VG"] = np.nan
+            resultado["Odd_Justa_Draw_VG"] = np.nan
+            resultado["Odd_Justa_Away_VG"] = np.nan
+
+            for linha in [0.5, 1.5, 2.5, 3.5, 4.5]:
+
+                resultado[f"VG_Over_{linha}"] = np.nan
+                resultado[f"VG_Under_{linha}"] = np.nan
+
+            resultado["VG_BTTS"] = np.nan
+            resultado["VG_CleanSheet_Home"] = np.nan
+            resultado["VG_CleanSheet_Away"] = np.nan
+            resultado["VG_PrimeiroGol_Home"] = np.nan
+            resultado["VG_PrimeiroGol_Away"] = np.nan
+
+        else:
+
+            ExG_Home_VG = min(float(ExG_Home_VG), 5)
+            ExG_Away_VG = min(float(ExG_Away_VG), 5)
+
+            resultado["ExG_Home_VG"] = round(ExG_Home_VG, 3)
+            resultado["ExG_Away_VG"] = round(ExG_Away_VG, 3)
+
+            matriz_vg = matriz_poisson(
+                ExG_Home_VG,
+                ExG_Away_VG
+            )
+
+            pH, pD, pA = calcular_probabilidades_ft(
+                ExG_Home_VG,
+                ExG_Away_VG,
+                MAX_GOLS
+            )
+
+            resultado["Odd_Justa_Home_VG"] = safe_odds(pH)
+            resultado["Odd_Justa_Draw_VG"] = safe_odds(pD)
+            resultado["Odd_Justa_Away_VG"] = safe_odds(pA)
+
+            # -----------------------------
+            # Over / Under
+            # -----------------------------
+
+            for linha in [0.5, 1.5, 2.5, 3.5, 4.5]:
+
+                over, under = calcular_over_under(
+                    ExG_Home_VG,
+                    ExG_Away_VG,
+                    linha
+                )
+
+                resultado[f"VG_Over_{linha}"] = over
+                resultado[f"VG_Under_{linha}"] = under
+
+            # -----------------------------
+            # BTTS
+            # -----------------------------
+
+            resultado["VG_BTTS"] = calcular_btts(
+                ExG_Home_VG,
+                ExG_Away_VG
+            )
+
+            # -----------------------------
+            # Clean Sheet
+            # -----------------------------
+
+            resultado["VG_CleanSheet_Home"] = round(
+                poisson.pmf(0, ExG_Away_VG) * 100,
+                2
+            )
+
+            resultado["VG_CleanSheet_Away"] = round(
+                poisson.pmf(0, ExG_Home_VG) * 100,
+                2
+            )
+
+            # -----------------------------
+            # Primeiro Gol
+            # -----------------------------
+
+            pg_home, pg_away = calcular_primeiro_gol(
+                ExG_Home_VG,
+                ExG_Away_VG,
+                matriz_vg,
+                row.get("CHM"),
+                row.get("CAM")
+            )
+
+            resultado["VG_PrimeiroGol_Home"] = pg_home
+            resultado["VG_PrimeiroGol_Away"] = pg_away
+            
 
         # =====================================================
-        # 07.4 VG
+        # BLOCO 07.5 — POISSON CONSENSO
         # =====================================================
-        # <<< COLAR O BLOCO VG AQUI >>>
 
-        # =====================================================
-        # 07.5 CONSENSO
-        # =====================================================
-        # <<< COLAR O BLOCO CONSENSO AQUI >>>
+        ExG_Home_Consenso = np.nanmean([
+            resultado["ExG_Home_MGF"],
+            resultado["ExG_Home_ATKDEF"],
+            resultado["ExG_Home_VG"]
+        ])
+
+        ExG_Away_Consenso = np.nanmean([
+            resultado["ExG_Away_MGF"],
+            resultado["ExG_Away_ATKDEF"],
+            resultado["ExG_Away_VG"]
+        ])
+
+        ExG_Home_Consenso = min(ExG_Home_Consenso, 5)
+        ExG_Away_Consenso = min(ExG_Away_Consenso, 5)
+
+        resultado["ExG_Home_Consenso"] = round(
+            ExG_Home_Consenso,
+            3
+        )
+
+        resultado["ExG_Away_Consenso"] = round(
+            ExG_Away_Consenso,
+            3
+        )
+
+        matriz_consenso = matriz_poisson(
+            ExG_Home_Consenso,
+            ExG_Away_Consenso
+        )
+
+        pH, pD, pA = calcular_probabilidades_ft(
+            ExG_Home_Consenso,
+            ExG_Away_Consenso,
+            MAX_GOLS
+        )
+
+        resultado["Odd_Justa_Home"] = safe_odds(pH)
+        resultado["Odd_Justa_Draw"] = safe_odds(pD)
+        resultado["Odd_Justa_Away"] = safe_odds(pA)
+
+        # ----------------------------------
+        # OVER / UNDER
+        # ----------------------------------
+
+        for linha in [0.5, 1.5, 2.5, 3.5, 4.5]:
+
+            over, under = calcular_over_under(
+                ExG_Home_Consenso,
+                ExG_Away_Consenso,
+                linha
+            )
+
+            resultado[f"Over_{linha}"] = over
+            resultado[f"Under_{linha}"] = under
+
+        # ----------------------------------
+        # BTTS
+        # ----------------------------------
+
+        resultado["BTTS_%"] = calcular_btts(
+            ExG_Home_Consenso,
+            ExG_Away_Consenso
+        )
+
+        # ----------------------------------
+        # CLEAN SHEET
+        # ----------------------------------
+
+        resultado["Clean_Sheet_Home"] = round(
+            poisson.pmf(0, ExG_Away_Consenso) * 100,
+            2
+        )
+
+        resultado["Clean_Sheet_Away"] = round(
+            poisson.pmf(0, ExG_Home_Consenso) * 100,
+            2
+        )
+
+        # ----------------------------------
+        # PRIMEIRO GOL
+        # ----------------------------------
+
+        pg_home, pg_away = calcular_primeiro_gol(
+            ExG_Home_Consenso,
+            ExG_Away_Consenso,
+            matriz_consenso,
+            row.get("CHM"),
+            row.get("CAM")
+        )
+
+        resultado["PrimeiroGol_Home"] = pg_home
+        resultado["PrimeiroGol_Away"] = pg_away
+
+        # ----------------------------------
+        # VALUE
+        # ----------------------------------
+
+        resultado["Value_Home"] = round(
+            (Odd_H / resultado["Odd_Justa_Home"]) - 1,
+            4
+        )
+
+        resultado["Value_Draw"] = round(
+            (Odd_D / resultado["Odd_Justa_Draw"]) - 1,
+            4
+        )
+
+        resultado["Value_Away"] = round(
+            (Odd_A / resultado["Odd_Justa_Away"]) - 1,
+            4
+        )
+
+        # ----------------------------------
+        # EDGE (%)
+        # ----------------------------------
+
+        resultado["Edge_Home"] = round(
+            (
+                (1 / resultado["Odd_Justa_Home"])
+                - (1 / Odd_H)
+            ) * 100,
+            2
+        )
+
+        resultado["Edge_Draw"] = round(
+            (
+                (1 / resultado["Odd_Justa_Draw"])
+                - (1 / Odd_D)
+            ) * 100,
+            2
+        )
+
+        resultado["Edge_Away"] = round(
+            (
+                (1 / resultado["Odd_Justa_Away"])
+                - (1 / Odd_A)
+            ) * 100,
+            2
+        )
+
+        # ----------------------------------
+        # INTERPRETAÇÃO
+        # ----------------------------------
+
+        resultado["Interpretacao"] = interpretar_forca_mix(
+
+            Team_Home,
+            Team_Away,
+
+            pH,
+            pA,
+
+            Odd_H,
+            Odd_A,
+
+            ExG_Home_Consenso,
+            ExG_Away_Consenso,
+
+            resultado["VR01"],
+            resultado["COEF_OVER1FT"]
+
+        )
+
+        # ----------------------------------
+        # SALVAR LINHA
+        # ----------------------------------
 
         lista_resultados.append(resultado)
 
     except Exception as erro:
-        print(f"Erro na linha {idx}: {erro}")
-        continue
 
+        print(
+            f"Erro na linha {idx} - "
+            f"{Team_Home} x {Team_Away}: {erro}"
+        )
+
+        continue
 
 # ============================================================
 # BLOCO 07.6 — FINALIZAÇÃO
