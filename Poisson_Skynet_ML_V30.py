@@ -1,2479 +1,936 @@
-# ============================================================
-# POISSON SKYNET ML V30
-# V30.2.0
-#
-# Engine de Machine Learning
-#
-# Objetivo:
-# Gerar BASE_ML_V30.csv
-#
-# Desenvolvido a partir da Poisson Skynet V42
-# ============================================================
+# =========================================================
+# BLOCO 1 — LEITURA E PREPARAÇÃO (VERSÃO ESTÁVEL SIMPLES)
+# =========================================================
 
-# ============================================================
-# BLOCO 01 - IMPORTAÇÕES
-# ============================================================
+pd.set_option('display.max_columns', None)
 
-from pathlib import Path
-from datetime import datetime
-import warnings
-import time
+# =========================================================
+# 1️⃣ HISTÓRICO (df)
+# =========================================================
 
-import numpy as np
-import pandas as pd
-
-from sklearn.preprocessing import StandardScaler
-
-warnings.filterwarnings("ignore")
-
-# ============================================================
-# BLOCO 02 - CONFIGURAÇÕES
-# ============================================================
-
-BASE_DIR = Path(__file__).resolve().parent
-
-ARQ_HISTORICO = BASE_DIR / "CSV_LIMPO.csv"
-
-ARQ_PACKBALL = BASE_DIR / "PackBall.csv"
-
-ARQ_BASE_ML = BASE_DIR / "BASE_ML_V30.csv"
-
-ARQ_LOG = BASE_DIR / "LOG_V30.txt"
-
-DATA_INICIO = time.time()
-
-MAX_GOLS = 5
-
-SEED = 42
-
-pd.set_option("display.max_columns", None)
-
-pd.set_option("display.width", 250)
-
-np.random.seed(SEED)
-
-# ============================================================
-# BLOCO 03 - LEITURA DOS DADOS
-# ============================================================
-
-print("=" * 70)
-print("POISSON SKYNET ML V30")
-print("=" * 70)
-
-print("\nCarregando histórico...")
-
-df_hist = pd.read_csv(
-
-    ARQ_HISTORICO,
-
-    sep=";",
-
-    encoding="utf-8-sig",
-
+df = pd.read_csv(
+    "/content/drive/MyDrive/Colab Notebooks/CONVERTENDO/CSV_LIMPO.csv",
+    sep=';',
+    encoding='utf-8-sig',
     low_memory=False
-
 )
 
-print(f"Histórico carregado: {len(df_hist):,} jogos")
+df = df.replace({pd.NA: np.nan})
 
-print("\nCarregando PackBall...")
-
-df_pack = pd.read_csv(
-
-    ARQ_PACKBALL,
-
-    sep=";",
-
-    encoding="utf-8-sig",
-
-    low_memory=False
-
+# 🔥 ÚNICA REGRA IMPORTANTE
+df['Hour'] = pd.to_datetime(
+    df['Hour'],
+    dayfirst=True,
+    errors='raise'
 )
 
-print(f"Jogos do dia: {len(df_pack):,}")
+df = df.sort_values('Hour').reset_index(drop=True)
 
-print("\nArquivos carregados com sucesso.")
+# 🔥🔥🔥 CORREÇÃO DEFINITIVA DE STRING → FLOAT (SÓ COLUNA K+)
 
-# ============================================================
-# BLOCO 04 - AUDITORIA DA BASE
-# ============================================================
+for c in df.columns[10:]:
 
-print("\n" + "=" * 70)
-print("AUDITORIA DA BASE")
-print("=" * 70)
-
-# ============================================================
-# REMOVE COLUNAS DUPLICADAS
-# ============================================================
-
-df_hist = df_hist.loc[:, ~df_hist.columns.duplicated()]
-
-df_pack = df_pack.loc[:, ~df_pack.columns.duplicated()]
-
-# ============================================================
-# VERIFICAÇÕES
-# ============================================================
-
-print(f"\nHistórico")
-
-print(f"Linhas...............: {len(df_hist):,}")
-
-print(f"Colunas..............: {len(df_hist.columns):,}")
-
-print(f"Nulos................: {int(df_hist.isna().sum().sum()):,}")
-
-print(f"Duplicados...........: {int(df_hist.duplicated().sum()):,}")
-
-print(f"Memória..............: {df_hist.memory_usage(deep=True).sum()/1024/1024:.2f} MB")
-
-print(f"\nPackBall")
-
-print(f"Linhas...............: {len(df_pack):,}")
-
-print(f"Colunas..............: {len(df_pack.columns):,}")
-
-print(f"Nulos................: {int(df_pack.isna().sum().sum()):,}")
-
-print(f"Duplicados...........: {int(df_pack.duplicated().sum()):,}")
-
-# ============================================================
-# DATAS
-# ============================================================
-
-if "Hour" in df_hist.columns:
-
-    df_hist["Hour"] = pd.to_datetime(
-
-        df_hist["Hour"],
-
-        dayfirst=True,
-
-        errors="coerce"
-
+    df[c] = (
+        df[c]
+        .astype(str)
+        .str.replace(',', '.', regex=False)
     )
 
-    print(
-
-        f"\nDatas inválidas......: "
-
-        f"{int(df_hist['Hour'].isna().sum()):,}"
-
+    df[c] = pd.to_numeric(
+        df[c],
+        errors='coerce'
     )
 
-# ============================================================
-# COLUNAS CONSTANTES
-# ============================================================
+print("✅ df (histórico):", df.shape)
 
-constantes = [
+# =========================================================
+# 2️⃣ PACKBALL (df_teams)
+# =========================================================
 
-    c
-
-    for c in df_hist.columns
-
-    if df_hist[c].nunique(dropna=False) <= 1
-
-]
-
-print(
-
-    f"Colunas constantes...: "
-
-    f"{len(constantes)}"
-
+df_teams = pd.read_csv(
+    "/content/drive/MyDrive/Colab Notebooks/CONVERTENDO/CSV_CRU/PackBall Custom EXP GOLS (01_07_2026).csv",
+    sep=';',
+    encoding='utf-8-sig',
+    keep_default_na=True
 )
 
-if constantes:
+df_teams = df_teams.replace({pd.NA: np.nan})
 
-    print("\nPrimeiras constantes:")
-
-    for c in constantes[:20]:
-
-        print(f" - {c}")
-
-# ============================================================
-# RESUMO
-# ============================================================
-
-print("\nAuditoria concluída com sucesso.")
-
-print("=" * 70)
-
-
-# ============================================================
-# BLOCO 05 - PADRONIZAÇÃO DA BASE
-# ============================================================
-
-print("\n" + "=" * 70)
-print("PADRONIZAÇÃO DA BASE")
-print("=" * 70)
-
-# ============================================================
-# REMOVE ESPAÇOS DOS NOMES DAS COLUNAS
-# ============================================================
-
-df_hist.columns = (
-
-    df_hist.columns
-
-    .str.strip()
-
+df_teams['Hour'] = pd.to_datetime(
+    df_teams['Hour'],
+    format='mixed',
+    dayfirst=True,
+    errors='raise'
 )
 
-df_pack.columns = (
-
-    df_pack.columns
-
-    .str.strip()
-
+df_teams = (
+    df_teams
+    .sort_values('Hour')
+    .reset_index(drop=True)
 )
 
-# ============================================================
-# REMOVE ESPAÇOS DOS TEXTOS
-# ============================================================
+# limpar textos
 
-for df in [
-
-    df_hist,
-
-    df_pack
-
+for c in [
+    'Country',
+    'Short',
+    'League',
+    'Home_Team',
+    'Visitor_Team'
 ]:
 
-    col_texto = df.select_dtypes(
+    if c in df_teams.columns:
 
-        include="object"
-
-    ).columns
-
-    for col in col_texto:
-
-        df[col] = (
-
-            df[col]
-
+        df_teams[c] = (
+            df_teams[c]
             .astype(str)
-
             .str.strip()
-
-            .replace(
-
-                {
-
-                    "nan": np.nan,
-
-                    "None": np.nan,
-
-                    "": np.nan
-
-                }
-
-            )
-
         )
 
-# ============================================================
-# CONVERTE DATAS
-# ============================================================
+# 🔥🔥🔥 CORREÇÃO DEFINITIVA DE STRING → FLOAT (SÓ COLUNA K+)
 
-for df in [
+for c in df_teams.columns[10:]:
 
-    df_hist,
+    df_teams[c] = (
+        df_teams[c]
+        .astype(str)
+        .str.replace(',', '.', regex=False)
+    )
 
-    df_pack
+    df_teams[c] = pd.to_numeric(
+        df_teams[c],
+        errors='coerce'
+    )
 
-]:
+print("✅ df_teams:", df_teams.shape)
 
-    if "Hour" in df.columns:
+# =========================================================
+# 3️⃣ FILTRO DO DIA
+# =========================================================
 
-        df["Hour"] = pd.to_datetime(
+DATA_ALVO = df_teams['Hour'].dt.date.iloc[0]
 
-            df["Hour"],
-
-            dayfirst=True,
-
-            errors="coerce"
-
-        )
-
-# ============================================================
-# CONVERTE RESULTADOS
-# ============================================================
-
-COL_RESULTADOS = [
-
-    "Result Home",
-
-    "Result Visitor",
-
-    "Result_Home_HT",
-
-    "Result_Visitor_HT"
-
-]
-
-for df in [
-
-    df_hist,
-
-    df_pack
-
-]:
-
-    for col in COL_RESULTADOS:
-
-        if col in df.columns:
-
-            df[col] = pd.to_numeric(
-
-                df[col],
-
-                errors="coerce"
-
-            )
-
-# ============================================================
-# CONVERTE TODAS AS ODDS
-# ============================================================
-
-for df in [
-
-    df_hist,
-
-    df_pack
-
-]:
-
-    odds_cols = [
-
-        c
-
-        for c in df.columns
-
-        if (
-
-            "Odd" in c
-
-            or "Odds" in c
-
-        )
-
+df_v_teams = (
+    df_teams[
+        df_teams['Hour'].dt.date == DATA_ALVO
     ]
-
-    for col in odds_cols:
-
-        df[col] = (
-
-            df[col]
-
-            .astype(str)
-
-            .str.replace(",", ".", regex=False)
-
-        )
-
-        df[col] = pd.to_numeric(
-
-            df[col],
-
-            errors="coerce"
-
-        )
-
-# ============================================================
-# CONVERTE DEMAIS NUMÉRICAS
-# ============================================================
-
-IGNORAR = [
-
-    "League",
-
-    "Country",
-
-    "Home_Team",
-
-    "Visitor_Team",
-
-    "Hour"
-
-]
-
-for df in [
-
-    df_hist,
-
-    df_pack
-
-]:
-
-    for col in df.columns:
-
-        if col in IGNORAR:
-
-            continue
-
-        if df[col].dtype == object:
-
-            try:
-
-                serie = (
-
-                    df[col]
-
-                    .astype(str)
-
-                    .str.replace(",", ".", regex=False)
-
-                )
-
-                convertido = pd.to_numeric(
-
-                    serie,
-
-                    errors="coerce"
-
-                )
-
-                if convertido.notna().sum() > 0:
-
-                    df[col] = convertido
-
-            except:
-
-                pass
-
-# ============================================================
-# ORDENA HISTÓRICO
-# ============================================================
-
-if "Hour" in df_hist.columns:
-
-    df_hist = (
-
-        df_hist
-
-        .sort_values(
-
-            "Hour"
-
-        )
-
-        .reset_index(
-
-            drop=True
-
-        )
-
-    )
-
-# ============================================================
-# RESUMO
-# ============================================================
-
-print("\nBase padronizada com sucesso.")
-
-print(f"Histórico : {len(df_hist):,} jogos")
-
-print(f"PackBall  : {len(df_pack):,} jogos")
-
-print("=" * 70)
-
-
-# ============================================================
-# BLOCO IA 01 - FEATURES OFICIAIS
-# ============================================================
-
-FEATURES_ML = [
-
-    # ========================================================
-    # MERCADO
-    # ========================================================
-
-    "Odds_Casa",
-    "Odds_Empate",
-    "Odds_Visitante",
-
-    "Odd_Over_0,5FT",
-    "Odd_Under_0,5FT",
-
-    "Odd_Over_1,5FT",
-    "Odd_Under_1,5FT",
-
-    "Odds_Over_2,5FT",
-    "Odds_Under_2,5FT",
-
-    "Odd_Over_3,5FT",
-    "Odd_Under_3,5FT",
-
-    "Odd_Over_4,5FT",
-    "Odd_Under_4,5FT",
-
-    "Odd_BTTS_YES",
-    "Odd_BTTS_NO",
-
-    # ========================================================
-    # ESTATÍSTICAS
-    # ========================================================
-
-    "PPJH",
-    "PPJA",
-
-    "FAH",
-    "FAA",
-
-    "FDH",
-    "FDA",
-
-    "MGFH",
-    "MGFA",
-
-    "MGCH",
-    "MGCA",
-
-    "MG_Global",
-
-    "VG_H",
-    "VG_A",
-
-    # ========================================================
-    # HT
-    # ========================================================
-
-    "MGF_HT_Home",
-    "MGF_HT_Away",
-
-    "MGC_HT_Home",
-    "MGC_HT_Away",
-
-    # ========================================================
-    # FORMA
-    # ========================================================
-
-    "Win4_H",
-    "Win4_A",
-
-    "Los4_H",
-    "Los4_A",
-
-    "Eficiência_H",
-    "Eficiência_A",
-
-    "Eficiência_HT_H",
-    "Eficiência_HT_A",
-
-    "Eficiência_2nd_H",
-    "Eficiência_2nd_A",
-
-    "Scored_First_H",
-    "Scored_First_A",
-
-    "Conceded_First_H",
-    "Conceded_First_A",
-
-    "FS_Win_H",
-    "FS_Win_A",
-
-    # ========================================================
-    # POISSON MGF
-    # ========================================================
-
-    "ExG_Home_MGF",
-    "ExG_Away_MGF",
-
-    # ========================================================
-    # POISSON ATK x DEF
-    # ========================================================
-
-    "ExG_Home_ATKxDEF",
-    "ExG_Away_ATKxDEF",
-
-    # ========================================================
-    # POISSON VG
-    # ========================================================
-
-    "ExG_Home_VG",
-    "ExG_Away_VG",
-
-    # ========================================================
-    # CONSENSO
-    # ========================================================
-
-    "ExG_Home_Consenso",
-    "ExG_Away_Consenso",
-
-    # ========================================================
-    # POISSON
-    # ========================================================
-
-    "BTTS_%",
-    "Clean_Sheet_Home_%",
-    "Clean_Sheet_Away_%",
-
-    "Odd_Justa_Home",
-    "Odd_Justa_Draw",
-    "Odd_Justa_Away",
-
-    "Prob_Over_0_5",
-    "Prob_Over_1_5",
-    "Prob_Over_2_5",
-    "Prob_Over_3_5",
-    "Prob_Over_4_5",
-
-    "Prob_Under_0_5",
-    "Prob_Under_1_5",
-    "Prob_Under_2_5",
-    "Prob_Under_3_5",
-    "Prob_Under_4_5",
-
-    # ========================================================
-    # INDICADORES
-    # ========================================================
-
-    "VR01",
-    "VAR01_00",
-    "VAR01_01",
-    "COEF_OVER1FT",
-
-    # ========================================================
-    # CONTEXTO
-    # ========================================================
-
-    "League",
-    "Country"
-
-]
-
-# ============================================================
-# TARGETS
-# ============================================================
-
-TARGETS = [
-
-    "LAY00",
-    "LAY01",
-    "LAY10",
-    "LAY22",
-    "LAYGH",
-    "LAYGA"
-
-]
-
-
-# ============================================================
-# BLOCO IA 02 - PREPARAÇÃO DA BASE ML
-# ============================================================
-
-print("\n" + "=" * 70)
-print("PREPARANDO BASE MACHINE LEARNING")
-print("=" * 70)
-
-# ============================================================
-# REMOVE COLUNAS DUPLICADAS
-# ============================================================
-
-df_hist = df_hist.loc[:, ~df_hist.columns.duplicated()]
-
-# ============================================================
-# FEATURES EXISTENTES
-# ============================================================
-
-FEATURES_VALIDAS = [
-
-    col
-
-    for col in FEATURES_ML
-
-    if col in df_hist.columns
-
-]
-
-print(f"\nFeatures encontradas : {len(FEATURES_VALIDAS)}")
-
-print(f"Features esperadas   : {len(FEATURES_ML)}")
-
-# ============================================================
-# TARGETS
-# ============================================================
-
-for col in TARGETS:
-
-    if col not in df_hist.columns:
-
-        df_hist[col] = np.nan
-
-# ============================================================
-# BASE ML
-# ============================================================
-
-COLUNAS_BASE = (
-
-    FEATURES_VALIDAS
-
-    + TARGETS
-
+    .sort_values('Hour')
+    .reset_index(drop=True)
 )
 
-COLUNAS_BASE = list(
+df_v_teams = df_v_teams.replace({pd.NA: np.nan})
 
-    dict.fromkeys(
+if df_v_teams.empty:
 
-        COLUNAS_BASE
-
+    raise RuntimeError(
+        "❌ df_v_teams vazio — erro no filtro"
     )
 
-)
+print("✅ df_v_teams:", df_v_teams.shape)
 
-BASE_ML = (
-
-    df_hist
-
-    [
-
-        COLUNAS_BASE
-
-    ]
-
-    .copy()
-
-)
+display(df.head(10))
 
 # ============================================================
-# CONVERTE NUMÉRICAS
+# BLOCO 06 — FUNÇÕES GERAIS
 # ============================================================
 
-for col in FEATURES_VALIDAS:
+# ============================================================
+# MGF REAL
+# ============================================================
 
-    if col in [
+def calcular_mgf_real(df, team_home, team_away, game_datetime):
 
-        "League",
+    df = df.sort_values("Hour")
 
-        "Country"
+    jogos_home = df[
+        (df["Home_Team"] == team_home) &
+        (df["Hour"] < game_datetime)
+    ].tail(1)
 
-    ]:
+    jogos_away = df[
+        (df["Visitor_Team"] == team_away) &
+        (df["Hour"] < game_datetime)
+    ].tail(1)
 
-        continue
+    if jogos_home.empty or jogos_away.empty:
+        return np.nan, np.nan, np.nan, np.nan
 
-    BASE_ML[col] = pd.to_numeric(
+    h = jogos_home.iloc[0]
+    a = jogos_away.iloc[0]
 
-        BASE_ML[col],
-
-        errors="coerce"
-
+    return (
+        h["MGF_H"],
+        h["MGC_H"],
+        a["MGF_A"],
+        a["MGC_A"]
     )
 
-# ============================================================
-# PREENCHE NaN
-# ============================================================
-
-for col in FEATURES_VALIDAS:
-
-    if col in [
-
-        "League",
-
-        "Country"
-
-    ]:
-
-        continue
-
-    mediana = BASE_ML[col].median()
-
-    if pd.isna(mediana):
-
-        mediana = 0
-
-    BASE_ML[col] = (
-
-        BASE_ML[col]
-
-        .fillna(
-
-            mediana
-
-        )
-
-    )
 
 # ============================================================
-# RESUMO
+# MATRIZ POISSON
 # ============================================================
-
-print(f"\nJogos..............: {len(BASE_ML):,}")
-
-print(f"Features...........: {len(FEATURES_VALIDAS)}")
-
-print(f"Targets............: {len(TARGETS)}")
-
-print("=" * 70)
-
-
-# ============================================================
-# BLOCO IA 03 - FEATURES OFICIAIS DA IA
-# ============================================================
-
-FEATURES_ML = [
-
-    # ========================================================
-    # MERCADO
-    # ========================================================
-
-    "Odds_Casa",
-    "Odds_Empate",
-    "Odds_Visitante",
-
-    "Odd_Over_0,5FT",
-    "Odd_Under_0,5FT",
-
-    "Odd_Over_1,5FT",
-    "Odd_Under_1,5FT",
-
-    "Odds_Over_2,5FT",
-    "Odds_Under_2,5FT",
-
-    "Odd_Over_3,5FT",
-    "Odd_Under_3,5FT",
-
-    "Odd_Over_4,5FT",
-    "Odd_Under_4,5FT",
-
-    "Odd_BTTS_YES",
-    "Odd_BTTS_NO",
-
-    # ========================================================
-    # ESTATÍSTICAS
-    # ========================================================
-
-    "PPJH",
-    "PPJA",
-
-    "FAH",
-    "FAA",
-
-    "FDH",
-    "FDA",
-
-    "MGFH",
-    "MGFA",
-
-    "MGCH",
-    "MGCA",
-
-    "MG_Global",
-
-    "VG_H",
-    "VG_A",
-
-    # ========================================================
-    # FORMA
-    # ========================================================
-
-    "Win4_H",
-    "Win4_A",
-
-    "Los4_H",
-    "Los4_A",
-
-    "Eficiência_H",
-    "Eficiência_A",
-
-    "Eficiência_HT_H",
-    "Eficiência_HT_A",
-
-    "Eficiência_2nd_H",
-    "Eficiência_2nd_A",
-
-    "FS_Win_H",
-    "FS_Win_A",
-
-    "Scored_First_H",
-    "Scored_First_A",
-
-    "Conceded_First_H",
-    "Conceded_First_A",
-
-    # ========================================================
-    # POISSON MGF
-    # ========================================================
-
-    "ExG_Home_MGF",
-    "ExG_Away_MGF",
-
-    # ========================================================
-    # POISSON ATK x DEF
-    # ========================================================
-
-    "ExG_Home_ATKxDEF",
-    "ExG_Away_ATKxDEF",
-
-    # ========================================================
-    # POISSON VG
-    # ========================================================
-
-    "ExG_Home_VG",
-    "ExG_Away_VG",
-
-    # ========================================================
-    # CONSENSO
-    # ========================================================
-
-    "ExG_Home_Consenso",
-    "ExG_Away_Consenso",
-
-    # ========================================================
-    # POISSON
-    # ========================================================
-
-    "BTTS_%",
-    "Clean_Sheet_Home_%",
-    "Clean_Sheet_Away_%",
-
-    "Odd_Justa_Home",
-    "Odd_Justa_Draw",
-    "Odd_Justa_Away",
-
-    "Prob_Over_0_5",
-    "Prob_Over_1_5",
-    "Prob_Over_2_5",
-    "Prob_Over_3_5",
-    "Prob_Over_4_5",
-
-    "Prob_Under_0_5",
-    "Prob_Under_1_5",
-    "Prob_Under_2_5",
-    "Prob_Under_3_5",
-    "Prob_Under_4_5",
-
-    # ========================================================
-    # INDICADORES PRÓPRIOS
-    # ========================================================
-    "VR01",
-    "COEF_OVER1,5FT",
-
-    # ========================================================
-    # CONTEXTO
-    # ========================================================
-    "League",
-    "Country"
-]
-# ============================================================
-# TARGETS
-# ============================================================
-TARGETS = [
-    "LAY00",
-    "LAY01",
-    "LAY10",
-    "LAY22",
-    "LAYGH",
-    "LAYGA"]
-
-# ============================================================
-# BLOCO IA 04 - INDICADORES DERIVADOS
-# ============================================================
-
-print("\nCalculando indicadores...")
-
-# ============================================================
-# VARIÁVEIS DERIVADAS
-# ============================================================
-
-BASE_ML["VAR01_00"] = (
-
-    BASE_ML["Odds_Empate"]
-
-    - BASE_ML["Odds_Casa"]
-
-).round(2)
-
-BASE_ML["VAR01_01"] = (
-
-    BASE_ML["Odds_Empate"]
-
-    - BASE_ML["Odds_Visitante"]
-
-).round(2)
-
-BASE_ML["COEF_OVER1FT"] = (
-
-    BASE_ML["Odds_Empate"]
-
-    / BASE_ML["Odds_Over_2,5FT"]
-
-).round(2)
-
-BASE_ML["VR01"] = (
-
-    BASE_ML["Odd_BTTS_YES"]
-
-    - BASE_ML["Odds_Over_2,5FT"]
-
-).round(2)
-
-# ============================================================
-# VALIDAÇÃO
-# ============================================================
-
-print("Indicadores calculados:")
-
-print(" - VAR01_00")
-
-print(" - VAR01_01")
-
-print(" - COEF_OVER1FT")
-
-print(" - VR01")
-
-# ============================================================
-# BLOCO IA 04 - FUNÇÕES BASE DO POISSON
-# ============================================================
-
-from scipy.stats import poisson
-
 
 def matriz_poisson(lh, la):
 
     return np.outer(
-
         [poisson.pmf(i, lh) for i in range(MAX_GOLS + 1)],
-
         [poisson.pmf(j, la) for j in range(MAX_GOLS + 1)]
-
     )
 
 
-def safe_odds(prob):
+# ============================================================
+# SAFE ODDS
+# ============================================================
 
-    if prob <= 0:
+def safe_odds(prob, min_prob=0.01):
 
+    if pd.isna(prob):
         return np.nan
+
+    prob = max(prob, min_prob)
 
     return round(1 / prob, 2)
 
 
-def placar_mais_provavel(matriz):
-
-    if matriz.size == 0:
-
-        return np.nan
-
-    if np.all(np.isnan(matriz)):
-
-        return np.nan
-
-    i, j = np.unravel_index(
-
-        np.argmax(matriz),
-
-        matriz.shape
-
-    )
-
-    return f"{i}x{j}"
-
-
-def calcular_btts_e_odd(matriz):
-
-    prob = sum(
-
-        matriz[i][j]
-
-        for i in range(1, MAX_GOLS + 1)
-
-        for j in range(1, MAX_GOLS + 1)
-
-    )
-
-    return (
-
-        round(prob * 100, 2),
-
-        safe_odds(prob)
-
-    )
-
-
-def calcular_primeiro_gol(
-
-    exg_home,
-
-    exg_away,
-
-    matriz,
-
-    CHM=None,
-
-    CAM=None
-
-):
-
-    if pd.isna(exg_home):
-
-        return np.nan, np.nan
-
-    if pd.isna(exg_away):
-
-        return np.nan, np.nan
-
-    lam_total = exg_home + exg_away
-
-    if lam_total <= 0:
-
-        return np.nan, np.nan
-
-    p_zero = matriz[0, 0]
-
-    base_home = exg_home / lam_total
-
-    base_away = exg_away / lam_total
-
-    ajuste_home = 1
-
-    ajuste_away = 1
-
-    if (
-
-        pd.notna(CHM)
-
-        and
-
-        pd.notna(CAM)
-
-    ):
-
-        total = CHM + CAM
-
-        if total > 0:
-
-            ajuste_home = CHM / total
-
-            ajuste_away = CAM / total
-
-    home = (
-
-        0.7 * base_home
-
-        +
-
-        0.3 * ajuste_home
-
-    ) * (
-
-        1 - p_zero
-
-    )
-
-    away = (
-
-        0.7 * base_away
-
-        +
-
-        0.3 * ajuste_away
-
-    ) * (
-
-        1 - p_zero
-
-    )
-
-    return (
-
-        round(home * 100, 2),
-
-        round(away * 100, 2)
-
-    )
 # ============================================================
-# BLOCO IA 05 - POISSON MGF
+# FULL TIME
 # ============================================================
 
-if pd.notna(MGF_H) and pd.notna(MGF_A):
-
-    matriz = matriz_poisson(
-
-        MGF_H,
-
-        MGF_A
-
-    )
-
-    home_fp, away_fp = calcular_primeiro_gol(
-
-        matriz,
-
-        H,
-
-        A,
-
-        jogo,
-
-        MGF_H,
-
-        MGF_A,
-
-        MGC_H,
-
-        MGC_A,
-
-        CHM,
-
-        CAM,
-
-        CHS,
-
-        CAS,
-
-        EPS
-
-    )
-
-    linha_mgf["Home_Abrir_Placar"] = home_fp
-
-    linha_mgf["Away_Abrir_Placar"] = away_fp
-
-    prob_home = sum(
-
-        matriz[i][j]
-
-        for i in range(MAX_GOLS + 1)
-
-        for j in range(i)
-
-    )
-
-    prob_draw = sum(
-
-        matriz[i][i]
-
-        for i in range(MAX_GOLS + 1)
-
-    )
-
-    prob_away = sum(
-
-        matriz[i][j]
-
-        for i in range(MAX_GOLS + 1)
-
-        for j in range(i + 1, MAX_GOLS + 1)
-
-    )
-
-    btts_pct, btts_odd = calcular_btts_e_odd(
-
-        matriz
-
-    )
-
-    linha_mgf.update({
-
-        "ExG_Home_MGF": round(MGF_H, 2),
-
-        "ExG_Away_MGF": round(MGF_A, 2),
-
-        "Placar_Mais_Provavel": placar_mais_provavel(
-
-            matriz
-
-        ),
-
-        "BTTS_%": round(
-
-            btts_pct,
-
-            2
-
-        ),
-
-        "Odd_Justa_BTTS": btts_odd,
-
-        "Odd_Justa_Home": safe_odds(
-
-            prob_home
-
-        ),
-
-        "Odd_Justa_Draw": safe_odds(
-
-            prob_draw
-
-        ),
-
-        "Odd_Justa_Away": safe_odds(
-
-            prob_away
-
-        ),
-
-        "Clean_Sheet_Home_%": round(
-
-            matriz[:, 0].sum() * 100,
-
-            2
-
-        ),
-
-        "Clean_Sheet_Away_%": round(
-
-            matriz[0, :].sum() * 100,
-
-            2
-
-        ),
-
-        "Interpretacao": interpretar_forca_mix(
-
-            jogo["Home_Team"],
-
-            jogo["Visitor_Team"],
-
-            prob_home,
-
-            prob_away,
-
-            jogo["Odds_Casa"],
-
-            jogo["Odds_Visitante"],
-
-            MGF_H,
-
-            MGF_A,
-
-            VR01,
-
-            COEF_OVER1FT
-
-        )
-
-    })
-
-    for col in [
-
-        "PPJH",
-
-        "PPJA",
-
-        "FAH",
-
-        "FAA",
-
-        "FDH",
-
-        "FDA",
-
-        "Posse_Bola_Home",
-
-        "Posse_Bola_Away",
-
-        "Precisao_CG_H",
-
-        "Precisao_CG_A",
-
-        "Clean_Games_H",
-
-        "Clean_Games_A"
-
-    ]:
-
-        linha_mgf[col] = jogo.get(col)
-
-    for i in range(MAX_GOLS + 1):
-
-        for j in range(MAX_GOLS + 1):
-
-            linha_mgf[f"{i}x{j}"] = round(
-
-                matriz[i][j] * 100,
-
-                2
-
-            )
-
-else:
-
-    linha_mgf.update({
-
-        "ExG_Home_MGF": np.nan,
-
-        "ExG_Away_MGF": np.nan,
-
-        "Placar_Mais_Provavel": np.nan,
-
-        "BTTS_%": np.nan,
-
-        "Odd_Justa_BTTS": np.nan,
-
-        "Odd_Justa_Home": np.nan,
-
-        "Odd_Justa_Draw": np.nan,
-
-        "Odd_Justa_Away": np.nan,
-
-        "Clean_Sheet_Home_%": np.nan,
-
-        "Clean_Sheet_Away_%": np.nan,
-
-        "Interpretacao": np.nan
-
-    })
-
-
-# =====================================================
-# POISSON — ATAQUE x DEFESA
-# =====================================================
-
-if pd.notna(MGF_H) and pd.notna(MGC_A) and pd.notna(MGF_A) and pd.notna(MGC_H):
-
-    ExG_H_atkdef = (MGF_H + MGC_A) / 2
-
-    ExG_A_atkdef = (MGF_A + MGC_H) / 2
-
-else:
-
-    ExG_H_atkdef = np.nan
-
-    ExG_A_atkdef = np.nan
-
-
-if pd.notna(ExG_H_atkdef) and pd.notna(ExG_A_atkdef):
-
-    matriz = matriz_poisson(
-
-        ExG_H_atkdef,
-
-        ExG_A_atkdef
-
-    )
-
-    home_fp, away_fp = calcular_primeiro_gol(
-
-        matriz,
-
-        H,
-
-        A,
-
-        jogo,
-
-        ExG_H_atkdef,
-
-        ExG_A_atkdef,
-
-        MGC_H,
-
-        MGC_A,
-
-        CHM,
-
-        CAM,
-
-        CHS,
-
-        CAS,
-
-        EPS
-
-    )
-
-    linha_exg["Home_Abrir_Placar"] = home_fp
-
-    linha_exg["Away_Abrir_Placar"] = away_fp
-
-    prob_home = sum(
-
-        matriz[i][j]
-
-        for i in range(MAX_GOLS + 1)
-
-        for j in range(i)
-
-    )
-
-    prob_draw = sum(
-
-        matriz[i][i]
-
-        for i in range(MAX_GOLS + 1)
-
-    )
-
-    prob_away = sum(
-
-        matriz[i][j]
-
-        for i in range(MAX_GOLS + 1)
-
-        for j in range(i + 1, MAX_GOLS + 1)
-
-    )
-
-    btts_pct, btts_odd = calcular_btts_e_odd(
-
-        matriz
-
-    )
-
-    linha_exg.update({
-
-        "ExG_Home_ATKxDEF": round(
-
-            ExG_H_atkdef,
-
-            2
-
-        ),
-
-        "ExG_Away_ATKxDEF": round(
-
-            ExG_A_atkdef,
-
-            2
-
-        ),
-
-        "Placar_Mais_Provavel": placar_mais_provavel(
-
-            matriz
-
-        ),
-
-        "BTTS_%": round(
-
-            btts_pct,
-
-            2
-
-        ),
-
-        "Odd_Justa_BTTS": btts_odd,
-
-        "Odd_Justa_Home": safe_odds(
-
-            prob_home
-
-        ),
-
-        "Odd_Justa_Draw": safe_odds(
-
-            prob_draw
-
-        ),
-
-        "Odd_Justa_Away": safe_odds(
-
-            prob_away
-
-        ),
-
-        "Clean_Sheet_Home_%": round(
-
-            matriz[:, 0].sum() * 100,
-
-            2
-
-        ),
-
-        "Clean_Sheet_Away_%": round(
-
-            matriz[0, :].sum() * 100,
-
-            2
-
-        ),
-
-        "Interpretacao": interpretar_forca_mix(
-
-            jogo["Home_Team"],
-
-            jogo["Visitor_Team"],
-
-            prob_home,
-
-            prob_away,
-
-            jogo["Odds_Casa"],
-
-            jogo["Odds_Visitante"],
-
-            ExG_H_atkdef,
-
-            ExG_A_atkdef,
-
-            VR01,
-
-            COEF_OVER1FT
-
-        )
-
-    })
-
-    for col in [
-
-        "PPJH",
-
-        "PPJA",
-
-        "FAH",
-
-        "FAA",
-
-        "FDH",
-
-        "FDA",
-
-        "Posse_Bola_Home",
-
-        "Posse_Bola_Away",
-
-        "Precisao_CG_H",
-
-        "Precisao_CG_A",
-
-        "Clean_Games_H",
-
-        "Clean_Games_A"
-
-    ]:
-
-        linha_exg[col] = jogo.get(col)
-
-    for i in range(MAX_GOLS + 1):
-
-        for j in range(MAX_GOLS + 1):
-
-            linha_exg[f"{i}x{j}"] = round(
-
-                matriz[i][j] * 100,
-
-                2
-
-            )
-
-else:
-
-    linha_exg.update({
-
-        "ExG_Home_ATKxDEF": np.nan,
-
-        "ExG_Away_ATKxDEF": np.nan,
-
-        "Placar_Mais_Provavel": np.nan,
-
-        "BTTS_%": np.nan,
-
-        "Odd_Justa_BTTS": np.nan,
-
-        "Odd_Justa_Home": np.nan,
-
-        "Odd_Justa_Draw": np.nan,
-
-        "Odd_Justa_Away": np.nan,
-
-        "Clean_Sheet_Home_%": np.nan,
-
-        "Clean_Sheet_Away_%": np.nan,
-
-        "Home_Abrir_Placar": np.nan,
-
-        "Away_Abrir_Placar": np.nan,
-
-        "Interpretacao": "Dados insuficientes para ATKxDEF"
-
-    })
-
-    for i in range(MAX_GOLS + 1):
-
-        for j in range(MAX_GOLS + 1):
-
-            linha_exg[f"{i}x{j}"] = np.nan
-
-saida_exg.append(
-
-    linha_exg
-
-)
-# =====================================================
-# POISSON — VG
-# =====================================================
-
-ExG_H_vg = np.nan
-ExG_A_vg = np.nan
-
-if (
-    pd.notna(H.get("Media_VG_H"))
-    and pd.notna(A.get("Media_VG_A"))
-    and pd.notna(jogo.get("Odds_Casa"))
-    and pd.notna(jogo.get("Odds_Visitante"))
-):
-
-    Odd_H_jogo = jogo.get("Odds_Casa")
-    Odd_A_jogo = jogo.get("Odds_Visitante")
-
-    ExG_H_vg = H.get("Media_VG_H") * Odd_A_jogo
-    ExG_A_vg = A.get("Media_VG_A") * Odd_H_jogo
-
-if pd.notna(ExG_H_vg) and pd.notna(ExG_A_vg):
-
-    matriz = matriz_poisson(
-
-        ExG_H_vg,
-
-        ExG_A_vg
-
-    )
-
-    home_fp, away_fp = calcular_primeiro_gol(
-
-        matriz,
-
-        H,
-
-        A,
-
-        jogo,
-
-        ExG_H_vg,
-
-        ExG_A_vg,
-
-        MGC_H,
-
-        MGC_A,
-
-        CHM,
-
-        CAM,
-
-        CHS,
-
-        CAS,
-
-        EPS
-
-    )
-
-    linha_vg["Home_Abrir_Placar"] = home_fp
-    linha_vg["Away_Abrir_Placar"] = away_fp
-
-    prob_home = sum(
-
-        matriz[i][j]
-
-        for i in range(MAX_GOLS + 1)
-
-        for j in range(i)
-
-    )
-
-    prob_draw = sum(
-
-        matriz[i][i]
-
-        for i in range(MAX_GOLS + 1)
-
-    )
-
-    prob_away = sum(
-
-        matriz[i][j]
-
-        for i in range(MAX_GOLS + 1)
-
-        for j in range(i + 1, MAX_GOLS + 1)
-
-    )
-
-    btts_pct, btts_odd = calcular_btts_e_odd(
-
-        matriz
-
-    )
-
-    linha_vg.update({
-
-        "ExG_Home_VG": round(
-
-            ExG_H_vg,
-
-            2
-
-        ),
-
-        "ExG_Away_VG": round(
-
-            ExG_A_vg,
-
-            2
-
-        ),
-
-        "Placar_Mais_Provavel": placar_mais_provavel(
-
-            matriz
-
-        ),
-
-        "BTTS_%": round(
-
-            btts_pct,
-
-            2
-
-        ),
-
-        "Odd_Justa_BTTS": btts_odd,
-
-        "Odd_Justa_Home": safe_odds(
-
-            prob_home
-
-        ),
-
-        "Odd_Justa_Draw": safe_odds(
-
-            prob_draw
-
-        ),
-
-        "Odd_Justa_Away": safe_odds(
-
-            prob_away
-
-        ),
-
-        "Clean_Sheet_Home_%": round(
-
-            matriz[:, 0].sum() * 100,
-
-            2
-
-        ),
-
-        "Clean_Sheet_Away_%": round(
-
-            matriz[0, :].sum() * 100,
-
-            2
-
-        ),
-
-        "Interpretacao": interpretar_forca_mix(
-
-            jogo.get("Home_Team"),
-
-            jogo.get("Visitor_Team"),
-
-            prob_home,
-
-            prob_away,
-
-            Odd_H_jogo,
-
-            Odd_A_jogo,
-
-            ExG_H_vg,
-
-            ExG_A_vg,
-
-            VR01,
-
-            COEF_OVER1FT
-
-        )
-
-    })
-
-    for col in [
-
-        "PPJH",
-        "PPJA",
-        "FAH",
-        "FAA",
-        "FDH",
-        "FDA",
-        "Posse_Bola_Home",
-        "Posse_Bola_Away",
-        "Precisao_CG_H",
-        "Precisao_CG_A",
-        "Clean_Games_H",
-        "Clean_Games_A"
-
-    ]:
-
-        linha_vg[col] = jogo.get(col)
-
-    for i in range(MAX_GOLS + 1):
-
-        for j in range(MAX_GOLS + 1):
-
-            linha_vg[f"{i}x{j}"] = round(
-
-                matriz[i][j] * 100,
-
-                2
-
-            )
-
-else:
-
-    linha_vg.update({
-
-        "ExG_Home_VG": np.nan,
-        "ExG_Away_VG": np.nan,
-        "Placar_Mais_Provavel": np.nan,
-        "BTTS_%": np.nan,
-        "Odd_Justa_BTTS": np.nan,
-        "Odd_Justa_Home": np.nan,
-        "Odd_Justa_Draw": np.nan,
-        "Odd_Justa_Away": np.nan,
-        "Clean_Sheet_Home_%": np.nan,
-        "Clean_Sheet_Away_%": np.nan,
-        "Home_Abrir_Placar": np.nan,
-        "Away_Abrir_Placar": np.nan,
-        "Interpretacao": "Dados insuficientes para VG"
-
-    })
-
-    for i in range(MAX_GOLS + 1):
-
-        for j in range(MAX_GOLS + 1):
-
-            linha_vg[f"{i}x{j}"] = np.nan
-
-saida_vg.append(
-
-    linha_vg
-
-)
-
-# =====================================================
-# CONSENSO
-# =====================================================
-
-linha_consenso = base.copy()
-
-linha_consenso.update({
-
-    'ExG_Home_Consenso': round(lambda_home, 2) if pd.notna(lambda_home) else np.nan,
-    'ExG_Away_Consenso': round(lambda_away, 2) if pd.notna(lambda_away) else np.nan,
-    'ExG_Total': exg_total,
-    'Dominio_Ofensivo': dominio,
-    'Time_Letal': time_letal,
-    'Tendencia_Gols': tendencia,
-    'Defesa_Home': defesa_home,
-    'Defesa_Away': defesa_away,
-
-# =========================================================
-# OVER / UNDER
-# =========================================================
-
-for linha in [
-
-    0.5,
-
-    1.5,
-
-    2.5,
-
-    3.5,
-
-    4.5
-
-]:
-
-    over,
-
-    under = calcular_over_under(
-
-        exg_home_consenso,
-
-        exg_away_consenso,
-
-        linha
-
-    )
-
-    linha_consenso[
-
-        f"Over_{linha}"
-
-    ] = over
-
-    linha_consenso[
-
-        f"Under_{linha}"
-
-    ] = under
-
-
-# =========================================================
-# BTTS
-# =========================================================
-
-linha_consenso["BTTS_%"] = calcular_btts(
-
-    exg_home_consenso,
-
-    exg_away_consenso
-
-)
-
-# ============================================================
-# ODDS JUSTAS
-# ============================================================
-
-(
-
-    odd_home,
-
-    odd_draw,
-
-    odd_away
-
-) = calcular_odds_justas(
-
-    exg_home_consenso,
-
-    exg_away_consenso
-
-)
-
-linha_consenso["Odd_Justa_Home"] = odd_home
-
-linha_consenso["Odd_Justa_Draw"] = odd_draw
-
-linha_consenso["Odd_Justa_Away"] = odd_away
-
-    # =====================================================
-    # CONSENSO TEMPORAL
-    # =====================================================
-
-    "GF_0-15_Home": H.get("GF_0-15_Home"),
-    "GF_0-15_Away": A.get("GF_0-15_Away"),
-
-    "GF_16-30_Home": H.get("GF_16-30_Home"),
-    "GF_16-30_Away": A.get("GF_16-30_Away"),
-
-    "GF_31-45_Home": H.get("GF_31-45_Home"),
-    "GF_31-45_Away": A.get("GF_31-45_Away"),
-
-    "GF_46-60_Home": H.get("GF_46-60_Home"),
-    "GF_46-60_Away": A.get("GF_46-60_Away"),
-
-    "GF_61-75_Home": H.get("GF_61-75_Home"),
-    "GF_61-75_Away": A.get("GF_61-75_Away"),
-
-    "GF_76-90_Home": H.get("GF_76-90_Home"),
-    "GF_76-90_Away": A.get("GF_76-90_Away"),
-
-    # =====================================================
-    # GC
-    # =====================================================
-
-    "GC_0-15_Home": H.get("GC_0-15_Home"),
-    "GC_0-15_Away": A.get("GC_0-15_Away"),
-
-    "GC_16-30_Home": H.get("GC_16-30_Home"),
-    "GC_16-30_Away": A.get("GC_16-30_Away"),
-
-    "GC_31-45_Home": H.get("GC_31-45_Home"),
-    "GC_31-45_Away": A.get("GC_31-45_Away"),
-
-    "GC_46-60_Home": H.get("GC_46-60_Home"),
-    "GC_46-60_Away": A.get("GC_46-60_Away"),
-
-    "GC_61-75_Home": H.get("GC_61-75_Home"),
-    "GC_61-75_Away": A.get("GC_61-75_Away"),
-
-    "GC_76-90_Home": H.get("GC_76-90_Home"),
-    "GC_76-90_Away": A.get("GC_76-90_Away"),
-
-    # =====================================================
-    # EFICIÊNCIA
-    # =====================================================
-
-    "Eficiência_HT_H": H.get("Eficiência_HT_H"),
-    "Eficiência_HT_A": A.get("Eficiência_HT_A"),
-
-    "Eficiência_2nd_H": H.get("Eficiência_2nd_H"),
-    "Eficiência_2nd_A": A.get("Eficiência_2nd_A"),
-
-    "Eficiência_H": H.get("Eficiência_H"),
-    "Eficiência_A": A.get("Eficiência_A"),
-
-    # =====================================================
-    # COMPORTAMENTAL
-    # =====================================================
-
-    "FS_Win_H": H.get("FS_Win_H"),
-    "FS_Win_A": A.get("FS_Win_A"),
-
-    "Changer_H": H.get("Changer_H"),
-    "Changer_A": A.get("Changer_A"),
-
-    "Clean_Games_H": H.get("Clean_Games_H"),
-    "Clean_Games_A": A.get("Clean_Games_A"),
-
-    "NS_Games_H": H.get("NS_Games_H"),
-    "NS_Games_A": A.get("NS_Games_A"),
-
-    "Win4_H": H.get("Win4_H"),
-    "Win4_A": A.get("Win4_A"),
-
-    "Los4_H": H.get("Los4_H"),
-    "Los4_A": A.get("Los4_A"),
-
-    # =====================================================
-    # CONSENSOS
-    # =====================================================
-
-    "Home_Abrir_Placar_Consenso": np.nanmean([
-        linha_mgf.get("Home_Abrir_Placar"),
-        linha_exg.get("Home_Abrir_Placar"),
-        linha_vg.get("Home_Abrir_Placar")
-    ]),
-
-    "Away_Abrir_Placar_Consenso": np.nanmean([
-        linha_mgf.get("Away_Abrir_Placar"),
-        linha_exg.get("Away_Abrir_Placar"),
-        linha_vg.get("Away_Abrir_Placar")
-    ]),
-
-    "Clean_Sheet_Home_Consenso": np.nanmean([
-        linha_mgf.get("Clean_Sheet_Home_%"),
-        linha_exg.get("Clean_Sheet_Home_%"),
-        linha_vg.get("Clean_Sheet_Home_%")
-    ]),
-
-    "Clean_Sheet_Away_Consenso": np.nanmean([
-        linha_mgf.get("Clean_Sheet_Away_%"),
-        linha_exg.get("Clean_Sheet_Away_%"),
-        linha_vg.get("Clean_Sheet_Away_%")
-    ]),
-
-    # MGF
-
-    "ExG_Home_MGF": linha_mgf.get("ExG_Home_MGF"),
-    "ExG_Away_MGF": linha_mgf.get("ExG_Away_MGF"),
-
-    # ATK x DEF
-
-    "ExG_Home_ATKxDEF": linha_exg.get("ExG_Home_ATKxDEF"),
-    "ExG_Away_ATKxDEF": linha_exg.get("ExG_Away_ATKxDEF"),
-
-    # VG
-
-    "ExG_Home_VG": linha_vg.get("ExG_Home_VG"),
-    "ExG_Away_VG": linha_vg.get("ExG_Away_VG"),
-
-})
-
-for col in [
-
-    "PPJH",
-    "PPJA",
-    "FAH",
-    "FAA",
-    "FDH",
-    "FDA",
-    "Posse_Bola_Home",
-    "Posse_Bola_Away",
-    "Precisao_CG_H",
-    "Precisao_CG_A",
-    "Clean_Games_H",
-    "Clean_Games_A"
-
-]:
-
-    linha_consenso[col] = jogo.get(col)
-
-saida_consenso.append(
-
-    linha_consenso
-
-)
-
-# =========================================================
-# OVER / UNDER
-# =========================================================
-
-def calcular_over_under(
-
-    exg_home,
-
-    exg_away,
-
-    limite
-
-):
+def calcular_probabilidades_ft(exg_home, exg_away, max_goals=8):
 
     if pd.isna(exg_home) or pd.isna(exg_away):
+        return np.nan, np.nan, np.nan
 
+    prob_home = 0.0
+    prob_draw = 0.0
+    prob_away = 0.0
+
+    for gh in range(max_goals + 1):
+        for ga in range(max_goals + 1):
+
+            p = (
+                poisson.pmf(gh, exg_home)
+                * poisson.pmf(ga, exg_away)
+            )
+
+            if gh > ga:
+                prob_home += p
+            elif gh == ga:
+                prob_draw += p
+            else:
+                prob_away += p
+
+    return prob_home, prob_draw, prob_away
+
+
+# ============================================================
+# OVER / UNDER
+# ============================================================
+
+def calcular_over_under(exg_home, exg_away, limite):
+
+    if pd.isna(exg_home) or pd.isna(exg_away):
         return np.nan, np.nan
 
     lam = exg_home + exg_away
 
-    under = poisson.cdf(
-
-        int(limite),
-
-        lam
-
-    )
-
+    under = poisson.cdf(int(limite), lam)
     over = 1 - under
 
-    return (
-
-        round(over * 100, 2),
-
-        round(under * 100, 2)
-
-    )
+    return round(over * 100, 2), round(under * 100, 2)
 
 
-# =========================================================
+# ============================================================
 # BTTS
-# =========================================================
+# ============================================================
 
-def calcular_btts(
+def calcular_btts(exg_home, exg_away):
 
+    if pd.isna(exg_home) or pd.isna(exg_away):
+        return np.nan
+
+    p_h0 = poisson.pmf(0, exg_home)
+    p_a0 = poisson.pmf(0, exg_away)
+
+    btts = 1 - p_h0 - p_a0 + (p_h0 * p_a0)
+
+    return round(btts * 100, 2)
+
+
+# ============================================================
+# PRIMEIRO GOL
+# ============================================================
+
+def calcular_primeiro_gol(
     exg_home,
-
-    exg_away
-
+    exg_away,
+    matriz,
+    CHM=None,
+    CAM=None
 ):
 
     if pd.isna(exg_home) or pd.isna(exg_away):
+        return np.nan, np.nan
 
-        return np.nan
+    lam_total = exg_home + exg_away
 
-    p_h0 = poisson.pmf(
+    if lam_total == 0:
+        return np.nan, np.nan
 
-        0,
+    p_zero = matriz[0, 0] if matriz.size else 0
 
-        exg_home
+    base_home = exg_home / lam_total
+    base_away = exg_away / lam_total
 
+    ajuste_home = 1
+    ajuste_away = 1
+
+    if pd.notna(CHM) and pd.notna(CAM):
+
+        total = CHM + CAM
+
+        if total > 0:
+            ajuste_home = CHM / total
+            ajuste_away = CAM / total
+
+    home = (
+        (0.7 * base_home + 0.3 * ajuste_home)
+        * (1 - p_zero)
     )
 
-    p_a0 = poisson.pmf(
-
-        0,
-
-        exg_away
-
+    away = (
+        (0.7 * base_away + 0.3 * ajuste_away)
+        * (1 - p_zero)
     )
 
-    btts = (
+    return round(home * 100, 2), round(away * 100, 2)
 
-        1
 
-        - p_h0
-
-        - p_a0
-
-        + (p_h0 * p_a0)
-
-    )
-
-    return round(
-
-        btts * 100,
-
-        2
-
-    )
 # ============================================================
-# ODDS JUSTAS
+# INTERPRETAÇÃO
 # ============================================================
 
-def calcular_odds_justas(
-
-    exg_home,
-
-    exg_away
-
+def interpretar_forca_mix(
+    home,
+    away,
+    prob_home,
+    prob_away,
+    odd_home,
+    odd_away,
+    exg_h,
+    exg_a,
+    vr01,
+    coef
 ):
 
-    if pd.isna(exg_home):
+    frases = []
 
-        return np.nan, np.nan, np.nan
+    edge_prob = prob_home - prob_away
+    edge_odds = (
+        (1 / odd_home if odd_home else 0)
+        - (1 / odd_away if odd_away else 0)
+    )
+    edge_exg = (exg_h - exg_a) / 3
 
-    if pd.isna(exg_away):
-
-        return np.nan, np.nan, np.nan
-
-    matriz = matriz_poisson(
-
-        exg_home,
-
-        exg_away
-
+    score = (
+        edge_prob * 0.5
+        + edge_odds * 0.3
+        + edge_exg * 0.2
     )
 
-    prob_home = np.tril(
+    if score > 0.35:
+        frases.append(f"Domínio do {home}")
+    elif score > 0.15:
+        frases.append(f"{home} favorito")
+    elif score < -0.35:
+        frases.append(f"Domínio do {away}")
+    elif score < -0.15:
+        frases.append(f"{away} favorito")
+    else:
+        frases.append("Jogo equilibrado")
 
-        matriz,
+    if pd.notna(coef):
 
-        -1
+        if coef >= 1.95:
+            frases.append("Tendência Over 1,5FT")
+        elif coef <= 1.70:
+            frases.append("Tendência Under")
 
-    ).sum()
+    if pd.notna(vr01):
 
-    prob_draw = np.trace(
+        if vr01 >= 0.12:
+            frases.append("Gols do Favorito")
+        elif vr01 <= -0.10:
+            frases.append("BTTS / Jogo Aberto")
 
-        matriz
+    return " | ".join(frases)
 
-    )
-
-    prob_away = np.triu(
-
-        matriz,
-
-        1
-
-    ).sum()
-
-    odd_home = safe_odds(
-
-        prob_home
-
-    )
-
-    odd_draw = safe_odds(
-
-        prob_draw
-
-    )
-
-    odd_away = safe_odds(
-
-        prob_away
-
-    )
-
-    return (
-
-        odd_home,
-
-        odd_draw,
-
-        odd_away
-
-    )
 
 # ============================================================
-# BLOCO IA 09 - VALUE INDICATORS
+# BLOCO 07.1 — LOOP PRINCIPAL
 # ============================================================
 
-# ------------------------------------------------------------
-# VALUE HOME
-# ------------------------------------------------------------
+lista_resultados = []
 
-if (
+for idx, row in df_v_teams.iterrows():
 
-    pd.notna(jogo.get("Odds_Casa"))
+    Team_Home = row["Home_Team"]
+    Team_Away = row["Visitor_Team"]
+    game_datetime = row["Hour"]
 
-    and
+    try:
 
-    pd.notna(linha_consenso["Odd_Justa_Home"])
+        # =====================================================
+        # MGF REAL
+        # =====================================================
 
-):
+        MGF_H, MGC_H, MGF_A, MGC_A = calcular_mgf_real(
+            df,
+            Team_Home,
+            Team_Away,
+            game_datetime
+        )
 
-    linha_consenso["Value_Home"] = round(
+        if (
+            pd.isna(MGF_H) or
+            pd.isna(MGC_H) or
+            pd.isna(MGF_A) or
+            pd.isna(MGC_A)
+        ):
+            continue
 
-        jogo["Odds_Casa"]
+        # =====================================================
+        # ODDS MERCADO
+        # =====================================================
 
-        /
+        Odd_H = float(row["Odds_Casa"])
+        Odd_D = float(row["Odds_Empate"])
+        Odd_A = float(row["Odds_Visitante"])
 
-        linha_consenso["Odd_Justa_Home"],
+        # =====================================================
+        # DADOS BASE
+        # =====================================================
 
-        3
+        resultado = {
 
-    )
+            "Country": row.get("Country"),
+            "League": row.get("League"),
 
-else:
+            "Home_Team": Team_Home,
+            "Visitor_Team": Team_Away,
 
-    linha_consenso["Value_Home"] = np.nan
+            "Hour": game_datetime,
 
+            "Odds_Casa": Odd_H,
+            "Odds_Empate": Odd_D,
+            "Odds_Visitante": Odd_A,
 
-# ------------------------------------------------------------
-# VALUE DRAW
-# ------------------------------------------------------------
+            "PPJH": row.get("PPJH"),
+            "PPJA": row.get("PPJA"),
 
-if (
+            "FAH": row.get("FAH"),
+            "FAA": row.get("FAA"),
 
-    pd.notna(jogo.get("Odds_Empate"))
+            "FDH": row.get("FDH"),
+            "FDA": row.get("FDA"),
 
-    and
+            "MGF_H": MGF_H,
+            "MGC_H": MGC_H,
 
-    pd.notna(linha_consenso["Odd_Justa_Draw"])
+            "MGF_A": MGF_A,
+            "MGC_A": MGC_A,
 
-):
+            "VR01": row.get("VR01"),
+            "COEF_OVER1FT": row.get("COEF_OVER1FT")
 
-    linha_consenso["Value_Draw"] = round(
+        }
 
-        jogo["Odds_Empate"]
+    except Exception:
+        continue
+        
+        # =====================================================
+        # POISSON — MGF
+        # =====================================================
 
-        /
+        ExG_Home_MGF = np.sqrt(MGF_H * MGC_A)
+        ExG_Away_MGF = np.sqrt(MGF_A * MGC_H)
 
-        linha_consenso["Odd_Justa_Draw"],
+        ExG_Home_MGF = min(ExG_Home_MGF, 5)
+        ExG_Away_MGF = min(ExG_Away_MGF, 5)
 
-        3
+        matriz_mgf = matriz_poisson(
+            ExG_Home_MGF,
+            ExG_Away_MGF,
+            MAX_GOLS
+        )
 
-    )
+        pH, pD, pA = calcular_probabilidades_ft(
+            ExG_Home_MGF,
+            ExG_Away_MGF,
+            MAX_GOLS
+        )
 
-else:
+        resultado["ExG_Home_MGF"] = round(ExG_Home_MGF, 3)
+        resultado["ExG_Away_MGF"] = round(ExG_Away_MGF, 3)
 
-    linha_consenso["Value_Draw"] = np.nan
+        resultado["Odd_Justa_Home_MGF"] = safe_odds(pH)
+        resultado["Odd_Justa_Draw_MGF"] = safe_odds(pD)
+        resultado["Odd_Justa_Away_MGF"] = safe_odds(pA)
 
+        for linha in [0.5, 1.5, 2.5, 3.5, 4.5]:
 
-# ------------------------------------------------------------
-# VALUE AWAY
-# ------------------------------------------------------------
+            over, under = calcular_over_under(
+                ExG_Home_MGF,
+                ExG_Away_MGF,
+                linha
+            )
 
-if (
+            resultado[f"MGF_Over_{linha}"] = over
+            resultado[f"MGF_Under_{linha}"] = under
 
-    pd.notna(jogo.get("Odds_Visitante"))
+        resultado["MGF_BTTS"] = calcular_btts(
+            ExG_Home_MGF,
+            ExG_Away_MGF
+        )
 
-    and
+        resultado["MGF_CleanSheet_Home"] = round(
+            poisson.pmf(0, ExG_Away_MGF) * 100,
+            2
+        )
 
-    pd.notna(linha_consenso["Odd_Justa_Away"])
+        resultado["MGF_CleanSheet_Away"] = round(
+            poisson.pmf(0, ExG_Home_MGF) * 100,
+            2
+        )
 
-):
+        pg_home, pg_away = calcular_primeiro_gol(
+            ExG_Home_MGF,
+            ExG_Away_MGF,
+            matriz_mgf,
+            row.get("CHM"),
+            row.get("CAM")
+        )
 
-    linha_consenso["Value_Away"] = round(
+        resultado["MGF_PrimeiroGol_Home"] = pg_home
+        resultado["MGF_PrimeiroGol_Away"] = pg_away
 
-        jogo["Odds_Visitante"]
+        
+        # =====================================================
+        # POISSON — ATK × DEF
+        # =====================================================
 
-        /
+        ExG_Home_ATKDEF = (MGF_H + MGC_A) / 2
+        ExG_Away_ATKDEF = (MGF_A + MGC_H) / 2
 
-        linha_consenso["Odd_Justa_Away"],
+        ExG_Home_ATKDEF = min(ExG_Home_ATKDEF, 5)
+        ExG_Away_ATKDEF = min(ExG_Away_ATKDEF, 5)
 
-        3
+        matriz_atkdef = matriz_poisson(
+            ExG_Home_ATKDEF,
+            ExG_Away_ATKDEF,
+            MAX_GOLS
+        )
 
-    )
+        pH, pD, pA = calcular_probabilidades_ft(
+            ExG_Home_ATKDEF,
+            ExG_Away_ATKDEF,
+            MAX_GOLS
+        )
 
-else:
+        resultado["ExG_Home_ATKDEF"] = round(ExG_Home_ATKDEF, 3)
+        resultado["ExG_Away_ATKDEF"] = round(ExG_Away_ATKDEF, 3)
 
-    linha_consenso["Value_Away"] = np.nan
+        resultado["Odd_Justa_Home_ATKDEF"] = safe_odds(pH)
+        resultado["Odd_Justa_Draw_ATKDEF"] = safe_odds(pD)
+        resultado["Odd_Justa_Away_ATKDEF"] = safe_odds(pA)
+
+        for linha in [0.5, 1.5, 2.5, 3.5, 4.5]:
+
+            over, under = calcular_over_under(
+                ExG_Home_ATKDEF,
+                ExG_Away_ATKDEF,
+                linha
+            )
+
+            resultado[f"ATKDEF_Over_{linha}"] = over
+            resultado[f"ATKDEF_Under_{linha}"] = under
+
+        resultado["ATKDEF_BTTS"] = calcular_btts(
+            ExG_Home_ATKDEF,
+            ExG_Away_ATKDEF
+        )
+
+        resultado["ATKDEF_CleanSheet_Home"] = round(
+            poisson.pmf(0, ExG_Away_ATKDEF) * 100,
+            2
+        )
+
+        resultado["ATKDEF_CleanSheet_Away"] = round(
+            poisson.pmf(0, ExG_Home_ATKDEF) * 100,
+            2
+        )
+
+        pg_home, pg_away = calcular_primeiro_gol(
+            ExG_Home_ATKDEF,
+            ExG_Away_ATKDEF,
+            matriz_atkdef,
+            row.get("CHM"),
+            row.get("CAM")
+        )
+
+        resultado["ATKDEF_PrimeiroGol_Home"] = pg_home
+        resultado["ATKDEF_PrimeiroGol_Away"] = pg_away
+
+        # =====================================================
+        # POISSON — ATK × DEF
+        # =====================================================
+
+        ExG_Home_ATKDEF = (MGF_H + MGC_A) / 2
+        ExG_Away_ATKDEF = (MGF_A + MGC_H) / 2
+
+        ExG_Home_ATKDEF = min(ExG_Home_ATKDEF, 5)
+        ExG_Away_ATKDEF = min(ExG_Away_ATKDEF, 5)
+
+        matriz_atkdef = matriz_poisson(
+            ExG_Home_ATKDEF,
+            ExG_Away_ATKDEF,
+            MAX_GOLS
+        )
+
+        pH, pD, pA = calcular_probabilidades_ft(
+            ExG_Home_ATKDEF,
+            ExG_Away_ATKDEF,
+            MAX_GOLS
+        )
+
+        resultado["ExG_Home_ATKDEF"] = round(ExG_Home_ATKDEF, 3)
+        resultado["ExG_Away_ATKDEF"] = round(ExG_Away_ATKDEF, 3)
+
+        resultado["Odd_Justa_Home_ATKDEF"] = safe_odds(pH)
+        resultado["Odd_Justa_Draw_ATKDEF"] = safe_odds(pD)
+        resultado["Odd_Justa_Away_ATKDEF"] = safe_odds(pA)
+
+        for linha in [0.5, 1.5, 2.5, 3.5, 4.5]:
+
+            over, under = calcular_over_under(
+                ExG_Home_ATKDEF,
+                ExG_Away_ATKDEF,
+                linha
+            )
+
+            resultado[f"ATKDEF_Over_{linha}"] = over
+            resultado[f"ATKDEF_Under_{linha}"] = under
+
+        resultado["ATKDEF_BTTS"] = calcular_btts(
+            ExG_Home_ATKDEF,
+            ExG_Away_ATKDEF
+        )
+
+        resultado["ATKDEF_CleanSheet_Home"] = round(
+            poisson.pmf(0, ExG_Away_ATKDEF) * 100,
+            2
+        )
+
+        resultado["ATKDEF_CleanSheet_Away"] = round(
+            poisson.pmf(0, ExG_Home_ATKDEF) * 100,
+            2
+        )
+
+        pg_home, pg_away = calcular_primeiro_gol(
+            ExG_Home_ATKDEF,
+            ExG_Away_ATKDEF,
+            matriz_atkdef,
+            row.get("CHM"),
+            row.get("CAM")
+        )
+
+        resultado["ATKDEF_PrimeiroGol_Home"] = pg_home
+        resultado["ATKDEF_PrimeiroGol_Away"] = pg_away
+
+        # =====================================================
+        # POISSON — VG
+        # =====================================================
+
+        ExG_Home_VG = row.get("Media_VG_H")
+        ExG_Away_VG = row.get("Media_VG_A")
+
+        if (
+            pd.isna(ExG_Home_VG) or
+            pd.isna(ExG_Away_VG)
+        ):
+            ExG_Home_VG = np.nan
+            ExG_Away_VG = np.nan
+
+                # =====================================================
+        # POISSON — CONSENSO
+        # =====================================================
+
+        ExG_Home_Consenso = np.nanmean([
+            resultado["ExG_Home_MGF"],
+            resultado["ExG_Home_ATKDEF"],
+            resultado["ExG_Home_VG"]
+        ])
+
+        ExG_Away_Consenso = np.nanmean([
+            resultado["ExG_Away_MGF"],
+            resultado["ExG_Away_ATKDEF"],
+            resultado["ExG_Away_VG"]
+        ])
+
+        ExG_Home_Consenso = min(ExG_Home_Consenso, 5)
+        ExG_Away_Consenso = min(ExG_Away_Consenso, 5)
+
+        matriz_consenso = matriz_poisson(
+            ExG_Home_Consenso,
+            ExG_Away_Consenso,
+            MAX_GOLS
+        )
+
+        pH, pD, pA = calcular_probabilidades_ft(
+            ExG_Home_Consenso,
+            ExG_Away_Consenso,
+            MAX_GOLS
+        )
+
+        resultado["ExG_Home_Consenso"] = round(ExG_Home_Consenso, 3)
+        resultado["ExG_Away_Consenso"] = round(ExG_Away_Consenso, 3)
+
+        resultado["Odd_Justa_Home"] = safe_odds(pH)
+        resultado["Odd_Justa_Draw"] = safe_odds(pD)
+        resultado["Odd_Justa_Away"] = safe_odds(pA)
+
+        # =====================================================
+        # OVER / UNDER (CONSENSO)
+        # =====================================================
+
+        for linha in [0.5, 1.5, 2.5, 3.5, 4.5]:
+
+            over, under = calcular_over_under(
+                ExG_Home_Consenso,
+                ExG_Away_Consenso,
+                linha
+            )
+
+            resultado[f"Over_{linha}"] = over
+            resultado[f"Under_{linha}"] = under
+
+        # =====================================================
+        # BTTS
+        # =====================================================
+
+        resultado["BTTS_%"] = calcular_btts(
+            ExG_Home_Consenso,
+            ExG_Away_Consenso
+        )
+
+        # =====================================================
+        # CLEAN SHEET
+        # =====================================================
+
+        resultado["Clean_Sheet_Home"] = round(
+            poisson.pmf(0, ExG_Away_Consenso) * 100,
+            2
+        )
+
+        resultado["Clean_Sheet_Away"] = round(
+            poisson.pmf(0, ExG_Home_Consenso) * 100,
+            2
+        )
+
+        # =====================================================
+        # PRIMEIRO GOL
+        # =====================================================
+
+        pg_home, pg_away = calcular_primeiro_gol(
+            ExG_Home_Consenso,
+            ExG_Away_Consenso,
+            matriz_consenso,
+            row.get("CHM"),
+            row.get("CAM")
+        )
+
+        resultado["Primeiro_Gol_Home"] = pg_home
+        resultado["Primeiro_Gol_Away"] = pg_away
+
+        # =====================================================
+        # VALUE
+        # =====================================================
+
+        resultado["Value_Home"] = (
+            Odd_H / resultado["Odd_Justa_Home"]
+        ) - 1
+
+        resultado["Value_Draw"] = (
+            Odd_D / resultado["Odd_Justa_Draw"]
+        ) - 1
+
+        resultado["Value_Away"] = (
+            Odd_A / resultado["Odd_Justa_Away"]
+        ) - 1
+
+        # =====================================================
+        # EDGE
+        # =====================================================
+
+        resultado["Edge_Home"] = (
+            (1 / resultado["Odd_Justa_Home"]) -
+            (1 / Odd_H)
+        ) * 100
+
+        resultado["Edge_Draw"] = (
+            (1 / resultado["Odd_Justa_Draw"]) -
+            (1 / Odd_D)
+        ) * 100
+
+        resultado["Edge_Away"] = (
+            (1 / resultado["Odd_Justa_Away"]) -
+            (1 / Odd_A)
+        ) * 100
+
+        # =====================================================
+        # SALVAR LINHA
+        # =====================================================
+
+        lista_resultados.append(resultado)
+
+        
+
+        else:
+
+            ExG_Home_VG = min(float(ExG_Home_VG), 5)
+            ExG_Away_VG = min(float(ExG_Away_VG), 5)
+
+            matriz_vg = matriz_poisson(
+                ExG_Home_VG,
+                ExG_Away_VG,
+                MAX_GOLS
+            )
+
+            pH, pD, pA = calcular_probabilidades_ft(
+                ExG_Home_VG,
+                ExG_Away_VG,
+                MAX_GOLS
+            )
+
+            resultado["ExG_Home_VG"] = round(ExG_Home_VG, 3)
+            resultado["ExG_Away_VG"] = round(ExG_Away_VG, 3)
+
+            resultado["Odd_Justa_Home_VG"] = safe_odds(pH)
+            resultado["Odd_Justa_Draw_VG"] = safe_odds(pD)
+            resultado["Odd_Justa_Away_VG"] = safe_odds(pA)
+
+            for linha in [0.5, 1.5, 2.5, 3.5, 4.5]:
+
+                over, under = calcular_over_under(
+                    ExG_Home_VG,
+                    ExG_Away_VG,
+                    linha
+                )
+
+                resultado[f"VG_Over_{linha}"] = over
+                resultado[f"VG_Under_{linha}"] = under
+
+            resultado["VG_BTTS"] = calcular_btts(
+                ExG_Home_VG,
+                ExG_Away_VG
+            )
+
+            resultado["VG_CleanSheet_Home"] = round(
+                poisson.pmf(0, ExG_Away_VG) * 100,
+                2
+            )
+
+            resultado["VG_CleanSheet_Away"] = round(
+                poisson.pmf(0, ExG_Home_VG) * 100,
+                2
+            )
+
+            pg_home, pg_away = calcular_primeiro_gol(
+                ExG_Home_VG,
+                ExG_Away_VG,
+                matriz_vg,
+                row.get("CHM"),
+                row.get("CAM")
+            )
+
+            resultado["VG_PrimeiroGol_Home"] = pg_home
+            resultado["VG_PrimeiroGol_Away"] = pg_away
 
 # ============================================================
-# BLOCO IA 10 - EDGE
+# BLOCO 07.5 — FINALIZAÇÃO DA BASE_ML
 # ============================================================
 
-linha_consenso["Edge_Home"] = (
+BASE_ML = pd.DataFrame(lista_resultados)
 
-    linha_consenso["Value_Home"] - 1
+print("\n" + "=" * 80)
+print("BASE_ML")
+print("=" * 80)
 
-) * 100
+print(f"Jogos.....................: {len(BASE_ML):,}")
+print(f"Colunas...................: {len(BASE_ML.columns):,}")
 
-linha_consenso["Edge_Draw"] = (
+# ============================================================
+# TRATAMENTO DE NaN
+# ============================================================
 
-    linha_consenso["Value_Draw"] - 1
+for coluna in BASE_ML.columns:
 
-) * 100
+    # Numéricas
+    if pd.api.types.is_numeric_dtype(BASE_ML[coluna]):
 
-linha_consenso["Edge_Away"] = (
+        if BASE_ML[coluna].isna().all():
+            continue
 
-    linha_consenso["Value_Away"] - 1
+        BASE_ML[coluna] = (
+            BASE_ML[coluna]
+            .replace([np.inf, -np.inf], np.nan)
+            .fillna(BASE_ML[coluna].median())
+        )
 
-) * 100
+    # Texto
+    else:
+
+        BASE_ML[coluna] = (
+            BASE_ML[coluna]
+            .fillna("")
+        )
+
+# ============================================================
+# REMOVER DUPLICIDADES
+# ============================================================
+
+BASE_ML = (
+    BASE_ML
+    .drop_duplicates()
+    .reset_index(drop=True)
+)
+
+# ============================================================
+# AUDITORIA FINAL
+# ============================================================
+
+print("\nResumo Final")
+
+print(f"Shape.....................: {BASE_ML.shape}")
+print(f"Nulos.....................: {BASE_ML.isna().sum().sum():,}")
+print(f"Duplicados............... : {BASE_ML.duplicated().sum():,}")
+
+# ============================================================
+# EXPORTAÇÃO
+# ============================================================
+
+ARQ_BASE_ML = "BASE_ML.csv"
+
+BASE_ML.to_csv(
+    ARQ_BASE_ML,
+    sep=";",
+    index=False,
+    encoding="utf-8-sig"
+)
+
+print("\n✅ BASE_ML.csv exportada com sucesso.")
+
+print(f"Tempo Total: {(time.time()-DATA_INICIO):.1f} segundos")
+print("=" * 80)
+
+
