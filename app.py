@@ -7844,6 +7844,132 @@ with tab9:
 
     else:
 
+        # =====================================================
+        # ADICIONA RESULTADOS FT / HT
+        # =====================================================
+
+        if {
+
+            "Home_Team",
+            "Visitor_Team",
+            "Result Home",
+            "Result Visitor",
+            "Result_Home_HT",
+            "Result_Visitor_HT"
+
+        }.issubset(jogos_semelhantes.columns):
+
+            resultados = (
+
+                jogos_semelhantes[
+                    [
+                        "Home_Team",
+                        "Visitor_Team",
+                        "Result Home",
+                        "Result Visitor",
+                        "Result_Home_HT",
+                        "Result_Visitor_HT"
+                    ]
+                ]
+
+                .drop_duplicates()
+
+            )
+
+            df_scanner = df_scanner.merge(
+
+                resultados,
+
+                on=[
+                    "Home_Team",
+                    "Visitor_Team"
+                ],
+
+                how="left"
+
+            )
+
+            # -----------------------------
+            # FT
+            # -----------------------------
+
+            df_scanner["FT"] = (
+
+                df_scanner["Result Home"]
+                .fillna("-")
+                .astype(str)
+
+                + " x " +
+
+                df_scanner["Result Visitor"]
+                .fillna("-")
+                .astype(str)
+
+            )
+
+            # -----------------------------
+            # HT
+            # -----------------------------
+
+            df_scanner["HT"] = (
+
+                df_scanner["Result_Home_HT"]
+                .fillna("-")
+                .astype(str)
+
+                + " x " +
+
+                df_scanner["Result_Visitor_HT"]
+                .fillna("-")
+                .astype(str)
+
+            )
+
+            # Caso não exista resultado
+
+            df_scanner.loc[
+
+                df_scanner["Result Home"].isna()
+                |
+                df_scanner["Result Visitor"].isna(),
+
+                "FT"
+
+            ] = "-"
+
+            df_scanner.loc[
+
+                df_scanner["Result_Home_HT"].isna()
+                |
+                df_scanner["Result_Visitor_HT"].isna(),
+
+                "HT"
+
+            ] = "-"
+
+            # Remove colunas antigas
+
+            df_scanner.drop(
+
+                columns=[
+
+                    "Result Home",
+                    "Result Visitor",
+                    "Result_Home_HT",
+                    "Result_Visitor_HT"
+
+                ],
+
+                inplace=True,
+
+                errors="ignore"
+
+            )
+
+        # =====================================================
+        # EXIBIÇÃO
+        # =====================================================
+
         st.dataframe(
 
             df_scanner.style.format(
@@ -7856,6 +7982,7 @@ with tab9:
                     "Lay 2x2": "{:.1f}%",
                     "Lay GH": "{:.1f}%",
                     "Lay GA": "{:.1f}%",
+
                     "Similaridade Média": "{:.2f}",
                     "SG_SCORE": "{:.2f}"
 
@@ -7868,4 +7995,3 @@ with tab9:
             hide_index=True
 
         )
-
