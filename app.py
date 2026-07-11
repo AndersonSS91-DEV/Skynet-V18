@@ -7845,7 +7845,7 @@ with tab9:
     else:
 
         # =====================================================
-        # ADICIONA RESULTADOS FT / HT
+        # ADICIONA RESULTADOS
         # =====================================================
 
         if {
@@ -7889,79 +7889,30 @@ with tab9:
 
             )
 
-            # =====================================================
-            # FT
-            # =====================================================
+            # Se não houver resultado, mostra "-"
 
-            df_scanner["FT"] = (
+            for c in [
 
-                df_scanner["Result Home"]
-                .fillna("-")
-                .astype(str)
+                "Result Home",
+                "Result Visitor",
+                "Result_Home_HT",
+                "Result_Visitor_HT"
 
-                + " x " +
+            ]:
 
-                df_scanner["Result Visitor"]
-                .fillna("-")
-                .astype(str)
+                if c in df_scanner.columns:
 
-            )
-
-            # =====================================================
-            # HT
-            # =====================================================
-
-            df_scanner["HT"] = (
-
-                df_scanner["Result_Home_HT"]
-                .fillna("-")
-                .astype(str)
-
-                + " x " +
-
-                df_scanner["Result_Visitor_HT"]
-                .fillna("-")
-                .astype(str)
-
-            )
-
-            # Se não houver resultado
-
-            df_scanner.loc[
-                df_scanner["Result Home"].isna()
-                |
-                df_scanner["Result Visitor"].isna(),
-                "FT"
-            ] = "-"
-
-            df_scanner.loc[
-                df_scanner["Result_Home_HT"].isna()
-                |
-                df_scanner["Result_Visitor_HT"].isna(),
-                "HT"
-            ] = "-"
-
-            # Remove colunas auxiliares
-
-            df_scanner.drop(
-
-                columns=[
-
-                    "Result Home",
-                    "Result Visitor",
-                    "Result_Home_HT",
-                    "Result_Visitor_HT"
-
-                ],
-
-                inplace=True,
-
-                errors="ignore"
-
-            )
+                    df_scanner[c] = (
+                        df_scanner[c]
+                        .fillna("-")
+                        .astype(str)
+                        .replace("nan", "-")
+                        .replace("None", "-")
+                    )
 
         # =====================================================
-        # REORGANIZA AS COLUNAS
+        # ORDEM DAS COLUNAS
+        # (IGUAL À TABELA DE JOGOS SEMELHANTES)
         # =====================================================
 
         ordem = [
@@ -7969,10 +7920,13 @@ with tab9:
             "League",
 
             "Home_Team",
-            "FT",
-
             "Visitor_Team",
-            "HT",
+
+            "Result Home",
+            "Result Visitor",
+
+            "Result_Home_HT",
+            "Result_Visitor_HT",
 
             "Similares",
             "Similaridade Média",
