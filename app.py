@@ -7845,74 +7845,36 @@ with tab9:
     else:
 
         # =====================================================
-        # ADICIONA RESULTADOS
+        # GARANTE EXIBIÇÃO DOS RESULTADOS
         # =====================================================
 
-        if {
+        for c in [
 
-            "Home_Team",
-            "Visitor_Team",
             "Result Home",
             "Result Visitor",
             "Result_Home_HT",
             "Result_Visitor_HT"
 
-        }.issubset(jogos_semelhantes.columns):
+        ]:
 
-            resultados = (
+            if c in df_scanner.columns:
 
-                jogos_semelhantes[
-                    [
-                        "Home_Team",
-                        "Visitor_Team",
-                        "Result Home",
-                        "Result Visitor",
-                        "Result_Home_HT",
-                        "Result_Visitor_HT"
-                    ]
-                ]
+                df_scanner[c] = (
 
-                .drop_duplicates()
+                    df_scanner[c]
 
-            )
+                    .fillna("-")
 
-            df_scanner = df_scanner.merge(
+                    .replace("", "-")
 
-                resultados,
+                    .replace("None", "-")
 
-                on=[
-                    "Home_Team",
-                    "Visitor_Team"
-                ],
+                    .astype(str)
 
-                how="left"
-
-            )
-
-            # Se não houver resultado, mostra "-"
-
-            for c in [
-
-                "Result Home",
-                "Result Visitor",
-                "Result_Home_HT",
-                "Result_Visitor_HT"
-
-            ]:
-
-                if c in df_scanner.columns:
-
-                    df_scanner[c] = (
-                        df_scanner[c]
-                        .fillna("-")
-                        .astype(str)
-                        .replace("nan", "-")
-                        .replace("None", "-")
-                    )
+                )
 
         # =====================================================
         # ORDEM DAS COLUNAS
-        # (IGUAL À TABELA DE JOGOS SEMELHANTES)
         # =====================================================
 
         ordem = [
@@ -7920,7 +7882,7 @@ with tab9:
             "League",
 
             "Home_Team",
-            "Visitor_Team",
+            "Away_Team",
 
             "Result Home",
             "Result Visitor",
@@ -7942,7 +7904,15 @@ with tab9:
 
         ]
 
-        ordem = [c for c in ordem if c in df_scanner.columns]
+        ordem = [
+
+            c
+
+            for c in ordem
+
+            if c in df_scanner.columns
+
+        ]
 
         ordem += [
 
@@ -7984,4 +7954,5 @@ with tab9:
 
             hide_index=True
 
+        )
         )
