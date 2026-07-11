@@ -7907,6 +7907,13 @@ with tab9:
 
                 {
 
+                    # RESULTADOS
+                    "Result Home": "{:.0f}",
+                    "Result Visitor": "{:.0f}",
+                    "Result_Home_HT": "{:.0f}",
+                    "Result_Visitor_HT": "{:.0f}",
+
+                    # MERCADOS
                     "Lay 0x0": "{:.1f}%",
                     "Lay 0x1": "{:.1f}%",
                     "Lay 1x0": "{:.1f}%",
@@ -7914,6 +7921,7 @@ with tab9:
                     "Lay GH": "{:.1f}%",
                     "Lay GA": "{:.1f}%",
 
+                    # SCORE
                     "Similaridade Média": "{:.2f}",
                     "SG_SCORE": "{:.2f}"
 
