@@ -5615,7 +5615,11 @@ Home {home_emoji}   x   Away {away_emoji}
             "Tier_HA": tier_ha,
 
             # 🔥 SCORE
-            "Score_Zebra": round(score_zebra, 2) if pd.notna(score_zebra) else "",
+            "Score_Zebra": (
+                round(score_zebra, 2)
+                if pd.notna(score_zebra)
+                else np.nan
+            ),
 
             # 🔥 TIMES
             "Home_Team": row.get(
