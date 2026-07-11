@@ -7855,9 +7855,50 @@ with tab9:
 
     else:
 
+        # =====================================
+        # ORDEM DAS COLUNAS
+        # =====================================
+
+        colunas_scanner = [
+
+            "League",
+
+            "Home_Team",
+            "Visitor_Team",
+
+            "Result Home",
+            "Result Visitor",
+
+            "Result_Home_HT",
+            "Result_Visitor_HT",
+
+            "Similares",
+            "Similaridade Média",
+
+            "Lay 0x0",
+            "Lay 0x1",
+            "Lay 1x0",
+            "Lay 2x2",
+            "Lay GH",
+            "Lay GA",
+
+            "SG_SCORE"
+
+        ]
+
+        colunas_scanner = [
+
+            c
+
+            for c in colunas_scanner
+
+            if c in df_scanner.columns
+
+        ]
+
         st.dataframe(
 
-            df_scanner.style.format(
+            df_scanner[colunas_scanner].style.format(
 
                 {
 
@@ -7867,6 +7908,7 @@ with tab9:
                     "Lay 2x2": "{:.1f}%",
                     "Lay GH": "{:.1f}%",
                     "Lay GA": "{:.1f}%",
+
                     "Similaridade Média": "{:.2f}",
                     "SG_SCORE": "{:.2f}"
 
