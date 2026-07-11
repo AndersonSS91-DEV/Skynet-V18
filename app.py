@@ -7836,4 +7836,35 @@ with tab9:
 
     st.markdown("---")
 
+    st.subheader("📊 Scanner Global V30.1.5")
 
+    if df_scanner.empty:
+
+        st.warning("Scanner Global não gerado.")
+
+    else:
+
+        st.dataframe(
+
+            df_scanner.style.format(
+
+                {
+
+                    "Lay 0x0": "{:.1f}%",
+                    "Lay 0x1": "{:.1f}%",
+                    "Lay 1x0": "{:.1f}%",
+                    "Lay 2x2": "{:.1f}%",
+                    "Lay GH": "{:.1f}%",
+                    "Lay GA": "{:.1f}%",
+                    "Similaridade Média": "{:.2f}",
+                    "SG_SCORE": "{:.2f}"
+
+                }
+
+            ),
+
+            use_container_width=True,
+
+            hide_index=True
+
+        )
