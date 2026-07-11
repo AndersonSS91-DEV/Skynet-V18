@@ -5715,6 +5715,13 @@ Home {home_emoji}   x   Away {away_emoji}
     if lista:
 
         df_final_aba7 = pd.DataFrame(lista)
+        # =========================================
+        # GARANTE TIPO NUMÉRICO
+        # =========================================
+        df_final_aba7["Score_Zebra"] = pd.to_numeric(
+            df_final_aba7["Score_Zebra"],
+            errors="coerce"
+        )
 
         st.dataframe(
             df_final_aba7,
