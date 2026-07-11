@@ -2173,8 +2173,13 @@ if knn is not None:
             "League": jogo_dia.get("League"),
 
             "Home_Team": jogo_dia.get("Home_Team"),
-
             "Visitor_Team": jogo_dia.get("Visitor_Team"),
+
+            "Result Home": jogo_dia.get("Result Home", "-"),
+            "Result Visitor": jogo_dia.get("Result Visitor", "-"),
+
+            "Result_Home_HT": jogo_dia.get("Result_Home_HT", "-"),
+            "Result_Visitor_HT": jogo_dia.get("Result_Visitor_HT", "-"),
 
             "Similares": total,
 
