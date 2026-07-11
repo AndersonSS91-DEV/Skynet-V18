@@ -7889,9 +7889,9 @@ with tab9:
 
             )
 
-            # -----------------------------
+            # =====================================================
             # FT
-            # -----------------------------
+            # =====================================================
 
             df_scanner["FT"] = (
 
@@ -7907,9 +7907,9 @@ with tab9:
 
             )
 
-            # -----------------------------
+            # =====================================================
             # HT
-            # -----------------------------
+            # =====================================================
 
             df_scanner["HT"] = (
 
@@ -7925,29 +7925,23 @@ with tab9:
 
             )
 
-            # Caso não exista resultado
+            # Se não houver resultado
 
             df_scanner.loc[
-
                 df_scanner["Result Home"].isna()
                 |
                 df_scanner["Result Visitor"].isna(),
-
                 "FT"
-
             ] = "-"
 
             df_scanner.loc[
-
                 df_scanner["Result_Home_HT"].isna()
                 |
                 df_scanner["Result_Visitor_HT"].isna(),
-
                 "HT"
-
             ] = "-"
 
-            # Remove colunas antigas
+            # Remove colunas auxiliares
 
             df_scanner.drop(
 
@@ -7965,6 +7959,48 @@ with tab9:
                 errors="ignore"
 
             )
+
+        # =====================================================
+        # REORGANIZA AS COLUNAS
+        # =====================================================
+
+        ordem = [
+
+            "League",
+
+            "Home_Team",
+            "FT",
+
+            "Visitor_Team",
+            "HT",
+
+            "Similares",
+            "Similaridade Média",
+
+            "Lay 0x0",
+            "Lay 0x1",
+            "Lay 1x0",
+            "Lay 2x2",
+            "Lay GH",
+            "Lay GA",
+
+            "SG_SCORE"
+
+        ]
+
+        ordem = [c for c in ordem if c in df_scanner.columns]
+
+        ordem += [
+
+            c
+
+            for c in df_scanner.columns
+
+            if c not in ordem
+
+        ]
+
+        df_scanner = df_scanner[ordem]
 
         # =====================================================
         # EXIBIÇÃO
