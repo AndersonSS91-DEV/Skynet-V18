@@ -7836,123 +7836,191 @@ with tab9:
 
     st.markdown("---")
 
-    st.subheader("📊 Scanner Global V30.1.5")
+# ============================================================
+# GERA SCANNER GLOBAL
+# ============================================================
 
-    if df_scanner.empty:
+scanner_global = []
 
-        st.warning("Scanner Global não gerado.")
+for _, jogo_dia in df_consenso.iterrows():
 
-    else:
+    try:
 
-        # =====================================================
-        # GARANTE EXIBIÇÃO DOS RESULTADOS
-        # =====================================================
+        semelhantes = buscar_jogos_semelhantes(
+            jogo_dia,
+            df_historico
+        )
 
-        for c in [
+        total = len(semelhantes)
 
-            "Result Home",
-            "Result Visitor",
-            "Result_Home_HT",
-            "Result_Visitor_HT"
+        if total == 0:
+            continue
 
-        ]:
+        wr = {
 
-            if c in df_scanner.columns:
+            "LAY00": semelhantes["LAY00"].mean(),
+            "LAY01": semelhantes["LAY01"].mean(),
+            "LAY10": semelhantes["LAY10"].mean(),
+            "LAY22": semelhantes["LAY22"].mean(),
+            "LAYGH": semelhantes["LAYGH"].mean(),
+            "LAYGA": semelhantes["LAYGA"].mean()
 
-                df_scanner[c] = (
+        }
 
-                    df_scanner[c]
+        scanner_global.append({
 
-                    .fillna("-")
+            "League": jogo_dia.get("League"),
 
-                    .replace("", "-")
+            "Home_Team": jogo_dia.get("Home_Team"),
 
-                    .replace("None", "-")
+            "Visitor_Team": jogo_dia.get("Visitor_Team"),
 
-                    .astype(str)
+            # =====================================
+            # RESULTADOS
+            # =====================================
 
-                )
+            "Result Home": jogo_dia.get("Result Home", "-"),
+            "Result Visitor": jogo_dia.get("Result Visitor", "-"),
 
-        # =====================================================
-        # ORDEM DAS COLUNAS
-        # =====================================================
+            "Result_Home_HT": jogo_dia.get("Result_Home_HT", "-"),
+            "Result_Visitor_HT": jogo_dia.get("Result_Visitor_HT", "-"),
 
-        ordem = [
+            # =====================================
+            # DADOS DO SCANNER
+            # =====================================
 
-            "League",
+            "Similares": total,
 
-            "Home_Team",
-            "Away_Team",
-
-            "Result Home",
-            "Result Visitor",
-
-            "Result_Home_HT",
-            "Result_Visitor_HT",
-
-            "Similares",
-            "Similaridade Média",
-
-            "Lay 0x0",
-            "Lay 0x1",
-            "Lay 1x0",
-            "Lay 2x2",
-            "Lay GH",
-            "Lay GA",
-
-            "SG_SCORE"
-
-        ]
-
-        ordem = [
-
-            c
-
-            for c in ordem
-
-            if c in df_scanner.columns
-
-        ]
-
-        ordem += [
-
-            c
-
-            for c in df_scanner.columns
-
-            if c not in ordem
-
-        ]
-
-        df_scanner = df_scanner[ordem]
-
-        # =====================================================
-        # EXIBIÇÃO
-        # =====================================================
-
-        st.dataframe(
-
-            df_scanner.style.format(
-
-                {
-
-                    "Lay 0x0": "{:.1f}%",
-                    "Lay 0x1": "{:.1f}%",
-                    "Lay 1x0": "{:.1f}%",
-                    "Lay 2x2": "{:.1f}%",
-                    "Lay GH": "{:.1f}%",
-                    "Lay GA": "{:.1f}%",
-
-                    "Similaridade Média": "{:.2f}",
-                    "SG_SCORE": "{:.2f}"
-
-                }
-
+            "Similaridade Média": round(
+                semelhantes["SIMILARIDADE"].mean(),
+                2
             ),
 
-            use_container_width=True,
+            "LAY00": wr["LAY00"],
+            "LAY01": wr["LAY01"],
+            "LAY10": wr["LAY10"],
+            "LAY22": wr["LAY22"],
+            "LAYGH": wr["LAYGH"],
+            "LAYGA": wr["LAYGA"]
 
-            hide_index=True
+        })
 
+    except Exception:
+        continue
+
+
+df_scanner = pd.DataFrame(scanner_global)
+
+if not df_scanner.empty:
+
+    mercados = [
+
+        "LAY00",
+        "LAY01",
+        "LAY10",
+        "LAY22",
+        "LAYGH",
+        "LAYGA"
+
+    ]
+
+    # =====================================
+    # CONVERTE PARA %
+    # =====================================
+
+    df_scanner[mercados] = (
+
+        df_scanner[mercados]
+
+        .apply(
+            pd.to_numeric,
+            errors="coerce"
         )
+
+        * 100
+
+    )
+
+    # =====================================
+    # SCORE
+    # =====================================
+
+    df_scanner["SG_SCORE"] = (
+
+        df_scanner[mercados].mean(axis=1)
+
+        * 0.70
+
+        +
+
+        df_scanner["Similaridade Média"]
+
+        * 0.30
+
+    )
+
+    # =====================================
+    # RENOMEIA
+    # =====================================
+
+    df_scanner = df_scanner.rename(
+
+        columns={
+
+            "LAY00": "Lay 0x0",
+            "LAY01": "Lay 0x1",
+            "LAY10": "Lay 1x0",
+            "LAY22": "Lay 2x2",
+            "LAYGH": "Lay GH",
+            "LAYGA": "Lay GA"
+
+        }
+
+    )
+
+    # =====================================
+    # GARANTE RESULTADOS
+    # =====================================
+
+    for c in [
+
+        "Result Home",
+        "Result Visitor",
+        "Result_Home_HT",
+        "Result_Visitor_HT"
+
+    ]:
+
+        if c in df_scanner.columns:
+
+            df_scanner[c] = (
+
+                df_scanner[c]
+
+                .fillna("-")
+
+                .replace("", "-")
+
+                .replace("None", "-")
+
+                .astype(str)
+
+            )
+
+    # =====================================
+    # ORDENA
+    # =====================================
+
+    df_scanner = (
+
+        df_scanner
+
+        .sort_values(
+            "SG_SCORE",
+            ascending=False
+        )
+
+        .reset_index(drop=True)
+
+    )
         )
