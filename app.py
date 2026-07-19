@@ -4868,7 +4868,9 @@ Home {home_emoji}   x   Away {away_emoji}
             "reserves",
 
             "friendly",
-            "amistoso"
+            "amistoso", 
+            "serie c",
+            "serie d",
         ]
 
         if any(
