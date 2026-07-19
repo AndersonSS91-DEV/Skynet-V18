@@ -5379,49 +5379,49 @@ Home {home_emoji}   x   Away {away_emoji}
             if "⭐⭐⭐⭐⭐" in tier_la:
 
                 if odd_home < 1.12:
-                    stake = 25
+                    stake = 208
 
                 elif odd_home < 1.20:
-                    stake = 45
+                    stake = 375
 
                 elif odd_home < 1.30:
-                    stake = 55
+                    stake = 458
 
                 elif odd_home < 1.40:
-                    stake = 60
+                    stake = 500
 
                 elif odd_home < 1.50:
-                    stake = 40
+                    stake = 333
 
                 elif odd_home < 1.60:
-                    stake = 55
+                    stake = 458
 
                 elif odd_home < 1.70:
-                    stake = 85
+                    stake = 708
 
                 elif odd_home < 1.80:
-                    stake = 70
+                    stake = 583
 
                 elif odd_home < 1.90:
-                    stake = 60
+                    stake = 500
 
                 elif odd_home < 2.00:
-                    stake = 40
+                    stake = 333
 
                 elif odd_home < 2.20:
-                    stake = 75
+                    stake = 625
 
                 elif odd_home < 2.50:
-                    stake = 120
+                    stake = 1000
 
                 elif odd_home < 3.00:
-                    stake = 70
+                    stake = 583
 
                 elif odd_home <= 5:
-                    stake = 100
+                    stake = 833
 
                 else:
-                    stake = 45
+                    stake = 375
 
             # =====================================
             # ⭐⭐⭐
@@ -5430,49 +5430,49 @@ Home {home_emoji}   x   Away {away_emoji}
             elif "⭐⭐⭐" in tier_la:
 
                 if odd_home < 1.12:
-                    stake = 18
+                    stake = 150
 
                 elif odd_home < 1.20:
-                    stake = 34
+                    stake = 283
 
                 elif odd_home < 1.30:
-                    stake = 41
+                    stake = 342
 
                 elif odd_home < 1.40:
-                    stake = 45
+                    stake = 375
 
                 elif odd_home < 1.50:
-                    stake = 30
+                    stake = 250
 
                 elif odd_home < 1.60:
-                    stake = 41
+                    stake = 342
 
                 elif odd_home < 1.70:
-                    stake = 64
+                    stake = 533
 
                 elif odd_home < 1.80:
-                    stake = 52
+                    stake = 433
 
                 elif odd_home < 1.90:
-                    stake = 45
+                    stake = 375
 
                 elif odd_home < 2.00:
-                    stake = 30
+                    stake = 250
 
                 elif odd_home < 2.20:
-                    stake = 56
+                    stake = 467
 
                 elif odd_home < 2.50:
-                    stake = 90
+                    stake = 750
 
                 elif odd_home < 3.00:
-                    stake = 52
+                    stake = 433
 
                 elif odd_home <= 5:
-                    stake = 75
+                    stake = 625
 
                 else:
-                    stake = 34
+                    stake = 283
 
             # =====================================
             # ⭐
@@ -5481,131 +5481,131 @@ Home {home_emoji}   x   Away {away_emoji}
             elif "⭐" in tier_la:
 
                 if odd_home < 1.12:
-                    stake = 12
+                    stake = 100
 
                 elif odd_home < 1.20:
-                    stake = 22
+                    stake = 183
 
                 elif odd_home < 1.30:
-                    stake = 28
+                    stake = 233
 
                 elif odd_home < 1.40:
-                    stake = 30
+                    stake = 250
 
                 elif odd_home < 1.50:
-                    stake = 20
+                    stake = 167
 
                 elif odd_home < 1.60:
-                    stake = 28
+                    stake = 233
 
                 elif odd_home < 1.70:
-                    stake = 42
+                    stake = 350
 
                 elif odd_home < 1.80:
-                    stake = 35
+                    stake = 292
 
                 elif odd_home < 1.90:
-                    stake = 30
+                    stake = 250
 
                 elif odd_home < 2.00:
-                    stake = 20
+                    stake = 167
 
                 elif odd_home < 2.20:
-                    stake = 38
+                    stake = 317
 
                 elif odd_home < 2.50:
-                    stake = 60
+                    stake = 500
 
                 elif odd_home < 3.00:
-                    stake = 35
+                    stake = 292
 
                 elif odd_home <= 5:
-                    stake = 50
+                    stake = 417
 
                 else:
-                    stake = 22
+                    stake = 183
 
-            # =====================================
-            # 💜💜💜💜💜
-            # =====================================
+        # =====================================
+        # 💜💜💜💜💜
+        # =====================================
 
-            elif "💜💜💜💜💜" in tier_la:
+        elif "💜💜💜💜💜" in tier_la:
 
-                if odd_home < 1.12:
-                    stake = 15
+            if odd_home < 1.12:
+                stake = 64
 
-                elif odd_home < 1.20:
-                    stake = 25
+            elif odd_home < 1.20:
+                stake = 107
 
-                elif odd_home < 1.30:
-                    stake = 30
+            elif odd_home < 1.30:
+                stake = 129
 
-                elif odd_home < 1.40:
-                    stake = 35
+            elif odd_home < 1.40:
+                stake = 150
 
-                elif odd_home < 1.50:
-                    stake = 25
+            elif odd_home < 1.50:
+                stake = 107
 
-                elif odd_home < 1.60:
-                    stake = 35
+            elif odd_home < 1.60:
+                stake = 150
 
-                elif odd_home < 1.70:
-                    stake = 50
+            elif odd_home < 1.70:
+                stake = 214
 
-                elif odd_home < 1.80:
-                    stake = 45
+            elif odd_home < 1.80:
+                stake = 193
 
-                elif odd_home < 1.90:
-                    stake = 35
+            elif odd_home < 1.90:
+                stake = 150
 
-                elif odd_home < 2.00:
-                    stake = 25
+            elif odd_home < 2.00:
+                stake = 107
 
-                elif odd_home < 2.20:
-                    stake = 45
+            elif odd_home < 2.20:
+                stake = 193
 
-                elif odd_home < 2.50:
-                    stake = 70
+            elif odd_home < 2.50:
+                stake = 300
 
-                elif odd_home < 3.00:
-                    stake = 45
+            elif odd_home < 3.00:
+                stake = 193
 
-                elif odd_home <= 5:
-                    stake = 60
+            elif odd_home <= 5:
+                stake = 257
 
-                else:
-                    stake = 25
+            else:
+                stake = 107
 
-            # =====================================
-            # 💜💜💜
-            # =====================================
+        # =====================================
+        # 💜💜💜
+        # =====================================
 
-            elif "💜💜💜" in tier_la:
+        elif "💜💜💜" in tier_la:
 
-                stake = 35
+            stake = 150
 
-            # =====================================
-            # 💜
-            # =====================================
+        # =====================================
+        # 💜
+        # =====================================
 
-            elif "💜" in tier_la:
+        elif "💜" in tier_la:
 
-                stake = 15
-                
+            stake = 64
+
         # =========================================
         # 🟡 HANDICAP
         # =========================================
         if isinstance(tier_ha, str):
 
             if "ELITE" in tier_ha:
-                stake = 50
+                stake = 100
 
             elif "FORTE" in tier_ha:
-                stake = 35
+                stake = 70
 
             elif "VALUE" in tier_ha:
-                stake = 20
-
+                stake = 40
+                
         # =========================================
         # 📋 APPEND FINAL
         # =========================================
