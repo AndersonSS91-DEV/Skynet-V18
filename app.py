@@ -4872,7 +4872,7 @@ Home {home_emoji}   x   Away {away_emoji}
             "serie c",
             "serie d",
             "nwsl",
-            "copa paulista",
+            "copa paulista"
         ]
 
         if any(
