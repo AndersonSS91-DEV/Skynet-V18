@@ -762,6 +762,23 @@ def escudo_path(nome_time):
     
     # (FIM DO BLOCO)
         
+@st.cache_data(show_spinner=False)
+def escudo_base64(nome_time):
+    """
+    Retorna o escudo do time já em Data URI (base64), pronto para uso
+    dentro de HTML (<img src="...">) via st.markdown/unsafe_allow_html.
+    Necessário porque o navegador não consegue acessar caminhos locais
+    de arquivo (ex: 'escudos/time.png') diretamente em tags <img>.
+    """
+    caminho = escudo_path(nome_time)
+    try:
+        with open(caminho, "rb") as f:
+            dados = base64.b64encode(f.read()).decode("utf-8")
+        return f"data:image/png;base64,{dados}"
+    except Exception:
+        return None
+
+
 def get_val(linha, col, fmt=None, default="—"):
     if col in linha.index and pd.notna(linha[col]):
         try:
@@ -2367,44 +2384,58 @@ with tab1:
     home = linha_exg["Home_Team"]
     away = linha_exg["Visitor_Team"]
 
-    esc_home = escudo_path(home)
-    esc_away = escudo_path(away)
+    _crest_home_uri = escudo_base64(home)
+    _crest_away_uri = escudo_base64(away)
 
-    header = st.container()
+    _crest_home_html = (
+        f'<img src="{_crest_home_uri}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">'
+        if _crest_home_uri else "⚽"
+    )
+    _crest_away_html = (
+        f'<img src="{_crest_away_uri}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">'
+        if _crest_away_uri else "⚽"
+    )
 
-    with header:
-        c1, c2, c3 = st.columns(3)
+    _mc_css = """
+    <style>
+    .mc-card { display:flex; align-items:center; justify-content:space-between;
+        border-radius:16px; border:1px solid #232c3d; background:#0d121b;
+        padding:20px 28px; margin-bottom:18px; gap:18px; }
+    .mc-side { display:flex; align-items:center; gap:14px; flex:1; }
+    .mc-side.away { flex-direction:row-reverse; text-align:right; }
+    .mc-crest { width:64px; height:64px; border-radius:50%; background:#1c2433;
+        display:flex; align-items:center; justify-content:center; font-size:28px;
+        border:1px solid #2c3648; flex-shrink:0; }
+    .mc-name { font-size:22px; font-weight:800; color:#f5f7fa; line-height:1.2; }
+    .mc-role { font-size:12.5px; font-weight:700; margin-top:3px; }
+    .mc-vs { font-size:20px; font-weight:900; color:#5b6472; padding:0 18px;
+        flex-shrink:0; }
+    </style>
+    """
+    _mc_css = "\n".join(l.lstrip() for l in _mc_css.splitlines())
+    st.markdown(_mc_css, unsafe_allow_html=True)
 
-        # ===============================
-        # 🏠 CASA
-        # ===============================
-        with c1:
-            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-            st.image(esc_home, width=105)
-            st.markdown(
-                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{home.upper()}</div></div>",
-                unsafe_allow_html=True
-            )
-
-        # ===============================
-        # ⚔️ VS
-        # ===============================
-        with c2:
-            st.markdown(
-                "<div style='text-align:center;font-size:28px;font-weight:900;margin-top:55px;'>VS</div>",
-                unsafe_allow_html=True
-            )
-
-        # ===============================
-        # 🛫 VISITANTE
-        # ===============================
-        with c3:
-            st.markdown("<div style='text-align:center'>", unsafe_allow_html=True)
-            st.image(esc_away, width=105)
-            st.markdown(
-                f"<div style='font-size:20px;font-weight:700;margin-top:6px'>{away.upper()}</div></div>",
-                unsafe_allow_html=True
-            )
+    _mc_html = f"""
+    <div class="mc-card">
+        <div class="mc-side home">
+            <div class="mc-crest">{_crest_home_html}</div>
+            <div>
+                <div class="mc-name">{home.upper()}</div>
+                <div class="mc-role" style="color:#7ee787;">🏠 MANDANTE</div>
+            </div>
+        </div>
+        <div class="mc-vs">VS</div>
+        <div class="mc-side away">
+            <div class="mc-crest">{_crest_away_html}</div>
+            <div>
+                <div class="mc-name">{away.upper()}</div>
+                <div class="mc-role" style="color:#7fb3ff;">✈ VISITANTE</div>
+            </div>
+        </div>
+    </div>
+    """
+    _mc_html = "\n".join(l.lstrip() for l in _mc_html.splitlines())
+    st.markdown(_mc_html, unsafe_allow_html=True)
 
     st.markdown("---")
 
@@ -6425,11 +6456,20 @@ with tab8:
             </div>
             """
 
+        _crest_data_uri = escudo_base64(perfil['time'])
+        if _crest_data_uri:
+            crest_conteudo = (
+                f'<img src="{_crest_data_uri}" '
+                'style="width:100%;height:100%;border-radius:50%;object-fit:cover;">'
+            )
+        else:
+            crest_conteudo = "⚽"
+
         html = f"""
         <div class="pt-card" style="border-left-color:{accent}; background:{cores['bg']};">
             <div class="pt-card-header">
                 <div class="pt-team">
-                    <div class="pt-crest">⚽</div>
+                    <div class="pt-crest">{crest_conteudo}</div>
                     <div>
                         <div class="pt-team-name">{perfil['time']}</div>
                         <div class="pt-tag-role" style="color:{role_color};">{role_icon} {role_label}</div>
