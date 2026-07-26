@@ -20,6 +20,7 @@ from pathlib import Path
 import unicodedata
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import NearestNeighbors
+import streamlit.components.v1 as components
 
 # =========================================
 # CONFIG  
@@ -6460,8 +6461,24 @@ with tab8:
             </div>
         </div>
         """
+        
+        components.html(
+            f"""
+            <html>
+            <head>
+            <style>
+            /* COLE TODO O CSS QUE ESTÁ NO st.markdown(<style>) */
+            </style>
+            </head>
 
-        st.markdown(html, unsafe_allow_html=True)
+            <body style="margin:0;padding:0;background:transparent;">
+                {html}
+            </body>
+            </html>
+            """,
+            height=720,
+            scrolling=False,
+        )
 
     # =========================================================
     # 🧠 HOME
