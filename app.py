@@ -6233,6 +6233,28 @@ with tab8:
             )
 
         # =====================================================
+        # 🔧 NOVO — TENDÊNCIA TEMPORAL (0-100), pra exibir no card
+        # =====================================================
+
+        total_gf = gf_early + gf_mid + gf_late
+
+        if total_gf > 0:
+            tendencia_score = round(
+                (max(gf_early, gf_mid, gf_late) / total_gf) * 100
+            )
+        else:
+            tendencia_score = 50
+
+        # =====================================================
+        # 🔧 NOVO — ESTILO (Controlador x Reativo), pra exibir no card
+        # =====================================================
+
+        if sustentacao >= volume:
+            estilo = "controlador"
+        else:
+            estilo = "reativo"
+
+        # =====================================================
         # 🚀 RETORNO
         # =====================================================
 
@@ -6248,8 +6270,185 @@ with tab8:
 
             "operacional": operacional,
 
-            "leitura": leitura
+            "leitura": leitura,
+
+            # 🔧 NOVO — fatores individuais (0-100) pro card visual
+            "eficiencia": round(eficiencia),
+            "criacao": round(score_ofensivo),
+            "volume": round(volume),
+            "sustentacao": round(sustentacao),
+            "controle": round(controle),
+            "tendencia_score": tendencia_score,
+            "estilo": estilo
         }
+
+    # =========================================================
+    # 🔧 NOVO — CSS DO CARD "PERFIL TÁTICO AUTOMÁTICO"
+    # (injetado uma vez só, os dois cards reaproveitam a classe)
+    # =========================================================
+
+    st.markdown("""
+    <style>
+    .pt-header-row {
+        display:flex; justify-content:space-between; align-items:center;
+        margin: 6px 0 14px 0; flex-wrap: wrap; gap: 10px;
+    }
+    .pt-header-title { font-size:26px; font-weight:900; color:#f5f7fa; margin:0; }
+    .pt-header-sub { font-size:14px; color:#8a93a3; margin-top:2px; }
+    .pt-legend { display:flex; gap:14px; align-items:center; font-size:13px; color:#c8cfd8;
+        background:#161d29; border:1px solid #232c3d; padding:10px 16px; border-radius:12px; }
+    .pt-legend-dot { width:11px; height:11px; border-radius:50%; display:inline-block; margin-right:5px; }
+    .pt-card { border-radius:16px; border:1px solid #232c3d; border-left:4px solid;
+        padding:20px 22px; height:100%; }
+    .pt-card-header { display:flex; justify-content:space-between; align-items:flex-start; }
+    .pt-team { display:flex; gap:12px; align-items:center; }
+    .pt-crest { width:46px; height:46px; border-radius:50%; background:#1c2433;
+        display:flex; align-items:center; justify-content:center; font-size:22px;
+        border:1px solid #2c3648; flex-shrink:0; }
+    .pt-team-name { font-size:20px; font-weight:800; color:#f5f7fa; line-height:1.2; }
+    .pt-tag-role { font-size:12.5px; font-weight:700; margin-top:3px; }
+    .pt-index { text-align:right; }
+    .pt-index-label { font-size:11px; letter-spacing:1px; color:#8a93a3; font-weight:700; }
+    .pt-index-value { font-size:34px; font-weight:900; line-height:1.1; }
+    .pt-index-suffix { font-size:15px; color:#8a93a3; font-weight:700; }
+    .pt-index-badge { display:inline-block; font-size:11px; font-weight:800; padding:3px 10px;
+        border-radius:8px; margin-top:4px; }
+    .pt-style-box { display:flex; justify-content:space-between; align-items:center;
+        background:#131a26; border-radius:12px; padding:16px 18px; margin:16px 0; gap:16px; }
+    .pt-style-title { font-size:16px; font-weight:800; margin-bottom:4px; }
+    .pt-style-desc { font-size:13px; color:#aab2bf; max-width:340px; line-height:1.4; }
+    .pt-gauge-wrap { text-align:center; flex-shrink:0; }
+    .pt-gauge { width:78px; height:78px; border-radius:50%; display:flex; align-items:center;
+        justify-content:center; }
+    .pt-gauge-inner { width:60px; height:60px; border-radius:50%; background:#0d121b;
+        display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:800;
+        color:#f5f7fa; }
+    .pt-gauge-label { font-size:11.5px; color:#8a93a3; margin-top:6px; }
+    .pt-fatores-title { font-size:12px; font-weight:800; letter-spacing:0.5px; color:#7fb3ff;
+        margin-bottom:10px; }
+    .pt-fatores-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 22px; }
+    .pt-fator { display:flex; flex-direction:column; gap:4px; }
+    .pt-fator-top { display:flex; justify-content:space-between; font-size:13px; color:#d3d8e0; }
+    .pt-fator-track { width:100%; height:6px; border-radius:4px; background:#1c2433; }
+    .pt-fator-fill { height:6px; border-radius:4px; }
+    .pt-tags-box { margin-top:18px; }
+    .pt-tags { display:flex; flex-wrap:wrap; gap:8px; }
+    .pt-tag { font-size:12.5px; font-weight:600; padding:6px 12px; border-radius:20px;
+        background:#161d29; border:1px solid #29334a; color:#d3d8e0; }
+    </style>
+    """, unsafe_allow_html=True)
+
+    def cor_faixa_tatica(score):
+        if score >= 70:
+            return {"accent": "#22c55e", "bg": "rgba(34,197,94,0.05)",
+                     "badge_bg": "rgba(34,197,94,0.18)", "badge": "PERFIL FORTE"}
+        elif score >= 50:
+            return {"accent": "#3b82f6", "bg": "rgba(59,130,246,0.05)",
+                     "badge_bg": "rgba(59,130,246,0.18)", "badge": "PERFIL COMPETITIVO"}
+        elif score >= 25:
+            return {"accent": "#eab308", "bg": "rgba(234,179,8,0.05)",
+                     "badge_bg": "rgba(234,179,8,0.18)", "badge": "PERFIL MÉDIO"}
+        else:
+            return {"accent": "#ef4444", "bg": "rgba(239,68,68,0.05)",
+                     "badge_bg": "rgba(239,68,68,0.18)", "badge": "PERFIL FRACO"}
+
+    def renderizar_card_perfil_tatico(perfil, tipo):
+
+        cores = cor_faixa_tatica(perfil["score"])
+        accent = cores["accent"]
+
+        if tipo == "home":
+            role_label, role_icon, role_color = "MANDANTE", "🏠", "#7ee787"
+        else:
+            role_label, role_icon, role_color = "VISITANTE", "✈", "#7fb3ff"
+
+        if perfil["estilo"] == "controlador":
+            estilo_titulo = "Time Controlador"
+            estilo_desc = ("Equipe com controle estrutural do jogo, marca forte e "
+                           "sabe cadenciar as ações ofensivas.")
+        else:
+            estilo_titulo = "Time Reativo"
+            estilo_desc = ("Equipe que prefere se defender e explorar espaços "
+                           "em transições e contra-ataques.")
+
+        # tags a partir da leitura já calculada (sem inventar critério novo)
+        tags_html = ""
+        for item in perfil["leitura"][:6]:
+            negativo = any(p in item.lower() for p in
+                           ["baixa", "vulnerável", "instável", "limitada", "inconsistente"])
+            cor_tag = "#f0b429" if negativo else "#7ee787"
+            icone = "⚠" if negativo else "✓"
+            texto_tag = item.split(" ", 1)[-1] if item[0] in "⚔🎯🌊🛡🧠⚡🔥🚫✔" else item
+            tags_html += (
+                f'<span class="pt-tag" style="color:{cor_tag};">{icone} {texto_tag}</span>'
+            )
+
+        fatores = [
+            ("🎯", "Eficiência Ofensiva", perfil["eficiencia"]),
+            ("🛡", "Sustentação Defensiva", perfil["sustentacao"]),
+            ("💡", "Criação Ofensiva", perfil["criacao"]),
+            ("🕐", "Tendência Temporal", perfil["tendencia_score"]),
+            ("⚖", "Volume Equilibrado", perfil["volume"]),
+            ("📈", "Controle de Ritmo", perfil["controle"]),
+        ]
+
+        fatores_html = ""
+        for icone, label, valor in fatores:
+            fatores_html += f"""
+            <div class="pt-fator">
+                <div class="pt-fator-top">
+                    <span>{icone} {label}</span>
+                    <span>{valor}/100</span>
+                </div>
+                <div class="pt-fator-track">
+                    <div class="pt-fator-fill" style="width:{valor}%; background:{accent};"></div>
+                </div>
+            </div>
+            """
+
+        html = f"""
+        <div class="pt-card" style="border-left-color:{accent}; background:{cores['bg']};">
+            <div class="pt-card-header">
+                <div class="pt-team">
+                    <div class="pt-crest">⚽</div>
+                    <div>
+                        <div class="pt-team-name">{perfil['time']}</div>
+                        <div class="pt-tag-role" style="color:{role_color};">{role_icon} {role_label}</div>
+                    </div>
+                </div>
+                <div class="pt-index">
+                    <div class="pt-index-label">ÍNDICE TÁTICO</div>
+                    <div class="pt-index-value" style="color:{accent};">{perfil['score']}<span class="pt-index-suffix">/100</span></div>
+                    <div class="pt-index-badge" style="background:{cores['badge_bg']}; color:{accent};">{cores['badge']}</div>
+                </div>
+            </div>
+
+            <div class="pt-style-box">
+                <div>
+                    <div class="pt-style-title" style="color:{accent};">🛡 {estilo_titulo}</div>
+                    <div class="pt-style-desc">{estilo_desc}</div>
+                </div>
+                <div class="pt-gauge-wrap">
+                    <div class="pt-gauge" style="background: conic-gradient({accent} {perfil['score']*3.6}deg, #1e2532 0deg);">
+                        <div class="pt-gauge-inner">{perfil['score']}%</div>
+                    </div>
+                    <div class="pt-gauge-label">Força Tática</div>
+                </div>
+            </div>
+
+            <div class="pt-fatores-title">FATORES DETERMINANTES</div>
+            <div class="pt-fatores-grid">
+                {fatores_html}
+            </div>
+
+            <div class="pt-tags-box">
+                <div class="pt-fatores-title">CARACTERÍSTICAS PRINCIPAIS</div>
+                <div class="pt-tags">{tags_html}</div>
+            </div>
+        </div>
+        """
+
+        st.markdown(html, unsafe_allow_html=True)
 
     # =========================================================
     # 🧠 HOME
@@ -6339,7 +6538,21 @@ with tab8:
     # 🧠 PERFIL TÁTICO AUTOMÁTICO
     # =========================================================
 
-    st.markdown("### 🧠 PERFIL TÁTICO AUTOMÁTICO")
+    st.markdown(f"""
+    <div class="pt-header-row">
+        <div>
+            <p class="pt-header-title">🧠 PERFIL TÁTICO AUTOMÁTICO</p>
+            <p class="pt-header-sub">Leitura tática baseada em dados de performance, temporal e comportamento de jogo</p>
+        </div>
+        <div class="pt-legend">
+            <span>LEGENDA:</span>
+            <span><span class="pt-legend-dot" style="background:#ef4444;"></span>0-25</span>
+            <span><span class="pt-legend-dot" style="background:#eab308;"></span>25-50</span>
+            <span><span class="pt-legend-dot" style="background:#3b82f6;"></span>50-70</span>
+            <span><span class="pt-legend-dot" style="background:#22c55e;"></span>70-100</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     c1, c2 = st.columns(2)
 
@@ -6348,107 +6561,15 @@ with tab8:
     # =====================================================
 
     with c1:
-
-        texto_home = f"""
-⚽ {perfil_home['time']}
-
-{perfil_home['perfil']} — {perfil_home['score']}/100
-
-{perfil_home['bloco']}
-
-• {chr(10).join(perfil_home['leitura'][:7])}
-
-🧠 Operacional:
-{perfil_home['operacional']}
-"""
-
-        # =================================================
-        # 🎨 COR HOME
-        # =================================================
-
-        if perfil_home["score"] <= 20:
-
-            st.error(
-                texto_home
-            )
-
-        elif perfil_home["score"] <= 35:
-
-            st.warning(
-                texto_home
-            )
-
-        elif perfil_home["score"] <= 50:
-
-            st.info(
-                texto_home
-            )
-
-        elif perfil_home["score"] <= 65:
-
-            st.success(
-                texto_home
-            )
-
-        else:
-
-            st.success(
-                texto_home
-            )
+        renderizar_card_perfil_tatico(perfil_home, "home")
 
     # =====================================================
     # 🧠 AWAY
     # =====================================================
 
     with c2:
+        renderizar_card_perfil_tatico(perfil_away, "away")
 
-        texto_away = f"""
-⚽ {perfil_away['time']}
-
-{perfil_away['perfil']} — {perfil_away['score']}/100
-
-{perfil_away['bloco']}
-
-• {chr(10).join(perfil_away['leitura'][:7])}
-
-🧠 Operacional:
-{perfil_away['operacional']}
-"""
-        
-        # =================================================
-        # 🎨 COR AWAY
-        # =================================================
-
-        if perfil_away["score"] <= 20:
-
-            st.error(
-                texto_away
-            )
-
-        elif perfil_away["score"] <= 35:
-
-            st.warning(
-                texto_away
-            )
-
-        elif perfil_away["score"] <= 50:
-
-            st.info(
-                texto_away
-            )
-
-        elif perfil_away["score"] <= 65:
-
-            st.success(
-                texto_away
-            )
-
-        else:
-
-            st.success(
-                texto_away
-            )
-            
     # =========================================================
     # ⚡ SCORE TEMPORAL GLOBAL
     # =========================================================
