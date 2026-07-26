@@ -326,14 +326,18 @@ else:
 # =========================================
 CSV_BASE = "data/CSV_LIMPO.csv"
 
-if os.path.exists(CSV_BASE):
-
-    df_base = pd.read_csv(
-        CSV_BASE,
+@st.cache_data(show_spinner="Carregando base histórica...")
+def carregar_csv_base(caminho, mtime):
+    return pd.read_csv(
+        caminho,
         sep=";",
         encoding="utf-8-sig",
         low_memory=False
     )
+
+if os.path.exists(CSV_BASE):
+
+    df_base = carregar_csv_base(CSV_BASE, os.path.getmtime(CSV_BASE))
 
     # =====================================
     # CORRIGE COLUNAS NUMÉRICAS
@@ -542,14 +546,38 @@ else:
 
 
 # =========================================
-# LEITURA DAS ABAS
+# LEITURA DAS ABAS (com cache)
 # =========================================
-df_mgf = pd.read_excel(xls, "Poisson_Media_Gols")
-df_exg = pd.read_excel(xls, "Poisson_Ataque_Defesa")
-df_vg  = pd.read_excel(xls, "Poisson_VG") 
-df_ht = pd.read_excel(xls,  "Poisson_HT")
-df_cantos = pd.read_excel(xls, "Escanteios") 
-df_consenso = pd.read_excel(xls, "Poisson_Consenso")  # 🔥 ESSA LINHA
+import io
+
+@st.cache_data(show_spinner="Carregando planilha Poisson...")
+def carregar_abas_poisson(fonte, mtime=None):
+    xls_local = pd.ExcelFile(io.BytesIO(fonte) if isinstance(fonte, bytes) else fonte)
+    return {
+        "mgf": pd.read_excel(xls_local, "Poisson_Media_Gols"),
+        "exg": pd.read_excel(xls_local, "Poisson_Ataque_Defesa"),
+        "vg": pd.read_excel(xls_local, "Poisson_VG"),
+        "ht": pd.read_excel(xls_local, "Poisson_HT"),
+        "cantos": pd.read_excel(xls_local, "Escanteios"),
+        "consenso": pd.read_excel(xls_local, "Poisson_Consenso"),
+    }
+
+if arquivo_upload:
+    _fonte_poisson = arquivo_upload.getvalue()
+    _mtime_poisson = None
+else:
+    _fonte_poisson = ARQUIVO_PADRAO
+    _mtime_poisson = os.path.getmtime(ARQUIVO_PADRAO)
+
+_abas_poisson = carregar_abas_poisson(_fonte_poisson, _mtime_poisson)
+
+df_mgf = _abas_poisson["mgf"]
+df_exg = _abas_poisson["exg"]
+df_vg  = _abas_poisson["vg"]
+df_ht = _abas_poisson["ht"]
+df_cantos = _abas_poisson["cantos"]
+df_consenso = _abas_poisson["consenso"]
+
 df_consenso["JOGO"] = (df_consenso["Home_Team"] + " x " + df_consenso["Visitor_Team"])
 
 for df in (df_mgf, df_exg, df_vg, df_ht, df_cantos):
@@ -1856,54 +1884,70 @@ def preparar_base_ml(df_base):
 df_ml, FEATURES_VALIDAS = preparar_base_ml(df_base)
 
 # =========================================
-# STANDARD SCALER
+# STANDARD SCALER + KNN (cacheados — só refaz o fit
+# quando df_ml/FEATURES_VALIDAS mudarem de verdade)
 # =========================================
 
 from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import NearestNeighbors
 
-scaler_ml = StandardScaler()
+@st.cache_resource(show_spinner="Preparando motor de similaridade (KNN)...")
+def preparar_scaler_knn(df_ml, features_validas):
 
-# =========================================
-# MATRIZ DE FEATURES
-# =========================================
+    scaler_ml_local = StandardScaler()
 
-X_ml = df_ml[FEATURES_VALIDAS].copy()
+    X_ml_local = df_ml[features_validas].copy()
 
-for col in FEATURES_VALIDAS:
+    for col in features_validas:
 
-    if col in ["League", "Country"]:
-        continue
+        if col in ["League", "Country"]:
+            continue
 
-    X_ml[col] = pd.to_numeric(
-        X_ml[col],
-        errors="coerce"
+        X_ml_local[col] = pd.to_numeric(
+            X_ml_local[col],
+            errors="coerce"
+        )
+
+    X_ml_local = X_ml_local.drop(
+        columns=["League", "Country"],
+        errors="ignore"
     )
 
-X_ml = X_ml.drop(
-    columns=["League", "Country"],
-    errors="ignore"
-)
+    features_validas_final = X_ml_local.columns.tolist()
 
-FEATURES_VALIDAS = X_ml.columns.tolist()
+    if len(features_validas_final) == 0:
+        return scaler_ml_local, None, None, X_ml_local, features_validas_final
 
-if len(FEATURES_VALIDAS) == 0:
+    for col in features_validas_final:
 
-    X_scaled = None
-
-else:
-
-    for col in FEATURES_VALIDAS:
-
-        mediana = X_ml[col].median()
+        mediana = X_ml_local[col].median()
 
         if pd.isna(mediana):
             mediana = 0
 
-        X_ml[col] = X_ml[col].fillna(mediana)
+        X_ml_local[col] = X_ml_local[col].fillna(mediana)
 
-    X_ml = X_ml.astype(float)
+    X_ml_local = X_ml_local.astype(float)
 
-    X_scaled = scaler_ml.fit_transform(X_ml)
+    X_scaled_local = scaler_ml_local.fit_transform(X_ml_local)
+
+    knn_local = None
+    N_VIZINHOS = min(100, len(df_ml))
+
+    if N_VIZINHOS > 0:
+        knn_local = NearestNeighbors(
+            n_neighbors=N_VIZINHOS,
+            metric="euclidean"
+        )
+        knn_local.fit(X_scaled_local)
+
+    return scaler_ml_local, knn_local, X_scaled_local, X_ml_local, features_validas_final
+
+
+scaler_ml, knn, X_scaled, X_ml, FEATURES_VALIDAS = preparar_scaler_knn(
+    df_ml,
+    FEATURES_VALIDAS
+)
 
 
 # =========================================
@@ -1967,26 +2011,11 @@ else:
 
 # =========================================
 # KNN - SIMILAR GAMES ENGINE
+# (scaler_ml/knn/X_scaled já vêm prontos e cacheados
+# do preparar_scaler_knn() lá em cima — não refitar aqui)
 # =========================================
 
-from sklearn.neighbors import NearestNeighbors
-
 jogos_semelhantes = pd.DataFrame()
-
-knn = None
-
-if X_scaled is not None:
-
-    N_VIZINHOS = min(100, len(df_ml))
-
-    if N_VIZINHOS > 0:
-
-        knn = NearestNeighbors(
-            n_neighbors=N_VIZINHOS,
-            metric="euclidean"
-        )
-
-        knn.fit(X_scaled)
 
 # =========================================
 # JOGO ATUAL
