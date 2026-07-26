@@ -6258,6 +6258,19 @@ with tab8:
         # 🚀 RETORNO
         # =====================================================
 
+        # =====================================================
+        # 🔧 NOVO — arredondamento à prova de NaN (jogos antigos
+        # sem dado em alguma coluna não podem derrubar o card)
+        # =====================================================
+
+        def _int_seguro(v, default=50):
+            try:
+                if pd.isna(v):
+                    return default
+            except (TypeError, ValueError):
+                pass
+            return int(round(v))
+
         return {
 
             "time": time,
@@ -6273,12 +6286,12 @@ with tab8:
             "leitura": leitura,
 
             # 🔧 NOVO — fatores individuais (0-100) pro card visual
-            "eficiencia": round(eficiencia),
-            "criacao": round(score_ofensivo),
-            "volume": round(volume),
-            "sustentacao": round(sustentacao),
-            "controle": round(controle),
-            "tendencia_score": tendencia_score,
+            "eficiencia": _int_seguro(eficiencia),
+            "criacao": _int_seguro(score_ofensivo),
+            "volume": _int_seguro(volume),
+            "sustentacao": _int_seguro(sustentacao),
+            "controle": _int_seguro(controle),
+            "tendencia_score": _int_seguro(tendencia_score),
             "estilo": estilo
         }
 
