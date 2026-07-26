@@ -20,7 +20,6 @@ from pathlib import Path
 import unicodedata
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import NearestNeighbors
-import streamlit.components.v1 as components
 
 # =========================================
 # CONFIG  
@@ -1516,6 +1515,7 @@ def mostrar_card(df_base, jogo):
     </div>
     """
 
+    card = "\n".join(linha.lstrip() for linha in card.splitlines())
     st.markdown(card, unsafe_allow_html=True)
 
 media_score = df_mgf["Score_Ofensivo"].mean()
@@ -2680,7 +2680,7 @@ with tab1:
         ) >= 1.00
     ):
 
-        st.markdown("""
+        _alerta_mo = """
         <div style="
             width: 100%;
             background: #FF8C00;
@@ -2694,7 +2694,9 @@ with tab1:
         ">
             ⚠️ Evitar Operar Match Odds
         </div>
-        """, unsafe_allow_html=True)
+        """
+        _alerta_mo = "\n".join(l.lstrip() for l in _alerta_mo.splitlines())
+        st.markdown(_alerta_mo, unsafe_allow_html=True)
 
     # =========================================
     # 🎯 ENTRADAS + SCORE (SEGURO E ESTÁVEL)
@@ -6301,7 +6303,7 @@ with tab8:
     # (injetado uma vez só, os dois cards reaproveitam a classe)
     # =========================================================
 
-    st.markdown("""
+    _pt_css = """
     <style>
     .pt-header-row {
         display:flex; justify-content:space-between; align-items:center;
@@ -6350,7 +6352,10 @@ with tab8:
     .pt-tag { font-size:12.5px; font-weight:600; padding:6px 12px; border-radius:20px;
         background:#161d29; border:1px solid #29334a; color:#d3d8e0; }
     </style>
-    """, unsafe_allow_html=True)
+    """
+    # remove indentação para o Markdown não tratar o <style> como bloco de código
+    _pt_css = "\n".join(l.lstrip() for l in _pt_css.splitlines())
+    st.markdown(_pt_css, unsafe_allow_html=True)
 
     def cor_faixa_tatica(score):
         if score >= 70:
@@ -6461,24 +6466,12 @@ with tab8:
             </div>
         </div>
         """
-        
-        components.html(
-            f"""
-            <html>
-            <head>
-            <style>
-            /* COLE TODO O CSS QUE ESTÁ NO st.markdown(<style>) */
-            </style>
-            </head>
 
-            <body style="margin:0;padding:0;background:transparent;">
-                {html}
-            </body>
-            </html>
-            """,
-            height=720,
-            scrolling=False,
-        )
+        # remove indentação de cada linha para o Markdown não
+        # interpretar o HTML como bloco de código (4+ espaços)
+        html = "\n".join(linha.lstrip() for linha in html.splitlines())
+
+        st.markdown(html, unsafe_allow_html=True)
 
     # =========================================================
     # 🧠 HOME
@@ -6568,7 +6561,7 @@ with tab8:
     # 🧠 PERFIL TÁTICO AUTOMÁTICO
     # =========================================================
 
-    st.markdown(f"""
+    _pt_header = f"""
     <div class="pt-header-row">
         <div>
             <p class="pt-header-title">🧠 PERFIL TÁTICO AUTOMÁTICO</p>
@@ -6582,7 +6575,9 @@ with tab8:
             <span><span class="pt-legend-dot" style="background:#22c55e;"></span>70-100</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    _pt_header = "\n".join(l.lstrip() for l in _pt_header.splitlines())
+    st.markdown(_pt_header, unsafe_allow_html=True)
 
     c1, c2 = st.columns(2)
 
