@@ -2984,10 +2984,16 @@ with tab1:
 # =========================================
 # ABA 2 — DADOS COMPLETOS
 # =========================================
+
+@st.cache_data(show_spinner=False)
+def carregar_aba_generica(fonte, mtime, aba):
+    xls_local = pd.ExcelFile(io.BytesIO(fonte) if isinstance(fonte, bytes) else fonte)
+    return pd.read_excel(xls_local, aba)
+
 with tab2:
     for aba in xls.sheet_names:
         with st.expander(aba):
-            df_temp = pd.read_excel(xls, aba)
+            df_temp = carregar_aba_generica(_fonte_poisson, _mtime_poisson, aba)
             st.dataframe(df_temp, use_container_width=True)
 
 
