@@ -487,7 +487,25 @@ if not df_base.empty:
         0,
         1
     )
-    
+
+    # =====================================
+    # 🔧 NOVO — TARGETS DE GOLS (usados no card do
+    # Machine Learning Skynet / histórico de jogos semelhantes)
+    # 1 = mercado bateu (green) / 0 = não bateu (red)
+    # =====================================
+    _gols_total = df_base["Result Home"] + df_base["Result Visitor"]
+    _gols_total_ht = df_base["Result_Home_HT"] + df_base["Result_Visitor_HT"]
+
+    df_base["OVER15FT"] = np.where(_gols_total >= 2, 1, 0)
+    df_base["OVER25FT"] = np.where(_gols_total >= 3, 1, 0)
+    df_base["UNDER25FT"] = np.where(_gols_total <= 2, 1, 0)
+    df_base["OVER05HT"] = np.where(_gols_total_ht >= 1, 1, 0)
+    df_base["UNDER15HT"] = np.where(_gols_total_ht <= 1, 1, 0)
+    df_base["BTTS_YES"] = np.where(
+        (df_base["Result Home"] > 0) & (df_base["Result Visitor"] > 0),
+        1, 0
+    )
+
 # =========================================
 # 🧠 RANKING LAY AWAY 300K
 # =========================================
@@ -1832,7 +1850,13 @@ def preparar_base_ml(df_base):
         "LAY10",
         "LAY22",
         "LAYGH",
-        "LAYGA"
+        "LAYGA",
+        "OVER15FT",
+        "OVER25FT",
+        "UNDER25FT",
+        "OVER05HT",
+        "UNDER15HT",
+        "BTTS_YES"
     ]
 
     for col in targets:
@@ -8160,3 +8184,594 @@ with tab9:
             hide_index=True
 
         )
+
+
+with tab10:
+
+    # ============================================================
+    # 🤖 MACHINE LEARNING SKYNET — helpers e metadados dos mercados
+    # ============================================================
+
+    LABEL_MERCADO_ML = {
+        "LAY00":     "Lay 0x0",
+        "LAY01":     "Lay 0x1",
+        "LAY10":     "Lay 1x0",
+        "LAY22":     "Lay 2x2",
+        "LAYGH":     "Lay Goleada Casa",
+        "LAYGA":     "Lay Goleada Fora",
+        "OVER05HT":  "Over 0.5 HT",
+        "OVER15FT":  "Over 1.5 FT",
+        "OVER25FT":  "Over 2.5 FT",
+        "UNDER15HT": "Under 1.5 HT",
+        "UNDER25FT": "Under 2.5 FT",
+        "BTTS_YES":  "Ambas Marcam",
+    }
+
+    SIGLA_MERCADO_ML = {
+        "LAY00": "L00", "LAY01": "L01", "LAY10": "L10", "LAY22": "L22",
+        "LAYGH": "LGH", "LAYGA": "LGA", "OVER05HT": "O0.5HT",
+        "OVER15FT": "O1.5", "OVER25FT": "O2.5", "UNDER15HT": "U1.5HT",
+        "UNDER25FT": "U2.5", "BTTS_YES": "BTTS",
+    }
+
+    GRUPO_MERCADO_ML = {
+        "Lay": ["LAY00", "LAY01", "LAY10", "LAY22", "LAYGH", "LAYGA"],
+        "Overs": ["OVER05HT", "OVER15FT", "OVER25FT"],
+        "Unders": ["UNDER15HT", "UNDER25FT"],
+        "Ambos Marcam": ["BTTS_YES"],
+    }
+
+    # coluna de odd real (na base CSV_LIMPO) usada pra ROI/EV/motivo
+    COLUNA_ODD_MERCADO_ML = {
+        "LAY00":     "CS 0X0",
+        "LAY01":     "CS 0X1",
+        "LAY10":     "CS 1X0",
+        "LAY22":     "CS 2X2",
+        "LAYGH":     None,
+        "LAYGA":     None,
+        "OVER05HT":  "Odd_Over_0,5HT",
+        "OVER15FT":  "Odd_Over_1,5FT",
+        "OVER25FT":  "Odds_Over_2,5FT",
+        "UNDER15HT": None,
+        "UNDER25FT": "Odds_Under_2,5FT",
+        "BTTS_YES":  "Odd_BTTS_YES",
+    }
+
+    def _ml_cor_valor(v):
+        if v is None or pd.isna(v):
+            return "#5b6472"
+        if v >= 95:
+            return "#22c55e"
+        if v >= 90:
+            return "#4ade80"
+        if v >= 80:
+            return "#eab308"
+        if v >= 70:
+            return "#c7ccd6"
+        return "#ef4444"
+
+    def _ml_estrelas(v):
+        if v is None or pd.isna(v):
+            return "—"
+        if v >= 95:
+            return "⭐⭐⭐⭐⭐"
+        if v >= 90:
+            return "⭐⭐⭐⭐"
+        if v >= 80:
+            return "⭐⭐⭐"
+        if v >= 70:
+            return "⭐⭐"
+        return "⭐"
+
+    def _ml_situacao(v):
+        if v is None or pd.isna(v):
+            return "⚪ SEM DADOS"
+        if v >= 95:
+            return "🟢 PREMIUM"
+        if v >= 90:
+            return "🟢 FORTE"
+        if v >= 80:
+            return "🟡 MODERADO"
+        if v >= 70:
+            return "⚪ NEUTRO"
+        return "🔴 EVITAR"
+
+    def _ml_fmt_pct(v, casas=1):
+        if v is None or pd.isna(v):
+            return "—"
+        return f"{v:.{casas}f}"
+
+    def _ml_dedent(html_text):
+        return "\n".join(l.lstrip() for l in html_text.splitlines())
+
+    # ============================================================
+    # CSS DO SKYNET
+    # ============================================================
+
+    _ml_css = """
+    <style>
+    .ml-header { border-radius:16px; border:1px solid #232c3d; background:linear-gradient(135deg,#101826,#0a0f18);
+        padding:20px 26px; margin-bottom:16px; }
+    .ml-header-title { font-size:24px; font-weight:900; color:#f5f7fa; text-align:center; margin:0; }
+    .ml-header-date { font-size:13px; color:#8a93a3; text-align:center; margin-top:2px; }
+    .ml-metrics-row { display:flex; justify-content:space-around; margin-top:16px; flex-wrap:wrap; gap:12px; }
+    .ml-metric { text-align:center; min-width:120px; }
+    .ml-metric-val { font-size:22px; font-weight:900; color:#7fb3ff; }
+    .ml-metric-label { font-size:11.5px; color:#8a93a3; margin-top:2px; }
+
+    .ml-top-card { border-radius:14px; border:1px solid #232c3d; background:#0d121b;
+        padding:14px 18px; margin-bottom:10px; display:flex; align-items:center; gap:14px; }
+    .ml-top-medal { font-size:26px; flex-shrink:0; width:34px; text-align:center; }
+    .ml-top-info { flex:1; }
+    .ml-top-jogo { font-size:15px; font-weight:800; color:#f5f7fa; }
+    .ml-top-sub { font-size:12.5px; color:#8a93a3; margin-top:2px; }
+    .ml-top-right { text-align:right; }
+    .ml-top-conf { font-size:20px; font-weight:900; }
+
+    .ml-header-jogo { display:flex; align-items:center; justify-content:space-between;
+        border-radius:14px; border:1px solid #232c3d; background:#0d121b; padding:14px 20px; margin-bottom:14px; gap:14px; }
+    .ml-crest-sm { width:40px; height:40px; border-radius:50%; background:#1c2433;
+        display:flex; align-items:center; justify-content:center; font-size:18px;
+        border:1px solid #2c3648; flex-shrink:0; }
+    .ml-team-block { display:flex; align-items:center; gap:10px; }
+    .ml-team-name { font-size:15px; font-weight:800; color:#f5f7fa; }
+    .ml-odds-block { display:flex; gap:18px; font-size:12.5px; color:#c8cfd8; }
+    .ml-odds-block b { color:#f5f7fa; }
+
+    .ml-card { border-radius:12px; border:1px solid #232c3d; background:#0d121b;
+        padding:12px 14px; font-size:12.5px; }
+    .ml-card-title { font-size:13.5px; font-weight:900; color:#f5f7fa; margin-bottom:8px;
+        padding-bottom:6px; border-bottom:1px solid #232c3d; }
+    .ml-card-row { display:flex; justify-content:space-between; padding:2px 0; color:#c8cfd8; }
+    .ml-card-row b { color:#f5f7fa; font-weight:700; }
+    .ml-card-situacao { margin-top:8px; padding-top:6px; border-top:1px solid #232c3d;
+        font-size:12.5px; font-weight:800; text-align:center; }
+
+    .ml-scanner-item { border-left:3px solid #4ade80; padding:8px 12px; margin-bottom:6px;
+        background:#0d121b; border-radius:8px; font-size:12.5px; }
+    </style>
+    """
+    st.markdown(_ml_dedent(_ml_css), unsafe_allow_html=True)
+
+    # ============================================================
+    # 📁 CARREGAMENTO DO ARQUIVO DE PREDIÇÕES (Pipeline do dia)
+    # ============================================================
+
+    ARQUIVO_ML_SKYNET = "data/PIPELINE2_RESULTADOS.xlsx"
+
+    @st.cache_data(show_spinner="Carregando previsões do Machine Learning Skynet...")
+    def carregar_ml_skynet(caminho, mtime):
+        xls_ml = pd.ExcelFile(caminho)
+        return {
+            "melhor": pd.read_excel(xls_ml, "Melhor Mercado"),
+            "todos": pd.read_excel(xls_ml, "Todos os Mercados"),
+        }
+
+    if not os.path.exists(ARQUIVO_ML_SKYNET):
+
+        st.warning(
+            "📁 Não encontrei `data/PIPELINE2_RESULTADOS.xlsx`. "
+            "Rode o **PIPELINE_JOGOSDODIA_R2_CORRIGIDO** no Colab e coloque o Excel exportado "
+            "na pasta `data/` do app — o mesmo lugar onde fica o `POISSON_DUAS_MATRIZES.xlsx`."
+        )
+
+    else:
+
+        _dados_ml = carregar_ml_skynet(ARQUIVO_ML_SKYNET, os.path.getmtime(ARQUIVO_ML_SKYNET))
+        df_ml_melhor = _dados_ml["melhor"].copy()
+        df_ml_todos = _dados_ml["todos"].copy()
+
+        df_ml_melhor["JOGO"] = (
+            df_ml_melhor["Home_Team"].astype(str).str.strip() + " x " +
+            df_ml_melhor["Visitor_Team"].astype(str).str.strip()
+        )
+        df_ml_todos["JOGO"] = (
+            df_ml_todos["Home_Team"].astype(str).str.strip() + " x " +
+            df_ml_todos["Visitor_Team"].astype(str).str.strip()
+        )
+
+        MERCADOS_ML_DIA = [
+            c.replace("_Confidence", "")
+            for c in df_ml_todos.columns
+            if c.endswith("_Confidence")
+        ]
+
+        # ========================================================
+        # 🤖 HEADER
+        # ========================================================
+
+        _data_ref = ""
+        if "Hour" in df_ml_todos.columns:
+            try:
+                _data_ref = pd.to_datetime(df_ml_todos["Hour"]).dt.strftime("%d/%m/%Y").iloc[0]
+            except Exception:
+                _data_ref = ""
+
+        _n_partidas_treino = len(df_base) if not df_base.empty else 0
+
+        _header_html = f"""
+        <div class="ml-header">
+            <p class="ml-header-title">🤖 MACHINE LEARNING SKYNET</p>
+            <p class="ml-header-date">{_data_ref}</p>
+            <div class="ml-metrics-row">
+                <div class="ml-metric"><div class="ml-metric-val">{len(df_ml_todos)}</div><div class="ml-metric-label">Jogos analisados</div></div>
+                <div class="ml-metric"><div class="ml-metric-val">{len(MERCADOS_ML_DIA)}</div><div class="ml-metric-label">Modelos carregados</div></div>
+                <div class="ml-metric"><div class="ml-metric-val">{_n_partidas_treino:,}</div><div class="ml-metric-label">Modelos treinados (partidas)</div></div>
+                <div class="ml-metric"><div class="ml-metric-val">V1.0</div><div class="ml-metric-label">Versão</div></div>
+            </div>
+        </div>
+        """
+        st.markdown(_ml_dedent(_header_html), unsafe_allow_html=True)
+
+        # ========================================================
+        # 🥇 TOP ENTRADAS DO DIA
+        # ========================================================
+
+        st.markdown("#### 🥇 Top Entradas do Dia")
+
+        if "Melhor_Confidence" in df_ml_melhor.columns:
+
+            _top3 = (
+                df_ml_melhor
+                .dropna(subset=["Melhor_Confidence"])
+                .sort_values("Melhor_Confidence", ascending=False)
+                .head(3)
+                .reset_index(drop=True)
+            )
+
+            _medalhas = ["🥇", "🥈", "🥉"]
+
+            _top_html = ""
+            for i, row in _top3.iterrows():
+                _hora = ""
+                if "Hour" in df_ml_todos.columns:
+                    _linha_hora = df_ml_todos[df_ml_todos["JOGO"] == row["JOGO"]]
+                    if not _linha_hora.empty:
+                        try:
+                            _hora = pd.to_datetime(_linha_hora["Hour"].iloc[0]).strftime("%H:%M")
+                        except Exception:
+                            _hora = ""
+                _mercado_label = LABEL_MERCADO_ML.get(row.get("Melhor_Mercado", ""), row.get("Melhor_Mercado", "—"))
+                _cor = _ml_cor_valor(row.get("Melhor_Confidence"))
+                _top_html += f"""
+                <div class="ml-top-card">
+                    <div class="ml-top-medal">{_medalhas[i]}</div>
+                    <div class="ml-top-info">
+                        <div class="ml-top-jogo">{_hora}  ·  {row['Home_Team']} x {row['Visitor_Team']}</div>
+                        <div class="ml-top-sub">{_mercado_label}  ·  {row.get('Melhor_Status','')}</div>
+                    </div>
+                    <div class="ml-top-right">
+                        <div class="ml-top-conf" style="color:{_cor};">{_ml_fmt_pct(row.get('Melhor_Confidence'))}%</div>
+                    </div>
+                </div>
+                """
+            st.markdown(_ml_dedent(_top_html), unsafe_allow_html=True)
+
+        st.markdown("---")
+
+        # ========================================================
+        # 📊 TODOS OS MERCADOS (tabela colorida)
+        # ========================================================
+
+        st.markdown("#### 📊 Todos os Mercados")
+        st.caption("🟢 ≥90   🟡 80–90   ⚪ 70–80   🔴 <70")
+
+        _cols_tabela = ["Hour", "Home_Team", "Visitor_Team"] if "Hour" in df_ml_todos.columns else ["Home_Team", "Visitor_Team"]
+        _mapa_sigla = {}
+        for m in MERCADOS_ML_DIA:
+            col_prob = f"{m}_Prob"
+            if col_prob in df_ml_todos.columns:
+                _cols_tabela.append(col_prob)
+                _mapa_sigla[col_prob] = SIGLA_MERCADO_ML.get(m, m)
+
+        _df_tabela = df_ml_todos[_cols_tabela].copy()
+        if "Hour" in _df_tabela.columns:
+            try:
+                _df_tabela["Hour"] = pd.to_datetime(_df_tabela["Hour"]).dt.strftime("%H:%M")
+            except Exception:
+                pass
+        _df_tabela = _df_tabela.rename(columns=_mapa_sigla).rename(columns={
+            "Hour": "Hora", "Home_Team": "Casa", "Visitor_Team": "Visitante"
+        })
+
+        _colunas_valor = list(_mapa_sigla.values())
+
+        def _ml_estilo_tabela(v):
+            if isinstance(v, (int, float)) and not pd.isna(v):
+                cor = _ml_cor_valor(v)
+                return f"color:{cor}; font-weight:700;"
+            return ""
+
+        st.dataframe(
+            _df_tabela.style.applymap(_ml_estilo_tabela, subset=_colunas_valor).format(
+                {c: "{:.0f}" for c in _colunas_valor}
+            ),
+            use_container_width=True,
+            hide_index=True
+        )
+
+        st.markdown("---")
+
+        # ========================================================
+        # 🎯 DETALHE DO JOGO (usa o mesmo seletor global "jogo")
+        # ========================================================
+
+        st.markdown("#### 🎯 Detalhe do Jogo")
+
+        _linha_ml_jogo = df_ml_todos[df_ml_todos["JOGO"] == jogo]
+
+        if _linha_ml_jogo.empty:
+
+            st.info("Esse jogo não está nas previsões do Machine Learning de hoje.")
+
+        else:
+
+            linha_ml = _linha_ml_jogo.iloc[0]
+
+            _home_nome = linha_ml.get("Home_Team", jogo.split(" x ")[0])
+            _away_nome = linha_ml.get("Visitor_Team", jogo.split(" x ")[-1])
+
+            _crest_h = escudo_base64(_home_nome)
+            _crest_a = escudo_base64(_away_nome)
+            _crest_h_html = f'<img src="{_crest_h}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">' if _crest_h else "⚽"
+            _crest_a_html = f'<img src="{_crest_a}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">' if _crest_a else "⚽"
+
+            _odd_c = linha_csv.get("Odds_Casa", np.nan) if not linha_csv.empty else np.nan
+            _odd_e = linha_csv.get("Odds_Empate", np.nan) if not linha_csv.empty else np.nan
+            _odd_v = linha_csv.get("Odds_Visitante", np.nan) if not linha_csv.empty else np.nan
+
+            _header_jogo_html = f"""
+            <div class="ml-header-jogo">
+                <div class="ml-team-block">
+                    <div class="ml-crest-sm">{_crest_h_html}</div>
+                    <div class="ml-team-name">{_home_nome}</div>
+                </div>
+                <div class="ml-odds-block">
+                    <div>Casa: <b>{_ml_fmt_pct(_odd_c,2)}</b></div>
+                    <div>Empate: <b>{_ml_fmt_pct(_odd_e,2)}</b></div>
+                    <div>Visitante: <b>{_ml_fmt_pct(_odd_v,2)}</b></div>
+                </div>
+                <div class="ml-team-block">
+                    <div class="ml-team-name">{_away_nome}</div>
+                    <div class="ml-crest-sm">{_crest_a_html}</div>
+                </div>
+            </div>
+            """
+            st.markdown(_ml_dedent(_header_jogo_html), unsafe_allow_html=True)
+
+            # --------------------------------------------------
+            # IA GERAL (média dos mercados aprovados do jogo)
+            # --------------------------------------------------
+            _probs_jogo = [
+                linha_ml[f"{m}_Prob"]
+                for m in MERCADOS_ML_DIA
+                if f"{m}_Prob" in linha_ml.index and pd.notna(linha_ml[f"{m}_Prob"])
+            ]
+            _ia_geral = float(np.mean(_probs_jogo)) if _probs_jogo else None
+
+            c_ia1, c_ia2 = st.columns(2)
+            with c_ia1:
+                st.metric("IA Geral", f"{_ml_fmt_pct(_ia_geral)}" if _ia_geral is not None else "—")
+            with c_ia2:
+                st.metric("Confiança", _ml_situacao(_ia_geral).split(" ", 1)[-1] if _ia_geral is not None else "—")
+
+            # --------------------------------------------------
+            # MINI TABELAS POR GRUPO
+            # --------------------------------------------------
+            _cg1, _cg2, _cg3, _cg4 = st.columns(4)
+            _grupos_cols = {"Lay": _cg1, "Overs": _cg2, "Unders": _cg3, "Ambos Marcam": _cg4}
+
+            for _nome_grupo, _mercados_grupo in GRUPO_MERCADO_ML.items():
+                with _grupos_cols[_nome_grupo]:
+                    st.markdown(f"**{_nome_grupo}**")
+                    for m in _mercados_grupo:
+                        col_prob = f"{m}_Prob"
+                        if col_prob in linha_ml.index and pd.notna(linha_ml[col_prob]):
+                            st.markdown(
+                                f"{LABEL_MERCADO_ML[m]}: **{_ml_fmt_pct(linha_ml[col_prob])}**"
+                            )
+
+            st.markdown("---")
+
+            # --------------------------------------------------
+            # 🧠 EXPLICAÇÃO DA IA (motivos dos mercados aprovados)
+            # --------------------------------------------------
+
+            st.markdown("#### 🧠 Explicação da IA")
+
+            _aprovados_jogo = [
+                m for m in MERCADOS_ML_DIA
+                if f"{m}_Motivo" in linha_ml.index and str(linha_ml.get(f"{m}_Aprovado", "")) == "✅"
+            ]
+
+            if not _aprovados_jogo and MERCADOS_ML_DIA:
+                # fallback: mostra o mercado de maior confiança mesmo sem aprovação
+                _confs = {
+                    m: linha_ml[f"{m}_Confidence"]
+                    for m in MERCADOS_ML_DIA
+                    if f"{m}_Confidence" in linha_ml.index and pd.notna(linha_ml[f"{m}_Confidence"])
+                }
+                if _confs:
+                    _aprovados_jogo = [max(_confs, key=_confs.get)]
+
+            if not _aprovados_jogo:
+                st.caption("Sem sinais para este jogo.")
+            else:
+                for m in _aprovados_jogo:
+                    st.markdown(f"**{LABEL_MERCADO_ML.get(m,m)}**")
+                    st.write(linha_ml.get(f"{m}_Motivo", "—"))
+
+            st.markdown("---")
+
+            # --------------------------------------------------
+            # 🎴 CARDS POR MERCADO (V2) — usa jogos_semelhantes já
+            # calculado globalmente (motor KNN) pro jogo selecionado
+            # --------------------------------------------------
+
+            st.markdown("#### 🎴 Cards por Mercado")
+            st.caption(
+                "Score IA = previsão do modelo treinado · Histórico = taxa real entre os jogos "
+                "semelhantes (motor KNN) · Poisson = probabilidade pela matriz de gols do jogo · "
+                "ROI/EV simulados aplicando a odd atual de hoje ao histórico de jogos semelhantes."
+            )
+
+            # matriz de Poisson consensual pro jogo (média MGF + ATKxDEF + VG)
+            try:
+                _exg_h = np.mean([
+                    float(linha_mgf.get("ExG_Home_MGF", np.nan)),
+                    float(linha_exg.get("ExG_Home_ATKxDEF", np.nan)),
+                    float(linha_vg.get("ExG_Home_VG", np.nan)),
+                ])
+                _exg_a = np.mean([
+                    float(linha_mgf.get("ExG_Away_MGF", np.nan)),
+                    float(linha_exg.get("ExG_Away_ATKxDEF", np.nan)),
+                    float(linha_vg.get("ExG_Away_VG", np.nan)),
+                ])
+                _matriz_ml = calcular_matriz_poisson(_exg_h, _exg_a) if pd.notna(_exg_h) and pd.notna(_exg_a) else None
+            except Exception:
+                _matriz_ml = None
+
+            def _ml_score_poisson(m):
+                if _matriz_ml is None:
+                    return None
+                mm = _matriz_ml
+                if m == "LAY00":
+                    return 100 - mm[0][0]
+                if m == "LAY01":
+                    return 100 - mm[0][1]
+                if m == "LAY10":
+                    return 100 - mm[1][0]
+                if m == "LAY22":
+                    return 100 - mm[2][2]
+                if m == "LAYGH":
+                    return 100 - (mm[4][0] + mm[4][1])
+                if m == "LAYGA":
+                    return 100 - (mm[0][4] + mm[1][4])
+                if m in ("OVER15FT", "OVER25FT", "UNDER25FT"):
+                    ou = calcular_over_under(mm)
+                    if m == "OVER15FT":
+                        return ou["Over 1.5"]
+                    if m == "OVER25FT":
+                        return ou["Over 2.5"]
+                    if m == "UNDER25FT":
+                        return ou["Under 2.5"]
+                if m == "BTTS_YES":
+                    return sum(mm[i][j] for i in range(1, 5) for j in range(1, 5))
+                return None  # OVER05HT / UNDER15HT — sem matriz de HT disponível
+
+            _n_cols_grid = 3
+            _mercados_grid = [m for m in LABEL_MERCADO_ML if f"{m}_Prob" in linha_ml.index]
+            _linhas_grid = [_mercados_grid[i:i + _n_cols_grid] for i in range(0, len(_mercados_grid), _n_cols_grid)]
+
+            for _linha_m in _linhas_grid:
+                _cols_grid = st.columns(_n_cols_grid)
+                for _idx_m, m in enumerate(_linha_m):
+                    with _cols_grid[_idx_m]:
+
+                        score_ia = linha_ml.get(f"{m}_Prob", None)
+                        score_ia = float(score_ia) if pd.notna(score_ia) else None
+
+                        score_poisson = _ml_score_poisson(m)
+
+                        total_hist = greens = reds = 0
+                        score_hist = None
+                        if not jogos_semelhantes.empty and m in jogos_semelhantes.columns:
+                            _serie = jogos_semelhantes[m].dropna()
+                            total_hist = len(_serie)
+                            if total_hist > 0:
+                                greens = int(_serie.sum())
+                                reds = total_hist - greens
+                                score_hist = (greens / total_hist) * 100
+
+                        _componentes = [v for v in [score_ia, score_hist, score_poisson] if v is not None]
+                        consenso = float(np.mean(_componentes)) if _componentes else None
+
+                        _odd_col_m = COLUNA_ODD_MERCADO_ML.get(m)
+                        odd_atual = None
+                        if _odd_col_m is not None and not linha_csv.empty and _odd_col_m in linha_csv.index:
+                            _v = linha_csv[_odd_col_m]
+                            odd_atual = float(_v) if pd.notna(_v) else None
+
+                        roi_hist = ev_est = None
+                        if odd_atual is not None and total_hist > 0:
+                            is_lay = m.startswith("LAY")
+                            lucro_green = 1.0 if is_lay else (odd_atual - 1.0)
+                            perda_red = (odd_atual - 1.0) if is_lay else 1.0
+                            roi_hist = ((greens * lucro_green - reds * perda_red) / total_hist) * 100
+                            prob_h = greens / total_hist
+                            ev_est = (prob_h * lucro_green - (1 - prob_h) * perda_red) * 100
+
+                        situacao_txt = _ml_situacao(consenso)
+                        cor_situacao = _ml_cor_valor(consenso)
+
+                        _card_html = f"""
+                        <div class="ml-card" style="border-left:3px solid {cor_situacao};">
+                            <div class="ml-card-title">{LABEL_MERCADO_ML.get(m,m).upper()}</div>
+                            <div class="ml-card-row"><span>Score IA</span><b>{_ml_fmt_pct(score_ia)}</b></div>
+                            <div class="ml-card-row"><span>Histórico</span><b>{_ml_fmt_pct(score_hist)}</b></div>
+                            <div class="ml-card-row"><span>Poisson</span><b>{_ml_fmt_pct(score_poisson)}</b></div>
+                            <div class="ml-card-row"><span>Consenso</span><b>{_ml_fmt_pct(consenso)}</b></div>
+                            <div class="ml-card-row"><span>Confiança</span><b>{_ml_estrelas(consenso)}</b></div>
+                            <div class="ml-card-row"><span>Jogos semelhantes</span><b>{total_hist}</b></div>
+                            <div class="ml-card-row"><span>Greens</span><b>{greens}</b></div>
+                            <div class="ml-card-row"><span>Reds</span><b>{reds}</b></div>
+                            <div class="ml-card-row"><span>ROI histórico</span><b>{_ml_fmt_pct(roi_hist)}%</b></div>
+                            <div class="ml-card-row"><span>EV</span><b>{_ml_fmt_pct(ev_est)}%</b></div>
+                            <div class="ml-card-situacao" style="color:{cor_situacao};">{situacao_txt}</div>
+                        </div>
+                        """
+                        st.markdown(_ml_dedent(_card_html), unsafe_allow_html=True)
+                st.write("")
+
+        st.markdown("---")
+
+        # ========================================================
+        # 📈 RANKING DOS MERCADOS DO DIA
+        # ========================================================
+
+        st.markdown("#### 📈 Ranking dos Mercados")
+
+        _contagem_mercados = {}
+        for m in MERCADOS_ML_DIA:
+            col_aprovado = f"{m}_Aprovado"
+            if col_aprovado in df_ml_todos.columns:
+                _contagem_mercados[LABEL_MERCADO_ML.get(m, m)] = int((df_ml_todos[col_aprovado] == "✅").sum())
+
+        if _contagem_mercados:
+            _df_ranking = (
+                pd.DataFrame(
+                    list(_contagem_mercados.items()),
+                    columns=["Mercado", "Entradas"]
+                )
+                .sort_values("Entradas", ascending=False)
+                .reset_index(drop=True)
+            )
+            st.dataframe(_df_ranking, use_container_width=True, hide_index=True)
+
+        st.markdown("---")
+
+        # ========================================================
+        # 🚦 SCANNER
+        # ========================================================
+
+        st.markdown("#### 🚦 Scanner")
+
+        if "Melhor_Status" in df_ml_melhor.columns:
+
+            _scanner = (
+                df_ml_melhor
+                .dropna(subset=["Melhor_Confidence"])
+                .sort_values("Melhor_Confidence", ascending=False)
+                .head(10)
+            )
+
+            _scanner_html = ""
+            for _, row in _scanner.iterrows():
+                _mercado_label = LABEL_MERCADO_ML.get(row.get("Melhor_Mercado", ""), row.get("Melhor_Mercado", "—"))
+                _scanner_html += f"""
+                <div class="ml-scanner-item">
+                    <b>{row.get('Melhor_Status','⭐')}</b> — {_mercado_label}<br>
+                    {row['Home_Team']} x {row['Visitor_Team']}
+                </div>
+                """
+            st.markdown(_ml_dedent(_scanner_html), unsafe_allow_html=True)
