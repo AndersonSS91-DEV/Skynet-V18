@@ -8482,8 +8482,14 @@ with tab10:
                 return f"color:{cor}; font-weight:700;"
             return ""
 
+        _ml_styler = _df_tabela.style
+        if hasattr(_ml_styler, "map"):
+            _ml_styler = _ml_styler.map(_ml_estilo_tabela, subset=_colunas_valor)
+        else:
+            _ml_styler = _ml_styler.applymap(_ml_estilo_tabela, subset=_colunas_valor)
+
         st.dataframe(
-            _df_tabela.style.applymap(_ml_estilo_tabela, subset=_colunas_valor).format(
+            _ml_styler.format(
                 {c: "{:.0f}" for c in _colunas_valor}
             ),
             use_container_width=True,
