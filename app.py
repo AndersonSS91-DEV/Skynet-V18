@@ -7467,7 +7467,7 @@ with tab8:
     # 🔄 LOOP TODOS OS JOGOS
     # =========================================================
 
-    for jogo in jogos:
+    for _jogo_scan in jogos:
 
         try:
 
@@ -7476,11 +7476,11 @@ with tab8:
             # =================================================
 
             linha_exg = df_exg[
-                df_exg["JOGO"] == jogo
+                df_exg["JOGO"] == _jogo_scan
             ].iloc[0]
 
             linha_consenso = df_consenso[
-                df_consenso["JOGO"] == jogo
+                df_consenso["JOGO"] == _jogo_scan
             ].iloc[0]
 
             home = linha_exg["Home_Team"]
@@ -7908,7 +7908,7 @@ with tab8:
         except Exception as e:
 
             st.write(
-                f"Erro em {jogo}:",
+                f"Erro em {_jogo_scan}:",
                 e
             )
 
