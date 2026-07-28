@@ -308,6 +308,11 @@ with st.sidebar:
         "Enviar outro Excel (opcional)",
         type=["xlsx"]
     )
+    arquivo_upload_ml = st.file_uploader(
+        "Enviar Excel do Machine Learning (opcional)",
+        type=["xlsx"],
+        key="upload_ml_skynet"
+    )
 
 if arquivo_upload:
     xls = pd.ExcelFile(arquivo_upload)
@@ -8340,24 +8345,43 @@ with tab10:
     ARQUIVO_ML_SKYNET = "data/PIPELINE2_RESULTADOS.xlsx"
 
     @st.cache_data(show_spinner="Carregando previsões do Machine Learning Skynet...")
-    def carregar_ml_skynet(caminho, mtime):
-        xls_ml = pd.ExcelFile(caminho)
+    def carregar_ml_skynet(fonte, mtime=None):
+        xls_ml_local = pd.ExcelFile(io.BytesIO(fonte) if isinstance(fonte, bytes) else fonte)
         return {
-            "melhor": pd.read_excel(xls_ml, "Melhor Mercado"),
-            "todos": pd.read_excel(xls_ml, "Todos os Mercados"),
+            "melhor": pd.read_excel(xls_ml_local, "Melhor Mercado"),
+            "todos": pd.read_excel(xls_ml_local, "Todos os Mercados"),
         }
 
-    if not os.path.exists(ARQUIVO_ML_SKYNET):
+    # ------------------------------------------------------------
+    # 🔧 HÍBRIDO — igual ao Poisson: upload manual (sidebar) tem
+    # prioridade; se não tiver upload, usa o arquivo padrão da pasta
+    # data/. Isso permite subir o Excel de outro dia direto pela
+    # tela, sem depender de push no GitHub / redeploy do Streamlit.
+    # ------------------------------------------------------------
+    if arquivo_upload_ml:
+        _fonte_ml = arquivo_upload_ml.getvalue()
+        _mtime_ml = None
+        _fonte_ml_ok = True
+        st.success("📤 Machine Learning: utilizando arquivo enviado pelo usuário")
+    elif os.path.exists(ARQUIVO_ML_SKYNET):
+        _fonte_ml = ARQUIVO_ML_SKYNET
+        _mtime_ml = os.path.getmtime(ARQUIVO_ML_SKYNET)
+        _fonte_ml_ok = True
+        st.info("📊 Machine Learning: utilizando arquivo padrão (data/PIPELINE2_RESULTADOS.xlsx)")
+    else:
+        _fonte_ml_ok = False
+
+    if not _fonte_ml_ok:
 
         st.warning(
-            "📁 Não encontrei `data/PIPELINE2_RESULTADOS.xlsx`. "
+            "📁 Não encontrei `data/PIPELINE2_RESULTADOS.xlsx` nem um arquivo enviado. "
             "Rode o **PIPELINE_JOGOSDODIA_R2_CORRIGIDO** no Colab e coloque o Excel exportado "
-            "na pasta `data/` do app — o mesmo lugar onde fica o `POISSON_DUAS_MATRIZES.xlsx`."
+            "na pasta `data/` do app, ou envie ele pela barra lateral (📂 Dados)."
         )
 
     else:
 
-        _dados_ml = carregar_ml_skynet(ARQUIVO_ML_SKYNET, os.path.getmtime(ARQUIVO_ML_SKYNET))
+        _dados_ml = carregar_ml_skynet(_fonte_ml, _mtime_ml)
         df_ml_melhor = _dados_ml["melhor"].copy()
         df_ml_todos = _dados_ml["todos"].copy()
 
@@ -8554,28 +8578,48 @@ with tab10:
                 if f"{m}_Prob" in linha_ml.index and pd.notna(linha_ml[f"{m}_Prob"])
             ]
             _ia_geral = float(np.mean(_probs_jogo)) if _probs_jogo else None
-
-            c_ia1, c_ia2 = st.columns(2)
-            with c_ia1:
-                st.metric("IA Geral", f"{_ml_fmt_pct(_ia_geral)}" if _ia_geral is not None else "—")
-            with c_ia2:
-                st.metric("Confiança", _ml_situacao(_ia_geral).split(" ", 1)[-1] if _ia_geral is not None else "—")
+            _cor_ia_geral = _ml_cor_valor(_ia_geral)
+            _situacao_geral = _ml_situacao(_ia_geral)
 
             # --------------------------------------------------
-            # MINI TABELAS POR GRUPO
+            # 🔧 NOVO — resumo estilizado (substitui st.metric solto)
+            # + mini-cards por grupo em grid, sem coluna vazia gigante
             # --------------------------------------------------
-            _cg1, _cg2, _cg3, _cg4 = st.columns(4)
-            _grupos_cols = {"Lay": _cg1, "Overs": _cg2, "Unders": _cg3, "Ambos Marcam": _cg4}
+            _resumo_html = f"""
+            <div class="ml-card" style="display:flex; justify-content:space-around; align-items:center; margin-bottom:14px;">
+                <div style="text-align:center;">
+                    <div style="font-size:11px; color:#8a93a3; font-weight:700;">IA GERAL</div>
+                    <div style="font-size:30px; font-weight:900; color:{_cor_ia_geral};">{_ml_fmt_pct(_ia_geral)}</div>
+                </div>
+                <div style="width:1px; height:40px; background:#232c3d;"></div>
+                <div style="text-align:center;">
+                    <div style="font-size:11px; color:#8a93a3; font-weight:700;">CONFIANÇA</div>
+                    <div style="font-size:20px; font-weight:900; color:{_cor_ia_geral};">{_situacao_geral}</div>
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; margin-bottom:14px;">
+            """
 
             for _nome_grupo, _mercados_grupo in GRUPO_MERCADO_ML.items():
-                with _grupos_cols[_nome_grupo]:
-                    st.markdown(f"**{_nome_grupo}**")
-                    for m in _mercados_grupo:
-                        col_prob = f"{m}_Prob"
-                        if col_prob in linha_ml.index and pd.notna(linha_ml[col_prob]):
-                            st.markdown(
-                                f"{LABEL_MERCADO_ML[m]}: **{_ml_fmt_pct(linha_ml[col_prob])}**"
-                            )
+                _linhas_grupo = ""
+                for m in _mercados_grupo:
+                    col_prob = f"{m}_Prob"
+                    if col_prob in linha_ml.index and pd.notna(linha_ml[col_prob]):
+                        _v = linha_ml[col_prob]
+                        _linhas_grupo += (
+                            f'<div class="ml-card-row"><span>{LABEL_MERCADO_ML[m]}</span>'
+                            f'<b style="color:{_ml_cor_valor(_v)};">{_ml_fmt_pct(_v)}</b></div>'
+                        )
+                if _linhas_grupo:
+                    _resumo_html += f"""
+                    <div class="ml-card">
+                        <div class="ml-card-title">{_nome_grupo.upper()}</div>
+                        {_linhas_grupo}
+                    </div>
+                    """
+
+            _resumo_html += "</div>"
+            st.markdown(_ml_dedent(_resumo_html), unsafe_allow_html=True)
 
             st.markdown("---")
 
