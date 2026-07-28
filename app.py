@@ -308,6 +308,11 @@ with st.sidebar:
         "Enviar outro Excel (opcional)",
         type=["xlsx"]
     )
+    arquivo_upload_ml = st.file_uploader(
+        "Enviar Excel do Machine Learning (opcional)",
+        type=["xlsx"],
+        key="upload_ml_skynet"
+    )
 
 if arquivo_upload:
     xls = pd.ExcelFile(arquivo_upload)
@@ -8340,24 +8345,43 @@ with tab10:
     ARQUIVO_ML_SKYNET = "data/PIPELINE2_RESULTADOS.xlsx"
 
     @st.cache_data(show_spinner="Carregando previsões do Machine Learning Skynet...")
-    def carregar_ml_skynet(caminho, mtime):
-        xls_ml = pd.ExcelFile(caminho)
+    def carregar_ml_skynet(fonte, mtime=None):
+        xls_ml_local = pd.ExcelFile(io.BytesIO(fonte) if isinstance(fonte, bytes) else fonte)
         return {
-            "melhor": pd.read_excel(xls_ml, "Melhor Mercado"),
-            "todos": pd.read_excel(xls_ml, "Todos os Mercados"),
+            "melhor": pd.read_excel(xls_ml_local, "Melhor Mercado"),
+            "todos": pd.read_excel(xls_ml_local, "Todos os Mercados"),
         }
 
-    if not os.path.exists(ARQUIVO_ML_SKYNET):
+    # ------------------------------------------------------------
+    # 🔧 HÍBRIDO — igual ao Poisson: upload manual (sidebar) tem
+    # prioridade; se não tiver upload, usa o arquivo padrão da pasta
+    # data/. Isso permite subir o Excel de outro dia direto pela
+    # tela, sem depender de push no GitHub / redeploy do Streamlit.
+    # ------------------------------------------------------------
+    if arquivo_upload_ml:
+        _fonte_ml = arquivo_upload_ml.getvalue()
+        _mtime_ml = None
+        _fonte_ml_ok = True
+        st.success("📤 Machine Learning: utilizando arquivo enviado pelo usuário")
+    elif os.path.exists(ARQUIVO_ML_SKYNET):
+        _fonte_ml = ARQUIVO_ML_SKYNET
+        _mtime_ml = os.path.getmtime(ARQUIVO_ML_SKYNET)
+        _fonte_ml_ok = True
+        st.info("📊 Machine Learning: utilizando arquivo padrão (data/PIPELINE2_RESULTADOS.xlsx)")
+    else:
+        _fonte_ml_ok = False
+
+    if not _fonte_ml_ok:
 
         st.warning(
-            "📁 Não encontrei `data/PIPELINE2_RESULTADOS.xlsx`. "
+            "📁 Não encontrei `data/PIPELINE2_RESULTADOS.xlsx` nem um arquivo enviado. "
             "Rode o **PIPELINE_JOGOSDODIA_R2_CORRIGIDO** no Colab e coloque o Excel exportado "
-            "na pasta `data/` do app — o mesmo lugar onde fica o `POISSON_DUAS_MATRIZES.xlsx`."
+            "na pasta `data/` do app, ou envie ele pela barra lateral (📂 Dados)."
         )
 
     else:
 
-        _dados_ml = carregar_ml_skynet(ARQUIVO_ML_SKYNET, os.path.getmtime(ARQUIVO_ML_SKYNET))
+        _dados_ml = carregar_ml_skynet(_fonte_ml, _mtime_ml)
         df_ml_melhor = _dados_ml["melhor"].copy()
         df_ml_todos = _dados_ml["todos"].copy()
 
