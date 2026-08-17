@@ -2481,7 +2481,7 @@ with tab1:
     with o2:
         st.metric("Odds Empate", linha_exg["Odds_Empate"])
         st.metric("Odds Over 2.5", linha_exg["Odds_Over_2,5FT"])
-        st.metric("Coef Over1,5FT", get_val(linha_exg, "COEF_OVER1,5FT", "{:.2f}"))
+        st.metric("Coef Over1,5FT", get_val(linha_exg, "COEF_OVER1FT", "{:.2f}"))
 
     with o3:
         st.metric("Odds Visitante", linha_exg["Odds_Visitante"])
