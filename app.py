@@ -3512,6 +3512,796 @@ with tab1:
     _resumo_html += "</div>"
 
     st.markdown(_resumo_dedent(_resumo_html), unsafe_allow_html=True)
+
+# ============================================================
+# 🔧 BLOCO ATUALIZADO — CARD ÚNICO DE RESUMO (ABA 1)
+# ------------------------------------------------------------
+# Substitua, no seu script, TUDO desde:
+#     st.markdown("---")
+# (o que vem logo antes de "def _resumo_dedent(...)")
+# até a última linha do bloco original:
+#     st.markdown(_resumo_dedent(_resumo_html), unsafe_allow_html=True)
+# por este bloco inteiro.
+#
+# O QUE MUDOU:
+# 1) CSS totalmente refeito seguindo a identidade visual da Aba CS
+#    (gradiente de fundo, glow, accent lateral colorido, gauge
+#    circular tipo velocímetro, barras de progresso).
+# 2) Mercados do Machine Learning: agora traz TODOS os mercados do
+#    pipeline (Lay 0x0, Lay 0x1, Lay 1x0, Lay Goleada Casa/Fora,
+#    Over 0.5HT, Under 1.5HT, Over 1.5FT, Over 2.5FT, Under 2.5FT,
+#    Ambas Marcam), ORDENADOS por valor. O Lay 2x2 fica de fora
+#    de propósito (ainda em calibração).
+# 3) Novo bloco "Consenso · Quem Abre o Placar (CG)" — média das
+#    3 métricas (MGF, ATKxDEF, VG) de "Home_Abrir_Placar" e
+#    "Away_Abrir_Placar", exibida com gauge circular pra cada time.
+# 4) Notas automáticas: se o CG consenso de um time for > 5,00 →
+#    "CG alto para Home/Away"; se for < 2,00 → "CG baixo para
+#    Home/Away". Essas notas entram junto com o "Sinal Principal",
+#    separadas por vírgula.
+#
+# ⚠️ ATENÇÃO SOBRE OS LIMIARES DO CG (5,00 / 2,00):
+# Usei exatamente os valores que você passou, aplicados sobre o
+# consenso de "Home_Abrir_Placar"/"Away_Abrir_Placar" (que no seu
+# código aparecem rotulados como "(%)" em outros pontos da Aba 1
+# e da Aba CS). Se essa coluna realmente for uma porcentagem
+# 0–100 no seu Excel, esses limiares vão praticamente sempre
+# disparar "CG alto". Rode com um jogo de teste e, se for o caso,
+# me diga a faixa real da coluna que eu recalibro os números —
+# a lógica e a estrutura do card já ficam prontas, só o corte
+# muda.
+# ============================================================
+
+    st.markdown("---")
+
+    def _resumo_dedent(html_texto):
+        return "\n".join(l.lstrip() for l in html_texto.splitlines())
+
+    # --------------------------------------------------------
+    # 1) ODDS JUSTAS — CONSENSO ENTRE MGF, ATKxDEF E VG
+    # --------------------------------------------------------
+    def _resumo_media_segura(*valores):
+        vals = [pd.to_numeric(v, errors="coerce") for v in valores]
+        vals = [v for v in vals if pd.notna(v)]
+        return float(np.mean(vals)) if vals else np.nan
+
+    _resumo_odd_justa_casa = _resumo_media_segura(
+        linha_mgf.get("Odd_Justa_Home"),
+        linha_exg.get("Odd_Justa_Home"),
+        linha_vg.get("Odd_Justa_Home"),
+    )
+    _resumo_odd_justa_empate = _resumo_media_segura(
+        linha_mgf.get("Odd_Justa_Draw"),
+        linha_exg.get("Odd_Justa_Draw"),
+        linha_vg.get("Odd_Justa_Draw"),
+    )
+    _resumo_odd_justa_fora = _resumo_media_segura(
+        linha_mgf.get("Odd_Justa_Away"),
+        linha_exg.get("Odd_Justa_Away"),
+        linha_vg.get("Odd_Justa_Away"),
+    )
+
+    _resumo_odd_casa = (
+        linha_csv.get("Odds_Casa", np.nan) if not linha_csv.empty
+        else linha_mgf.get("Odds_Casa", np.nan)
+    )
+    _resumo_odd_empate = (
+        linha_csv.get("Odds_Empate", np.nan) if not linha_csv.empty
+        else linha_mgf.get("Odds_Empate", np.nan)
+    )
+    _resumo_odd_fora = (
+        linha_csv.get("Odds_Visitante", np.nan) if not linha_csv.empty
+        else linha_mgf.get("Odds_Visitante", np.nan)
+    )
+
+    def _resumo_fmt2(v):
+        v = pd.to_numeric(v, errors="coerce")
+        return f"{v:.2f}" if pd.notna(v) else "—"
+
+    # --------------------------------------------------------
+    # 2) TOP 5 PLACARES + OVER/UNDER
+    # --------------------------------------------------------
+    _resumo_top5 = top_placares(matriz_consenso, n=5)
+    _resumo_ou = calcular_over_under(matriz_consenso)
+
+    # --------------------------------------------------------
+    # 3) ESCUDOS + NOMES
+    # --------------------------------------------------------
+    _resumo_home = linha_exg.get("Home_Team", jogo.split(" x ")[0])
+    _resumo_away = linha_exg.get("Visitor_Team", jogo.split(" x ")[-1])
+    _resumo_crest_h = escudo_base64(_resumo_home)
+    _resumo_crest_a = escudo_base64(_resumo_away)
+    _resumo_crest_h_html = (
+        f'<img src="{_resumo_crest_h}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">'
+        if _resumo_crest_h else "⚽"
+    )
+    _resumo_crest_a_html = (
+        f'<img src="{_resumo_crest_a}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">'
+        if _resumo_crest_a else "⚽"
+    )
+
+    # --------------------------------------------------------
+    # 4) SINAL PRINCIPAL — Tier_LA / Tier_LH (Aba IA)
+    # --------------------------------------------------------
+    _resumo_tier_la = ""
+    _resumo_tier_lh = ""
+
+    if not df_rank_la.empty:
+        _home_key = str(_resumo_home).strip().lower()
+        _linha_la = df_rank_la[df_rank_la["Home_Key"] == _home_key]
+        if not _linha_la.empty:
+            _resumo_tier_la = str(_linha_la.iloc[0].get("Tier_LA", "") or "")
+
+    if not df_rank_lh.empty:
+        _away_key = str(_resumo_away).strip().lower()
+        _linha_lh = df_rank_lh[df_rank_lh["Away_Key"] == _away_key]
+        if not _linha_lh.empty:
+            _resumo_tier_lh = str(_linha_lh.iloc[0].get("Tier_LH", "") or "")
+
+    _resumo_frases_sinal = []
+    if _resumo_tier_la:
+        if "💜" in _resumo_tier_la:
+            _resumo_frases_sinal.append(("Lay Away - Atenção!", "#a78bfa"))
+        elif "⭐" in _resumo_tier_la:
+            _resumo_frases_sinal.append(("Lay Away ⭐⭐⭐⭐⭐", "#4ade80"))
+    if _resumo_tier_lh:
+        if "💜" in _resumo_tier_lh:
+            _resumo_frases_sinal.append(("Lay Home - Atenção!", "#a78bfa"))
+        elif "⭐" in _resumo_tier_lh:
+            _resumo_frases_sinal.append(("Lay Home ⭐⭐⭐⭐⭐", "#60a5fa"))
+
+    # --------------------------------------------------------
+    # 4b) 🔧 NOVO — CONSENSO "QUEM ABRE O PLACAR" (CG)
+    # Consenso entre MGF, ATKxDEF (exg) e VG do valor de cada
+    # time marcar o primeiro gol. Fora da faixa 2,00–5,00 ganha
+    # comentário extra dentro do Sinal Principal.
+    # --------------------------------------------------------
+    _resumo_cg_home = _resumo_media_segura(
+        linha_mgf.get("Home_Abrir_Placar"),
+        linha_exg.get("Home_Abrir_Placar"),
+        linha_vg.get("Home_Abrir_Placar"),
+    )
+    _resumo_cg_away = _resumo_media_segura(
+        linha_mgf.get("Away_Abrir_Placar"),
+        linha_exg.get("Away_Abrir_Placar"),
+        linha_vg.get("Away_Abrir_Placar"),
+    )
+
+    # --------------------------------------------------------
+    # 🔧 CORRIGIDO — o aviso de CG alto/baixo NÃO usa o consenso
+    # de "abrir placar". Usa o Media_CG_H_01 / Media_CG_A_01
+    # (mesma métrica já usada na Aba IA / classificar_filtro_duplo),
+    # que fica em df_mgf / linha_mgf.
+    # --------------------------------------------------------
+    _resumo_cg_home_media = pd.to_numeric(
+        linha_mgf.get("Media_CG_H_01"), errors="coerce"
+    )
+    _resumo_cg_away_media = pd.to_numeric(
+        linha_mgf.get("Media_CG_A_01"), errors="coerce"
+    )
+
+    _resumo_cg_notas = []
+    if pd.notna(_resumo_cg_home_media):
+        if _resumo_cg_home_media > 5.00:
+            _resumo_cg_notas.append("CG alto para Home")
+        elif _resumo_cg_home_media < 2.00:
+            _resumo_cg_notas.append("CG baixo para Home")
+    if pd.notna(_resumo_cg_away_media):
+        if _resumo_cg_away_media > 5.00:
+            _resumo_cg_notas.append("CG alto para Away")
+        elif _resumo_cg_away_media < 2.00:
+            _resumo_cg_notas.append("CG baixo para Away")
+
+    def _resumo_deg(v):
+        return (0.0 if pd.isna(v) else float(v)) * 3.6
+
+    # --------------------------------------------------------
+    # 5) COMENTÁRIO ADICIONAL — IA_Direcao (Aba IA / df_consenso)
+    # --------------------------------------------------------
+    _resumo_ia_direcao = str(linha_consenso.get("IA_Direcao", "") or "")
+    _resumo_mostrar_live = "Analisar no Live" in _resumo_ia_direcao
+
+    # --------------------------------------------------------
+    # 6) MERCADOS DO MACHINE LEARNING — Aba Machine Learning
+    # Agora traz TODOS os mercados do pipeline (Lay's, Overs,
+    # Unders e BTTS). O Lay 2x2 fica de fora (em calibração).
+    # --------------------------------------------------------
+    _resumo_label_mercados = {
+        "LAY00":     "Lay 0x0",
+        "LAY01":     "Lay 0x1",
+        "LAY10":     "Lay 1x0",
+        "LAYGH":     "Lay Goleada Casa",
+        "LAYGA":     "Lay Goleada Fora",
+        "OVER05HT":  "Over 0.5 HT",
+        "UNDER15HT": "Under 1.5 HT",
+        "OVER15FT":  "Over 1.5 FT",
+        "OVER25FT":  "Over 2.5 FT",
+        "UNDER25FT": "Under 2.5 FT",
+        "BTTS_YES":  "Ambas Marcam",
+    }
+    # LAY22 fica de fora de propósito (em calibração)
+
+    @st.cache_data(show_spinner=False)
+    def _resumo_carregar_ml(fonte, mtime=None):
+        xls_ml_local = pd.ExcelFile(io.BytesIO(fonte) if isinstance(fonte, bytes) else fonte)
+        return pd.read_excel(xls_ml_local, "Todos os Mercados")
+
+    _resumo_mercados_ml = []
+    try:
+        _ARQUIVO_ML_RESUMO = "data/PIPELINE2_RESULTADOS.xlsx"
+        if arquivo_upload_ml:
+            _fonte_ml_resumo = arquivo_upload_ml.getvalue()
+            _mtime_ml_resumo = None
+        elif os.path.exists(_ARQUIVO_ML_RESUMO):
+            _fonte_ml_resumo = _ARQUIVO_ML_RESUMO
+            _mtime_ml_resumo = os.path.getmtime(_ARQUIVO_ML_RESUMO)
+        else:
+            _fonte_ml_resumo = None
+
+        if _fonte_ml_resumo is not None:
+            _df_ml_resumo = _resumo_carregar_ml(_fonte_ml_resumo, _mtime_ml_resumo)
+            _df_ml_resumo["JOGO"] = (
+                _df_ml_resumo["Home_Team"].astype(str).str.strip() + " x " +
+                _df_ml_resumo["Visitor_Team"].astype(str).str.strip()
+            )
+            _linha_ml_resumo = _df_ml_resumo[_df_ml_resumo["JOGO"] == jogo]
+
+            if not _linha_ml_resumo.empty:
+                _linha_ml_resumo = _linha_ml_resumo.iloc[0]
+                for _mkt, _lbl in _resumo_label_mercados.items():
+                    _col = f"{_mkt}_Prob"
+                    if _col in _linha_ml_resumo.index and pd.notna(_linha_ml_resumo[_col]):
+                        _resumo_mercados_ml.append((_lbl, float(_linha_ml_resumo[_col])))
+                _resumo_mercados_ml.sort(key=lambda x: x[1], reverse=True)
+    except Exception:
+        _resumo_mercados_ml = []
+
+    # --------------------------------------------------------
+    # 🔧 NOVO — cor por valor (mesmo padrão visual da Aba CS)
+    # --------------------------------------------------------
+    def _resumo_cor_valor(v):
+        if v is None or pd.isna(v):
+            return "#5b6472"
+        if v >= 90:
+            return "#22c55e"
+        if v >= 80:
+            return "#4ade80"
+        if v >= 70:
+            return "#eab308"
+        if v >= 60:
+            return "#c7ccd6"
+        return "#ef4444"
+
+    # --------------------------------------------------------
+    # CSS — identidade visual igual à Aba CS Score
+    # (gradiente, accent lateral, gauge circular, barras de
+    # progresso e sombras/tipografia mais ricas)
+    # --------------------------------------------------------
+    _resumo_css = """
+    <style>
+    .rc-card { border-radius:18px; border:1px solid #232c3d;
+        background:linear-gradient(135deg,#101826,#0a0f18);
+        padding:30px 34px; margin-top:10px;
+        box-shadow:0 8px 24px rgba(0,0,0,0.35); }
+
+    .rc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:26px; }
+    .rc-team { display:flex; align-items:center; gap:16px; }
+    .rc-team.away { flex-direction:row-reverse; text-align:right; }
+    .rc-crest { width:68px; height:68px; border-radius:50%; background:#161d29;
+        display:flex; align-items:center; justify-content:center; font-size:30px;
+        border:1px solid #2c3648; flex-shrink:0;
+        box-shadow:0 0 0 3px rgba(127,179,255,0.08); }
+    .rc-team-name { font-size:28px; font-weight:900; color:#f5f7fa; letter-spacing:0.3px;
+        text-shadow:0 1px 6px rgba(0,0,0,0.4); }
+    .rc-vs { font-size:19px; font-weight:800; color:#5b6472; padding:0 16px; }
+
+    .rc-section-title { font-size:14px; font-weight:800; letter-spacing:1.4px; color:#7fb3ff;
+        text-transform:uppercase; margin:26px 0 14px 0; }
+
+    .rc-odds-row { display:flex; gap:14px; }
+    .rc-odds-box { flex:1; text-align:center; background:#11161f; border:1px solid #232c3d;
+        border-radius:14px; padding:18px 10px; }
+    .rc-odds-label { font-size:13px; color:#8a93a3; font-weight:800; letter-spacing:0.8px; }
+    .rc-odds-real { font-size:30px; font-weight:900; color:#f5f7fa; margin-top:4px; }
+    .rc-odds-justa { font-size:15px; color:#7fb3ff; margin-top:6px; font-weight:700; }
+
+    .rc-cols2 { display:flex; gap:20px; }
+    .rc-col { flex:1; }
+    .rc-placar-row { display:flex; justify-content:space-between; padding:8px 0;
+        border-bottom:1px solid #161c27; font-size:17px; color:#c8cfd8; }
+    .rc-placar-row b { color:#f5f7fa; font-weight:800; font-size:18px; }
+    .rc-ou-row { display:flex; justify-content:space-between; padding:8px 0;
+        border-bottom:1px solid #161c27; font-size:16.5px; color:#c8cfd8; }
+    .rc-ou-over { color:#4ade80; font-weight:800; }
+    .rc-ou-under { color:#f87171; font-weight:800; }
+
+    .rc-cg-row { display:flex; gap:16px; }
+    .rc-cg-box { flex:1; background:#11161f; border:1px solid #232c3d; border-radius:14px;
+        padding:16px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .rc-cg-label { font-size:15.5px; color:#c8cfd8; font-weight:700; }
+    .rc-cg-gauge { width:64px; height:64px; border-radius:50%; display:flex; align-items:center;
+        justify-content:center; flex-shrink:0; }
+    .rc-cg-gauge-inner { width:50px; height:50px; border-radius:50%; background:#0d121b;
+        display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:900;
+        color:#f5f7fa; }
+
+    .rc-mkt-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px; }
+    .rc-mkt-box { background:#11161f; border:1px solid #232c3d; border-left:4px solid;
+        border-radius:12px; padding:14px 16px; }
+    .rc-mkt-label { font-size:14px; color:#c8cfd8; font-weight:700; margin-bottom:8px; }
+    .rc-mkt-value { font-size:26px; font-weight:900; margin-bottom:8px; }
+    .rc-mkt-track { width:100%; height:6px; border-radius:4px; background:#1c2433; }
+    .rc-mkt-fill { height:6px; border-radius:4px; }
+
+    .rc-signal-row { display:flex; gap:16px; margin-top:26px; flex-wrap:wrap; }
+    .rc-signal-box { flex:1; min-width:220px; background:#11161f; border:1px solid #232c3d;
+        border-radius:14px; padding:18px 20px; text-align:center; }
+    .rc-signal-label { font-size:12.5px; color:#8a93a3; font-weight:800; letter-spacing:0.8px;
+        margin-bottom:10px; }
+    .rc-signal-text { font-size:21px; font-weight:900; text-shadow:0 1px 6px rgba(0,0,0,0.4); }
+    </style>
+    """
+    st.markdown(_resumo_dedent(_resumo_css), unsafe_allow_html=True)
+
+    # --------------------------------------------------------
+    # MONTA O HTML DO CARD
+    # --------------------------------------------------------
+    _resumo_html = f"""
+    <div class="rc-card">
+
+        <div class="rc-header">
+            <div class="rc-team">
+                <div class="rc-crest">{_resumo_crest_h_html}</div>
+                <div class="rc-team-name">{str(_resumo_home).upper()}</div>
+            </div>
+            <div class="rc-vs">X</div>
+            <div class="rc-team away">
+                <div class="rc-crest">{_resumo_crest_a_html}</div>
+                <div class="rc-team-name">{str(_resumo_away).upper()}</div>
+            </div>
+        </div>
+
+        <div class="rc-section-title">Odds 1x2 · Odd Justa (Consenso MGF · ATKxDEF · VG)</div>
+        <div class="rc-odds-row">
+            <div class="rc-odds-box">
+                <div class="rc-odds-label">CASA</div>
+                <div class="rc-odds-real">{_resumo_fmt2(_resumo_odd_casa)}</div>
+                <div class="rc-odds-justa">Justa {_resumo_odd_justa_casa:.2f}</div>
+            </div>
+            <div class="rc-odds-box">
+                <div class="rc-odds-label">EMPATE</div>
+                <div class="rc-odds-real">{_resumo_fmt2(_resumo_odd_empate)}</div>
+                <div class="rc-odds-justa">Justa {_resumo_odd_justa_empate:.2f}</div>
+            </div>
+            <div class="rc-odds-box">
+                <div class="rc-odds-label">FORA</div>
+                <div class="rc-odds-real">{_resumo_fmt2(_resumo_odd_fora)}</div>
+                <div class="rc-odds-justa">Justa {_resumo_odd_justa_fora:.2f}</div>
+            </div>
+        </div>
+
+        <div class="rc-cols2">
+            <div class="rc-col">
+                <div class="rc-section-title">Top 5 Placares Mais Prováveis</div>
+    """
+
+    for _, _lin in _resumo_top5.iterrows():
+        _resumo_html += (
+            f'<div class="rc-placar-row"><span>{int(_lin["Gols_Home"])} - {int(_lin["Gols_Away"])}</span>'
+            f'<b>{_lin["Probabilidade%"]}</b></div>'
+        )
+
+    _resumo_html += """
+            </div>
+            <div class="rc-col">
+                <div class="rc-section-title">Over / Under FT (Consenso)</div>
+    """
+
+    for _linha_ou in ["0.5", "1.5", "2.5"]:
+        _over_v = _resumo_ou[f"Over {_linha_ou}"]
+        _under_v = _resumo_ou[f"Under {_linha_ou}"]
+        _resumo_html += (
+            f'<div class="rc-ou-row"><span>Linha {_linha_ou}</span>'
+            f'<span><span class="rc-ou-over">{_over_v:.1f}%</span> · '
+            f'<span class="rc-ou-under">{_under_v:.1f}%</span></span></div>'
+        )
+
+    _resumo_html += """
+            </div>
+        </div>
+    """
+
+    # --------------------------------------------------------
+    # 🔧 NOVO — CONSENSO "QUEM ABRE O PLACAR" (CG)
+    # --------------------------------------------------------
+    _cor_cg_home = _resumo_cor_valor(_resumo_cg_home)
+    _cor_cg_away = _resumo_cor_valor(_resumo_cg_away)
+
+    _resumo_html += f"""
+        <div class="rc-section-title">Consenso · Quem Abre o Placar (CG)</div>
+        <div class="rc-cg-row">
+            <div class="rc-cg-box">
+                <span class="rc-cg-label">🏠 {str(_resumo_home).upper()}</span>
+                <div class="rc-cg-gauge" style="background: conic-gradient({_cor_cg_home} {_resumo_deg(_resumo_cg_home)}deg, #1e2532 0deg);">
+                    <div class="rc-cg-gauge-inner">{_resumo_fmt2(_resumo_cg_home)}</div>
+                </div>
+            </div>
+            <div class="rc-cg-box">
+                <span class="rc-cg-label">✈ {str(_resumo_away).upper()}</span>
+                <div class="rc-cg-gauge" style="background: conic-gradient({_cor_cg_away} {_resumo_deg(_resumo_cg_away)}deg, #1e2532 0deg);">
+                    <div class="rc-cg-gauge-inner">{_resumo_fmt2(_resumo_cg_away)}</div>
+                </div>
+            </div>
+        </div>
+    """
+
+    # --------------------------------------------------------
+    # 🔧 NOVO — GRID COM TODOS OS MERCADOS (SEM LAY 2X2)
+    # --------------------------------------------------------
+    if _resumo_mercados_ml:
+        _resumo_html += '<div class="rc-section-title">Mercados · Consenso Machine Learning</div><div class="rc-mkt-grid">'
+        for _lbl, _val in _resumo_mercados_ml:
+            _cor = _resumo_cor_valor(_val)
+            _resumo_html += f"""
+            <div class="rc-mkt-box" style="border-left-color:{_cor};">
+                <div class="rc-mkt-label">{_lbl}</div>
+                <div class="rc-mkt-value" style="color:{_cor};">{_val:.0f}</div>
+                <div class="rc-mkt-track"><div class="rc-mkt-fill" style="width:{_val}%; background:{_cor};"></div></div>
+            </div>
+            """
+        _resumo_html += "</div>"
+
+    # --------------------------------------------------------
+    # SINAIS FINAIS (Sinal Principal + Comentário Adicional)
+    # --------------------------------------------------------
+    _resumo_texto_sinal_principal = ""
+    _resumo_cor_sinal_principal = "#f5f7fa"
+
+    if _resumo_frases_sinal:
+        _resumo_texto_sinal_principal, _resumo_cor_sinal_principal = _resumo_frases_sinal[0]
+
+    if _resumo_cg_notas:
+        if _resumo_texto_sinal_principal:
+            _resumo_texto_sinal_principal += " , " + " , ".join(_resumo_cg_notas)
+        else:
+            _resumo_texto_sinal_principal = " , ".join(_resumo_cg_notas)
+
+    if _resumo_texto_sinal_principal or _resumo_mostrar_live:
+        _resumo_html += '<div class="rc-signal-row">'
+        if _resumo_texto_sinal_principal:
+            _resumo_html += (
+                '<div class="rc-signal-box"><div class="rc-signal-label">SINAL PRINCIPAL</div>'
+                f'<div class="rc-signal-text" style="color:{_resumo_cor_sinal_principal};">{_resumo_texto_sinal_principal}</div></div>'
+            )
+        if _resumo_mostrar_live:
+            _resumo_html += (
+                '<div class="rc-signal-box"><div class="rc-signal-label">COMENTÁRIO ADICIONAL</div>'
+                '<div class="rc-signal-text" style="color:#facc15;">⚠ Analisar / Acompanhar Jogo Live</div></div>'
+            )
+        _resumo_html += "</div>"
+
+    _resumo_html += "</div>"
+
+    st.markdown(_resumo_dedent(_resumo_html), unsafe_allow_html=True)
+
+# ============================================================
+# 📸 CARD INSTAGRAM — cole isso LOGO DEPOIS da linha:
+#     st.markdown(_resumo_dedent(_resumo_html), unsafe_allow_html=True)
+# (ou seja, depois do card de resumo que já existe, ainda dentro
+# de "with tab1:"). Reaproveita as variáveis já calculadas ali:
+# _resumo_top5, _resumo_ou, _resumo_mercados_ml, _resumo_label_mercados,
+# _resumo_crest_h_html/a, _resumo_home/away, _resumo_odd_*, 
+# _resumo_odd_justa_*, _resumo_texto_sinal_principal,
+# _resumo_cor_sinal_principal, _resumo_mostrar_live, matriz_consenso,
+# score_ofensivo, radar_home_consenso, radar_away_consenso, linha_ht.
+# ============================================================
+
+    st.markdown("---")
+    st.markdown("### 📸 Card para Instagram")
+
+    def _ig_dedent(html_texto):
+        return "\n".join(l.lstrip() for l in html_texto.splitlines())
+
+    # ------------------------------------------------------------
+    # ÍNDICE TÁTICO / PERFIL / CONFIANÇA (rodapé do card)
+    # ------------------------------------------------------------
+    _ig_indice_tatico = int(round(score_ofensivo)) if pd.notna(score_ofensivo) else 50
+
+    _ig_dominio = dominio_ofensivo(radar_home_consenso, radar_away_consenso)
+    _ig_perfil_label = {
+        "HOME": "CASA FORTE",
+        "AWAY": "VISITANTE FORTE",
+        "EQUILIBRADO": "EQUILIBRADO",
+    }.get(_ig_dominio, "EQUILIBRADO")
+
+    _ig_score_poisson = poisson_score(matriz_consenso)
+    if _ig_score_poisson > 75:
+        _ig_confianca = "ALTA"
+    elif _ig_score_poisson > 55:
+        _ig_confianca = "MÉDIA"
+    else:
+        _ig_confianca = "BAIXA"
+
+    # ------------------------------------------------------------
+    # PROBABILIDADE REAL (Poisson / Over-Under / BTTS) por mercado,
+    # pra exibir junto do score de IA de cada mini-card
+    # ------------------------------------------------------------
+    _ig_btts_pct, _ = calcular_btts_e_odd(matriz_consenso / 100)
+
+    def _ig_prob_mercado(chave):
+        try:
+            if chave == "LAY00":
+                return matriz_consenso[0][0]
+            if chave == "LAY01":
+                return matriz_consenso[0][1]
+            if chave == "LAY10":
+                return matriz_consenso[1][0]
+            if chave == "LAYGH":
+                return matriz_consenso[4][0] + matriz_consenso[4][1]
+            if chave == "LAYGA":
+                return matriz_consenso[0][4] + matriz_consenso[1][4]
+            if chave == "OVER15FT":
+                return _resumo_ou["Over 1.5"]
+            if chave == "OVER25FT":
+                return _resumo_ou["Over 2.5"]
+            if chave == "UNDER25FT":
+                return _resumo_ou["Under 2.5"]
+            if chave == "BTTS_YES":
+                return _ig_btts_pct
+            if chave == "OVER05HT":
+                return pd.to_numeric(linha_ht.get("Prob_Gol_HT"), errors="coerce")
+            if chave == "UNDER15HT":
+                v = pd.to_numeric(linha_ht.get("Prob_Gol_HT"), errors="coerce")
+                return (100 - v) if pd.notna(v) else None
+        except Exception:
+            return None
+        return None
+
+    _ig_icone_mercado = {
+        "LAY00": "🥅", "LAY01": "👟⚽", "LAY10": "👟⚽",
+        "LAYGH": "🥅", "LAYGA": "🥅",
+        "OVER05HT": "⏱️⚽", "UNDER15HT": "🧊⚽",
+        "OVER15FT": "🔥⚽", "OVER25FT": "🔥⚽", "UNDER25FT": "🧊⚽",
+        "BTTS_YES": "🤝⚽",
+    }
+
+    _ig_paleta = ["#ef4444", "#f97316", "#3b82f6", "#a855f7", "#22c55e", "#eab308"]
+
+    # já vem ordenado do maior pro menor valor (sem Lay 2x2)
+    _ig_top4 = _resumo_mercados_ml[:4]
+
+    # ------------------------------------------------------------
+    # CSS — mesmo padrão do exemplo (borda azul brilhante, fundo
+    # quase preto, cantos bem arredondados)
+    # ------------------------------------------------------------
+    _ig_css = """
+    <style>
+    .ig-wrap { max-width:760px; margin:0 auto; border-radius:26px;
+        border:2px solid #2f6fed; background:#03050a;
+        box-shadow:0 0 40px rgba(47,111,237,0.35), inset 0 0 40px rgba(47,111,237,0.05);
+        padding:30px 34px 26px 34px; }
+
+    .ig-brand { text-align:center; font-size:15px; font-weight:800; letter-spacing:2px;
+        color:#7fb3ff; margin-bottom:18px; text-transform:uppercase; }
+
+    .ig-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+    .ig-team { display:flex; align-items:center; gap:14px; }
+    .ig-team.away { flex-direction:row-reverse; text-align:right; }
+    .ig-crest { width:70px; height:70px; border-radius:50%; background:#11161f;
+        display:flex; align-items:center; justify-content:center; font-size:30px;
+        border:1px solid #2c3648; flex-shrink:0; }
+    .ig-team-name { font-size:24px; font-weight:900; color:#f5f7fa; }
+    .ig-team-tag { font-size:13px; font-weight:800; margin-top:4px; }
+    .ig-vs { font-size:24px; font-weight:900; color:#5b6472; }
+
+    .ig-section { border-radius:16px; border:1px solid #1c2433; background:#080b12;
+        padding:18px 20px; margin-bottom:16px; }
+    .ig-section-title { text-align:center; font-size:13px; font-weight:800; letter-spacing:1.4px;
+        color:#8a93a3; text-transform:uppercase; margin-bottom:14px; }
+
+    .ig-odds-row { display:flex; gap:14px; }
+    .ig-odds-box { flex:1; text-align:center; }
+    .ig-odds-label { font-size:12px; color:#8a93a3; font-weight:800; letter-spacing:0.6px; }
+    .ig-odds-real { font-size:26px; font-weight:900; color:#f5f7fa; margin-top:2px; }
+    .ig-odds-justa-tag { font-size:11px; color:#7fb3ff; font-weight:700; margin-top:2px; }
+    .ig-odds-justa-val { font-size:18px; color:#4a9dff; font-weight:900; }
+
+    .ig-consenso-line { text-align:center; font-size:13px; color:#c8cfd8; margin-top:14px;
+        padding-top:12px; border-top:1px solid #1c2433; }
+    .ig-consenso-line b { color:#4a9dff; }
+
+    .ig-cols2 { display:flex; gap:16px; }
+    .ig-col { flex:1; }
+    .ig-placar-row { display:flex; justify-content:space-between; padding:6px 0;
+        font-size:14px; color:#c8cfd8; }
+    .ig-placar-badge { display:inline-flex; align-items:center; justify-content:center;
+        width:20px; height:20px; border-radius:5px; background:#1e6b3a; color:#fff;
+        font-size:11px; font-weight:800; margin-right:8px; }
+    .ig-placar-row b { color:#4ade80; font-weight:800; }
+    .ig-ou-row { display:flex; justify-content:space-between; padding:6px 0; font-size:13px; color:#c8cfd8; }
+    .ig-ou-over { color:#4ade80; font-weight:800; }
+    .ig-ou-under { color:#f87171; font-weight:800; }
+
+    .ig-mkt-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; }
+    .ig-mkt-box { text-align:center; border-radius:14px; border:1px solid #1c2433;
+        background:#0b0f18; padding:14px 8px; }
+    .ig-mkt-label { font-size:11.5px; color:#c8cfd8; font-weight:800; margin-bottom:8px; }
+    .ig-mkt-icon { font-size:22px; margin-bottom:6px; }
+    .ig-mkt-score { font-size:26px; font-weight:900; }
+    .ig-mkt-score-suffix { font-size:13px; color:#8a93a3; font-weight:700; }
+    .ig-mkt-track { width:100%; height:5px; border-radius:4px; background:#1c2433; margin:8px 0; }
+    .ig-mkt-fill { height:5px; border-radius:4px; }
+    .ig-mkt-prob-label { font-size:10px; color:#8a93a3; font-weight:700; letter-spacing:0.5px; }
+    .ig-mkt-prob-val { font-size:14px; font-weight:900; }
+
+    .ig-signal-row { display:flex; gap:16px; }
+    .ig-signal-box { flex:1; text-align:center; }
+    .ig-signal-label { font-size:11px; color:#8a93a3; font-weight:800; letter-spacing:0.8px;
+        margin-bottom:8px; }
+    .ig-signal-text { font-size:22px; font-weight:900; }
+
+    .ig-footer { display:flex; justify-content:space-around; border-top:1px solid #1c2433;
+        margin-top:6px; padding-top:16px; }
+    .ig-footer-item { text-align:center; }
+    .ig-footer-icon { font-size:16px; }
+    .ig-footer-label { font-size:11px; color:#8a93a3; font-weight:700; letter-spacing:0.5px; margin-top:4px; }
+    .ig-footer-value { font-size:20px; font-weight:900; margin-top:2px; }
+    </style>
+    """
+    st.markdown(_ig_dedent(_ig_css), unsafe_allow_html=True)
+
+    # ------------------------------------------------------------
+    # MONTA O HTML
+    # ------------------------------------------------------------
+    _ig_html = f"""
+    <div class="ig-wrap">
+
+        <div class="ig-brand">@laratodata</div>
+
+        <div class="ig-header">
+            <div class="ig-team">
+                <div class="ig-crest">{_resumo_crest_h_html}</div>
+                <div>
+                    <div class="ig-team-name">{str(_resumo_home).title()}</div>
+                    <div class="ig-team-tag" style="color:#4ade80;">🏠 MANDANTE</div>
+                </div>
+            </div>
+            <div class="ig-vs">X</div>
+            <div class="ig-team away">
+                <div class="ig-crest">{_resumo_crest_a_html}</div>
+                <div>
+                    <div class="ig-team-name">{str(_resumo_away).title()}</div>
+                    <div class="ig-team-tag" style="color:#7fb3ff;">✈ VISITANTE</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ig-section">
+            <div class="ig-section-title">🎯 Odds 1x2</div>
+            <div class="ig-odds-row">
+                <div class="ig-odds-box">
+                    <div class="ig-odds-label">CASA</div>
+                    <div class="ig-odds-real">{_resumo_fmt2(_resumo_odd_casa)}</div>
+                    <div class="ig-odds-justa-tag">ODD JUSTA</div>
+                    <div class="ig-odds-justa-val">{_resumo_odd_justa_casa:.2f}</div>
+                </div>
+                <div class="ig-odds-box">
+                    <div class="ig-odds-label">EMPATE</div>
+                    <div class="ig-odds-real">{_resumo_fmt2(_resumo_odd_empate)}</div>
+                    <div class="ig-odds-justa-tag">ODD JUSTA</div>
+                    <div class="ig-odds-justa-val">{_resumo_odd_justa_empate:.2f}</div>
+                </div>
+                <div class="ig-odds-box">
+                    <div class="ig-odds-label">FORA</div>
+                    <div class="ig-odds-real">{_resumo_fmt2(_resumo_odd_fora)}</div>
+                    <div class="ig-odds-justa-tag">ODD JUSTA</div>
+                    <div class="ig-odds-justa-val">{_resumo_odd_justa_fora:.2f}</div>
+                </div>
+            </div>
+            <div class="ig-consenso-line">
+                🎯 ODD JUSTA MÉDIA (CONSENSO)<br>
+                CASA: <b>{_resumo_odd_justa_casa:.2f}</b> &nbsp;|&nbsp;
+                EMPATE: <b>{_resumo_odd_justa_empate:.2f}</b> &nbsp;|&nbsp;
+                FORA: <b>{_resumo_odd_justa_fora:.2f}</b>
+            </div>
+        </div>
+
+        <div class="ig-cols2">
+            <div class="ig-col ig-section">
+                <div class="ig-section-title">📊 Top 5 Placares</div>
+    """
+
+    for _i, (_, _lin) in enumerate(_resumo_top5.iterrows()):
+        _ig_html += (
+            f'<div class="ig-placar-row"><span><span class="ig-placar-badge">{_i+1}</span>'
+            f'{int(_lin["Gols_Home"])} - {int(_lin["Gols_Away"])}</span>'
+            f'<b>{_lin["Probabilidade%"]}</b></div>'
+        )
+
+    _ig_html += """
+            </div>
+            <div class="ig-col ig-section">
+                <div class="ig-section-title">📈 Over / Under FT</div>
+    """
+
+    for _linha_ou in ["0.5", "1.5", "2.5"]:
+        _over_v = _resumo_ou[f"Over {_linha_ou}"]
+        _under_v = _resumo_ou[f"Under {_linha_ou}"]
+        _ig_html += (
+            f'<div class="ig-ou-row"><span>Linha {_linha_ou}</span>'
+            f'<span><span class="ig-ou-over">{_over_v:.2f}%</span> · '
+            f'<span class="ig-ou-under">{_under_v:.2f}%</span></span></div>'
+        )
+
+    _ig_html += """
+            </div>
+        </div>
+
+        <div class="ig-section">
+            <div class="ig-section-title">🛡 Top 4 Mercados</div>
+            <div class="ig-mkt-grid">
+    """
+
+    for _i, (_lbl, _val) in enumerate(_ig_top4):
+        _cor = _ig_paleta[_i % len(_ig_paleta)]
+        _chave = next((k for k, v in _resumo_label_mercados.items() if v == _lbl), "")
+        _icone = _ig_icone_mercado.get(_chave, "⚽")
+        _prob = _ig_prob_mercado(_chave)
+        _prob_txt = f"{_prob:.2f}%" if _prob is not None and pd.notna(_prob) else "—"
+
+        _ig_html += f"""
+        <div class="ig-mkt-box">
+            <div class="ig-mkt-label">{_lbl.upper()}</div>
+            <div class="ig-mkt-icon">{_icone}</div>
+            <div><span class="ig-mkt-score" style="color:{_cor};">{_val:.0f}</span><span class="ig-mkt-score-suffix">/100</span></div>
+            <div class="ig-mkt-track"><div class="ig-mkt-fill" style="width:{_val}%; background:{_cor};"></div></div>
+            <div class="ig-mkt-prob-label">PROB. {_lbl.upper()}</div>
+            <div class="ig-mkt-prob-val" style="color:{_cor};">{_prob_txt}</div>
+        </div>
+        """
+
+    _ig_html += """
+            </div>
+        </div>
+    """
+
+    if _resumo_texto_sinal_principal or _resumo_mostrar_live:
+        _ig_html += '<div class="ig-section"><div class="ig-signal-row">'
+        if _resumo_texto_sinal_principal:
+            _ig_html += (
+                '<div class="ig-signal-box"><div class="ig-signal-label">⭐ SINAL PRINCIPAL</div>'
+                f'<div class="ig-signal-text" style="color:{_resumo_cor_sinal_principal};">{_resumo_texto_sinal_principal}</div></div>'
+            )
+        if _resumo_mostrar_live:
+            _ig_html += (
+                '<div class="ig-signal-box"><div class="ig-signal-label">💬 COMENTÁRIO ADICIONAL</div>'
+                '<div class="ig-signal-text" style="color:#facc15;">⚠ ANALISAR / ACOMPANHAR JOGO LIVE</div></div>'
+            )
+        _ig_html += "</div></div>"
+
+    _ig_html += f"""
+        <div class="ig-footer">
+            <div class="ig-footer-item">
+                <div class="ig-footer-icon">🎯</div>
+                <div class="ig-footer-label">ÍNDICE TÁTICO</div>
+                <div class="ig-footer-value" style="color:#4ade80;">{_ig_indice_tatico}/100</div>
+            </div>
+            <div class="ig-footer-item">
+                <div class="ig-footer-icon">👤</div>
+                <div class="ig-footer-label">PERFIL</div>
+                <div class="ig-footer-value" style="color:#7fb3ff;">{_ig_perfil_label}</div>
+            </div>
+            <div class="ig-footer-item">
+                <div class="ig-footer-icon">🛡</div>
+                <div class="ig-footer-label">CONFIANÇA</div>
+                <div class="ig-footer-value" style="color:#4ade80;">{_ig_confianca}</div>
+            </div>
+        </div>
+
+    </div>
+    """
+
+    st.markdown(_ig_dedent(_ig_html), unsafe_allow_html=True)
 # =========================================
 # ABA 2 — DADOS COMPLETOS
 # =========================================
