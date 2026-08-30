@@ -3213,43 +3213,101 @@ with tab1:
     # --------------------------------------------------------
     # CSS — fundo escuro e discreto
     # --------------------------------------------------------
-_resumo_css = """
-<style>
-.rc-card{border-radius:18px;border:1px solid #26384a;background:linear-gradient(145deg,#0b1119,#0d1621,#091019);padding:26px 30px;margin-top:10px;box-shadow:0 8px 25px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.025)}
-.rc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid rgba(65,110,150,.22)}
-.rc-team{display:flex;align-items:center;gap:14px}
-.rc-team.away{flex-direction:row-reverse;text-align:right}
-.rc-crest{width:58px;height:58px;border-radius:50%;background:#111c28;display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid #30465c;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.35)}
-.rc-team-name{font-size:19px;font-weight:800;color:#edf2f7;letter-spacing:.3px}
-.rc-vs{font-size:14px;font-weight:800;color:#2f9cff;letter-spacing:1px}
-.rc-section-title{font-size:11.5px;font-weight:800;letter-spacing:1px;color:#8fa6b8;text-transform:uppercase;margin:22px 0 12px;padding-left:10px;border-left:3px solid #2f9cff}
-.rc-odds-row{display:flex;gap:12px}
-.rc-odds-box,.rc-cs-box,.rc-signal-box{background:linear-gradient(145deg,#111c28,#0d1722);border:1px solid #26394c;border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
-.rc-odds-box{flex:1;text-align:center;padding:13px 8px}
-.rc-odds-label{font-size:10.5px;color:#8fa0b1;font-weight:700;letter-spacing:.6px}
-.rc-odds-real{font-size:20px;font-weight:900;color:#f2f4f7;margin-top:3px}
-.rc-odds-justa{font-size:12px;color:#2f9cff;margin-top:4px;font-weight:700}
-.rc-cols2{display:flex;gap:16px}
-.rc-col{flex:1}
-.rc-placar-row,.rc-ou-row{display:flex;justify-content:space-between;padding:6px 4px;border-bottom:1px solid rgba(55,78,98,.22);color:#c8d1da}
-.rc-placar-row{font-size:13px}
-.rc-placar-row b{color:#f2f4f7}
-.rc-ou-row{font-size:12.5px}
-.rc-ou-over{color:#36d276;font-weight:800}
-.rc-ou-under{color:#ff6262;font-weight:800}
-.rc-cs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.rc-cs-box{padding:13px 8px;text-align:center}
-.rc-cs-label{font-size:11px;color:#c8d1da;font-weight:800}
-.rc-cs-value{font-size:22px;font-weight:900;color:#2f9cff;margin-top:5px;line-height:1}
-.rc-signal-row{display:flex;gap:14px;margin-top:22px}
-.rc-signal-box{flex:1;padding:14px 16px;text-align:center}
-.rc-signal-label{font-size:10.5px;color:#8fa0b1;font-weight:800;letter-spacing:.7px;margin-bottom:6px}
-.rc-signal-text{font-size:16px;font-weight:900;letter-spacing:.2px}
-@media(max-width:800px){.rc-card{padding:20px}.rc-cols2{flex-direction:column;gap:10px}.rc-cs-grid{grid-template-columns:repeat(2,1fr)}.rc-signal-row{flex-direction:column;gap:10px}}
-@media(max-width:520px){.rc-card{padding:16px}.rc-team-name{font-size:15px}.rc-crest{width:48px;height:48px}.rc-odds-row{gap:7px}.rc-odds-box{padding:10px 5px}.rc-odds-real{font-size:17px}.rc-cs-grid{gap:7px}.rc-cs-box{padding:10px 5px}.rc-cs-value{font-size:19px}}
-</style>
-"""
-st.markdown(_resumo_dedent(_resumo_css), unsafe_allow_html=True)
+    _resumo_css = """
+    <style>
+    .rc-card {
+        border-radius:18px; border:1px solid #26384a;
+        background:linear-gradient(145deg,#0b1119,#0d1621,#091019);
+        padding:26px 30px; margin-top:10px;
+        box-shadow:0 8px 25px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.025);
+    }
+    .rc-header {
+        display:flex; align-items:center; justify-content:space-between;
+        margin-bottom:22px; padding-bottom:18px;
+        border-bottom:1px solid rgba(65,110,150,.22);
+    }
+    .rc-team { display:flex; align-items:center; gap:14px; }
+    .rc-team.away { flex-direction:row-reverse; text-align:right; }
+    .rc-crest {
+        width:58px; height:58px; border-radius:50%; background:#111c28;
+        display:flex; align-items:center; justify-content:center;
+        font-size:24px; border:1px solid #30465c; flex-shrink:0;
+        box-shadow:0 4px 12px rgba(0,0,0,.35);
+    }
+    .rc-team-name {
+        font-size:19px; font-weight:800; color:#edf2f7; letter-spacing:.3px;
+    }
+    .rc-vs { font-size:14px; font-weight:800; color:#2f9cff; letter-spacing:1px; }
+    .rc-section-title {
+        font-size:11.5px; font-weight:800; letter-spacing:1px; color:#8fa6b8;
+        text-transform:uppercase; margin:22px 0 12px; padding-left:10px;
+        border-left:3px solid #2f9cff;
+    }
+    .rc-odds-row { display:flex; gap:12px; }
+    .rc-odds-box {
+        flex:1; text-align:center; background:linear-gradient(145deg,#111c28,#0d1722);
+        border:1px solid #26394c; border-radius:12px; padding:13px 8px;
+    }
+    .rc-odds-label {
+        font-size:10.5px; color:#8fa0b1; font-weight:700; letter-spacing:.6px;
+    }
+    .rc-odds-real { font-size:20px; font-weight:900; color:#f2f4f7; margin-top:3px; }
+    .rc-odds-justa { font-size:12px; color:#2f9cff; margin-top:4px; font-weight:700; }
+    .rc-cols2 { display:flex; gap:16px; }
+    .rc-col { flex:1; }
+    .rc-placar-row,.rc-ou-row {
+        display:flex; justify-content:space-between; padding:6px 4px;
+        border-bottom:1px solid rgba(55,78,98,.22); color:#c8d1da;
+    }
+    .rc-placar-row { font-size:13px; }
+    .rc-placar-row b { color:#f2f4f7; }
+    .rc-ou-row { font-size:12.5px; }
+    .rc-ou-over { color:#36d276; font-weight:800; }
+    .rc-ou-under { color:#ff6262; font-weight:800; }
+    .rc-cs-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+    .rc-cs-box {
+        background:linear-gradient(145deg,#111c28,#0d1722);
+        border:1px solid #26394c; border-radius:11px;
+        padding:13px 8px; text-align:center;
+    }
+    .rc-cs-label { font-size:11px; color:#c8d1da; font-weight:800; }
+    .rc-cs-value {
+        font-size:22px; font-weight:900; color:#2f9cff;
+        margin-top:5px; line-height:1;
+    }
+    .rc-signal-row { display:flex; gap:14px; margin-top:22px; }
+    .rc-signal-box {
+        flex:1; background:linear-gradient(145deg,#111c28,#0d1722);
+        border:1px solid #26394c; border-radius:12px;
+        padding:14px 16px; text-align:center;
+    }
+    .rc-signal-label {
+        font-size:10.5px; color:#8fa0b1; font-weight:800;
+        letter-spacing:.7px; margin-bottom:6px;
+    }
+    .rc-signal-text { font-size:16px; font-weight:900; letter-spacing:.2px; }
+
+    @media(max-width:800px) {
+        .rc-card { padding:20px; }
+        .rc-cols2 { flex-direction:column; gap:10px; }
+        .rc-cs-grid { grid-template-columns:repeat(2,1fr); }
+        .rc-signal-row { flex-direction:column; gap:10px; }
+    }
+
+    @media(max-width:520px) {
+        .rc-card { padding:16px; }
+        .rc-team-name { font-size:15px; }
+        .rc-crest { width:48px; height:48px; }
+        .rc-odds-row { gap:7px; }
+        .rc-odds-box { padding:10px 5px; }
+        .rc-odds-real { font-size:17px; }
+        .rc-cs-grid { gap:7px; }
+        .rc-cs-box { padding:10px 5px; }
+        .rc-cs-value { font-size:19px; }
+    }
+    </style>
+    """
+    st.markdown(_resumo_dedent(_resumo_css), unsafe_allow_html=True)
 
     # --------------------------------------------------------
     # MONTA O HTML DO CARD
