@@ -3042,15 +3042,44 @@ with tab1:
     except Exception as e:
         st.error(f"ERRO POISSON: {e}")
 
-    # ============================================================
-    # 🔧 NOVO — CARD ÚNICO DE RESUMO (pra redes sociais)
-    # Fica no final da ABA 1. Reaproveita dados já calculados
-    # nesta aba (matriz_consenso, odds justas, linha_mgf/exg/vg,
-    # linha_consenso) e busca de forma independente os dados da
-    # Aba IA (Tier_LA/Tier_LH) e da Aba Machine Learning (Top 4
-    # mercados Lay CS), porque no Streamlit o script roda de cima
-    # pra baixo e essas abas só existem mais adiante no arquivo.
-    # ============================================================
+# ============================================================
+# 🔧 BLOCO ATUALIZADO — CARD ÚNICO DE RESUMO (ABA 1)
+# ------------------------------------------------------------
+# Substitua, no seu script, TUDO desde:
+#     st.markdown("---")
+# (o que vem logo antes de "def _resumo_dedent(...)")
+# até a última linha do bloco original:
+#     st.markdown(_resumo_dedent(_resumo_html), unsafe_allow_html=True)
+# por este bloco inteiro.
+#
+# O QUE MUDOU:
+# 1) CSS totalmente refeito seguindo a identidade visual da Aba CS
+#    (gradiente de fundo, glow, accent lateral colorido, gauge
+#    circular tipo velocímetro, barras de progresso).
+# 2) Mercados do Machine Learning: agora traz TODOS os mercados do
+#    pipeline (Lay 0x0, Lay 0x1, Lay 1x0, Lay Goleada Casa/Fora,
+#    Over 0.5HT, Under 1.5HT, Over 1.5FT, Over 2.5FT, Under 2.5FT,
+#    Ambas Marcam), ORDENADOS por valor. O Lay 2x2 fica de fora
+#    de propósito (ainda em calibração).
+# 3) Novo bloco "Consenso · Quem Abre o Placar (CG)" — média das
+#    3 métricas (MGF, ATKxDEF, VG) de "Home_Abrir_Placar" e
+#    "Away_Abrir_Placar", exibida com gauge circular pra cada time.
+# 4) Notas automáticas: se o CG consenso de um time for > 5,00 →
+#    "CG alto para Home/Away"; se for < 2,00 → "CG baixo para
+#    Home/Away". Essas notas entram junto com o "Sinal Principal",
+#    separadas por vírgula.
+#
+# ⚠️ ATENÇÃO SOBRE OS LIMIARES DO CG (5,00 / 2,00):
+# Usei exatamente os valores que você passou, aplicados sobre o
+# consenso de "Home_Abrir_Placar"/"Away_Abrir_Placar" (que no seu
+# código aparecem rotulados como "(%)" em outros pontos da Aba 1
+# e da Aba CS). Se essa coluna realmente for uma porcentagem
+# 0–100 no seu Excel, esses limiares vão praticamente sempre
+# disparar "CG alto". Rode com um jogo de teste e, se for o caso,
+# me diga a faixa real da coluna que eu recalibro os números —
+# a lógica e a estrutura do card já ficam prontas, só o corte
+# muda.
+# ============================================================
 
     st.markdown("---")
 
@@ -3099,8 +3128,7 @@ with tab1:
         return f"{v:.2f}" if pd.notna(v) else "—"
 
     # --------------------------------------------------------
-    # 2) TOP 5 PLACARES + OVER/UNDER — reaproveita matriz_consenso
-    #    (já calculada mais acima nesta mesma aba, não recalcula)
+    # 2) TOP 5 PLACARES + OVER/UNDER
     # --------------------------------------------------------
     _resumo_top5 = top_placares(matriz_consenso, n=5)
     _resumo_ou = calcular_over_under(matriz_consenso)
@@ -3123,11 +3151,6 @@ with tab1:
 
     # --------------------------------------------------------
     # 4) SINAL PRINCIPAL — Tier_LA / Tier_LH (Aba IA)
-    # Busca direta nos rankings (df_rank_la / df_rank_lh), que já
-    # são carregados no início do app. Não reproduz aqui os filtros
-    # situacionais extras (odd mínima, bloqueio elite etc.) que a
-    # Aba IA aplica jogo a jogo — mostra a classificação "crua" do
-    # time, que é a mesma fonte de dado usada lá.
     # --------------------------------------------------------
     _resumo_tier_la = ""
     _resumo_tier_lh = ""
@@ -3157,28 +3180,69 @@ with tab1:
             _resumo_frases_sinal.append(("Lay Home ⭐⭐⭐⭐⭐", "#60a5fa"))
 
     # --------------------------------------------------------
+    # 4b) 🔧 NOVO — CONSENSO "QUEM ABRE O PLACAR" (CG)
+    # Consenso entre MGF, ATKxDEF (exg) e VG do valor de cada
+    # time marcar o primeiro gol. Fora da faixa 2,00–5,00 ganha
+    # comentário extra dentro do Sinal Principal.
+    # --------------------------------------------------------
+    _resumo_cg_home = _resumo_media_segura(
+        linha_mgf.get("Home_Abrir_Placar"),
+        linha_exg.get("Home_Abrir_Placar"),
+        linha_vg.get("Home_Abrir_Placar"),
+    )
+    _resumo_cg_away = _resumo_media_segura(
+        linha_mgf.get("Away_Abrir_Placar"),
+        linha_exg.get("Away_Abrir_Placar"),
+        linha_vg.get("Away_Abrir_Placar"),
+    )
+
+    _resumo_cg_notas = []
+    if pd.notna(_resumo_cg_home):
+        if _resumo_cg_home > 5.00:
+            _resumo_cg_notas.append("CG alto para Home")
+        elif _resumo_cg_home < 2.00:
+            _resumo_cg_notas.append("CG baixo para Home")
+    if pd.notna(_resumo_cg_away):
+        if _resumo_cg_away > 5.00:
+            _resumo_cg_notas.append("CG alto para Away")
+        elif _resumo_cg_away < 2.00:
+            _resumo_cg_notas.append("CG baixo para Away")
+
+    def _resumo_deg(v):
+        return (0.0 if pd.isna(v) else float(v)) * 3.6
+
+    # --------------------------------------------------------
     # 5) COMENTÁRIO ADICIONAL — IA_Direcao (Aba IA / df_consenso)
     # --------------------------------------------------------
     _resumo_ia_direcao = str(linha_consenso.get("IA_Direcao", "") or "")
     _resumo_mostrar_live = "Analisar no Live" in _resumo_ia_direcao
 
     # --------------------------------------------------------
-    # 6) TOP 4 MERCADOS PARA LAY CS — Aba Machine Learning
-    # Carrega o Excel do pipeline de forma independente (mesmo
-    # arquivo/uploader da Aba Machine Learning), sem depender do
-    # código de lá, que só roda mais adiante no script.
+    # 6) MERCADOS DO MACHINE LEARNING — Aba Machine Learning
+    # Agora traz TODOS os mercados do pipeline (Lay's, Overs,
+    # Unders e BTTS). O Lay 2x2 fica de fora (em calibração).
     # --------------------------------------------------------
-    _resumo_label_cs = {
-        "LAY00": "Lay 0x0", "LAY01": "Lay 0x1", "LAY10": "Lay 1x0",
-        "LAY22": "Lay 2x2", "LAYGH": "Lay Goleada Casa", "LAYGA": "Lay Goleada Fora",
+    _resumo_label_mercados = {
+        "LAY00":     "Lay 0x0",
+        "LAY01":     "Lay 0x1",
+        "LAY10":     "Lay 1x0",
+        "LAYGH":     "Lay Goleada Casa",
+        "LAYGA":     "Lay Goleada Fora",
+        "OVER05HT":  "Over 0.5 HT",
+        "UNDER15HT": "Under 1.5 HT",
+        "OVER15FT":  "Over 1.5 FT",
+        "OVER25FT":  "Over 2.5 FT",
+        "UNDER25FT": "Under 2.5 FT",
+        "BTTS_YES":  "Ambas Marcam",
     }
+    # LAY22 fica de fora de propósito (em calibração)
 
     @st.cache_data(show_spinner=False)
     def _resumo_carregar_ml(fonte, mtime=None):
         xls_ml_local = pd.ExcelFile(io.BytesIO(fonte) if isinstance(fonte, bytes) else fonte)
         return pd.read_excel(xls_ml_local, "Todos os Mercados")
 
-    _resumo_top4_cs = []
+    _resumo_mercados_ml = []
     try:
         _ARQUIVO_ML_RESUMO = "data/PIPELINE2_RESULTADOS.xlsx"
         if arquivo_upload_ml:
@@ -3200,59 +3264,97 @@ with tab1:
 
             if not _linha_ml_resumo.empty:
                 _linha_ml_resumo = _linha_ml_resumo.iloc[0]
-                _valores_cs = []
-                for _mkt, _lbl in _resumo_label_cs.items():
+                for _mkt, _lbl in _resumo_label_mercados.items():
                     _col = f"{_mkt}_Prob"
                     if _col in _linha_ml_resumo.index and pd.notna(_linha_ml_resumo[_col]):
-                        _valores_cs.append((_lbl, float(_linha_ml_resumo[_col])))
-                _valores_cs.sort(key=lambda x: x[1], reverse=True)
-                _resumo_top4_cs = _valores_cs[:4]
+                        _resumo_mercados_ml.append((_lbl, float(_linha_ml_resumo[_col])))
+                _resumo_mercados_ml.sort(key=lambda x: x[1], reverse=True)
     except Exception:
-        _resumo_top4_cs = []
+        _resumo_mercados_ml = []
 
     # --------------------------------------------------------
-    # CSS — fundo escuro e discreto
+    # 🔧 NOVO — cor por valor (mesmo padrão visual da Aba CS)
+    # --------------------------------------------------------
+    def _resumo_cor_valor(v):
+        if v is None or pd.isna(v):
+            return "#5b6472"
+        if v >= 90:
+            return "#22c55e"
+        if v >= 80:
+            return "#4ade80"
+        if v >= 70:
+            return "#eab308"
+        if v >= 60:
+            return "#c7ccd6"
+        return "#ef4444"
+
+    # --------------------------------------------------------
+    # CSS — identidade visual igual à Aba CS Score
+    # (gradiente, accent lateral, gauge circular, barras de
+    # progresso e sombras/tipografia mais ricas)
     # --------------------------------------------------------
     _resumo_css = """
     <style>
-    .rc-card { border-radius:18px; border:1px solid #1f2733; background:#0b0f16;
-        padding:26px 30px; margin-top:10px; }
+    .rc-card { border-radius:18px; border:1px solid #232c3d;
+        background:linear-gradient(135deg,#101826,#0a0f18);
+        padding:26px 30px; margin-top:10px;
+        box-shadow:0 8px 24px rgba(0,0,0,0.35); }
+
     .rc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
     .rc-team { display:flex; align-items:center; gap:14px; }
     .rc-team.away { flex-direction:row-reverse; text-align:right; }
-    .rc-crest { width:54px; height:54px; border-radius:50%; background:#161d29;
-        display:flex; align-items:center; justify-content:center; font-size:24px;
-        border:1px solid #29334a; flex-shrink:0; }
-    .rc-team-name { font-size:19px; font-weight:800; color:#f2f4f7; letter-spacing:0.3px; }
-    .rc-vs { font-size:14px; font-weight:700; color:#4b5563; }
-    .rc-section-title { font-size:11.5px; font-weight:800; letter-spacing:1px; color:#7c8698;
-        text-transform:uppercase; margin:22px 0 12px 0; }
+    .rc-crest { width:58px; height:58px; border-radius:50%; background:#161d29;
+        display:flex; align-items:center; justify-content:center; font-size:26px;
+        border:1px solid #2c3648; flex-shrink:0;
+        box-shadow:0 0 0 3px rgba(127,179,255,0.08); }
+    .rc-team-name { font-size:21px; font-weight:900; color:#f5f7fa; letter-spacing:0.3px;
+        text-shadow:0 1px 6px rgba(0,0,0,0.4); }
+    .rc-vs { font-size:15px; font-weight:800; color:#5b6472; padding:0 14px; }
+
+    .rc-section-title { font-size:11.5px; font-weight:800; letter-spacing:1.4px; color:#7fb3ff;
+        text-transform:uppercase; margin:24px 0 12px 0; }
+
     .rc-odds-row { display:flex; gap:12px; }
-    .rc-odds-box { flex:1; text-align:center; background:#11161f; border:1px solid #1f2733;
-        border-radius:12px; padding:12px 8px; }
-    .rc-odds-label { font-size:10.5px; color:#7c8698; font-weight:700; letter-spacing:0.5px; }
-    .rc-odds-real { font-size:19px; font-weight:800; color:#f2f4f7; margin-top:2px; }
-    .rc-odds-justa { font-size:11.5px; color:#7fb3ff; margin-top:3px; }
+    .rc-odds-box { flex:1; text-align:center; background:#11161f; border:1px solid #232c3d;
+        border-radius:14px; padding:14px 8px; }
+    .rc-odds-label { font-size:10.5px; color:#7c8698; font-weight:800; letter-spacing:0.8px; }
+    .rc-odds-real { font-size:22px; font-weight:900; color:#f5f7fa; margin-top:3px; }
+    .rc-odds-justa { font-size:12px; color:#7fb3ff; margin-top:4px; font-weight:700; }
+
     .rc-cols2 { display:flex; gap:16px; }
     .rc-col { flex:1; }
-    .rc-placar-row { display:flex; justify-content:space-between; padding:5px 0;
+    .rc-placar-row { display:flex; justify-content:space-between; padding:6px 0;
+        border-bottom:1px solid #161c27; font-size:13.5px; color:#c8cfd8; }
+    .rc-placar-row b { color:#f5f7fa; font-weight:800; }
+    .rc-ou-row { display:flex; justify-content:space-between; padding:6px 0;
         border-bottom:1px solid #161c27; font-size:13px; color:#c8cfd8; }
-    .rc-placar-row b { color:#f2f4f7; }
-    .rc-ou-row { display:flex; justify-content:space-between; padding:5px 0;
-        border-bottom:1px solid #161c27; font-size:12.5px; color:#c8cfd8; }
-    .rc-ou-over { color:#4ade80; font-weight:700; }
-    .rc-ou-under { color:#f87171; font-weight:700; }
-    .rc-cs-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; }
-    .rc-cs-box { background:#11161f; border:1px solid #1f2733; border-radius:12px;
-        padding:12px 8px; text-align:center; }
-    .rc-cs-label { font-size:11px; color:#c8cfd8; font-weight:700; }
-    .rc-cs-value { font-size:20px; font-weight:900; color:#7fb3ff; margin-top:4px; }
-    .rc-signal-row { display:flex; gap:14px; margin-top:22px; }
-    .rc-signal-box { flex:1; background:#11161f; border:1px solid #1f2733; border-radius:12px;
-        padding:14px 16px; text-align:center; }
-    .rc-signal-label { font-size:10.5px; color:#7c8698; font-weight:700; letter-spacing:0.5px;
-        margin-bottom:6px; }
-    .rc-signal-text { font-size:16px; font-weight:800; }
+    .rc-ou-over { color:#4ade80; font-weight:800; }
+    .rc-ou-under { color:#f87171; font-weight:800; }
+
+    .rc-cg-row { display:flex; gap:16px; }
+    .rc-cg-box { flex:1; background:#11161f; border:1px solid #232c3d; border-radius:14px;
+        padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .rc-cg-label { font-size:12.5px; color:#c8cfd8; font-weight:700; }
+    .rc-cg-gauge { width:52px; height:52px; border-radius:50%; display:flex; align-items:center;
+        justify-content:center; flex-shrink:0; }
+    .rc-cg-gauge-inner { width:40px; height:40px; border-radius:50%; background:#0d121b;
+        display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900;
+        color:#f5f7fa; }
+
+    .rc-mkt-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:12px; }
+    .rc-mkt-box { background:#11161f; border:1px solid #232c3d; border-left:3px solid;
+        border-radius:12px; padding:12px 14px; }
+    .rc-mkt-label { font-size:11.5px; color:#c8cfd8; font-weight:700; margin-bottom:6px; }
+    .rc-mkt-value { font-size:21px; font-weight:900; margin-bottom:6px; }
+    .rc-mkt-track { width:100%; height:5px; border-radius:4px; background:#1c2433; }
+    .rc-mkt-fill { height:5px; border-radius:4px; }
+
+    .rc-signal-row { display:flex; gap:14px; margin-top:22px; flex-wrap:wrap; }
+    .rc-signal-box { flex:1; min-width:220px; background:#11161f; border:1px solid #232c3d;
+        border-radius:14px; padding:16px 18px; text-align:center; }
+    .rc-signal-label { font-size:10.5px; color:#7c8698; font-weight:800; letter-spacing:0.8px;
+        margin-bottom:8px; }
+    .rc-signal-text { font-size:17px; font-weight:900; text-shadow:0 1px 6px rgba(0,0,0,0.4); }
     </style>
     """
     st.markdown(_resumo_dedent(_resumo_css), unsafe_allow_html=True)
@@ -3325,22 +3427,67 @@ with tab1:
         </div>
     """
 
-    if _resumo_top4_cs:
-        _resumo_html += '<div class="rc-section-title">Top 4 Mercados para Lay CS</div><div class="rc-cs-grid">'
-        for _lbl, _val in _resumo_top4_cs:
-            _resumo_html += (
-                f'<div class="rc-cs-box"><div class="rc-cs-label">{_lbl}</div>'
-                f'<div class="rc-cs-value">{_val:.0f}</div></div>'
-            )
+    # --------------------------------------------------------
+    # 🔧 NOVO — CONSENSO "QUEM ABRE O PLACAR" (CG)
+    # --------------------------------------------------------
+    _cor_cg_home = _resumo_cor_valor(_resumo_cg_home)
+    _cor_cg_away = _resumo_cor_valor(_resumo_cg_away)
+
+    _resumo_html += f"""
+        <div class="rc-section-title">Consenso · Quem Abre o Placar (CG)</div>
+        <div class="rc-cg-row">
+            <div class="rc-cg-box">
+                <span class="rc-cg-label">🏠 {str(_resumo_home).upper()}</span>
+                <div class="rc-cg-gauge" style="background: conic-gradient({_cor_cg_home} {_resumo_deg(_resumo_cg_home)}deg, #1e2532 0deg);">
+                    <div class="rc-cg-gauge-inner">{_resumo_fmt2(_resumo_cg_home)}</div>
+                </div>
+            </div>
+            <div class="rc-cg-box">
+                <span class="rc-cg-label">✈ {str(_resumo_away).upper()}</span>
+                <div class="rc-cg-gauge" style="background: conic-gradient({_cor_cg_away} {_resumo_deg(_resumo_cg_away)}deg, #1e2532 0deg);">
+                    <div class="rc-cg-gauge-inner">{_resumo_fmt2(_resumo_cg_away)}</div>
+                </div>
+            </div>
+        </div>
+    """
+
+    # --------------------------------------------------------
+    # 🔧 NOVO — GRID COM TODOS OS MERCADOS (SEM LAY 2X2)
+    # --------------------------------------------------------
+    if _resumo_mercados_ml:
+        _resumo_html += '<div class="rc-section-title">Mercados · Consenso Machine Learning</div><div class="rc-mkt-grid">'
+        for _lbl, _val in _resumo_mercados_ml:
+            _cor = _resumo_cor_valor(_val)
+            _resumo_html += f"""
+            <div class="rc-mkt-box" style="border-left-color:{_cor};">
+                <div class="rc-mkt-label">{_lbl}</div>
+                <div class="rc-mkt-value" style="color:{_cor};">{_val:.0f}</div>
+                <div class="rc-mkt-track"><div class="rc-mkt-fill" style="width:{_val}%; background:{_cor};"></div></div>
+            </div>
+            """
         _resumo_html += "</div>"
 
-    if _resumo_frases_sinal or _resumo_mostrar_live:
+    # --------------------------------------------------------
+    # SINAIS FINAIS (Sinal Principal + Comentário Adicional)
+    # --------------------------------------------------------
+    _resumo_texto_sinal_principal = ""
+    _resumo_cor_sinal_principal = "#f5f7fa"
+
+    if _resumo_frases_sinal:
+        _resumo_texto_sinal_principal, _resumo_cor_sinal_principal = _resumo_frases_sinal[0]
+
+    if _resumo_cg_notas:
+        if _resumo_texto_sinal_principal:
+            _resumo_texto_sinal_principal += " , " + " , ".join(_resumo_cg_notas)
+        else:
+            _resumo_texto_sinal_principal = " , ".join(_resumo_cg_notas)
+
+    if _resumo_texto_sinal_principal or _resumo_mostrar_live:
         _resumo_html += '<div class="rc-signal-row">'
-        if _resumo_frases_sinal:
-            _texto_sinal, _cor_sinal = _resumo_frases_sinal[0]
+        if _resumo_texto_sinal_principal:
             _resumo_html += (
                 '<div class="rc-signal-box"><div class="rc-signal-label">SINAL PRINCIPAL</div>'
-                f'<div class="rc-signal-text" style="color:{_cor_sinal};">{_texto_sinal}</div></div>'
+                f'<div class="rc-signal-text" style="color:{_resumo_cor_sinal_principal};">{_resumo_texto_sinal_principal}</div></div>'
             )
         if _resumo_mostrar_live:
             _resumo_html += (
@@ -3352,8 +3499,6 @@ with tab1:
     _resumo_html += "</div>"
 
     st.markdown(_resumo_dedent(_resumo_html), unsafe_allow_html=True)
-
-
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
