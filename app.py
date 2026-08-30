@@ -3042,6 +3042,317 @@ with tab1:
     except Exception as e:
         st.error(f"ERRO POISSON: {e}")
 
+    # ============================================================
+    # 🔧 NOVO — CARD ÚNICO DE RESUMO (pra redes sociais)
+    # Fica no final da ABA 1. Reaproveita dados já calculados
+    # nesta aba (matriz_consenso, odds justas, linha_mgf/exg/vg,
+    # linha_consenso) e busca de forma independente os dados da
+    # Aba IA (Tier_LA/Tier_LH) e da Aba Machine Learning (Top 4
+    # mercados Lay CS), porque no Streamlit o script roda de cima
+    # pra baixo e essas abas só existem mais adiante no arquivo.
+    # ============================================================
+
+    st.markdown("---")
+
+    def _resumo_dedent(html_texto):
+        return "\n".join(l.lstrip() for l in html_texto.splitlines())
+
+    # --------------------------------------------------------
+    # 1) ODDS JUSTAS — CONSENSO ENTRE MGF, ATKxDEF E VG
+    # --------------------------------------------------------
+    def _resumo_media_segura(*valores):
+        vals = [pd.to_numeric(v, errors="coerce") for v in valores]
+        vals = [v for v in vals if pd.notna(v)]
+        return float(np.mean(vals)) if vals else np.nan
+
+    _resumo_odd_justa_casa = _resumo_media_segura(
+        linha_mgf.get("Odd_Justa_Home"),
+        linha_exg.get("Odd_Justa_Home"),
+        linha_vg.get("Odd_Justa_Home"),
+    )
+    _resumo_odd_justa_empate = _resumo_media_segura(
+        linha_mgf.get("Odd_Justa_Draw"),
+        linha_exg.get("Odd_Justa_Draw"),
+        linha_vg.get("Odd_Justa_Draw"),
+    )
+    _resumo_odd_justa_fora = _resumo_media_segura(
+        linha_mgf.get("Odd_Justa_Away"),
+        linha_exg.get("Odd_Justa_Away"),
+        linha_vg.get("Odd_Justa_Away"),
+    )
+
+    _resumo_odd_casa = (
+        linha_csv.get("Odds_Casa", np.nan) if not linha_csv.empty
+        else linha_mgf.get("Odds_Casa", np.nan)
+    )
+    _resumo_odd_empate = (
+        linha_csv.get("Odds_Empate", np.nan) if not linha_csv.empty
+        else linha_mgf.get("Odds_Empate", np.nan)
+    )
+    _resumo_odd_fora = (
+        linha_csv.get("Odds_Visitante", np.nan) if not linha_csv.empty
+        else linha_mgf.get("Odds_Visitante", np.nan)
+    )
+
+    def _resumo_fmt2(v):
+        v = pd.to_numeric(v, errors="coerce")
+        return f"{v:.2f}" if pd.notna(v) else "—"
+
+    # --------------------------------------------------------
+    # 2) TOP 5 PLACARES + OVER/UNDER — reaproveita matriz_consenso
+    #    (já calculada mais acima nesta mesma aba, não recalcula)
+    # --------------------------------------------------------
+    _resumo_top5 = top_placares(matriz_consenso, n=5)
+    _resumo_ou = calcular_over_under(matriz_consenso)
+
+    # --------------------------------------------------------
+    # 3) ESCUDOS + NOMES
+    # --------------------------------------------------------
+    _resumo_home = linha_exg.get("Home_Team", jogo.split(" x ")[0])
+    _resumo_away = linha_exg.get("Visitor_Team", jogo.split(" x ")[-1])
+    _resumo_crest_h = escudo_base64(_resumo_home)
+    _resumo_crest_a = escudo_base64(_resumo_away)
+    _resumo_crest_h_html = (
+        f'<img src="{_resumo_crest_h}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">'
+        if _resumo_crest_h else "⚽"
+    )
+    _resumo_crest_a_html = (
+        f'<img src="{_resumo_crest_a}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">'
+        if _resumo_crest_a else "⚽"
+    )
+
+    # --------------------------------------------------------
+    # 4) SINAL PRINCIPAL — Tier_LA / Tier_LH (Aba IA)
+    # Busca direta nos rankings (df_rank_la / df_rank_lh), que já
+    # são carregados no início do app. Não reproduz aqui os filtros
+    # situacionais extras (odd mínima, bloqueio elite etc.) que a
+    # Aba IA aplica jogo a jogo — mostra a classificação "crua" do
+    # time, que é a mesma fonte de dado usada lá.
+    # --------------------------------------------------------
+    _resumo_tier_la = ""
+    _resumo_tier_lh = ""
+
+    if not df_rank_la.empty:
+        _home_key = str(_resumo_home).strip().lower()
+        _linha_la = df_rank_la[df_rank_la["Home_Key"] == _home_key]
+        if not _linha_la.empty:
+            _resumo_tier_la = str(_linha_la.iloc[0].get("Tier_LA", "") or "")
+
+    if not df_rank_lh.empty:
+        _away_key = str(_resumo_away).strip().lower()
+        _linha_lh = df_rank_lh[df_rank_lh["Away_Key"] == _away_key]
+        if not _linha_lh.empty:
+            _resumo_tier_lh = str(_linha_lh.iloc[0].get("Tier_LH", "") or "")
+
+    _resumo_frases_sinal = []
+    if _resumo_tier_la:
+        if "💜" in _resumo_tier_la:
+            _resumo_frases_sinal.append(("Lay Away - Atenção!", "#a78bfa"))
+        elif "⭐" in _resumo_tier_la:
+            _resumo_frases_sinal.append(("Lay Away ⭐⭐⭐⭐⭐", "#4ade80"))
+    if _resumo_tier_lh:
+        if "💜" in _resumo_tier_lh:
+            _resumo_frases_sinal.append(("Lay Home - Atenção!", "#a78bfa"))
+        elif "⭐" in _resumo_tier_lh:
+            _resumo_frases_sinal.append(("Lay Home ⭐⭐⭐⭐⭐", "#60a5fa"))
+
+    # --------------------------------------------------------
+    # 5) COMENTÁRIO ADICIONAL — IA_Direcao (Aba IA / df_consenso)
+    # --------------------------------------------------------
+    _resumo_ia_direcao = str(linha_consenso.get("IA_Direcao", "") or "")
+    _resumo_mostrar_live = "Analisar no Live" in _resumo_ia_direcao
+
+    # --------------------------------------------------------
+    # 6) TOP 4 MERCADOS PARA LAY CS — Aba Machine Learning
+    # Carrega o Excel do pipeline de forma independente (mesmo
+    # arquivo/uploader da Aba Machine Learning), sem depender do
+    # código de lá, que só roda mais adiante no script.
+    # --------------------------------------------------------
+    _resumo_label_cs = {
+        "LAY00": "Lay 0x0", "LAY01": "Lay 0x1", "LAY10": "Lay 1x0",
+        "LAY22": "Lay 2x2", "LAYGH": "Lay Goleada Casa", "LAYGA": "Lay Goleada Fora",
+    }
+
+    @st.cache_data(show_spinner=False)
+    def _resumo_carregar_ml(fonte, mtime=None):
+        xls_ml_local = pd.ExcelFile(io.BytesIO(fonte) if isinstance(fonte, bytes) else fonte)
+        return pd.read_excel(xls_ml_local, "Todos os Mercados")
+
+    _resumo_top4_cs = []
+    try:
+        _ARQUIVO_ML_RESUMO = "data/PIPELINE2_RESULTADOS.xlsx"
+        if arquivo_upload_ml:
+            _fonte_ml_resumo = arquivo_upload_ml.getvalue()
+            _mtime_ml_resumo = None
+        elif os.path.exists(_ARQUIVO_ML_RESUMO):
+            _fonte_ml_resumo = _ARQUIVO_ML_RESUMO
+            _mtime_ml_resumo = os.path.getmtime(_ARQUIVO_ML_RESUMO)
+        else:
+            _fonte_ml_resumo = None
+
+        if _fonte_ml_resumo is not None:
+            _df_ml_resumo = _resumo_carregar_ml(_fonte_ml_resumo, _mtime_ml_resumo)
+            _df_ml_resumo["JOGO"] = (
+                _df_ml_resumo["Home_Team"].astype(str).str.strip() + " x " +
+                _df_ml_resumo["Visitor_Team"].astype(str).str.strip()
+            )
+            _linha_ml_resumo = _df_ml_resumo[_df_ml_resumo["JOGO"] == jogo]
+
+            if not _linha_ml_resumo.empty:
+                _linha_ml_resumo = _linha_ml_resumo.iloc[0]
+                _valores_cs = []
+                for _mkt, _lbl in _resumo_label_cs.items():
+                    _col = f"{_mkt}_Prob"
+                    if _col in _linha_ml_resumo.index and pd.notna(_linha_ml_resumo[_col]):
+                        _valores_cs.append((_lbl, float(_linha_ml_resumo[_col])))
+                _valores_cs.sort(key=lambda x: x[1], reverse=True)
+                _resumo_top4_cs = _valores_cs[:4]
+    except Exception:
+        _resumo_top4_cs = []
+
+    # --------------------------------------------------------
+    # CSS — fundo escuro e discreto
+    # --------------------------------------------------------
+    _resumo_css = """
+    <style>
+    .rc-card { border-radius:18px; border:1px solid #1f2733; background:#0b0f16;
+        padding:26px 30px; margin-top:10px; }
+    .rc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
+    .rc-team { display:flex; align-items:center; gap:14px; }
+    .rc-team.away { flex-direction:row-reverse; text-align:right; }
+    .rc-crest { width:54px; height:54px; border-radius:50%; background:#161d29;
+        display:flex; align-items:center; justify-content:center; font-size:24px;
+        border:1px solid #29334a; flex-shrink:0; }
+    .rc-team-name { font-size:19px; font-weight:800; color:#f2f4f7; letter-spacing:0.3px; }
+    .rc-vs { font-size:14px; font-weight:700; color:#4b5563; }
+    .rc-section-title { font-size:11.5px; font-weight:800; letter-spacing:1px; color:#7c8698;
+        text-transform:uppercase; margin:22px 0 12px 0; }
+    .rc-odds-row { display:flex; gap:12px; }
+    .rc-odds-box { flex:1; text-align:center; background:#11161f; border:1px solid #1f2733;
+        border-radius:12px; padding:12px 8px; }
+    .rc-odds-label { font-size:10.5px; color:#7c8698; font-weight:700; letter-spacing:0.5px; }
+    .rc-odds-real { font-size:19px; font-weight:800; color:#f2f4f7; margin-top:2px; }
+    .rc-odds-justa { font-size:11.5px; color:#7fb3ff; margin-top:3px; }
+    .rc-cols2 { display:flex; gap:16px; }
+    .rc-col { flex:1; }
+    .rc-placar-row { display:flex; justify-content:space-between; padding:5px 0;
+        border-bottom:1px solid #161c27; font-size:13px; color:#c8cfd8; }
+    .rc-placar-row b { color:#f2f4f7; }
+    .rc-ou-row { display:flex; justify-content:space-between; padding:5px 0;
+        border-bottom:1px solid #161c27; font-size:12.5px; color:#c8cfd8; }
+    .rc-ou-over { color:#4ade80; font-weight:700; }
+    .rc-ou-under { color:#f87171; font-weight:700; }
+    .rc-cs-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; }
+    .rc-cs-box { background:#11161f; border:1px solid #1f2733; border-radius:12px;
+        padding:12px 8px; text-align:center; }
+    .rc-cs-label { font-size:11px; color:#c8cfd8; font-weight:700; }
+    .rc-cs-value { font-size:20px; font-weight:900; color:#7fb3ff; margin-top:4px; }
+    .rc-signal-row { display:flex; gap:14px; margin-top:22px; }
+    .rc-signal-box { flex:1; background:#11161f; border:1px solid #1f2733; border-radius:12px;
+        padding:14px 16px; text-align:center; }
+    .rc-signal-label { font-size:10.5px; color:#7c8698; font-weight:700; letter-spacing:0.5px;
+        margin-bottom:6px; }
+    .rc-signal-text { font-size:16px; font-weight:800; }
+    </style>
+    """
+    st.markdown(_resumo_dedent(_resumo_css), unsafe_allow_html=True)
+
+    # --------------------------------------------------------
+    # MONTA O HTML DO CARD
+    # --------------------------------------------------------
+    _resumo_html = f"""
+    <div class="rc-card">
+
+        <div class="rc-header">
+            <div class="rc-team">
+                <div class="rc-crest">{_resumo_crest_h_html}</div>
+                <div class="rc-team-name">{str(_resumo_home).upper()}</div>
+            </div>
+            <div class="rc-vs">X</div>
+            <div class="rc-team away">
+                <div class="rc-crest">{_resumo_crest_a_html}</div>
+                <div class="rc-team-name">{str(_resumo_away).upper()}</div>
+            </div>
+        </div>
+
+        <div class="rc-section-title">Odds 1x2 · Odd Justa (Consenso MGF · ATKxDEF · VG)</div>
+        <div class="rc-odds-row">
+            <div class="rc-odds-box">
+                <div class="rc-odds-label">CASA</div>
+                <div class="rc-odds-real">{_resumo_fmt2(_resumo_odd_casa)}</div>
+                <div class="rc-odds-justa">Justa {_resumo_odd_justa_casa:.2f}</div>
+            </div>
+            <div class="rc-odds-box">
+                <div class="rc-odds-label">EMPATE</div>
+                <div class="rc-odds-real">{_resumo_fmt2(_resumo_odd_empate)}</div>
+                <div class="rc-odds-justa">Justa {_resumo_odd_justa_empate:.2f}</div>
+            </div>
+            <div class="rc-odds-box">
+                <div class="rc-odds-label">FORA</div>
+                <div class="rc-odds-real">{_resumo_fmt2(_resumo_odd_fora)}</div>
+                <div class="rc-odds-justa">Justa {_resumo_odd_justa_fora:.2f}</div>
+            </div>
+        </div>
+
+        <div class="rc-cols2">
+            <div class="rc-col">
+                <div class="rc-section-title">Top 5 Placares Mais Prováveis</div>
+    """
+
+    for _, _lin in _resumo_top5.iterrows():
+        _resumo_html += (
+            f'<div class="rc-placar-row"><span>{int(_lin["Gols_Home"])} - {int(_lin["Gols_Away"])}</span>'
+            f'<b>{_lin["Probabilidade%"]}</b></div>'
+        )
+
+    _resumo_html += """
+            </div>
+            <div class="rc-col">
+                <div class="rc-section-title">Over / Under FT (Consenso)</div>
+    """
+
+    for _linha_ou in ["0.5", "1.5", "2.5"]:
+        _over_v = _resumo_ou[f"Over {_linha_ou}"]
+        _under_v = _resumo_ou[f"Under {_linha_ou}"]
+        _resumo_html += (
+            f'<div class="rc-ou-row"><span>Linha {_linha_ou}</span>'
+            f'<span><span class="rc-ou-over">{_over_v:.1f}%</span> · '
+            f'<span class="rc-ou-under">{_under_v:.1f}%</span></span></div>'
+        )
+
+    _resumo_html += """
+            </div>
+        </div>
+    """
+
+    if _resumo_top4_cs:
+        _resumo_html += '<div class="rc-section-title">Top 4 Mercados para Lay CS</div><div class="rc-cs-grid">'
+        for _lbl, _val in _resumo_top4_cs:
+            _resumo_html += (
+                f'<div class="rc-cs-box"><div class="rc-cs-label">{_lbl}</div>'
+                f'<div class="rc-cs-value">{_val:.0f}</div></div>'
+            )
+        _resumo_html += "</div>"
+
+    if _resumo_frases_sinal or _resumo_mostrar_live:
+        _resumo_html += '<div class="rc-signal-row">'
+        if _resumo_frases_sinal:
+            _texto_sinal, _cor_sinal = _resumo_frases_sinal[0]
+            _resumo_html += (
+                '<div class="rc-signal-box"><div class="rc-signal-label">SINAL PRINCIPAL</div>'
+                f'<div class="rc-signal-text" style="color:{_cor_sinal};">{_texto_sinal}</div></div>'
+            )
+        if _resumo_mostrar_live:
+            _resumo_html += (
+                '<div class="rc-signal-box"><div class="rc-signal-label">COMENTÁRIO ADICIONAL</div>'
+                '<div class="rc-signal-text" style="color:#facc15;">⚠ Analisar / Acompanhar Jogo Live</div></div>'
+            )
+        _resumo_html += "</div>"
+
+    _resumo_html += "</div>"
+
+    st.markdown(_resumo_dedent(_resumo_html), unsafe_allow_html=True)
+
 
 
 # =========================================
