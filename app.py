@@ -3310,64 +3310,64 @@ with tab1:
     <style>
     .rc-card { border-radius:18px; border:1px solid #232c3d;
         background:linear-gradient(135deg,#101826,#0a0f18);
-        padding:26px 30px; margin-top:10px;
+        padding:30px 34px; margin-top:10px;
         box-shadow:0 8px 24px rgba(0,0,0,0.35); }
 
-    .rc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
-    .rc-team { display:flex; align-items:center; gap:14px; }
+    .rc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:26px; }
+    .rc-team { display:flex; align-items:center; gap:16px; }
     .rc-team.away { flex-direction:row-reverse; text-align:right; }
-    .rc-crest { width:58px; height:58px; border-radius:50%; background:#161d29;
-        display:flex; align-items:center; justify-content:center; font-size:26px;
+    .rc-crest { width:68px; height:68px; border-radius:50%; background:#161d29;
+        display:flex; align-items:center; justify-content:center; font-size:30px;
         border:1px solid #2c3648; flex-shrink:0;
         box-shadow:0 0 0 3px rgba(127,179,255,0.08); }
-    .rc-team-name { font-size:21px; font-weight:900; color:#f5f7fa; letter-spacing:0.3px;
+    .rc-team-name { font-size:28px; font-weight:900; color:#f5f7fa; letter-spacing:0.3px;
         text-shadow:0 1px 6px rgba(0,0,0,0.4); }
-    .rc-vs { font-size:15px; font-weight:800; color:#5b6472; padding:0 14px; }
+    .rc-vs { font-size:19px; font-weight:800; color:#5b6472; padding:0 16px; }
 
-    .rc-section-title { font-size:11.5px; font-weight:800; letter-spacing:1.4px; color:#7fb3ff;
-        text-transform:uppercase; margin:24px 0 12px 0; }
+    .rc-section-title { font-size:14px; font-weight:800; letter-spacing:1.4px; color:#7fb3ff;
+        text-transform:uppercase; margin:26px 0 14px 0; }
 
-    .rc-odds-row { display:flex; gap:12px; }
+    .rc-odds-row { display:flex; gap:14px; }
     .rc-odds-box { flex:1; text-align:center; background:#11161f; border:1px solid #232c3d;
-        border-radius:14px; padding:14px 8px; }
-    .rc-odds-label { font-size:10.5px; color:#7c8698; font-weight:800; letter-spacing:0.8px; }
-    .rc-odds-real { font-size:22px; font-weight:900; color:#f5f7fa; margin-top:3px; }
-    .rc-odds-justa { font-size:12px; color:#7fb3ff; margin-top:4px; font-weight:700; }
+        border-radius:14px; padding:18px 10px; }
+    .rc-odds-label { font-size:13px; color:#8a93a3; font-weight:800; letter-spacing:0.8px; }
+    .rc-odds-real { font-size:30px; font-weight:900; color:#f5f7fa; margin-top:4px; }
+    .rc-odds-justa { font-size:15px; color:#7fb3ff; margin-top:6px; font-weight:700; }
 
-    .rc-cols2 { display:flex; gap:16px; }
+    .rc-cols2 { display:flex; gap:20px; }
     .rc-col { flex:1; }
-    .rc-placar-row { display:flex; justify-content:space-between; padding:6px 0;
-        border-bottom:1px solid #161c27; font-size:13.5px; color:#c8cfd8; }
-    .rc-placar-row b { color:#f5f7fa; font-weight:800; }
-    .rc-ou-row { display:flex; justify-content:space-between; padding:6px 0;
-        border-bottom:1px solid #161c27; font-size:13px; color:#c8cfd8; }
+    .rc-placar-row { display:flex; justify-content:space-between; padding:8px 0;
+        border-bottom:1px solid #161c27; font-size:17px; color:#c8cfd8; }
+    .rc-placar-row b { color:#f5f7fa; font-weight:800; font-size:18px; }
+    .rc-ou-row { display:flex; justify-content:space-between; padding:8px 0;
+        border-bottom:1px solid #161c27; font-size:16.5px; color:#c8cfd8; }
     .rc-ou-over { color:#4ade80; font-weight:800; }
     .rc-ou-under { color:#f87171; font-weight:800; }
 
     .rc-cg-row { display:flex; gap:16px; }
     .rc-cg-box { flex:1; background:#11161f; border:1px solid #232c3d; border-radius:14px;
-        padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .rc-cg-label { font-size:12.5px; color:#c8cfd8; font-weight:700; }
-    .rc-cg-gauge { width:52px; height:52px; border-radius:50%; display:flex; align-items:center;
+        padding:16px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .rc-cg-label { font-size:15.5px; color:#c8cfd8; font-weight:700; }
+    .rc-cg-gauge { width:64px; height:64px; border-radius:50%; display:flex; align-items:center;
         justify-content:center; flex-shrink:0; }
-    .rc-cg-gauge-inner { width:40px; height:40px; border-radius:50%; background:#0d121b;
-        display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900;
+    .rc-cg-gauge-inner { width:50px; height:50px; border-radius:50%; background:#0d121b;
+        display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:900;
         color:#f5f7fa; }
 
-    .rc-mkt-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:12px; }
-    .rc-mkt-box { background:#11161f; border:1px solid #232c3d; border-left:3px solid;
-        border-radius:12px; padding:12px 14px; }
-    .rc-mkt-label { font-size:11.5px; color:#c8cfd8; font-weight:700; margin-bottom:6px; }
-    .rc-mkt-value { font-size:21px; font-weight:900; margin-bottom:6px; }
-    .rc-mkt-track { width:100%; height:5px; border-radius:4px; background:#1c2433; }
-    .rc-mkt-fill { height:5px; border-radius:4px; }
+    .rc-mkt-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px; }
+    .rc-mkt-box { background:#11161f; border:1px solid #232c3d; border-left:4px solid;
+        border-radius:12px; padding:14px 16px; }
+    .rc-mkt-label { font-size:14px; color:#c8cfd8; font-weight:700; margin-bottom:8px; }
+    .rc-mkt-value { font-size:26px; font-weight:900; margin-bottom:8px; }
+    .rc-mkt-track { width:100%; height:6px; border-radius:4px; background:#1c2433; }
+    .rc-mkt-fill { height:6px; border-radius:4px; }
 
-    .rc-signal-row { display:flex; gap:14px; margin-top:22px; flex-wrap:wrap; }
+    .rc-signal-row { display:flex; gap:16px; margin-top:26px; flex-wrap:wrap; }
     .rc-signal-box { flex:1; min-width:220px; background:#11161f; border:1px solid #232c3d;
-        border-radius:14px; padding:16px 18px; text-align:center; }
-    .rc-signal-label { font-size:10.5px; color:#7c8698; font-weight:800; letter-spacing:0.8px;
-        margin-bottom:8px; }
-    .rc-signal-text { font-size:17px; font-weight:900; text-shadow:0 1px 6px rgba(0,0,0,0.4); }
+        border-radius:14px; padding:18px 20px; text-align:center; }
+    .rc-signal-label { font-size:12.5px; color:#8a93a3; font-weight:800; letter-spacing:0.8px;
+        margin-bottom:10px; }
+    .rc-signal-text { font-size:21px; font-weight:900; text-shadow:0 1px 6px rgba(0,0,0,0.4); }
     </style>
     """
     st.markdown(_resumo_dedent(_resumo_css), unsafe_allow_html=True)
@@ -3512,7 +3512,6 @@ with tab1:
     _resumo_html += "</div>"
 
     st.markdown(_resumo_dedent(_resumo_html), unsafe_allow_html=True)
-
 # =========================================
 # ABA 2 — DADOS COMPLETOS
 # =========================================
