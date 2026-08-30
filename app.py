@@ -3196,16 +3196,29 @@ with tab1:
         linha_vg.get("Away_Abrir_Placar"),
     )
 
+    # --------------------------------------------------------
+    # 🔧 CORRIGIDO — o aviso de CG alto/baixo NÃO usa o consenso
+    # de "abrir placar". Usa o Media_CG_H_01 / Media_CG_A_01
+    # (mesma métrica já usada na Aba IA / classificar_filtro_duplo),
+    # que fica em df_mgf / linha_mgf.
+    # --------------------------------------------------------
+    _resumo_cg_home_media = pd.to_numeric(
+        linha_mgf.get("Media_CG_H_01"), errors="coerce"
+    )
+    _resumo_cg_away_media = pd.to_numeric(
+        linha_mgf.get("Media_CG_A_01"), errors="coerce"
+    )
+
     _resumo_cg_notas = []
-    if pd.notna(_resumo_cg_home):
-        if _resumo_cg_home > 5.00:
+    if pd.notna(_resumo_cg_home_media):
+        if _resumo_cg_home_media > 5.00:
             _resumo_cg_notas.append("CG alto para Home")
-        elif _resumo_cg_home < 2.00:
+        elif _resumo_cg_home_media < 2.00:
             _resumo_cg_notas.append("CG baixo para Home")
-    if pd.notna(_resumo_cg_away):
-        if _resumo_cg_away > 5.00:
+    if pd.notna(_resumo_cg_away_media):
+        if _resumo_cg_away_media > 5.00:
             _resumo_cg_notas.append("CG alto para Away")
-        elif _resumo_cg_away < 2.00:
+        elif _resumo_cg_away_media < 2.00:
             _resumo_cg_notas.append("CG baixo para Away")
 
     def _resumo_deg(v):
