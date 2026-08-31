@@ -5540,9 +5540,16 @@ Home {home_emoji}   x   Away {away_emoji}
 
     st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
+# ============================================================
+# 🔧 FIX 3a — RANKING "TOP JOGOS DO DIA A+/A" (linhas ~5994–6025)
+# ============================================================
+
+@st.cache_data(show_spinner=False)
+def montar_lista_rank(_base_df, _fonte_poisson, _mtime_poisson):
+
     lista_rank = []
 
-    for _, row in base_df.iterrows():
+    for _, row in _base_df.iterrows():
 
         res = classificar_jogo(row)
 
@@ -5565,13 +5572,24 @@ Home {home_emoji}   x   Away {away_emoji}
             "Classe": res["Classe"]
         })
 
-    if lista_rank:
-        df_rank = pd.DataFrame(lista_rank)
-        df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
-        df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
-        st.dataframe(df_rank, use_container_width=True, hide_index=True)
-    else:
-        st.info("Nenhum jogo A+/A encontrado")
+    return lista_rank
+
+lista_rank = montar_lista_rank(base_df, _fonte_poisson, _mtime_poisson)
+
+if lista_rank:
+    df_rank = pd.DataFrame(lista_rank)
+    df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
+    df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
+    st.dataframe(df_rank, use_container_width=True, hide_index=True)
+else:
+    st.info("Nenhum jogo A+/A encontrado")
+
+# ============================================================
+# 🔧 TRECHO QUE FALTOU — cole EXATAMENTE aqui, entre o Fix 3a e o
+# Fix 3b (esse pedaço nunca fazia parte de nenhum dos dois fixes,
+# só ficava ENTRE eles no arquivo original — por isso sumiu na
+# hora de colar por cima).
+# ============================================================
 
     # =========================================
     # 📋 TABELA FINAL
@@ -5665,9 +5683,16 @@ Home {home_emoji}   x   Away {away_emoji}
     # =========================================
     # 🧠 LISTA FINAL
     # =========================================
+# ============================================================
+# 🔧 FIX 3b — TABELA "TODOS OS JOGOS FILTRADOS" (linhas ~6119–7075)
+# ============================================================
+
+@st.cache_data(show_spinner="Calculando tabela da Aba IA...")
+def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, _fonte_poisson, _mtime_poisson):
+
     lista = []
 
-    for _, row in df_clean.iterrows():
+    for _, row in _df_clean.iterrows():
 
         # =========================================
         # 🧠 CLASSIFICAÇÃO
@@ -5682,7 +5707,7 @@ Home {home_emoji}   x   Away {away_emoji}
         # =========================================
         dir_poisson = str(row.get("Poisson_Direcao", ""))
         dir_ia = str(row.get("IA_Direcao", ""))
-        
+
         # =========================================
         # 🎯 FUNÇÕES
         # =========================================
@@ -5922,7 +5947,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
         ):
 
-            if not df_rank_la.empty:
+            if not _df_rank_la.empty:
 
                 home_key = (
 
@@ -5932,9 +5957,9 @@ Home {home_emoji}   x   Away {away_emoji}
 
                 )
 
-                linha_rank_elite = df_rank_la[
+                linha_rank_elite = _df_rank_la[
 
-                    df_rank_la["Home_Key"]
+                    _df_rank_la["Home_Key"]
                     == home_key
 
                 ]
@@ -6000,7 +6025,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
                     if odd_home > 1.13:
 
-                        if not df_rank_la.empty:
+                        if not _df_rank_la.empty:
 
                             home_key = (
 
@@ -6010,13 +6035,13 @@ Home {home_emoji}   x   Away {away_emoji}
 
                             )
 
-                            linha_rank = df_rank_la[
+                            linha_rank = _df_rank_la[
 
-                                df_rank_la["Home_Key"]
+                                _df_rank_la["Home_Key"]
                                 == home_key
 
                             ]
-                            
+
                             if not linha_rank.empty:
 
                                 tier_original = linha_rank.iloc[0].get(
@@ -6085,7 +6110,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
                     if odd_away > 1.13:
 
-                        if not df_rank_lh.empty:
+                        if not _df_rank_lh.empty:
 
                             away_key = (
 
@@ -6095,9 +6120,9 @@ Home {home_emoji}   x   Away {away_emoji}
 
                             )
 
-                            linha_rank = df_rank_lh[
+                            linha_rank = _df_rank_lh[
 
-                                df_rank_lh["Away_Key"]
+                                _df_rank_lh["Away_Key"]
                                 == away_key
 
                             ]
@@ -6185,9 +6210,9 @@ Home {home_emoji}   x   Away {away_emoji}
                 ht_a
 
             ]
- 
+
             if not any(pd.isna(v) for v in valores):
-                
+
            # =====================================
            # ⭐ DEFINE FAVORITO / ZEBRA
            # =====================================
@@ -6239,7 +6264,7 @@ Home {home_emoji}   x   Away {away_emoji}
                     +
 
                     ((favorito_mgc - zebra_mgc) * 0.8))
-                
+
         # =====================================
         # 🧠 SCORE ZEBRA
         # =====================================
@@ -6499,7 +6524,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
             stake = 13
 
-        
+
         # =========================================
         # 🟡 HANDICAP
         # =========================================
@@ -6513,7 +6538,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
             elif "VALUE" in tier_ha:
                 stake = 40
-                
+
         # =========================================
         # 📋 APPEND FINAL
         # =========================================
@@ -6623,29 +6648,30 @@ Home {home_emoji}   x   Away {away_emoji}
                 ""
             )})
 
-    # =========================================
-    # 📈 OUTPUT FINAL
-    # =========================================
+    return lista
 
-    if lista:
+lista = montar_lista_aba_ia(df_clean, df_rank_la, df_rank_lh, _fonte_poisson, _mtime_poisson)
 
-        df_final_aba7 = pd.DataFrame(lista)
-        # =========================================
-        # GARANTE TIPO NUMÉRICO
-        # =========================================
-        df_final_aba7["Score_Zebra"] = pd.to_numeric(
-            df_final_aba7["Score_Zebra"],
-            errors="coerce"
-        )
+# =========================================
+# 📈 OUTPUT FINAL
+# =========================================
 
-        st.dataframe(
-            df_final_aba7,
-            use_container_width=True,
-            hide_index=True)
+if lista:
 
-    else:
+    df_final_aba7 = pd.DataFrame(lista)
+    df_final_aba7["Score_Zebra"] = pd.to_numeric(
+        df_final_aba7["Score_Zebra"],
+        errors="coerce"
+    )
 
-        st.info("Sem jogos válidos após filtro")
+    st.dataframe(
+        df_final_aba7,
+        use_container_width=True,
+        hide_index=True)
+
+else:
+
+    st.info("Sem jogos válidos após filtro")
     
 # =========================================
 # ABA 8 — CLEAN SHEET (CS)
