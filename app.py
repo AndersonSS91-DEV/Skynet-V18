@@ -3514,323 +3514,156 @@ with tab1:
     st.markdown(_resumo_dedent(_resumo_html), unsafe_allow_html=True)
 
 # ============================================================
-# 📸 CARD INSTAGRAM — cole isso LOGO DEPOIS da linha:
-#     st.markdown(_resumo_dedent(_resumo_html), unsafe_allow_html=True)
-# (ou seja, depois do card de resumo que já existe, ainda dentro
-# de "with tab1:"). Reaproveita as variáveis já calculadas ali:
-# _resumo_top5, _resumo_ou, _resumo_mercados_ml, _resumo_label_mercados,
-# _resumo_crest_h_html/a, _resumo_home/away, _resumo_odd_*, 
-# _resumo_odd_justa_*, _resumo_texto_sinal_principal,
-# _resumo_cor_sinal_principal, _resumo_mostrar_live, matriz_consenso,
-# score_ofensivo, radar_home_consenso, radar_away_consenso, linha_ht.
+# 📸 CARD INSTAGRAM — versão em IMAGEM (substitui o bloco de HTML)
+# Cole isso no lugar de TODO o bloco antigo que ia de
+#   st.markdown("### 📸 Card para Instagram")
+# até
+#   st.markdown(_ig_dedent(_ig_html), unsafe_allow_html=True)
+#
+# Requer o arquivo card_instagram_engine.py na mesma pasta do app.
 # ============================================================
 
-    st.markdown("---")
-    st.markdown("### 📸 Card para Instagram")
+from card_instagram_engine import gerar_card_instagram
 
-    def _ig_dedent(html_texto):
-        return "\n".join(l.lstrip() for l in html_texto.splitlines())
+st.markdown("---")
+st.markdown("### 📸 Card para Instagram")
 
-    # ------------------------------------------------------------
-    # ÍNDICE TÁTICO / PERFIL / CONFIANÇA (rodapé do card)
-    # ------------------------------------------------------------
-    _ig_indice_tatico = int(round(score_ofensivo)) if pd.notna(score_ofensivo) else 50
+# ------------------------------------------------------------
+# ÍNDICE TÁTICO / PERFIL / CONFIANÇA (rodapé do card)
+# — igual ao código original, sem mudanças —
+# ------------------------------------------------------------
+_ig_indice_tatico = int(round(score_ofensivo)) if pd.notna(score_ofensivo) else 50
 
-    _ig_dominio = dominio_ofensivo(radar_home_consenso, radar_away_consenso)
-    _ig_perfil_label = {
-        "HOME": "CASA FORTE",
-        "AWAY": "VISITANTE FORTE",
-        "EQUILIBRADO": "EQUILIBRADO",
-    }.get(_ig_dominio, "EQUILIBRADO")
+_ig_dominio = dominio_ofensivo(radar_home_consenso, radar_away_consenso)
+_ig_perfil_label = {
+    "HOME": "CASA FORTE",
+    "AWAY": "VISITANTE FORTE",
+    "EQUILIBRADO": "EQUILIBRADO",
+}.get(_ig_dominio, "EQUILIBRADO")
 
-    _ig_score_poisson = poisson_score(matriz_consenso)
-    if _ig_score_poisson > 75:
-        _ig_confianca = "ALTA"
-    elif _ig_score_poisson > 55:
-        _ig_confianca = "MÉDIA"
-    else:
-        _ig_confianca = "BAIXA"
+_ig_score_poisson = poisson_score(matriz_consenso)
+if _ig_score_poisson > 75:
+    _ig_confianca = "ALTA"
+elif _ig_score_poisson > 55:
+    _ig_confianca = "MÉDIA"
+else:
+    _ig_confianca = "BAIXA"
 
-    # ------------------------------------------------------------
-    # PROBABILIDADE REAL (Poisson / Over-Under / BTTS) por mercado,
-    # pra exibir junto do score de IA de cada mini-card
-    # ------------------------------------------------------------
-    _ig_btts_pct, _ = calcular_btts_e_odd(matriz_consenso / 100)
+_ig_btts_pct, _ = calcular_btts_e_odd(matriz_consenso / 100)
 
-    def _ig_prob_mercado(chave):
-        try:
-            if chave == "LAY00":
-                return matriz_consenso[0][0]
-            if chave == "LAY01":
-                return matriz_consenso[0][1]
-            if chave == "LAY10":
-                return matriz_consenso[1][0]
-            if chave == "LAYGH":
-                return matriz_consenso[4][0] + matriz_consenso[4][1]
-            if chave == "LAYGA":
-                return matriz_consenso[0][4] + matriz_consenso[1][4]
-            if chave == "OVER15FT":
-                return _resumo_ou["Over 1.5"]
-            if chave == "OVER25FT":
-                return _resumo_ou["Over 2.5"]
-            if chave == "UNDER25FT":
-                return _resumo_ou["Under 2.5"]
-            if chave == "BTTS_YES":
-                return _ig_btts_pct
-            if chave == "OVER05HT":
-                return pd.to_numeric(linha_ht.get("Prob_Gol_HT"), errors="coerce")
-            if chave == "UNDER15HT":
-                v = pd.to_numeric(linha_ht.get("Prob_Gol_HT"), errors="coerce")
-                return (100 - v) if pd.notna(v) else None
-        except Exception:
-            return None
+def _ig_prob_mercado(chave):
+    try:
+        if chave == "LAY00":
+            return matriz_consenso[0][0]
+        if chave == "LAY01":
+            return matriz_consenso[0][1]
+        if chave == "LAY10":
+            return matriz_consenso[1][0]
+        if chave == "LAYGH":
+            return matriz_consenso[4][0] + matriz_consenso[4][1]
+        if chave == "LAYGA":
+            return matriz_consenso[0][4] + matriz_consenso[1][4]
+        if chave == "OVER15FT":
+            return _resumo_ou["Over 1.5"]
+        if chave == "OVER25FT":
+            return _resumo_ou["Over 2.5"]
+        if chave == "UNDER25FT":
+            return _resumo_ou["Under 2.5"]
+        if chave == "BTTS_YES":
+            return _ig_btts_pct
+        if chave == "OVER05HT":
+            return pd.to_numeric(linha_ht.get("Prob_Gol_HT"), errors="coerce")
+        if chave == "UNDER15HT":
+            v = pd.to_numeric(linha_ht.get("Prob_Gol_HT"), errors="coerce")
+            return (100 - v) if pd.notna(v) else None
+    except Exception:
         return None
+    return None
 
-    _ig_icone_mercado = {
-        "LAY00": "🥅", "LAY01": "👟⚽", "LAY10": "👟⚽",
-        "LAYGH": "🥅", "LAYGA": "🥅",
-        "OVER05HT": "⏱️⚽", "UNDER15HT": "🧊⚽",
-        "OVER15FT": "🔥⚽", "OVER25FT": "🔥⚽", "UNDER25FT": "🧊⚽",
-        "BTTS_YES": "🤝⚽",
-    }
+_ig_icone_mercado = {
+    "LAY00": "🥅", "LAY01": "👟⚽", "LAY10": "👟⚽",
+    "LAYGH": "🥅", "LAYGA": "🥅",
+    "OVER05HT": "⏱️⚽", "UNDER15HT": "🧊⚽",
+    "OVER15FT": "🔥⚽", "OVER25FT": "🔥⚽", "UNDER25FT": "🧊⚽",
+    "BTTS_YES": "🤝⚽",
+}
 
-    _ig_paleta = ["#ef4444", "#f97316", "#3b82f6", "#a855f7", "#22c55e", "#eab308"]
+_ig_paleta = ["#ef4444", "#f97316", "#3b82f6", "#a855f7", "#22c55e", "#eab308"]
 
-    # já vem ordenado do maior pro menor valor (sem Lay 2x2)
-    _ig_top4 = _resumo_mercados_ml[:4]
+# já vem ordenado do maior pro menor valor (sem Lay 2x2)
+_ig_top4 = _resumo_mercados_ml[:4]
 
-    # ------------------------------------------------------------
-    # CSS — mesmo padrão do exemplo (borda azul brilhante, fundo
-    # quase preto, cantos bem arredondados)
-    # ------------------------------------------------------------
-    _ig_css = """
-    <style>
-    .ig-wrap { max-width:760px; margin:0 auto; border-radius:26px;
-        border:2px solid #2f6fed; background:#03050a;
-        box-shadow:0 0 40px rgba(47,111,237,0.35), inset 0 0 40px rgba(47,111,237,0.05);
-        padding:30px 34px 26px 34px; }
+# ------------------------------------------------------------
+# Monta a lista de mercados no formato que o gerador espera:
+# (label, valor_0_100, cor, emoji, texto_da_probabilidade)
+# ------------------------------------------------------------
+_ig_mercados_fmt = []
+for _i, (_lbl, _val) in enumerate(_ig_top4):
+    _cor = _ig_paleta[_i % len(_ig_paleta)]
+    _chave = next((k for k, v in _resumo_label_mercados.items() if v == _lbl), "")
+    _icone = _ig_icone_mercado.get(_chave, "⚽")
+    _prob = _ig_prob_mercado(_chave)
+    _prob_txt = f"{_prob:.2f}%" if _prob is not None and pd.notna(_prob) else "—"
+    _ig_mercados_fmt.append((_lbl, float(_val), _cor, _icone, _prob_txt))
 
-    .ig-brand { text-align:center; font-size:15px; font-weight:800; letter-spacing:2px;
-        color:#7fb3ff; margin-bottom:18px; text-transform:uppercase; }
+# ------------------------------------------------------------
+# Top 5 placares no formato (gols_home, gols_away, "xx.xx%")
+# ------------------------------------------------------------
+_ig_top5_fmt = [
+    (int(_lin["Gols_Home"]), int(_lin["Gols_Away"]), str(_lin["Probabilidade%"]))
+    for _, _lin in _resumo_top5.iterrows()
+]
 
-    .ig-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
-    .ig-team { display:flex; align-items:center; gap:14px; }
-    .ig-team.away { flex-direction:row-reverse; text-align:right; }
-    .ig-crest { width:70px; height:70px; border-radius:50%; background:#11161f;
-        display:flex; align-items:center; justify-content:center; font-size:30px;
-        border:1px solid #2c3648; flex-shrink:0; }
-    .ig-team-name { font-size:24px; font-weight:900; color:#f5f7fa; }
-    .ig-team-tag { font-size:13px; font-weight:800; margin-top:4px; }
-    .ig-vs { font-size:24px; font-weight:900; color:#5b6472; }
+# ------------------------------------------------------------
+# Over/Under no formato {"0.5": (over, under), ...}
+# ------------------------------------------------------------
+_ig_ou_fmt = {
+    linha: (_resumo_ou[f"Over {linha}"], _resumo_ou[f"Under {linha}"])
+    for linha in ["0.5", "1.5", "2.5"]
+}
 
-    .ig-section { border-radius:16px; border:1px solid #1c2433; background:#080b12;
-        padding:18px 20px; margin-bottom:16px; }
-    .ig-section-title { text-align:center; font-size:13px; font-weight:800; letter-spacing:1.4px;
-        color:#8a93a3; text-transform:uppercase; margin-bottom:14px; }
+# ------------------------------------------------------------
+# Escudos: se _resumo_crest_h_html / _resumo_crest_a_html forem
+# tags <img src="..."> (url ou base64), o gerador consegue extrair
+# a imagem sozinho. Se não conseguir, cai automaticamente no
+# fallback com as iniciais do time dentro de um círculo.
+# ------------------------------------------------------------
+_ig_png = gerar_card_instagram(
+    home=_resumo_home,
+    away=_resumo_away,
+    crest_home=_resumo_crest_h_html,
+    crest_away=_resumo_crest_a_html,
+    odd_casa=_resumo_fmt2(_resumo_odd_casa),
+    odd_empate=_resumo_fmt2(_resumo_odd_empate),
+    odd_fora=_resumo_fmt2(_resumo_odd_fora),
+    odd_justa_casa=_resumo_odd_justa_casa,
+    odd_justa_empate=_resumo_odd_justa_empate,
+    odd_justa_fora=_resumo_odd_justa_fora,
+    top5=_ig_top5_fmt,
+    over_under=_ig_ou_fmt,
+    top4_mercados=_ig_mercados_fmt,
+    sinal_texto=_resumo_texto_sinal_principal,
+    sinal_cor=_resumo_cor_sinal_principal,
+    mostrar_live=_resumo_mostrar_live,
+    indice_tatico=_ig_indice_tatico,
+    perfil_label=_ig_perfil_label,
+    confianca=_ig_confianca,
+    brand="@laratodata",
+)
 
-    .ig-odds-row { display:flex; gap:14px; }
-    .ig-odds-box { flex:1; text-align:center; }
-    .ig-odds-label { font-size:12px; color:#8a93a3; font-weight:800; letter-spacing:0.6px; }
-    .ig-odds-real { font-size:26px; font-weight:900; color:#f5f7fa; margin-top:2px; }
-    .ig-odds-justa-tag { font-size:11px; color:#7fb3ff; font-weight:700; margin-top:2px; }
-    .ig-odds-justa-val { font-size:18px; color:#4a9dff; font-weight:900; }
+# ------------------------------------------------------------
+# Mostra a imagem no app + botão de download já pronto pra postar
+# ------------------------------------------------------------
+st.image(_ig_png, use_container_width=True)
+st.download_button(
+    label="📥 Baixar card para Instagram",
+    data=_ig_png,
+    file_name=f"card_{_resumo_home}_{_resumo_away}.png".replace(" ", "_"),
+    mime="image/png",
+    use_container_width=True,
+)
 
-    .ig-consenso-line { text-align:center; font-size:13px; color:#c8cfd8; margin-top:14px;
-        padding-top:12px; border-top:1px solid #1c2433; }
-    .ig-consenso-line b { color:#4a9dff; }
 
-    .ig-cols2 { display:flex; gap:16px; }
-    .ig-col { flex:1; }
-    .ig-placar-row { display:flex; justify-content:space-between; padding:6px 0;
-        font-size:14px; color:#c8cfd8; }
-    .ig-placar-badge { display:inline-flex; align-items:center; justify-content:center;
-        width:20px; height:20px; border-radius:5px; background:#1e6b3a; color:#fff;
-        font-size:11px; font-weight:800; margin-right:8px; }
-    .ig-placar-row b { color:#4ade80; font-weight:800; }
-    .ig-ou-row { display:flex; justify-content:space-between; padding:6px 0; font-size:13px; color:#c8cfd8; }
-    .ig-ou-over { color:#4ade80; font-weight:800; }
-    .ig-ou-under { color:#f87171; font-weight:800; }
-
-    .ig-mkt-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; }
-    .ig-mkt-box { text-align:center; border-radius:14px; border:1px solid #1c2433;
-        background:#0b0f18; padding:14px 8px; }
-    .ig-mkt-label { font-size:11.5px; color:#c8cfd8; font-weight:800; margin-bottom:8px; }
-    .ig-mkt-icon { font-size:22px; margin-bottom:6px; }
-    .ig-mkt-score { font-size:26px; font-weight:900; }
-    .ig-mkt-score-suffix { font-size:13px; color:#8a93a3; font-weight:700; }
-    .ig-mkt-track { width:100%; height:5px; border-radius:4px; background:#1c2433; margin:8px 0; }
-    .ig-mkt-fill { height:5px; border-radius:4px; }
-    .ig-mkt-prob-label { font-size:10px; color:#8a93a3; font-weight:700; letter-spacing:0.5px; }
-    .ig-mkt-prob-val { font-size:14px; font-weight:900; }
-
-    .ig-signal-row { display:flex; gap:16px; }
-    .ig-signal-box { flex:1; text-align:center; }
-    .ig-signal-label { font-size:11px; color:#8a93a3; font-weight:800; letter-spacing:0.8px;
-        margin-bottom:8px; }
-    .ig-signal-text { font-size:22px; font-weight:900; }
-
-    .ig-footer { display:flex; justify-content:space-around; border-top:1px solid #1c2433;
-        margin-top:6px; padding-top:16px; }
-    .ig-footer-item { text-align:center; }
-    .ig-footer-icon { font-size:16px; }
-    .ig-footer-label { font-size:11px; color:#8a93a3; font-weight:700; letter-spacing:0.5px; margin-top:4px; }
-    .ig-footer-value { font-size:20px; font-weight:900; margin-top:2px; }
-    </style>
-    """
-    st.markdown(_ig_dedent(_ig_css), unsafe_allow_html=True)
-
-    # ------------------------------------------------------------
-    # MONTA O HTML
-    # ------------------------------------------------------------
-    _ig_html = f"""
-    <div class="ig-wrap">
-
-        <div class="ig-brand">@laratodata</div>
-
-        <div class="ig-header">
-            <div class="ig-team">
-                <div class="ig-crest">{_resumo_crest_h_html}</div>
-                <div>
-                    <div class="ig-team-name">{str(_resumo_home).title()}</div>
-                    <div class="ig-team-tag" style="color:#4ade80;">🏠 MANDANTE</div>
-                </div>
-            </div>
-            <div class="ig-vs">X</div>
-            <div class="ig-team away">
-                <div class="ig-crest">{_resumo_crest_a_html}</div>
-                <div>
-                    <div class="ig-team-name">{str(_resumo_away).title()}</div>
-                    <div class="ig-team-tag" style="color:#7fb3ff;">✈ VISITANTE</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="ig-section">
-            <div class="ig-section-title">🎯 Odds 1x2</div>
-            <div class="ig-odds-row">
-                <div class="ig-odds-box">
-                    <div class="ig-odds-label">CASA</div>
-                    <div class="ig-odds-real">{_resumo_fmt2(_resumo_odd_casa)}</div>
-                    <div class="ig-odds-justa-tag">ODD JUSTA</div>
-                    <div class="ig-odds-justa-val">{_resumo_odd_justa_casa:.2f}</div>
-                </div>
-                <div class="ig-odds-box">
-                    <div class="ig-odds-label">EMPATE</div>
-                    <div class="ig-odds-real">{_resumo_fmt2(_resumo_odd_empate)}</div>
-                    <div class="ig-odds-justa-tag">ODD JUSTA</div>
-                    <div class="ig-odds-justa-val">{_resumo_odd_justa_empate:.2f}</div>
-                </div>
-                <div class="ig-odds-box">
-                    <div class="ig-odds-label">FORA</div>
-                    <div class="ig-odds-real">{_resumo_fmt2(_resumo_odd_fora)}</div>
-                    <div class="ig-odds-justa-tag">ODD JUSTA</div>
-                    <div class="ig-odds-justa-val">{_resumo_odd_justa_fora:.2f}</div>
-                </div>
-            </div>
-            <div class="ig-consenso-line">
-                🎯 ODD JUSTA MÉDIA (CONSENSO)<br>
-                CASA: <b>{_resumo_odd_justa_casa:.2f}</b> &nbsp;|&nbsp;
-                EMPATE: <b>{_resumo_odd_justa_empate:.2f}</b> &nbsp;|&nbsp;
-                FORA: <b>{_resumo_odd_justa_fora:.2f}</b>
-            </div>
-        </div>
-
-        <div class="ig-cols2">
-            <div class="ig-col ig-section">
-                <div class="ig-section-title">📊 Top 5 Placares</div>
-    """
-
-    for _i, (_, _lin) in enumerate(_resumo_top5.iterrows()):
-        _ig_html += (
-            f'<div class="ig-placar-row"><span><span class="ig-placar-badge">{_i+1}</span>'
-            f'{int(_lin["Gols_Home"])} - {int(_lin["Gols_Away"])}</span>'
-            f'<b>{_lin["Probabilidade%"]}</b></div>'
-        )
-
-    _ig_html += """
-            </div>
-            <div class="ig-col ig-section">
-                <div class="ig-section-title">📈 Over / Under FT</div>
-    """
-
-    for _linha_ou in ["0.5", "1.5", "2.5"]:
-        _over_v = _resumo_ou[f"Over {_linha_ou}"]
-        _under_v = _resumo_ou[f"Under {_linha_ou}"]
-        _ig_html += (
-            f'<div class="ig-ou-row"><span>Linha {_linha_ou}</span>'
-            f'<span><span class="ig-ou-over">{_over_v:.2f}%</span> · '
-            f'<span class="ig-ou-under">{_under_v:.2f}%</span></span></div>'
-        )
-
-    _ig_html += """
-            </div>
-        </div>
-
-        <div class="ig-section">
-            <div class="ig-section-title">🛡 Top 4 Mercados</div>
-            <div class="ig-mkt-grid">
-    """
-
-    for _i, (_lbl, _val) in enumerate(_ig_top4):
-        _cor = _ig_paleta[_i % len(_ig_paleta)]
-        _chave = next((k for k, v in _resumo_label_mercados.items() if v == _lbl), "")
-        _icone = _ig_icone_mercado.get(_chave, "⚽")
-        _prob = _ig_prob_mercado(_chave)
-        _prob_txt = f"{_prob:.2f}%" if _prob is not None and pd.notna(_prob) else "—"
-
-        _ig_html += f"""
-        <div class="ig-mkt-box">
-            <div class="ig-mkt-label">{_lbl.upper()}</div>
-            <div class="ig-mkt-icon">{_icone}</div>
-            <div><span class="ig-mkt-score" style="color:{_cor};">{_val:.0f}</span><span class="ig-mkt-score-suffix">/100</span></div>
-            <div class="ig-mkt-track"><div class="ig-mkt-fill" style="width:{_val}%; background:{_cor};"></div></div>
-            <div class="ig-mkt-prob-label">PROB. {_lbl.upper()}</div>
-            <div class="ig-mkt-prob-val" style="color:{_cor};">{_prob_txt}</div>
-        </div>
-        """
-
-    _ig_html += """
-            </div>
-        </div>
-    """
-
-    if _resumo_texto_sinal_principal or _resumo_mostrar_live:
-        _ig_html += '<div class="ig-section"><div class="ig-signal-row">'
-        if _resumo_texto_sinal_principal:
-            _ig_html += (
-                '<div class="ig-signal-box"><div class="ig-signal-label">⭐ SINAL PRINCIPAL</div>'
-                f'<div class="ig-signal-text" style="color:{_resumo_cor_sinal_principal};">{_resumo_texto_sinal_principal}</div></div>'
-            )
-        if _resumo_mostrar_live:
-            _ig_html += (
-                '<div class="ig-signal-box"><div class="ig-signal-label">💬 COMENTÁRIO ADICIONAL</div>'
-                '<div class="ig-signal-text" style="color:#facc15;">⚠ ANALISAR / ACOMPANHAR JOGO LIVE</div></div>'
-            )
-        _ig_html += "</div></div>"
-
-    _ig_html += f"""
-        <div class="ig-footer">
-            <div class="ig-footer-item">
-                <div class="ig-footer-icon">🎯</div>
-                <div class="ig-footer-label">ÍNDICE TÁTICO</div>
-                <div class="ig-footer-value" style="color:#4ade80;">{_ig_indice_tatico}/100</div>
-            </div>
-            <div class="ig-footer-item">
-                <div class="ig-footer-icon">👤</div>
-                <div class="ig-footer-label">PERFIL</div>
-                <div class="ig-footer-value" style="color:#7fb3ff;">{_ig_perfil_label}</div>
-            </div>
-            <div class="ig-footer-item">
-                <div class="ig-footer-icon">🛡</div>
-                <div class="ig-footer-label">CONFIANÇA</div>
-                <div class="ig-footer-value" style="color:#4ade80;">{_ig_confianca}</div>
-            </div>
-        </div>
-
-    </div>
-    """
-
-    st.markdown(_ig_dedent(_ig_html), unsafe_allow_html=True)
 # =========================================
 # ABA 2 — DADOS COMPLETOS
 # =========================================
