@@ -5584,7 +5584,105 @@ if lista_rank:
 else:
     st.info("Nenhum jogo A+/A encontrado")
 
+# ============================================================
+# 🔧 TRECHO QUE FALTOU — cole EXATAMENTE aqui, entre o Fix 3a e o
+# Fix 3b (esse pedaço nunca fazia parte de nenhum dos dois fixes,
+# só ficava ENTRE eles no arquivo original — por isso sumiu na
+# hora de colar por cima).
+# ============================================================
 
+    # =========================================
+    # 📋 TABELA FINAL
+    # =========================================
+    st.markdown("### 📋 Todos os Jogos Filtrados")
+
+    cols_odds = [
+        "Odd_BTTS_YES",
+        "Odds_Over_2,5FT",
+        "Odds_Casa",
+        "Odds_Visitante"
+    ]
+
+    for col in cols_odds:
+        base_df[col] = (
+            base_df[col]
+            .astype(str)
+            .str.replace(",", ".", regex=False)
+        )
+        base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
+
+    df_clean = base_df[
+        (base_df["Odd_BTTS_YES"] > 0) &
+        (base_df["Odds_Over_2,5FT"] > 0) &
+        (base_df["Odds_Casa"] > 0) &
+        (base_df["Odds_Visitante"] > 0)
+    ].copy()
+
+    df_clean["Home"] = df_clean.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_H_01"], x["CV_CG_H_01"],
+            x["Media_CG_H_02"], x["CV_CG_H_02"]
+        ), axis=1
+    )
+
+    df_clean["Away"] = df_clean.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_A_01"], x["CV_CG_A_01"],
+            x["Media_CG_A_02"], x["CV_CG_A_02"]
+        ), axis=1
+    )
+
+    # =========================================
+    # 🔥 FUNÇÃO SNIPER / CORE
+    # =========================================
+    def classificar_sniper_core(row):
+        try:
+            exg_home = row.get("ExG_Home_Consenso")
+            exg_away = row.get("ExG_Away_Consenso")
+
+            if pd.isna(exg_home) or pd.isna(exg_away):
+                return ""
+
+            odd_home = float(str(row.get("Odds_Casa", 0)).replace(",", "."))
+            odd_away = float(str(row.get("Odds_Visitante", 0)).replace(",", "."))
+
+            exg_diff = exg_home - exg_away
+            ratio = exg_home / (exg_away + 0.01)
+
+            forca_home = exg_home / odd_home
+            forca_away = exg_away / odd_away
+
+            diff_forca = forca_home - forca_away
+
+            if (
+                (exg_diff > 0.6) and
+                (ratio > 1.45) and
+                (diff_forca > 0.18) and
+                (odd_away >= 2.9) and
+                (odd_away <= 3.8) and
+                (odd_home >= 1.45)
+            ):
+                return "🔥 SNIPER"
+
+            elif (
+                (exg_diff > 0.4) and
+                (ratio > 1.30) and
+                (diff_forca > 0.12) and
+                (odd_away >= 2.5) and
+                (odd_away <= 4.0) and
+                (odd_home >= 1.35)
+            ):
+                return "🟢 CORE"
+
+            else:
+                return ""
+
+        except:
+            return ""
+            
+    # =========================================
+    # 🧠 LISTA FINAL
+    # =========================================
 # ============================================================
 # 🔧 FIX 3b — TABELA "TODOS OS JOGOS FILTRADOS" (linhas ~6119–7075)
 # ============================================================
