@@ -611,7 +611,7 @@ for df in (df_mgf, df_exg, df_vg, df_ht, df_cantos):
 # ============================================================
 
 @st.cache_data(show_spinner="Calculando Score Ofensivo...")
-def calcular_score_ofensivo(_df_mgf, _df_exg, _df_vg, _fonte_poisson, _mtime_poisson):
+def calcular_score_ofensivo(_df_mgf, _df_exg, _df_vg, fonte_poisson, mtime_poisson):
 
     # 🔥 SCORE OFENSIVO CONSENSO 0–100
     # =========================================
@@ -2177,7 +2177,7 @@ df_cs = pd.DataFrame(resultado_cs)
 # ============================================================
 
 @st.cache_data(show_spinner="Calculando Scanner Global...")
-def calcular_scanner_global(_df_consenso, _df_ml, _knn, _scaler_ml, _fonte_poisson, _mtime_poisson):
+def calcular_scanner_global(_df_consenso, _df_ml, _knn, _scaler_ml, fonte_poisson, mtime_poisson):
 
     scanner_global = []
 
@@ -5545,7 +5545,7 @@ Home {home_emoji}   x   Away {away_emoji}
 # ============================================================
 
 @st.cache_data(show_spinner=False)
-def montar_lista_rank(_base_df, _fonte_poisson, _mtime_poisson):
+def montar_lista_rank(_base_df, fonte_poisson, mtime_poisson):
 
     lista_rank = []
 
@@ -5688,7 +5688,7 @@ else:
 # ============================================================
 
 @st.cache_data(show_spinner="Calculando tabela da Aba IA...")
-def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, _fonte_poisson, _mtime_poisson):
+def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtime_poisson):
 
     lista = []
 
@@ -8290,7 +8290,7 @@ with tab8:
 # ============================================================
 
 @st.cache_data(show_spinner="Calculando Scanner Operacional CS...")
-def montar_scanner_cs(_df_exg, _df_consenso, _fonte_poisson, _mtime_poisson):
+def montar_scanner_cs(_df_exg, _df_consenso, fonte_poisson, mtime_poisson):
 
     jogos = sorted(
         _df_exg["JOGO"]
