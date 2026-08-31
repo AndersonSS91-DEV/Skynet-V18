@@ -606,52 +606,62 @@ df_consenso["JOGO"] = (df_consenso["Home_Team"] + " x " + df_consenso["Visitor_T
 for df in (df_mgf, df_exg, df_vg, df_ht, df_cantos):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
 
-# =========================================
-# 🔥 SCORE OFENSIVO CONSENSO 0–100
-# =========================================
+# ============================================================
+# 🔧 FIX 1 — SCORE OFENSIVO (linhas ~610–655 do arquivo original)
+# ============================================================
 
-score_raw = []
+@st.cache_data(show_spinner="Calculando Score Ofensivo...")
+def calcular_score_ofensivo(_df_mgf, _df_exg, _df_vg, _fonte_poisson, _mtime_poisson):
 
-for _, row in df_mgf.iterrows():
+    # 🔥 SCORE OFENSIVO CONSENSO 0–100
+    # =========================================
 
-    jogo = row["Home_Team"] + " x " + row["Visitor_Team"]
+    score_raw = []
 
-    exg_row = df_exg[df_exg["Home_Team"].eq(row["Home_Team"]) &
-                     df_exg["Visitor_Team"].eq(row["Visitor_Team"])]
+    for _, row in _df_mgf.iterrows():
 
-    vg_row  = df_vg[df_vg["Home_Team"].eq(row["Home_Team"]) &
-                    df_vg["Visitor_Team"].eq(row["Visitor_Team"])]
+        jogo = row["Home_Team"] + " x " + row["Visitor_Team"]
 
-    if exg_row.empty or vg_row.empty:
-        score_raw.append(np.nan)
-        continue
+        exg_row = _df_exg[_df_exg["Home_Team"].eq(row["Home_Team"]) &
+                         _df_exg["Visitor_Team"].eq(row["Visitor_Team"])]
 
-    exg_row = exg_row.iloc[0]
-    vg_row  = vg_row.iloc[0]
+        vg_row  = _df_vg[_df_vg["Home_Team"].eq(row["Home_Team"]) &
+                        _df_vg["Visitor_Team"].eq(row["Visitor_Team"])]
 
-    # eficiência
-    ief_home = (1 / row["CHM"]) * 100 if row["CHM"] > 0 else 0
-    ief_away = (1 / row["CAM"]) * 100 if row["CAM"] > 0 else 0
+        if exg_row.empty or vg_row.empty:
+            score_raw.append(np.nan)
+            continue
 
-    # normalizações radar
-    def norm_exg(x): return min(x * 40, 100)
-    def norm_shots(x): return min((x / 15) * 100, 100)
+        exg_row = exg_row.iloc[0]
+        vg_row  = vg_row.iloc[0]
 
-    radar_home = np.mean([
-        [ief_home, norm_exg(row["ExG_Home_MGF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], row["BTTS_%"]],
-        [exg_row["FAH"], norm_exg(exg_row["ExG_Home_ATKxDEF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], exg_row["BTTS_%"]],
-        [exg_row["FAH"], norm_exg(vg_row["ExG_Home_VG"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], vg_row["BTTS_%"]]
-    ], axis=0)
+        # eficiência
+        ief_home = (1 / row["CHM"]) * 100 if row["CHM"] > 0 else 0
+        ief_away = (1 / row["CAM"]) * 100 if row["CAM"] > 0 else 0
 
-    radar_away = np.mean([
-        [ief_away, norm_exg(row["ExG_Away_MGF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], row["BTTS_%"]],
-        [exg_row["FAA"], norm_exg(exg_row["ExG_Away_ATKxDEF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], exg_row["BTTS_%"]],
-        [exg_row["FAA"], norm_exg(vg_row["ExG_Away_VG"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], vg_row["BTTS_%"]]
-    ], axis=0)
+        # normalizações radar
+        def norm_exg(x): return min(x * 40, 100)
+        def norm_shots(x): return min((x / 15) * 100, 100)
 
-    score = ((sum(radar_home)/5 + sum(radar_away)/5) / 2)
-    score_raw.append(score)
+        radar_home = np.mean([
+            [ief_home, norm_exg(row["ExG_Home_MGF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], row["BTTS_%"]],
+            [exg_row["FAH"], norm_exg(exg_row["ExG_Home_ATKxDEF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], exg_row["BTTS_%"]],
+            [exg_row["FAH"], norm_exg(vg_row["ExG_Home_VG"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], vg_row["BTTS_%"]]
+        ], axis=0)
 
+        radar_away = np.mean([
+            [ief_away, norm_exg(row["ExG_Away_MGF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], row["BTTS_%"]],
+            [exg_row["FAA"], norm_exg(exg_row["ExG_Away_ATKxDEF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], exg_row["BTTS_%"]],
+            [exg_row["FAA"], norm_exg(vg_row["ExG_Away_VG"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], vg_row["BTTS_%"]]
+        ], axis=0)
+
+        score = ((sum(radar_home)/5 + sum(radar_away)/5) / 2)
+        score_raw.append(score)
+
+
+    return score_raw
+
+score_raw = calcular_score_ofensivo(df_mgf, df_exg, df_vg, _fonte_poisson, _mtime_poisson)
 df_mgf["Score_Ofensivo"] = score_raw
 
 # =========================================    
@@ -2162,220 +2172,228 @@ if not jogos_semelhantes.empty:
 
 df_cs = pd.DataFrame(resultado_cs)
 
-# =========================================
-# SCANNER GLOBAL V30.1.5
-# =========================================
+# ============================================================
+# 🔧 FIX 2 — SCANNER GLOBAL (linhas ~2166–2378 do arquivo original)
+# ============================================================
 
-scanner_global = []
+@st.cache_data(show_spinner="Calculando Scanner Global...")
+def calcular_scanner_global(_df_consenso, _df_ml, _knn, _scaler_ml, _fonte_poisson, _mtime_poisson):
 
-if knn is not None:
+    scanner_global = []
 
-    for _, jogo_dia in df_consenso.iterrows():
+    if _knn is not None:
 
-        jogo_ml = preparar_jogo_ml(jogo_dia)
+        for _, jogo_dia in _df_consenso.iterrows():
 
-        if jogo_ml is None:
-            continue
+            jogo_ml = preparar_jogo_ml(jogo_dia)
 
-        jogo_scaled = scaler_ml.transform(jogo_ml)
+            if jogo_ml is None:
+                continue
 
-        distancias, indices = knn.kneighbors(jogo_scaled)
+            jogo_scaled = _scaler_ml.transform(jogo_ml)
 
-        semelhantes = (
-            df_ml
-            .iloc[indices[0]]
-            .copy()
-            .reset_index(drop=True)
-        )
+            distancias, indices = _knn.kneighbors(jogo_scaled)
 
-        semelhantes["DISTANCIA"] = distancias[0]
-
-        dist_max = semelhantes["DISTANCIA"].max()
-        dist_min = semelhantes["DISTANCIA"].min()
-
-        if dist_max > dist_min:
-
-            semelhantes["SIMILARIDADE"] = (
-                100
-                * (
-                    1
-                    - (
-                        semelhantes["DISTANCIA"] - dist_min
-                    )
-                    / (
-                        dist_max - dist_min
-                    )
-                )
+            semelhantes = (
+                _df_ml
+                .iloc[indices[0]]
+                .copy()
+                .reset_index(drop=True)
             )
 
-        else:
+            semelhantes["DISTANCIA"] = distancias[0]
 
-            semelhantes["SIMILARIDADE"] = 100.0
+            dist_max = semelhantes["DISTANCIA"].max()
+            dist_min = semelhantes["DISTANCIA"].min()
 
-        semelhantes["SIMILARIDADE"] = (
-            semelhantes["SIMILARIDADE"]
-            .round(2)
-        )
+            if dist_max > dist_min:
 
-        total = len(semelhantes)
+                semelhantes["SIMILARIDADE"] = (
+                    100
+                    * (
+                        1
+                        - (
+                            semelhantes["DISTANCIA"] - dist_min
+                        )
+                        / (
+                            dist_max - dist_min
+                        )
+                    )
+                )
 
-        if total == 0:
-            continue
+            else:
 
-        wr = {}
+                semelhantes["SIMILARIDADE"] = 100.0
 
-        for mercado in [
+            semelhantes["SIMILARIDADE"] = (
+                semelhantes["SIMILARIDADE"]
+                .round(2)
+            )
+
+            total = len(semelhantes)
+
+            if total == 0:
+                continue
+
+            wr = {}
+
+            for mercado in [
+                "LAY00",
+                "LAY01",
+                "LAY10",
+                "LAY22",
+                "LAYGH",
+                "LAYGA"
+            ]:
+
+                if mercado in semelhantes.columns:
+
+                    wr[mercado] = round(
+                        semelhantes[mercado].mean(),
+                        2
+                    )
+
+                else:
+
+                    wr[mercado] = np.nan
+
+            scanner_global.append({
+
+                "League": jogo_dia.get("League"),
+
+                "Home_Team": jogo_dia.get("Home_Team"),
+                "Visitor_Team": jogo_dia.get("Visitor_Team"),
+
+                "Result Home": jogo_dia.get("Result Home", "-"),
+                "Result Visitor": jogo_dia.get("Result Visitor", "-"),
+
+                "Result_Home_HT": jogo_dia.get("Result_Home_HT", "-"),
+                "Result_Visitor_HT": jogo_dia.get("Result_Visitor_HT", "-"),
+
+                "Similares": total,
+
+                "Similaridade Média": round(
+                    semelhantes["SIMILARIDADE"].mean(),
+                    2
+                ),
+
+                "LAY00": wr["LAY00"],
+
+                "LAY01": wr["LAY01"],
+
+                "LAY10": wr["LAY10"],
+
+                "LAY22": wr["LAY22"],
+
+                "LAYGH": wr["LAYGH"],
+
+                "LAYGA": wr["LAYGA"]
+
+            })
+
+    df_scanner = pd.DataFrame(scanner_global)
+
+    if not df_scanner.empty:
+
+        mercados = [
+
             "LAY00",
             "LAY01",
             "LAY10",
             "LAY22",
             "LAYGH",
             "LAYGA"
-        ]:
 
-            if mercado in semelhantes.columns:
+        ]
 
-                wr[mercado] = round(
-                    semelhantes[mercado].mean(),
-                    2
-                )
+        # =====================================
+        # CONVERTE PARA %
+        # =====================================
 
-            else:
+        df_scanner[mercados] = (
 
-                wr[mercado] = np.nan
+            df_scanner[mercados]
 
-        scanner_global.append({
+            .apply(
 
-            "League": jogo_dia.get("League"),
+                pd.to_numeric,
 
-            "Home_Team": jogo_dia.get("Home_Team"),
-            "Visitor_Team": jogo_dia.get("Visitor_Team"),
+                errors="coerce"
 
-            "Result Home": jogo_dia.get("Result Home", "-"),
-            "Result Visitor": jogo_dia.get("Result Visitor", "-"),
+            )
 
-            "Result_Home_HT": jogo_dia.get("Result_Home_HT", "-"),
-            "Result_Visitor_HT": jogo_dia.get("Result_Visitor_HT", "-"),
-
-            "Similares": total,
-
-            "Similaridade Média": round(
-                semelhantes["SIMILARIDADE"].mean(),
-                2
-            ),
-
-            "LAY00": wr["LAY00"],
-
-            "LAY01": wr["LAY01"],
-
-            "LAY10": wr["LAY10"],
-
-            "LAY22": wr["LAY22"],
-
-            "LAYGH": wr["LAYGH"],
-
-            "LAYGA": wr["LAYGA"]
-
-        })
-
-df_scanner = pd.DataFrame(scanner_global)
-
-if not df_scanner.empty:
-
-    mercados = [
-
-        "LAY00",
-        "LAY01",
-        "LAY10",
-        "LAY22",
-        "LAYGH",
-        "LAYGA"
-
-    ]
-
-    # =====================================
-    # CONVERTE PARA %
-    # =====================================
-
-    df_scanner[mercados] = (
-
-        df_scanner[mercados]
-
-        .apply(
-
-            pd.to_numeric,
-
-            errors="coerce"
+            * 100
 
         )
 
-        * 100
+        # =====================================
+        # SCORE
+        # =====================================
 
-    )
+        df_scanner["SG_SCORE"] = (
 
-    # =====================================
-    # SCORE
-    # =====================================
+            df_scanner[mercados]
 
-    df_scanner["SG_SCORE"] = (
+            .mean(axis=1)
 
-        df_scanner[mercados]
+            * 0.70
 
-        .mean(axis=1)
+            +
 
-        * 0.70
+            df_scanner["Similaridade Média"]
 
-        +
-
-        df_scanner["Similaridade Média"]
-
-        * 0.30
-
-    )
-
-    # =====================================
-    # RENOMEIA
-    # =====================================
-
-    df_scanner = df_scanner.rename(
-
-        columns={
-
-            "LAY00": "Lay 0x0",
-
-            "LAY01": "Lay 0x1",
-
-            "LAY10": "Lay 1x0",
-
-            "LAY22": "Lay 2x2",
-
-            "LAYGH": "Lay GH",
-
-            "LAYGA": "Lay GA"
-
-        }
-
-    )
-
-    # =====================================
-    # ORDENA
-    # =====================================
-
-    df_scanner = (
-
-        df_scanner
-
-        .sort_values(
-
-            "SG_SCORE",
-
-            ascending=False
+            * 0.30
 
         )
 
-        .reset_index(drop=True)
+        # =====================================
+        # RENOMEIA
+        # =====================================
 
-    )
+        df_scanner = df_scanner.rename(
+
+            columns={
+
+                "LAY00": "Lay 0x0",
+
+                "LAY01": "Lay 0x1",
+
+                "LAY10": "Lay 1x0",
+
+                "LAY22": "Lay 2x2",
+
+                "LAYGH": "Lay GH",
+
+                "LAYGA": "Lay GA"
+
+            }
+
+        )
+
+        # =====================================
+        # ORDENA
+        # =====================================
+
+        df_scanner = (
+
+            df_scanner
+
+            .sort_values(
+
+                "SG_SCORE",
+
+                ascending=False
+
+            )
+
+            .reset_index(drop=True)
+
+        )
+
+    return df_scanner
+
+df_scanner = calcular_scanner_global(df_consenso, df_ml, knn, scaler_ml, _fonte_poisson, _mtime_poisson)
+
 # =========================================
 # ABAS
 # =========================================
@@ -5991,9 +6009,16 @@ Home {home_emoji}   x   Away {away_emoji}
 
     st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
+# ============================================================
+# 🔧 FIX 3a — RANKING "TOP JOGOS DO DIA A+/A" (linhas ~5994–6025)
+# ============================================================
+
+@st.cache_data(show_spinner=False)
+def montar_lista_rank(_base_df, _fonte_poisson, _mtime_poisson):
+
     lista_rank = []
 
-    for _, row in base_df.iterrows():
+    for _, row in _base_df.iterrows():
 
         res = classificar_jogo(row)
 
@@ -6016,109 +6041,29 @@ Home {home_emoji}   x   Away {away_emoji}
             "Classe": res["Classe"]
         })
 
-    if lista_rank:
-        df_rank = pd.DataFrame(lista_rank)
-        df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
-        df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
-        st.dataframe(df_rank, use_container_width=True, hide_index=True)
-    else:
-        st.info("Nenhum jogo A+/A encontrado")
+    return lista_rank
 
-    # =========================================
-    # 📋 TABELA FINAL
-    # =========================================
-    st.markdown("### 📋 Todos os Jogos Filtrados")
+lista_rank = montar_lista_rank(base_df, _fonte_poisson, _mtime_poisson)
 
-    cols_odds = [
-        "Odd_BTTS_YES",
-        "Odds_Over_2,5FT",
-        "Odds_Casa",
-        "Odds_Visitante"
-    ]
+if lista_rank:
+    df_rank = pd.DataFrame(lista_rank)
+    df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
+    df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
+    st.dataframe(df_rank, use_container_width=True, hide_index=True)
+else:
+    st.info("Nenhum jogo A+/A encontrado")
 
-    for col in cols_odds:
-        base_df[col] = (
-            base_df[col]
-            .astype(str)
-            .str.replace(",", ".", regex=False)
-        )
-        base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
 
-    df_clean = base_df[
-        (base_df["Odd_BTTS_YES"] > 0) &
-        (base_df["Odds_Over_2,5FT"] > 0) &
-        (base_df["Odds_Casa"] > 0) &
-        (base_df["Odds_Visitante"] > 0)
-    ].copy()
+# ============================================================
+# 🔧 FIX 3b — TABELA "TODOS OS JOGOS FILTRADOS" (linhas ~6119–7075)
+# ============================================================
 
-    df_clean["Home"] = df_clean.apply(
-        lambda x: classificar_filtro_duplo(
-            x["Media_CG_H_01"], x["CV_CG_H_01"],
-            x["Media_CG_H_02"], x["CV_CG_H_02"]
-        ), axis=1
-    )
+@st.cache_data(show_spinner="Calculando tabela da Aba IA...")
+def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, _fonte_poisson, _mtime_poisson):
 
-    df_clean["Away"] = df_clean.apply(
-        lambda x: classificar_filtro_duplo(
-            x["Media_CG_A_01"], x["CV_CG_A_01"],
-            x["Media_CG_A_02"], x["CV_CG_A_02"]
-        ), axis=1
-    )
-
-    # =========================================
-    # 🔥 FUNÇÃO SNIPER / CORE
-    # =========================================
-    def classificar_sniper_core(row):
-        try:
-            exg_home = row.get("ExG_Home_Consenso")
-            exg_away = row.get("ExG_Away_Consenso")
-
-            if pd.isna(exg_home) or pd.isna(exg_away):
-                return ""
-
-            odd_home = float(str(row.get("Odds_Casa", 0)).replace(",", "."))
-            odd_away = float(str(row.get("Odds_Visitante", 0)).replace(",", "."))
-
-            exg_diff = exg_home - exg_away
-            ratio = exg_home / (exg_away + 0.01)
-
-            forca_home = exg_home / odd_home
-            forca_away = exg_away / odd_away
-
-            diff_forca = forca_home - forca_away
-
-            if (
-                (exg_diff > 0.6) and
-                (ratio > 1.45) and
-                (diff_forca > 0.18) and
-                (odd_away >= 2.9) and
-                (odd_away <= 3.8) and
-                (odd_home >= 1.45)
-            ):
-                return "🔥 SNIPER"
-
-            elif (
-                (exg_diff > 0.4) and
-                (ratio > 1.30) and
-                (diff_forca > 0.12) and
-                (odd_away >= 2.5) and
-                (odd_away <= 4.0) and
-                (odd_home >= 1.35)
-            ):
-                return "🟢 CORE"
-
-            else:
-                return ""
-
-        except:
-            return ""
-            
-    # =========================================
-    # 🧠 LISTA FINAL
-    # =========================================
     lista = []
 
-    for _, row in df_clean.iterrows():
+    for _, row in _df_clean.iterrows():
 
         # =========================================
         # 🧠 CLASSIFICAÇÃO
@@ -6133,7 +6078,7 @@ Home {home_emoji}   x   Away {away_emoji}
         # =========================================
         dir_poisson = str(row.get("Poisson_Direcao", ""))
         dir_ia = str(row.get("IA_Direcao", ""))
-        
+
         # =========================================
         # 🎯 FUNÇÕES
         # =========================================
@@ -6373,7 +6318,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
         ):
 
-            if not df_rank_la.empty:
+            if not _df_rank_la.empty:
 
                 home_key = (
 
@@ -6383,9 +6328,9 @@ Home {home_emoji}   x   Away {away_emoji}
 
                 )
 
-                linha_rank_elite = df_rank_la[
+                linha_rank_elite = _df_rank_la[
 
-                    df_rank_la["Home_Key"]
+                    _df_rank_la["Home_Key"]
                     == home_key
 
                 ]
@@ -6451,7 +6396,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
                     if odd_home > 1.13:
 
-                        if not df_rank_la.empty:
+                        if not _df_rank_la.empty:
 
                             home_key = (
 
@@ -6461,13 +6406,13 @@ Home {home_emoji}   x   Away {away_emoji}
 
                             )
 
-                            linha_rank = df_rank_la[
+                            linha_rank = _df_rank_la[
 
-                                df_rank_la["Home_Key"]
+                                _df_rank_la["Home_Key"]
                                 == home_key
 
                             ]
-                            
+
                             if not linha_rank.empty:
 
                                 tier_original = linha_rank.iloc[0].get(
@@ -6536,7 +6481,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
                     if odd_away > 1.13:
 
-                        if not df_rank_lh.empty:
+                        if not _df_rank_lh.empty:
 
                             away_key = (
 
@@ -6546,9 +6491,9 @@ Home {home_emoji}   x   Away {away_emoji}
 
                             )
 
-                            linha_rank = df_rank_lh[
+                            linha_rank = _df_rank_lh[
 
-                                df_rank_lh["Away_Key"]
+                                _df_rank_lh["Away_Key"]
                                 == away_key
 
                             ]
@@ -6636,9 +6581,9 @@ Home {home_emoji}   x   Away {away_emoji}
                 ht_a
 
             ]
- 
+
             if not any(pd.isna(v) for v in valores):
-                
+
            # =====================================
            # ⭐ DEFINE FAVORITO / ZEBRA
            # =====================================
@@ -6690,7 +6635,7 @@ Home {home_emoji}   x   Away {away_emoji}
                     +
 
                     ((favorito_mgc - zebra_mgc) * 0.8))
-                
+
         # =====================================
         # 🧠 SCORE ZEBRA
         # =====================================
@@ -6950,7 +6895,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
             stake = 13
 
-        
+
         # =========================================
         # 🟡 HANDICAP
         # =========================================
@@ -6964,7 +6909,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
             elif "VALUE" in tier_ha:
                 stake = 40
-                
+
         # =========================================
         # 📋 APPEND FINAL
         # =========================================
@@ -7074,30 +7019,31 @@ Home {home_emoji}   x   Away {away_emoji}
                 ""
             )})
 
-    # =========================================
-    # 📈 OUTPUT FINAL
-    # =========================================
+    return lista
 
-    if lista:
+lista = montar_lista_aba_ia(df_clean, df_rank_la, df_rank_lh, _fonte_poisson, _mtime_poisson)
 
-        df_final_aba7 = pd.DataFrame(lista)
-        # =========================================
-        # GARANTE TIPO NUMÉRICO
-        # =========================================
-        df_final_aba7["Score_Zebra"] = pd.to_numeric(
-            df_final_aba7["Score_Zebra"],
-            errors="coerce"
-        )
+# =========================================
+# 📈 OUTPUT FINAL
+# =========================================
 
-        st.dataframe(
-            df_final_aba7,
-            use_container_width=True,
-            hide_index=True)
+if lista:
 
-    else:
+    df_final_aba7 = pd.DataFrame(lista)
+    df_final_aba7["Score_Zebra"] = pd.to_numeric(
+        df_final_aba7["Score_Zebra"],
+        errors="coerce"
+    )
 
-        st.info("Sem jogos válidos após filtro")
+    st.dataframe(
+        df_final_aba7,
+        use_container_width=True,
+        hide_index=True)
 
+else:
+
+    st.info("Sem jogos válidos após filtro")
+    
 # =========================================
 # ABA 8 — CLEAN SHEET (CS)
 # =========================================
@@ -8706,6 +8652,24 @@ with tab8:
 
     lista_cs = []
 
+# ============================================================
+# 🔧 FIX 4 — SCANNER OPERACIONAL CS (linhas ~8709–9172)
+# Loop que roda gerar_perfil_tatico() 2x por jogo, pra TODOS os
+# jogos do dia. Substitua o bloco original por este (o restante,
+# a partir de "DATAFRAME FINAL"/filtro de busca, continua igual
+# e fica FORA da função — é barato e usa lista_cs já pronta).
+# ============================================================
+
+@st.cache_data(show_spinner="Calculando Scanner Operacional CS...")
+def montar_scanner_cs(_df_exg, _df_consenso, _fonte_poisson, _mtime_poisson):
+
+    jogos = sorted(
+        _df_exg["JOGO"]
+        .dropna()
+        .unique()
+        .tolist()
+    )
+
     # =========================================================
     # 🎮 LISTA DE JOGOS
     # =========================================================
@@ -8733,11 +8697,11 @@ with tab8:
             # ⚽ FILTRO JOGO
             # =================================================
 
-            linha_exg = df_exg[
+            linha_exg = _df_exg[
                 df_exg["JOGO"] == _jogo_scan
             ].iloc[0]
 
-            linha_consenso = df_consenso[
+            linha_consenso = _df_consenso[
                 df_consenso["JOGO"] == _jogo_scan
             ].iloc[0]
 
@@ -9165,10 +9129,15 @@ with tab8:
 
         except Exception as e:
 
-            st.write(
-                f"Erro em {_jogo_scan}:",
-                e
-            )
+            erros_cs.append(f"Erro em {_jogo_scan}: {e}")
+
+
+    return lista_cs, erros_cs
+
+lista_cs, erros_cs = montar_scanner_cs(df_exg, df_consenso, _fonte_poisson, _mtime_poisson)
+
+for _erro in erros_cs:
+    st.write(_erro)
 
     # =========================================================
     # 📊 DATAFRAME FINAL
