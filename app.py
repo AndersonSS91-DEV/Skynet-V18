@@ -3513,6 +3513,172 @@ with tab1:
 
     st.markdown(_resumo_dedent(_resumo_html), unsafe_allow_html=True)
 
+# ============================================================
+# 📸 CARD INSTAGRAM — versão em IMAGEM (substitui o bloco de HTML)
+# Cole isso no lugar de TODO o bloco antigo que ia de
+#   st.markdown("### 📸 Card para Instagram")
+# até
+#   st.markdown(_ig_dedent(_ig_html), unsafe_allow_html=True)
+#
+# Requer o arquivo card_instagram_engine.py na mesma pasta do app.
+# ============================================================
+
+from card_instagram_engine import gerar_card_instagram
+
+st.markdown("---")
+st.markdown("### 📸 Card para Instagram")
+
+# ------------------------------------------------------------
+# ÍNDICE TÁTICO / PERFIL / CONFIANÇA (rodapé do card)
+# — igual ao código original, sem mudanças —
+# ------------------------------------------------------------
+_ig_indice_tatico = int(round(score_ofensivo)) if pd.notna(score_ofensivo) else 50
+
+_ig_dominio = dominio_ofensivo(radar_home_consenso, radar_away_consenso)
+_ig_perfil_label = {
+    "HOME": "CASA FORTE",
+    "AWAY": "VISITANTE FORTE",
+    "EQUILIBRADO": "EQUILIBRADO",
+}.get(_ig_dominio, "EQUILIBRADO")
+
+_ig_score_poisson = poisson_score(matriz_consenso)
+if _ig_score_poisson > 75:
+    _ig_confianca = "ALTA"
+elif _ig_score_poisson > 55:
+    _ig_confianca = "MÉDIA"
+else:
+    _ig_confianca = "BAIXA"
+
+_ig_btts_pct, _ = calcular_btts_e_odd(matriz_consenso / 100)
+
+def _ig_prob_mercado(chave):
+    try:
+        if chave == "LAY00":
+            return matriz_consenso[0][0]
+        if chave == "LAY01":
+            return matriz_consenso[0][1]
+        if chave == "LAY10":
+            return matriz_consenso[1][0]
+        if chave == "LAYGH":
+            return matriz_consenso[4][0] + matriz_consenso[4][1]
+        if chave == "LAYGA":
+            return matriz_consenso[0][4] + matriz_consenso[1][4]
+        if chave == "OVER15FT":
+            return _resumo_ou["Over 1.5"]
+        if chave == "OVER25FT":
+            return _resumo_ou["Over 2.5"]
+        if chave == "UNDER25FT":
+            return _resumo_ou["Under 2.5"]
+        if chave == "BTTS_YES":
+            return _ig_btts_pct
+        if chave == "OVER05HT":
+            return pd.to_numeric(linha_ht.get("Prob_Gol_HT"), errors="coerce")
+        if chave == "UNDER15HT":
+            v = pd.to_numeric(linha_ht.get("Prob_Gol_HT"), errors="coerce")
+            return (100 - v) if pd.notna(v) else None
+    except Exception:
+        return None
+    return None
+
+_ig_icone_mercado = {
+    "LAY00": "🥅", "LAY01": "👟⚽", "LAY10": "👟⚽",
+    "LAYGH": "🥅", "LAYGA": "🥅",
+    "OVER05HT": "⏱️⚽", "UNDER15HT": "🧊⚽",
+    "OVER15FT": "🔥⚽", "OVER25FT": "🔥⚽", "UNDER25FT": "🧊⚽",
+    "BTTS_YES": "🤝⚽",
+}
+
+_ig_paleta = ["#ef4444", "#f97316", "#3b82f6", "#a855f7", "#22c55e", "#eab308"]
+
+# já vem ordenado do maior pro menor valor (sem Lay 2x2)
+_ig_top4 = _resumo_mercados_ml[:4]
+
+# ------------------------------------------------------------
+# Monta a lista de mercados no formato que o gerador espera:
+# (label, valor_0_100, cor, emoji, texto_da_probabilidade)
+# ------------------------------------------------------------
+_ig_mercados_fmt = []
+for _i, (_lbl, _val) in enumerate(_ig_top4):
+    _cor = _ig_paleta[_i % len(_ig_paleta)]
+    _chave = next((k for k, v in _resumo_label_mercados.items() if v == _lbl), "")
+    _icone = _ig_icone_mercado.get(_chave, "⚽")
+    _prob = _ig_prob_mercado(_chave)
+    _prob_txt = f"{_prob:.2f}%" if _prob is not None and pd.notna(_prob) else "—"
+    _ig_mercados_fmt.append((_lbl, float(_val), _cor, _icone, _prob_txt))
+
+# ------------------------------------------------------------
+# Top 5 placares no formato (gols_home, gols_away, "xx.xx%")
+# ------------------------------------------------------------
+_ig_top5_fmt = [
+    (int(_lin["Gols_Home"]), int(_lin["Gols_Away"]), str(_lin["Probabilidade%"]))
+    for _, _lin in _resumo_top5.iterrows()
+]
+
+# ------------------------------------------------------------
+# Over/Under no formato {"0.5": (over, under), ...}
+# ------------------------------------------------------------
+_ig_ou_fmt = {
+    linha: (_resumo_ou[f"Over {linha}"], _resumo_ou[f"Under {linha}"])
+    for linha in ["0.5", "1.5", "2.5"]
+}
+
+# ------------------------------------------------------------
+# Escudos: se _resumo_crest_h_html / _resumo_crest_a_html forem
+# tags <img src="..."> (url ou base64), o gerador consegue extrair
+# a imagem sozinho. Se não conseguir, cai automaticamente no
+# fallback com as iniciais do time dentro de um círculo.
+# ------------------------------------------------------------
+_ig_png = gerar_card_instagram(
+    home=_resumo_home,
+    away=_resumo_away,
+    crest_home=_resumo_crest_h_html,
+    crest_away=_resumo_crest_a_html,
+    odd_casa=_resumo_fmt2(_resumo_odd_casa),
+    odd_empate=_resumo_fmt2(_resumo_odd_empate),
+    odd_fora=_resumo_fmt2(_resumo_odd_fora),
+    odd_justa_casa=_resumo_odd_justa_casa,
+    odd_justa_empate=_resumo_odd_justa_empate,
+    odd_justa_fora=_resumo_odd_justa_fora,
+    top5=_ig_top5_fmt,
+    over_under=_ig_ou_fmt,
+    top4_mercados=_ig_mercados_fmt,
+    sinal_texto=_resumo_texto_sinal_principal,
+    sinal_cor=_resumo_cor_sinal_principal,
+    mostrar_live=_resumo_mostrar_live,
+    indice_tatico=_ig_indice_tatico,
+    perfil_label=_ig_perfil_label,
+    confianca=_ig_confianca,
+    brand="@laratodata",
+)
+
+# ------------------------------------------------------------
+# Mostra a imagem no app + botão de download já pronto pra postar
+# ------------------------------------------------------------
+st.image(_ig_png, use_container_width=True)
+st.download_button(
+    label="📥 Baixar card para Instagram",
+    data=_ig_png,
+    file_name=f"card_{_resumo_home}_{_resumo_away}.png".replace(" ", "_"),
+    mime="image/png",
+    use_container_width=True,
+)
+
+
+# =========================================
+# ABA 2 — DADOS COMPLETOS
+# =========================================
+
+@st.cache_data(show_spinner=False)
+def carregar_aba_generica(fonte, mtime, aba):
+    xls_local = pd.ExcelFile(io.BytesIO(fonte) if isinstance(fonte, bytes) else fonte)
+    return pd.read_excel(xls_local, aba)
+
+with tab2:
+    for aba in xls.sheet_names:
+        with st.expander(aba):
+            df_temp = carregar_aba_generica(_fonte_poisson, _mtime_poisson, aba)
+            st.dataframe(df_temp, use_container_width=True)
+
 
 # =========================================
 # ABA 3 — POISSON MGF
@@ -5346,115 +5512,62 @@ Home {home_emoji}   x   Away {away_emoji}
         # =========================================
         # 🎯 FLAGS
         # =========================================
-        # =========================================
-        # 🎯 FILTRO LAY AWAY — ÚNICO E DEFINITIVO
-        # =========================================
-
-        def is_lay_away(x):
-            return (
-                isinstance(x, str)
-                and "lay away" in x.lower()
-            )
-
-        # -----------------------------------------
-        # Dados básicos
-        # -----------------------------------------
-        dir_poisson = str(row.get("Poisson_Direcao", ""))
-        dir_ia = str(row.get("IA_Direcao", ""))
-
-        league = str(row.get("League", "")).lower()
-        home_name = str(
-            row.get("Home_Team", row.get("Home", ""))
-        ).lower()
-        away_name = str(
-            row.get("Visitor_Team", row.get("Away", ""))
-        ).lower()
-
-        odd_home = pd.to_numeric(
-            row.get("Odds_Casa", np.nan),
-            errors="coerce"
-        )
-
-        odd_away = pd.to_numeric(
-            row.get("Odds_Visitante", np.nan),
-            errors="coerce"
-        )
-
-        odd_over25 = pd.to_numeric(
-            row.get("Odds_Over_2,5FT", np.nan),
-            errors="coerce"
-        )
-
-        odd_under25 = pd.to_numeric(
-            row.get("Odds_Under_2,5FT", np.nan),
-            errors="coerce"
-        )
-
-        cv_away = pd.to_numeric(
-            row.get("CV_CG_A_01", np.nan),
-            errors="coerce"
-        )
-
-        media_away = pd.to_numeric(
-            row.get("Media_CG_A_01", np.nan),
-            errors="coerce"
-        )
+        passou_filtro_la = True
+        passou_filtro_lh = True
 
         # =========================================
-        # 1️⃣ DIREÇÃO — PRECISA SER LAY AWAY
-        # =========================================
-
-        passou_filtro_la = (
-            is_lay_away(dir_poisson)
-            or
-            is_lay_away(dir_ia)
-        )
-
-        # =========================================
-        # 2️⃣ CONFLITO / ANALISAR
+        # 🚫 CONFLITOS
         # =========================================
 
         if "conflito" in dir_poisson.lower():
+
             passou_filtro_la = False
+            passou_filtro_lh = False
 
         if "conflito" in dir_ia.lower():
+
             passou_filtro_la = False
+            passou_filtro_lh = False
 
         if "analisar" in dir_ia.lower():
+
             passou_filtro_la = False
+            passou_filtro_lh = False
 
         # =========================================
-        # 3️⃣ DADOS OBRIGATÓRIOS
+        # 🚫 NÃO É LAY AWAY
         # =========================================
 
-        if (
-            pd.isna(odd_home)
+        if not (
+            is_lay_away(dir_poisson)
             or
-            pd.isna(odd_away)
+            is_lay_away(dir_ia)
+        ):
+
+            passou_filtro_la = False
+
+        # =========================================
+        # 🚫 NÃO É LAY HOME
+        # =========================================
+
+        if not (
+            is_lay_home(dir_poisson)
             or
-            pd.isna(odd_over25)
+            is_lay_home(dir_ia)
         ):
-            passou_filtro_la = False
+
+            passou_filtro_lh = False
 
         # =========================================
-        # 4️⃣ AWAY NÃO PODE SER FAVORITO
+        # 🚫 BLACKLIST
         # =========================================
 
-        if (
-            pd.notna(odd_home)
-            and
-            pd.notna(odd_away)
-            and
-            odd_away < odd_home
-        ):
-            passou_filtro_la = False
-
-        # =========================================
-        # 5️⃣ BLACKLIST
-        #    League + Home + Away
-        # =========================================
+        league = str(
+            row.get("League", "")
+        ).lower()
 
         blacklist_keywords = [
+
             "u17",
             "u19",
             "u20",
@@ -5463,117 +5576,151 @@ Home {home_emoji}   x   Away {away_emoji}
             "youth",
             "juniores",
             "juvenil",
+
             "women",
             "woman",
             "feminino",
             "fem",
+
             "reserve",
             "reserves",
+
             "friendly",
-            "amistoso",
+            "amistoso", 
             "serie c",
             "serie d",
             "nwsl",
             "copa paulista"
         ]
 
-        texto_blacklist = (
-            league
-            + " "
-            + home_name
-            + " "
-            + away_name
-        )
-
         if any(
-            palavra in texto_blacklist
-            for palavra in blacklist_keywords
+            word in league
+            for word in blacklist_keywords
         ):
+
             passou_filtro_la = False
+            passou_filtro_lh = False
 
         # =========================================
-        # 6️⃣ UNDER 2.5
+        # 🚫 UNDER 2.5
         # =========================================
 
-        if (
-            pd.notna(odd_under25)
-            and
-            odd_under25 > 8.50
-        ):
-            passou_filtro_la = False
-
-        # =========================================
-        # 7️⃣ CV AWAY
-        # =========================================
-
-        if (
-            pd.notna(cv_away)
-            and
-            cv_away > 2.00
-        ):
-            passou_filtro_la = False
-
-        # =========================================
-        # 8️⃣ AWAY ROCKET
-        # =========================================
-
-        away_is_rocket = (
-            pd.notna(media_away)
-            and
-            pd.notna(cv_away)
-            and
-            2.70 <= media_away <= 3.00
-            and
-            cv_away <= 0.90
+        odd_under25 = row.get(
+            "Odds_Under_2,5FT",
+            np.nan
         )
 
-        if away_is_rocket:
-            passou_filtro_la = False
+        if pd.notna(odd_under25):
+
+            if odd_under25 > 8.50:
+
+                passou_filtro_la = False
+                passou_filtro_lh = False
 
         # =========================================
-        # 9️⃣ AWAY VOLCANO
+        # 🚫 CV AWAY
         # =========================================
 
-        away_is_volcano = (
-            pd.notna(media_away)
-            and
-            pd.notna(cv_away)
-            and
-            2.80 <= media_away <= 5.50
-            and
-            cv_away <= 0.80
+        CV_CG_A_01 = row.get(
+            "CV_CG_A_01",
+            np.nan
         )
 
-        if away_is_volcano:
-            passou_filtro_la = False
-
-        # =========================================
-        # 🔟 LAY AWAY PRO
-        # =========================================
-
-        lay_away_pro = (
-            pd.notna(odd_home)
-            and
-            pd.notna(odd_away)
-            and
-            pd.notna(odd_over25)
-            and
-            odd_home <= 1.90
-            and
-            odd_over25 >= 1.60
-            and
-            2.20 <= odd_away <= 5.00
+        Media_CG_A_01 = row.get(
+            "Media_CG_A_01",
+            np.nan
         )
 
-        if not lay_away_pro:
+        if pd.notna(CV_CG_A_01):
+
+            if CV_CG_A_01 > 2.00:
+
+                passou_filtro_la = False
+
+        # =========================================
+        # 🚫 AWAY ROCKET
+        # =========================================
+
+        def away_is_rocket():
+
+            return (
+                2.70 <= Media_CG_A_01 <= 3.00
+                and
+                CV_CG_A_01 <= 0.90
+            )
+
+        # =========================================
+        # 🚫 AWAY VOLCANO
+        # =========================================
+
+        def away_is_volcano():
+
+            return (
+                2.80 <= Media_CG_A_01 <= 5.50
+                and
+                CV_CG_A_01 <= 0.80
+            )
+
+        if away_is_rocket():
+
+            passou_filtro_la = False
+
+        if away_is_volcano():
+
             passou_filtro_la = False
 
         # =========================================
-        # 🚫 SEGURANÇA FINAL
+        # 🚫 CV HOME
         # =========================================
 
-        if not passou_filtro_la:
-            tier_la = ""
+        CV_CG_H_01 = row.get(
+            "CV_CG_H_01",
+            np.nan
+        )
+
+        Media_CG_H_01 = row.get(
+            "Media_CG_H_01",
+            np.nan
+        )
+
+        if pd.notna(CV_CG_H_01):
+
+            if CV_CG_H_01 > 2.00:
+
+                passou_filtro_lh = False
+
+        # =========================================
+        # 🚫 HOME ROCKET
+        # =========================================
+
+        def home_is_rocket():
+
+            return (
+                2.70 <= Media_CG_H_01 <= 3.00
+                and
+                CV_CG_H_01 <= 0.90
+            )
+
+        # =========================================
+        # 🚫 HOME VOLCANO
+        # =========================================
+
+        def home_is_volcano():
+
+            return (
+                2.80 <= Media_CG_H_01 <= 5.50
+                and
+                CV_CG_H_01 <= 0.80
+            )
+
+        if home_is_rocket():
+
+            passou_filtro_lh = False
+
+        if home_is_volcano():
+
+            passou_filtro_lh = False
+
         # =========================================
         # 💜 FLAG ELITE BLOQUEADO
         # =========================================
