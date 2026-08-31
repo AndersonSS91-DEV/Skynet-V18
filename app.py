@@ -5512,62 +5512,115 @@ Home {home_emoji}   x   Away {away_emoji}
         # =========================================
         # 🎯 FLAGS
         # =========================================
-        passou_filtro_la = True
-        passou_filtro_lh = True
-
         # =========================================
-        # 🚫 CONFLITOS
+        # 🎯 FILTRO LAY AWAY — ÚNICO E DEFINITIVO
         # =========================================
 
-        if "conflito" in dir_poisson.lower():
+        def is_lay_away(x):
+            return (
+                isinstance(x, str)
+                and "lay away" in x.lower()
+            )
 
-            passou_filtro_la = False
-            passou_filtro_lh = False
+        # -----------------------------------------
+        # Dados básicos
+        # -----------------------------------------
+        dir_poisson = str(row.get("Poisson_Direcao", ""))
+        dir_ia = str(row.get("IA_Direcao", ""))
 
-        if "conflito" in dir_ia.lower():
+        league = str(row.get("League", "")).lower()
+        home_name = str(
+            row.get("Home_Team", row.get("Home", ""))
+        ).lower()
+        away_name = str(
+            row.get("Visitor_Team", row.get("Away", ""))
+        ).lower()
 
-            passou_filtro_la = False
-            passou_filtro_lh = False
+        odd_home = pd.to_numeric(
+            row.get("Odds_Casa", np.nan),
+            errors="coerce"
+        )
 
-        if "analisar" in dir_ia.lower():
+        odd_away = pd.to_numeric(
+            row.get("Odds_Visitante", np.nan),
+            errors="coerce"
+        )
 
-            passou_filtro_la = False
-            passou_filtro_lh = False
+        odd_over25 = pd.to_numeric(
+            row.get("Odds_Over_2,5FT", np.nan),
+            errors="coerce"
+        )
+
+        odd_under25 = pd.to_numeric(
+            row.get("Odds_Under_2,5FT", np.nan),
+            errors="coerce"
+        )
+
+        cv_away = pd.to_numeric(
+            row.get("CV_CG_A_01", np.nan),
+            errors="coerce"
+        )
+
+        media_away = pd.to_numeric(
+            row.get("Media_CG_A_01", np.nan),
+            errors="coerce"
+        )
 
         # =========================================
-        # 🚫 NÃO É LAY AWAY
+        # 1️⃣ DIREÇÃO — PRECISA SER LAY AWAY
         # =========================================
 
-        if not (
+        passou_filtro_la = (
             is_lay_away(dir_poisson)
             or
             is_lay_away(dir_ia)
-        ):
+        )
 
+        # =========================================
+        # 2️⃣ CONFLITO / ANALISAR
+        # =========================================
+
+        if "conflito" in dir_poisson.lower():
+            passou_filtro_la = False
+
+        if "conflito" in dir_ia.lower():
+            passou_filtro_la = False
+
+        if "analisar" in dir_ia.lower():
             passou_filtro_la = False
 
         # =========================================
-        # 🚫 NÃO É LAY HOME
+        # 3️⃣ DADOS OBRIGATÓRIOS
         # =========================================
 
-        if not (
-            is_lay_home(dir_poisson)
+        if (
+            pd.isna(odd_home)
             or
-            is_lay_home(dir_ia)
+            pd.isna(odd_away)
+            or
+            pd.isna(odd_over25)
         ):
-
-            passou_filtro_lh = False
+            passou_filtro_la = False
 
         # =========================================
-        # 🚫 BLACKLIST
+        # 4️⃣ AWAY NÃO PODE SER FAVORITO
         # =========================================
 
-        league = str(
-            row.get("League", "")
-        ).lower()
+        if (
+            pd.notna(odd_home)
+            and
+            pd.notna(odd_away)
+            and
+            odd_away < odd_home
+        ):
+            passou_filtro_la = False
+
+        # =========================================
+        # 5️⃣ BLACKLIST
+        #    League + Home + Away
+        # =========================================
 
         blacklist_keywords = [
-
             "u17",
             "u19",
             "u20",
@@ -5576,151 +5629,117 @@ Home {home_emoji}   x   Away {away_emoji}
             "youth",
             "juniores",
             "juvenil",
-
             "women",
             "woman",
             "feminino",
             "fem",
-
             "reserve",
             "reserves",
-
             "friendly",
-            "amistoso", 
+            "amistoso",
             "serie c",
             "serie d",
             "nwsl",
             "copa paulista"
         ]
 
+        texto_blacklist = (
+            league
+            + " "
+            + home_name
+            + " "
+            + away_name
+        )
+
         if any(
-            word in league
-            for word in blacklist_keywords
+            palavra in texto_blacklist
+            for palavra in blacklist_keywords
         ):
-
-            passou_filtro_la = False
-            passou_filtro_lh = False
-
-        # =========================================
-        # 🚫 UNDER 2.5
-        # =========================================
-
-        odd_under25 = row.get(
-            "Odds_Under_2,5FT",
-            np.nan
-        )
-
-        if pd.notna(odd_under25):
-
-            if odd_under25 > 8.50:
-
-                passou_filtro_la = False
-                passou_filtro_lh = False
-
-        # =========================================
-        # 🚫 CV AWAY
-        # =========================================
-
-        CV_CG_A_01 = row.get(
-            "CV_CG_A_01",
-            np.nan
-        )
-
-        Media_CG_A_01 = row.get(
-            "Media_CG_A_01",
-            np.nan
-        )
-
-        if pd.notna(CV_CG_A_01):
-
-            if CV_CG_A_01 > 2.00:
-
-                passou_filtro_la = False
-
-        # =========================================
-        # 🚫 AWAY ROCKET
-        # =========================================
-
-        def away_is_rocket():
-
-            return (
-                2.70 <= Media_CG_A_01 <= 3.00
-                and
-                CV_CG_A_01 <= 0.90
-            )
-
-        # =========================================
-        # 🚫 AWAY VOLCANO
-        # =========================================
-
-        def away_is_volcano():
-
-            return (
-                2.80 <= Media_CG_A_01 <= 5.50
-                and
-                CV_CG_A_01 <= 0.80
-            )
-
-        if away_is_rocket():
-
-            passou_filtro_la = False
-
-        if away_is_volcano():
-
             passou_filtro_la = False
 
         # =========================================
-        # 🚫 CV HOME
+        # 6️⃣ UNDER 2.5
         # =========================================
 
-        CV_CG_H_01 = row.get(
-            "CV_CG_H_01",
-            np.nan
+        if (
+            pd.notna(odd_under25)
+            and
+            odd_under25 > 8.50
+        ):
+            passou_filtro_la = False
+
+        # =========================================
+        # 7️⃣ CV AWAY
+        # =========================================
+
+        if (
+            pd.notna(cv_away)
+            and
+            cv_away > 2.00
+        ):
+            passou_filtro_la = False
+
+        # =========================================
+        # 8️⃣ AWAY ROCKET
+        # =========================================
+
+        away_is_rocket = (
+            pd.notna(media_away)
+            and
+            pd.notna(cv_away)
+            and
+            2.70 <= media_away <= 3.00
+            and
+            cv_away <= 0.90
         )
 
-        Media_CG_H_01 = row.get(
-            "Media_CG_H_01",
-            np.nan
+        if away_is_rocket:
+            passou_filtro_la = False
+
+        # =========================================
+        # 9️⃣ AWAY VOLCANO
+        # =========================================
+
+        away_is_volcano = (
+            pd.notna(media_away)
+            and
+            pd.notna(cv_away)
+            and
+            2.80 <= media_away <= 5.50
+            and
+            cv_away <= 0.80
         )
 
-        if pd.notna(CV_CG_H_01):
-
-            if CV_CG_H_01 > 2.00:
-
-                passou_filtro_lh = False
+        if away_is_volcano:
+            passou_filtro_la = False
 
         # =========================================
-        # 🚫 HOME ROCKET
+        # 🔟 LAY AWAY PRO
         # =========================================
 
-        def home_is_rocket():
+        lay_away_pro = (
+            pd.notna(odd_home)
+            and
+            pd.notna(odd_away)
+            and
+            pd.notna(odd_over25)
+            and
+            odd_home <= 1.90
+            and
+            odd_over25 >= 1.60
+            and
+            2.20 <= odd_away <= 5.00
+        )
 
-            return (
-                2.70 <= Media_CG_H_01 <= 3.00
-                and
-                CV_CG_H_01 <= 0.90
-            )
+        if not lay_away_pro:
+            passou_filtro_la = False
 
         # =========================================
-        # 🚫 HOME VOLCANO
+        # 🚫 SEGURANÇA FINAL
         # =========================================
 
-        def home_is_volcano():
-
-            return (
-                2.80 <= Media_CG_H_01 <= 5.50
-                and
-                CV_CG_H_01 <= 0.80
-            )
-
-        if home_is_rocket():
-
-            passou_filtro_lh = False
-
-        if home_is_volcano():
-
-            passou_filtro_lh = False
-
+        if not passou_filtro_la:
+            tier_la = ""
         # =========================================
         # 💜 FLAG ELITE BLOQUEADO
         # =========================================
