@@ -606,62 +606,52 @@ df_consenso["JOGO"] = (df_consenso["Home_Team"] + " x " + df_consenso["Visitor_T
 for df in (df_mgf, df_exg, df_vg, df_ht, df_cantos):
     df["JOGO"] = df["Home_Team"] + " x " + df["Visitor_Team"]
 
-# ============================================================
-# 🔧 FIX 1 — SCORE OFENSIVO (linhas ~610–655 do arquivo original)
-# ============================================================
+# =========================================
+# 🔥 SCORE OFENSIVO CONSENSO 0–100
+# =========================================
 
-@st.cache_data(show_spinner="Calculando Score Ofensivo...")
-def calcular_score_ofensivo(_df_mgf, _df_exg, _df_vg, fonte_poisson, mtime_poisson):
+score_raw = []
 
-    # 🔥 SCORE OFENSIVO CONSENSO 0–100
-    # =========================================
+for _, row in df_mgf.iterrows():
 
-    score_raw = []
+    jogo = row["Home_Team"] + " x " + row["Visitor_Team"]
 
-    for _, row in _df_mgf.iterrows():
+    exg_row = df_exg[df_exg["Home_Team"].eq(row["Home_Team"]) &
+                     df_exg["Visitor_Team"].eq(row["Visitor_Team"])]
 
-        jogo = row["Home_Team"] + " x " + row["Visitor_Team"]
+    vg_row  = df_vg[df_vg["Home_Team"].eq(row["Home_Team"]) &
+                    df_vg["Visitor_Team"].eq(row["Visitor_Team"])]
 
-        exg_row = _df_exg[_df_exg["Home_Team"].eq(row["Home_Team"]) &
-                         _df_exg["Visitor_Team"].eq(row["Visitor_Team"])]
+    if exg_row.empty or vg_row.empty:
+        score_raw.append(np.nan)
+        continue
 
-        vg_row  = _df_vg[_df_vg["Home_Team"].eq(row["Home_Team"]) &
-                        _df_vg["Visitor_Team"].eq(row["Visitor_Team"])]
+    exg_row = exg_row.iloc[0]
+    vg_row  = vg_row.iloc[0]
 
-        if exg_row.empty or vg_row.empty:
-            score_raw.append(np.nan)
-            continue
+    # eficiência
+    ief_home = (1 / row["CHM"]) * 100 if row["CHM"] > 0 else 0
+    ief_away = (1 / row["CAM"]) * 100 if row["CAM"] > 0 else 0
 
-        exg_row = exg_row.iloc[0]
-        vg_row  = vg_row.iloc[0]
+    # normalizações radar
+    def norm_exg(x): return min(x * 40, 100)
+    def norm_shots(x): return min((x / 15) * 100, 100)
 
-        # eficiência
-        ief_home = (1 / row["CHM"]) * 100 if row["CHM"] > 0 else 0
-        ief_away = (1 / row["CAM"]) * 100 if row["CAM"] > 0 else 0
+    radar_home = np.mean([
+        [ief_home, norm_exg(row["ExG_Home_MGF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], row["BTTS_%"]],
+        [exg_row["FAH"], norm_exg(exg_row["ExG_Home_ATKxDEF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], exg_row["BTTS_%"]],
+        [exg_row["FAH"], norm_exg(vg_row["ExG_Home_VG"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], vg_row["BTTS_%"]]
+    ], axis=0)
 
-        # normalizações radar
-        def norm_exg(x): return min(x * 40, 100)
-        def norm_shots(x): return min((x / 15) * 100, 100)
+    radar_away = np.mean([
+        [ief_away, norm_exg(row["ExG_Away_MGF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], row["BTTS_%"]],
+        [exg_row["FAA"], norm_exg(exg_row["ExG_Away_ATKxDEF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], exg_row["BTTS_%"]],
+        [exg_row["FAA"], norm_exg(vg_row["ExG_Away_VG"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], vg_row["BTTS_%"]]
+    ], axis=0)
 
-        radar_home = np.mean([
-            [ief_home, norm_exg(row["ExG_Home_MGF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], row["BTTS_%"]],
-            [exg_row["FAH"], norm_exg(exg_row["ExG_Home_ATKxDEF"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], exg_row["BTTS_%"]],
-            [exg_row["FAH"], norm_exg(vg_row["ExG_Home_VG"]), norm_shots(row["CHM"]), exg_row["Precisao_CG_H"], vg_row["BTTS_%"]]
-        ], axis=0)
+    score = ((sum(radar_home)/5 + sum(radar_away)/5) / 2)
+    score_raw.append(score)
 
-        radar_away = np.mean([
-            [ief_away, norm_exg(row["ExG_Away_MGF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], row["BTTS_%"]],
-            [exg_row["FAA"], norm_exg(exg_row["ExG_Away_ATKxDEF"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], exg_row["BTTS_%"]],
-            [exg_row["FAA"], norm_exg(vg_row["ExG_Away_VG"]), norm_shots(row["CAM"]), exg_row["Precisao_CG_A"], vg_row["BTTS_%"]]
-        ], axis=0)
-
-        score = ((sum(radar_home)/5 + sum(radar_away)/5) / 2)
-        score_raw.append(score)
-
-
-    return score_raw
-
-score_raw = calcular_score_ofensivo(df_mgf, df_exg, df_vg, _fonte_poisson, _mtime_poisson)
 df_mgf["Score_Ofensivo"] = score_raw
 
 # =========================================    
@@ -2172,228 +2162,220 @@ if not jogos_semelhantes.empty:
 
 df_cs = pd.DataFrame(resultado_cs)
 
-# ============================================================
-# 🔧 FIX 2 — SCANNER GLOBAL (linhas ~2166–2378 do arquivo original)
-# ============================================================
+# =========================================
+# SCANNER GLOBAL V30.1.5
+# =========================================
 
-@st.cache_data(show_spinner="Calculando Scanner Global...")
-def calcular_scanner_global(_df_consenso, _df_ml, _knn, _scaler_ml, fonte_poisson, mtime_poisson):
+scanner_global = []
 
-    scanner_global = []
+if knn is not None:
 
-    if _knn is not None:
+    for _, jogo_dia in df_consenso.iterrows():
 
-        for _, jogo_dia in _df_consenso.iterrows():
+        jogo_ml = preparar_jogo_ml(jogo_dia)
 
-            jogo_ml = preparar_jogo_ml(jogo_dia)
+        if jogo_ml is None:
+            continue
 
-            if jogo_ml is None:
-                continue
+        jogo_scaled = scaler_ml.transform(jogo_ml)
 
-            jogo_scaled = _scaler_ml.transform(jogo_ml)
+        distancias, indices = knn.kneighbors(jogo_scaled)
 
-            distancias, indices = _knn.kneighbors(jogo_scaled)
+        semelhantes = (
+            df_ml
+            .iloc[indices[0]]
+            .copy()
+            .reset_index(drop=True)
+        )
 
-            semelhantes = (
-                _df_ml
-                .iloc[indices[0]]
-                .copy()
-                .reset_index(drop=True)
-            )
+        semelhantes["DISTANCIA"] = distancias[0]
 
-            semelhantes["DISTANCIA"] = distancias[0]
+        dist_max = semelhantes["DISTANCIA"].max()
+        dist_min = semelhantes["DISTANCIA"].min()
 
-            dist_max = semelhantes["DISTANCIA"].max()
-            dist_min = semelhantes["DISTANCIA"].min()
-
-            if dist_max > dist_min:
-
-                semelhantes["SIMILARIDADE"] = (
-                    100
-                    * (
-                        1
-                        - (
-                            semelhantes["DISTANCIA"] - dist_min
-                        )
-                        / (
-                            dist_max - dist_min
-                        )
-                    )
-                )
-
-            else:
-
-                semelhantes["SIMILARIDADE"] = 100.0
+        if dist_max > dist_min:
 
             semelhantes["SIMILARIDADE"] = (
-                semelhantes["SIMILARIDADE"]
-                .round(2)
+                100
+                * (
+                    1
+                    - (
+                        semelhantes["DISTANCIA"] - dist_min
+                    )
+                    / (
+                        dist_max - dist_min
+                    )
+                )
             )
 
-            total = len(semelhantes)
+        else:
 
-            if total == 0:
-                continue
+            semelhantes["SIMILARIDADE"] = 100.0
 
-            wr = {}
+        semelhantes["SIMILARIDADE"] = (
+            semelhantes["SIMILARIDADE"]
+            .round(2)
+        )
 
-            for mercado in [
-                "LAY00",
-                "LAY01",
-                "LAY10",
-                "LAY22",
-                "LAYGH",
-                "LAYGA"
-            ]:
+        total = len(semelhantes)
 
-                if mercado in semelhantes.columns:
+        if total == 0:
+            continue
 
-                    wr[mercado] = round(
-                        semelhantes[mercado].mean(),
-                        2
-                    )
+        wr = {}
 
-                else:
-
-                    wr[mercado] = np.nan
-
-            scanner_global.append({
-
-                "League": jogo_dia.get("League"),
-
-                "Home_Team": jogo_dia.get("Home_Team"),
-                "Visitor_Team": jogo_dia.get("Visitor_Team"),
-
-                "Result Home": jogo_dia.get("Result Home", "-"),
-                "Result Visitor": jogo_dia.get("Result Visitor", "-"),
-
-                "Result_Home_HT": jogo_dia.get("Result_Home_HT", "-"),
-                "Result_Visitor_HT": jogo_dia.get("Result_Visitor_HT", "-"),
-
-                "Similares": total,
-
-                "Similaridade Média": round(
-                    semelhantes["SIMILARIDADE"].mean(),
-                    2
-                ),
-
-                "LAY00": wr["LAY00"],
-
-                "LAY01": wr["LAY01"],
-
-                "LAY10": wr["LAY10"],
-
-                "LAY22": wr["LAY22"],
-
-                "LAYGH": wr["LAYGH"],
-
-                "LAYGA": wr["LAYGA"]
-
-            })
-
-    df_scanner = pd.DataFrame(scanner_global)
-
-    if not df_scanner.empty:
-
-        mercados = [
-
+        for mercado in [
             "LAY00",
             "LAY01",
             "LAY10",
             "LAY22",
             "LAYGH",
             "LAYGA"
+        ]:
 
-        ]
+            if mercado in semelhantes.columns:
 
-        # =====================================
-        # CONVERTE PARA %
-        # =====================================
+                wr[mercado] = round(
+                    semelhantes[mercado].mean(),
+                    2
+                )
 
-        df_scanner[mercados] = (
+            else:
 
-            df_scanner[mercados]
+                wr[mercado] = np.nan
 
-            .apply(
+        scanner_global.append({
 
-                pd.to_numeric,
+            "League": jogo_dia.get("League"),
 
-                errors="coerce"
+            "Home_Team": jogo_dia.get("Home_Team"),
+            "Visitor_Team": jogo_dia.get("Visitor_Team"),
 
-            )
+            "Result Home": jogo_dia.get("Result Home", "-"),
+            "Result Visitor": jogo_dia.get("Result Visitor", "-"),
 
-            * 100
+            "Result_Home_HT": jogo_dia.get("Result_Home_HT", "-"),
+            "Result_Visitor_HT": jogo_dia.get("Result_Visitor_HT", "-"),
 
-        )
+            "Similares": total,
 
-        # =====================================
-        # SCORE
-        # =====================================
+            "Similaridade Média": round(
+                semelhantes["SIMILARIDADE"].mean(),
+                2
+            ),
 
-        df_scanner["SG_SCORE"] = (
+            "LAY00": wr["LAY00"],
 
-            df_scanner[mercados]
+            "LAY01": wr["LAY01"],
 
-            .mean(axis=1)
+            "LAY10": wr["LAY10"],
 
-            * 0.70
+            "LAY22": wr["LAY22"],
 
-            +
+            "LAYGH": wr["LAYGH"],
 
-            df_scanner["Similaridade Média"]
+            "LAYGA": wr["LAYGA"]
 
-            * 0.30
+        })
 
-        )
+df_scanner = pd.DataFrame(scanner_global)
 
-        # =====================================
-        # RENOMEIA
-        # =====================================
+if not df_scanner.empty:
 
-        df_scanner = df_scanner.rename(
+    mercados = [
 
-            columns={
+        "LAY00",
+        "LAY01",
+        "LAY10",
+        "LAY22",
+        "LAYGH",
+        "LAYGA"
 
-                "LAY00": "Lay 0x0",
+    ]
 
-                "LAY01": "Lay 0x1",
+    # =====================================
+    # CONVERTE PARA %
+    # =====================================
 
-                "LAY10": "Lay 1x0",
+    df_scanner[mercados] = (
 
-                "LAY22": "Lay 2x2",
+        df_scanner[mercados]
 
-                "LAYGH": "Lay GH",
+        .apply(
 
-                "LAYGA": "Lay GA"
+            pd.to_numeric,
 
-            }
-
-        )
-
-        # =====================================
-        # ORDENA
-        # =====================================
-
-        df_scanner = (
-
-            df_scanner
-
-            .sort_values(
-
-                "SG_SCORE",
-
-                ascending=False
-
-            )
-
-            .reset_index(drop=True)
+            errors="coerce"
 
         )
 
-    return df_scanner
+        * 100
 
-df_scanner = calcular_scanner_global(df_consenso, df_ml, knn, scaler_ml, _fonte_poisson, _mtime_poisson)
+    )
 
+    # =====================================
+    # SCORE
+    # =====================================
+
+    df_scanner["SG_SCORE"] = (
+
+        df_scanner[mercados]
+
+        .mean(axis=1)
+
+        * 0.70
+
+        +
+
+        df_scanner["Similaridade Média"]
+
+        * 0.30
+
+    )
+
+    # =====================================
+    # RENOMEIA
+    # =====================================
+
+    df_scanner = df_scanner.rename(
+
+        columns={
+
+            "LAY00": "Lay 0x0",
+
+            "LAY01": "Lay 0x1",
+
+            "LAY10": "Lay 1x0",
+
+            "LAY22": "Lay 2x2",
+
+            "LAYGH": "Lay GH",
+
+            "LAYGA": "Lay GA"
+
+        }
+
+    )
+
+    # =====================================
+    # ORDENA
+    # =====================================
+
+    df_scanner = (
+
+        df_scanner
+
+        .sort_values(
+
+            "SG_SCORE",
+
+            ascending=False
+
+        )
+
+        .reset_index(drop=True)
+
+    )
 # =========================================
 # ABAS
 # =========================================
@@ -3060,7 +3042,476 @@ with tab1:
     except Exception as e:
         st.error(f"ERRO POISSON: {e}")
 
+# ============================================================
+# 🔧 BLOCO ATUALIZADO — CARD ÚNICO DE RESUMO (ABA 1)
+# ------------------------------------------------------------
+# Substitua, no seu script, TUDO desde:
+#     st.markdown("---")
+# (o que vem logo antes de "def _resumo_dedent(...)")
+# até a última linha do bloco original:
+#     st.markdown(_resumo_dedent(_resumo_html), unsafe_allow_html=True)
+# por este bloco inteiro.
+#
+# O QUE MUDOU:
+# 1) CSS totalmente refeito seguindo a identidade visual da Aba CS
+#    (gradiente de fundo, glow, accent lateral colorido, gauge
+#    circular tipo velocímetro, barras de progresso).
+# 2) Mercados do Machine Learning: agora traz TODOS os mercados do
+#    pipeline (Lay 0x0, Lay 0x1, Lay 1x0, Lay Goleada Casa/Fora,
+#    Over 0.5HT, Under 1.5HT, Over 1.5FT, Over 2.5FT, Under 2.5FT,
+#    Ambas Marcam), ORDENADOS por valor. O Lay 2x2 fica de fora
+#    de propósito (ainda em calibração).
+# 3) Novo bloco "Consenso · Quem Abre o Placar (CG)" — média das
+#    3 métricas (MGF, ATKxDEF, VG) de "Home_Abrir_Placar" e
+#    "Away_Abrir_Placar", exibida com gauge circular pra cada time.
+# 4) Notas automáticas: se o CG consenso de um time for > 5,00 →
+#    "CG alto para Home/Away"; se for < 2,00 → "CG baixo para
+#    Home/Away". Essas notas entram junto com o "Sinal Principal",
+#    separadas por vírgula.
+#
+# ⚠️ ATENÇÃO SOBRE OS LIMIARES DO CG (5,00 / 2,00):
+# Usei exatamente os valores que você passou, aplicados sobre o
+# consenso de "Home_Abrir_Placar"/"Away_Abrir_Placar" (que no seu
+# código aparecem rotulados como "(%)" em outros pontos da Aba 1
+# e da Aba CS). Se essa coluna realmente for uma porcentagem
+# 0–100 no seu Excel, esses limiares vão praticamente sempre
+# disparar "CG alto". Rode com um jogo de teste e, se for o caso,
+# me diga a faixa real da coluna que eu recalibro os números —
+# a lógica e a estrutura do card já ficam prontas, só o corte
+# muda.
+# ============================================================
 
+    st.markdown("---")
+
+    def _resumo_dedent(html_texto):
+        return "\n".join(l.lstrip() for l in html_texto.splitlines())
+
+    # --------------------------------------------------------
+    # 1) ODDS JUSTAS — CONSENSO ENTRE MGF, ATKxDEF E VG
+    # --------------------------------------------------------
+    def _resumo_media_segura(*valores):
+        vals = [pd.to_numeric(v, errors="coerce") for v in valores]
+        vals = [v for v in vals if pd.notna(v)]
+        return float(np.mean(vals)) if vals else np.nan
+
+    _resumo_odd_justa_casa = _resumo_media_segura(
+        linha_mgf.get("Odd_Justa_Home"),
+        linha_exg.get("Odd_Justa_Home"),
+        linha_vg.get("Odd_Justa_Home"),
+    )
+    _resumo_odd_justa_empate = _resumo_media_segura(
+        linha_mgf.get("Odd_Justa_Draw"),
+        linha_exg.get("Odd_Justa_Draw"),
+        linha_vg.get("Odd_Justa_Draw"),
+    )
+    _resumo_odd_justa_fora = _resumo_media_segura(
+        linha_mgf.get("Odd_Justa_Away"),
+        linha_exg.get("Odd_Justa_Away"),
+        linha_vg.get("Odd_Justa_Away"),
+    )
+
+    _resumo_odd_casa = (
+        linha_csv.get("Odds_Casa", np.nan) if not linha_csv.empty
+        else linha_mgf.get("Odds_Casa", np.nan)
+    )
+    _resumo_odd_empate = (
+        linha_csv.get("Odds_Empate", np.nan) if not linha_csv.empty
+        else linha_mgf.get("Odds_Empate", np.nan)
+    )
+    _resumo_odd_fora = (
+        linha_csv.get("Odds_Visitante", np.nan) if not linha_csv.empty
+        else linha_mgf.get("Odds_Visitante", np.nan)
+    )
+
+    def _resumo_fmt2(v):
+        v = pd.to_numeric(v, errors="coerce")
+        return f"{v:.2f}" if pd.notna(v) else "—"
+
+    # --------------------------------------------------------
+    # 2) TOP 5 PLACARES + OVER/UNDER
+    # --------------------------------------------------------
+    _resumo_top5 = top_placares(matriz_consenso, n=5)
+    _resumo_ou = calcular_over_under(matriz_consenso)
+
+    # --------------------------------------------------------
+    # 3) ESCUDOS + NOMES
+    # --------------------------------------------------------
+    _resumo_home = linha_exg.get("Home_Team", jogo.split(" x ")[0])
+    _resumo_away = linha_exg.get("Visitor_Team", jogo.split(" x ")[-1])
+    _resumo_crest_h = escudo_base64(_resumo_home)
+    _resumo_crest_a = escudo_base64(_resumo_away)
+    _resumo_crest_h_html = (
+        f'<img src="{_resumo_crest_h}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">'
+        if _resumo_crest_h else "⚽"
+    )
+    _resumo_crest_a_html = (
+        f'<img src="{_resumo_crest_a}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">'
+        if _resumo_crest_a else "⚽"
+    )
+
+    # --------------------------------------------------------
+    # 4) SINAL PRINCIPAL — Tier_LA / Tier_LH (Aba IA)
+    # --------------------------------------------------------
+    _resumo_tier_la = ""
+    _resumo_tier_lh = ""
+
+    if not df_rank_la.empty:
+        _home_key = str(_resumo_home).strip().lower()
+        _linha_la = df_rank_la[df_rank_la["Home_Key"] == _home_key]
+        if not _linha_la.empty:
+            _resumo_tier_la = str(_linha_la.iloc[0].get("Tier_LA", "") or "")
+
+    if not df_rank_lh.empty:
+        _away_key = str(_resumo_away).strip().lower()
+        _linha_lh = df_rank_lh[df_rank_lh["Away_Key"] == _away_key]
+        if not _linha_lh.empty:
+            _resumo_tier_lh = str(_linha_lh.iloc[0].get("Tier_LH", "") or "")
+
+    _resumo_frases_sinal = []
+    if _resumo_tier_la:
+        if "💜" in _resumo_tier_la:
+            _resumo_frases_sinal.append(("Lay Away - Atenção!", "#a78bfa"))
+        elif "⭐" in _resumo_tier_la:
+            _resumo_frases_sinal.append(("Lay Away ⭐⭐⭐⭐⭐", "#4ade80"))
+    if _resumo_tier_lh:
+        if "💜" in _resumo_tier_lh:
+            _resumo_frases_sinal.append(("Lay Home - Atenção!", "#a78bfa"))
+        elif "⭐" in _resumo_tier_lh:
+            _resumo_frases_sinal.append(("Lay Home ⭐⭐⭐⭐⭐", "#60a5fa"))
+
+    # --------------------------------------------------------
+    # 4b) 🔧 NOVO — CONSENSO "QUEM ABRE O PLACAR" (CG)
+    # Consenso entre MGF, ATKxDEF (exg) e VG do valor de cada
+    # time marcar o primeiro gol. Fora da faixa 2,00–5,00 ganha
+    # comentário extra dentro do Sinal Principal.
+    # --------------------------------------------------------
+    _resumo_cg_home = _resumo_media_segura(
+        linha_mgf.get("Home_Abrir_Placar"),
+        linha_exg.get("Home_Abrir_Placar"),
+        linha_vg.get("Home_Abrir_Placar"),
+    )
+    _resumo_cg_away = _resumo_media_segura(
+        linha_mgf.get("Away_Abrir_Placar"),
+        linha_exg.get("Away_Abrir_Placar"),
+        linha_vg.get("Away_Abrir_Placar"),
+    )
+
+    # --------------------------------------------------------
+    # 🔧 CORRIGIDO — o aviso de CG alto/baixo NÃO usa o consenso
+    # de "abrir placar". Usa o Media_CG_H_01 / Media_CG_A_01
+    # (mesma métrica já usada na Aba IA / classificar_filtro_duplo),
+    # que fica em df_mgf / linha_mgf.
+    # --------------------------------------------------------
+    _resumo_cg_home_media = pd.to_numeric(
+        linha_mgf.get("Media_CG_H_01"), errors="coerce"
+    )
+    _resumo_cg_away_media = pd.to_numeric(
+        linha_mgf.get("Media_CG_A_01"), errors="coerce"
+    )
+
+    _resumo_cg_notas = []
+    if pd.notna(_resumo_cg_home_media):
+        if _resumo_cg_home_media > 5.00:
+            _resumo_cg_notas.append("CG alto para Home")
+        elif _resumo_cg_home_media < 2.00:
+            _resumo_cg_notas.append("CG baixo para Home")
+    if pd.notna(_resumo_cg_away_media):
+        if _resumo_cg_away_media > 5.00:
+            _resumo_cg_notas.append("CG alto para Away")
+        elif _resumo_cg_away_media < 2.00:
+            _resumo_cg_notas.append("CG baixo para Away")
+
+    def _resumo_deg(v):
+        return (0.0 if pd.isna(v) else float(v)) * 3.6
+
+    # --------------------------------------------------------
+    # 5) COMENTÁRIO ADICIONAL — IA_Direcao (Aba IA / df_consenso)
+    # --------------------------------------------------------
+    _resumo_ia_direcao = str(linha_consenso.get("IA_Direcao", "") or "")
+    _resumo_mostrar_live = "Analisar no Live" in _resumo_ia_direcao
+
+    # --------------------------------------------------------
+    # 6) MERCADOS DO MACHINE LEARNING — Aba Machine Learning
+    # Agora traz TODOS os mercados do pipeline (Lay's, Overs,
+    # Unders e BTTS). O Lay 2x2 fica de fora (em calibração).
+    # --------------------------------------------------------
+    _resumo_label_mercados = {
+        "LAY00":     "Lay 0x0",
+        "LAY01":     "Lay 0x1",
+        "LAY10":     "Lay 1x0",
+        "LAYGH":     "Lay Goleada Casa",
+        "LAYGA":     "Lay Goleada Fora",
+        "OVER05HT":  "Over 0.5 HT",
+        "UNDER15HT": "Under 1.5 HT",
+        "OVER15FT":  "Over 1.5 FT",
+        "OVER25FT":  "Over 2.5 FT",
+        "UNDER25FT": "Under 2.5 FT",
+        "BTTS_YES":  "Ambas Marcam",
+    }
+    # LAY22 fica de fora de propósito (em calibração)
+
+    @st.cache_data(show_spinner=False)
+    def _resumo_carregar_ml(fonte, mtime=None):
+        xls_ml_local = pd.ExcelFile(io.BytesIO(fonte) if isinstance(fonte, bytes) else fonte)
+        return pd.read_excel(xls_ml_local, "Todos os Mercados")
+
+    _resumo_mercados_ml = []
+    try:
+        _ARQUIVO_ML_RESUMO = "data/PIPELINE2_RESULTADOS.xlsx"
+        if arquivo_upload_ml:
+            _fonte_ml_resumo = arquivo_upload_ml.getvalue()
+            _mtime_ml_resumo = None
+        elif os.path.exists(_ARQUIVO_ML_RESUMO):
+            _fonte_ml_resumo = _ARQUIVO_ML_RESUMO
+            _mtime_ml_resumo = os.path.getmtime(_ARQUIVO_ML_RESUMO)
+        else:
+            _fonte_ml_resumo = None
+
+        if _fonte_ml_resumo is not None:
+            _df_ml_resumo = _resumo_carregar_ml(_fonte_ml_resumo, _mtime_ml_resumo)
+            _df_ml_resumo["JOGO"] = (
+                _df_ml_resumo["Home_Team"].astype(str).str.strip() + " x " +
+                _df_ml_resumo["Visitor_Team"].astype(str).str.strip()
+            )
+            _linha_ml_resumo = _df_ml_resumo[_df_ml_resumo["JOGO"] == jogo]
+
+            if not _linha_ml_resumo.empty:
+                _linha_ml_resumo = _linha_ml_resumo.iloc[0]
+                for _mkt, _lbl in _resumo_label_mercados.items():
+                    _col = f"{_mkt}_Prob"
+                    if _col in _linha_ml_resumo.index and pd.notna(_linha_ml_resumo[_col]):
+                        _resumo_mercados_ml.append((_lbl, float(_linha_ml_resumo[_col])))
+                _resumo_mercados_ml.sort(key=lambda x: x[1], reverse=True)
+    except Exception:
+        _resumo_mercados_ml = []
+
+    # --------------------------------------------------------
+    # 🔧 NOVO — cor por valor (mesmo padrão visual da Aba CS)
+    # --------------------------------------------------------
+    def _resumo_cor_valor(v):
+        if v is None or pd.isna(v):
+            return "#5b6472"
+        if v >= 90:
+            return "#22c55e"
+        if v >= 80:
+            return "#4ade80"
+        if v >= 70:
+            return "#eab308"
+        if v >= 60:
+            return "#c7ccd6"
+        return "#ef4444"
+
+    # --------------------------------------------------------
+    # CSS — identidade visual igual à Aba CS Score
+    # (gradiente, accent lateral, gauge circular, barras de
+    # progresso e sombras/tipografia mais ricas)
+    # --------------------------------------------------------
+    _resumo_css = """
+    <style>
+    .rc-card { border-radius:18px; border:1px solid #232c3d;
+        background:linear-gradient(135deg,#101826,#0a0f18);
+        padding:30px 34px; margin-top:10px;
+        box-shadow:0 8px 24px rgba(0,0,0,0.35); }
+
+    .rc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:26px; }
+    .rc-team { display:flex; align-items:center; gap:16px; }
+    .rc-team.away { flex-direction:row-reverse; text-align:right; }
+    .rc-crest { width:68px; height:68px; border-radius:50%; background:#161d29;
+        display:flex; align-items:center; justify-content:center; font-size:30px;
+        border:1px solid #2c3648; flex-shrink:0;
+        box-shadow:0 0 0 3px rgba(127,179,255,0.08); }
+    .rc-team-name { font-size:28px; font-weight:900; color:#f5f7fa; letter-spacing:0.3px;
+        text-shadow:0 1px 6px rgba(0,0,0,0.4); }
+    .rc-vs { font-size:19px; font-weight:800; color:#5b6472; padding:0 16px; }
+
+    .rc-section-title { font-size:14px; font-weight:800; letter-spacing:1.4px; color:#7fb3ff;
+        text-transform:uppercase; margin:26px 0 14px 0; }
+
+    .rc-odds-row { display:flex; gap:14px; }
+    .rc-odds-box { flex:1; text-align:center; background:#11161f; border:1px solid #232c3d;
+        border-radius:14px; padding:18px 10px; }
+    .rc-odds-label { font-size:13px; color:#8a93a3; font-weight:800; letter-spacing:0.8px; }
+    .rc-odds-real { font-size:30px; font-weight:900; color:#f5f7fa; margin-top:4px; }
+    .rc-odds-justa { font-size:15px; color:#7fb3ff; margin-top:6px; font-weight:700; }
+
+    .rc-cols2 { display:flex; gap:20px; }
+    .rc-col { flex:1; }
+    .rc-placar-row { display:flex; justify-content:space-between; padding:8px 0;
+        border-bottom:1px solid #161c27; font-size:17px; color:#c8cfd8; }
+    .rc-placar-row b { color:#f5f7fa; font-weight:800; font-size:18px; }
+    .rc-ou-row { display:flex; justify-content:space-between; padding:8px 0;
+        border-bottom:1px solid #161c27; font-size:16.5px; color:#c8cfd8; }
+    .rc-ou-over { color:#4ade80; font-weight:800; }
+    .rc-ou-under { color:#f87171; font-weight:800; }
+
+    .rc-cg-row { display:flex; gap:16px; }
+    .rc-cg-box { flex:1; background:#11161f; border:1px solid #232c3d; border-radius:14px;
+        padding:16px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .rc-cg-label { font-size:15.5px; color:#c8cfd8; font-weight:700; }
+    .rc-cg-gauge { width:64px; height:64px; border-radius:50%; display:flex; align-items:center;
+        justify-content:center; flex-shrink:0; }
+    .rc-cg-gauge-inner { width:50px; height:50px; border-radius:50%; background:#0d121b;
+        display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:900;
+        color:#f5f7fa; }
+
+    .rc-mkt-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px; }
+    .rc-mkt-box { background:#11161f; border:1px solid #232c3d; border-left:4px solid;
+        border-radius:12px; padding:14px 16px; }
+    .rc-mkt-label { font-size:14px; color:#c8cfd8; font-weight:700; margin-bottom:8px; }
+    .rc-mkt-value { font-size:26px; font-weight:900; margin-bottom:8px; }
+    .rc-mkt-track { width:100%; height:6px; border-radius:4px; background:#1c2433; }
+    .rc-mkt-fill { height:6px; border-radius:4px; }
+
+    .rc-signal-row { display:flex; gap:16px; margin-top:26px; flex-wrap:wrap; }
+    .rc-signal-box { flex:1; min-width:220px; background:#11161f; border:1px solid #232c3d;
+        border-radius:14px; padding:18px 20px; text-align:center; }
+    .rc-signal-label { font-size:12.5px; color:#8a93a3; font-weight:800; letter-spacing:0.8px;
+        margin-bottom:10px; }
+    .rc-signal-text { font-size:21px; font-weight:900; text-shadow:0 1px 6px rgba(0,0,0,0.4); }
+    </style>
+    """
+    st.markdown(_resumo_dedent(_resumo_css), unsafe_allow_html=True)
+
+    # --------------------------------------------------------
+    # MONTA O HTML DO CARD
+    # --------------------------------------------------------
+    _resumo_html = f"""
+    <div class="rc-card">
+
+        <div class="rc-header">
+            <div class="rc-team">
+                <div class="rc-crest">{_resumo_crest_h_html}</div>
+                <div class="rc-team-name">{str(_resumo_home).upper()}</div>
+            </div>
+            <div class="rc-vs">X</div>
+            <div class="rc-team away">
+                <div class="rc-crest">{_resumo_crest_a_html}</div>
+                <div class="rc-team-name">{str(_resumo_away).upper()}</div>
+            </div>
+        </div>
+
+        <div class="rc-section-title">Odds 1x2 · Odd Justa (Consenso MGF · ATKxDEF · VG)</div>
+        <div class="rc-odds-row">
+            <div class="rc-odds-box">
+                <div class="rc-odds-label">CASA</div>
+                <div class="rc-odds-real">{_resumo_fmt2(_resumo_odd_casa)}</div>
+                <div class="rc-odds-justa">Justa {_resumo_odd_justa_casa:.2f}</div>
+            </div>
+            <div class="rc-odds-box">
+                <div class="rc-odds-label">EMPATE</div>
+                <div class="rc-odds-real">{_resumo_fmt2(_resumo_odd_empate)}</div>
+                <div class="rc-odds-justa">Justa {_resumo_odd_justa_empate:.2f}</div>
+            </div>
+            <div class="rc-odds-box">
+                <div class="rc-odds-label">FORA</div>
+                <div class="rc-odds-real">{_resumo_fmt2(_resumo_odd_fora)}</div>
+                <div class="rc-odds-justa">Justa {_resumo_odd_justa_fora:.2f}</div>
+            </div>
+        </div>
+
+        <div class="rc-cols2">
+            <div class="rc-col">
+                <div class="rc-section-title">Top 5 Placares Mais Prováveis</div>
+    """
+
+    for _, _lin in _resumo_top5.iterrows():
+        _resumo_html += (
+            f'<div class="rc-placar-row"><span>{int(_lin["Gols_Home"])} - {int(_lin["Gols_Away"])}</span>'
+            f'<b>{_lin["Probabilidade%"]}</b></div>'
+        )
+
+    _resumo_html += """
+            </div>
+            <div class="rc-col">
+                <div class="rc-section-title">Over / Under FT (Consenso)</div>
+    """
+
+    for _linha_ou in ["0.5", "1.5", "2.5"]:
+        _over_v = _resumo_ou[f"Over {_linha_ou}"]
+        _under_v = _resumo_ou[f"Under {_linha_ou}"]
+        _resumo_html += (
+            f'<div class="rc-ou-row"><span>Linha {_linha_ou}</span>'
+            f'<span><span class="rc-ou-over">{_over_v:.1f}%</span> · '
+            f'<span class="rc-ou-under">{_under_v:.1f}%</span></span></div>'
+        )
+
+    _resumo_html += """
+            </div>
+        </div>
+    """
+
+    # --------------------------------------------------------
+    # 🔧 NOVO — CONSENSO "QUEM ABRE O PLACAR" (CG)
+    # --------------------------------------------------------
+    _cor_cg_home = _resumo_cor_valor(_resumo_cg_home)
+    _cor_cg_away = _resumo_cor_valor(_resumo_cg_away)
+
+    _resumo_html += f"""
+        <div class="rc-section-title">Consenso · Quem Abre o Placar (CG)</div>
+        <div class="rc-cg-row">
+            <div class="rc-cg-box">
+                <span class="rc-cg-label">🏠 {str(_resumo_home).upper()}</span>
+                <div class="rc-cg-gauge" style="background: conic-gradient({_cor_cg_home} {_resumo_deg(_resumo_cg_home)}deg, #1e2532 0deg);">
+                    <div class="rc-cg-gauge-inner">{_resumo_fmt2(_resumo_cg_home)}</div>
+                </div>
+            </div>
+            <div class="rc-cg-box">
+                <span class="rc-cg-label">✈ {str(_resumo_away).upper()}</span>
+                <div class="rc-cg-gauge" style="background: conic-gradient({_cor_cg_away} {_resumo_deg(_resumo_cg_away)}deg, #1e2532 0deg);">
+                    <div class="rc-cg-gauge-inner">{_resumo_fmt2(_resumo_cg_away)}</div>
+                </div>
+            </div>
+        </div>
+    """
+
+    # --------------------------------------------------------
+    # 🔧 NOVO — GRID COM TODOS OS MERCADOS (SEM LAY 2X2)
+    # --------------------------------------------------------
+    if _resumo_mercados_ml:
+        _resumo_html += '<div class="rc-section-title">Mercados · Consenso Machine Learning</div><div class="rc-mkt-grid">'
+        for _lbl, _val in _resumo_mercados_ml:
+            _cor = _resumo_cor_valor(_val)
+            _resumo_html += f"""
+            <div class="rc-mkt-box" style="border-left-color:{_cor};">
+                <div class="rc-mkt-label">{_lbl}</div>
+                <div class="rc-mkt-value" style="color:{_cor};">{_val:.0f}</div>
+                <div class="rc-mkt-track"><div class="rc-mkt-fill" style="width:{_val}%; background:{_cor};"></div></div>
+            </div>
+            """
+        _resumo_html += "</div>"
+
+    # --------------------------------------------------------
+    # SINAIS FINAIS (Sinal Principal + Comentário Adicional)
+    # --------------------------------------------------------
+    _resumo_texto_sinal_principal = ""
+    _resumo_cor_sinal_principal = "#f5f7fa"
+
+    if _resumo_frases_sinal:
+        _resumo_texto_sinal_principal, _resumo_cor_sinal_principal = _resumo_frases_sinal[0]
+
+    if _resumo_cg_notas:
+        if _resumo_texto_sinal_principal:
+            _resumo_texto_sinal_principal += " , " + " , ".join(_resumo_cg_notas)
+        else:
+            _resumo_texto_sinal_principal = " , ".join(_resumo_cg_notas)
+
+    if _resumo_texto_sinal_principal or _resumo_mostrar_live:
+        _resumo_html += '<div class="rc-signal-row">'
+        if _resumo_texto_sinal_principal:
+            _resumo_html += (
+                '<div class="rc-signal-box"><div class="rc-signal-label">SINAL PRINCIPAL</div>'
+                f'<div class="rc-signal-text" style="color:{_resumo_cor_sinal_principal};">{_resumo_texto_sinal_principal}</div></div>'
+            )
+        if _resumo_mostrar_live:
+            _resumo_html += (
+                '<div class="rc-signal-box"><div class="rc-signal-label">COMENTÁRIO ADICIONAL</div>'
+                '<div class="rc-signal-text" style="color:#facc15;">⚠ Analisar / Acompanhar Jogo Live</div></div>'
+            )
+        _resumo_html += "</div>"
+
+    _resumo_html += "</div>"
+
+    st.markdown(_resumo_dedent(_resumo_html), unsafe_allow_html=True)
 
 # ============================================================
 # 🔧 BLOCO ATUALIZADO — CARD ÚNICO DE RESUMO (ABA 1)
@@ -5540,16 +5991,9 @@ Home {home_emoji}   x   Away {away_emoji}
 
     st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
 
-# ============================================================
-# 🔧 FIX 3a — RANKING "TOP JOGOS DO DIA A+/A" (linhas ~5994–6025)
-# ============================================================
-
-@st.cache_data(show_spinner=False)
-def montar_lista_rank(_base_df, fonte_poisson, mtime_poisson):
-
     lista_rank = []
 
-    for _, row in _base_df.iterrows():
+    for _, row in base_df.iterrows():
 
         res = classificar_jogo(row)
 
@@ -5572,24 +6016,13 @@ def montar_lista_rank(_base_df, fonte_poisson, mtime_poisson):
             "Classe": res["Classe"]
         })
 
-    return lista_rank
-
-lista_rank = montar_lista_rank(base_df, _fonte_poisson, _mtime_poisson)
-
-if lista_rank:
-    df_rank = pd.DataFrame(lista_rank)
-    df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
-    df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
-    st.dataframe(df_rank, use_container_width=True, hide_index=True)
-else:
-    st.info("Nenhum jogo A+/A encontrado")
-
-# ============================================================
-# 🔧 TRECHO QUE FALTOU — cole EXATAMENTE aqui, entre o Fix 3a e o
-# Fix 3b (esse pedaço nunca fazia parte de nenhum dos dois fixes,
-# só ficava ENTRE eles no arquivo original — por isso sumiu na
-# hora de colar por cima).
-# ============================================================
+    if lista_rank:
+        df_rank = pd.DataFrame(lista_rank)
+        df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
+        df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
+        st.dataframe(df_rank, use_container_width=True, hide_index=True)
+    else:
+        st.info("Nenhum jogo A+/A encontrado")
 
     # =========================================
     # 📋 TABELA FINAL
@@ -5683,16 +6116,9 @@ else:
     # =========================================
     # 🧠 LISTA FINAL
     # =========================================
-# ============================================================
-# 🔧 FIX 3b — TABELA "TODOS OS JOGOS FILTRADOS" (linhas ~6119–7075)
-# ============================================================
-
-@st.cache_data(show_spinner="Calculando tabela da Aba IA...")
-def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtime_poisson):
-
     lista = []
 
-    for _, row in _df_clean.iterrows():
+    for _, row in df_clean.iterrows():
 
         # =========================================
         # 🧠 CLASSIFICAÇÃO
@@ -5707,7 +6133,7 @@ def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtim
         # =========================================
         dir_poisson = str(row.get("Poisson_Direcao", ""))
         dir_ia = str(row.get("IA_Direcao", ""))
-
+        
         # =========================================
         # 🎯 FUNÇÕES
         # =========================================
@@ -5947,7 +6373,7 @@ def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtim
 
         ):
 
-            if not _df_rank_la.empty:
+            if not df_rank_la.empty:
 
                 home_key = (
 
@@ -5957,9 +6383,9 @@ def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtim
 
                 )
 
-                linha_rank_elite = _df_rank_la[
+                linha_rank_elite = df_rank_la[
 
-                    _df_rank_la["Home_Key"]
+                    df_rank_la["Home_Key"]
                     == home_key
 
                 ]
@@ -6025,7 +6451,7 @@ def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtim
 
                     if odd_home > 1.13:
 
-                        if not _df_rank_la.empty:
+                        if not df_rank_la.empty:
 
                             home_key = (
 
@@ -6035,13 +6461,13 @@ def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtim
 
                             )
 
-                            linha_rank = _df_rank_la[
+                            linha_rank = df_rank_la[
 
-                                _df_rank_la["Home_Key"]
+                                df_rank_la["Home_Key"]
                                 == home_key
 
                             ]
-
+                            
                             if not linha_rank.empty:
 
                                 tier_original = linha_rank.iloc[0].get(
@@ -6110,7 +6536,7 @@ def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtim
 
                     if odd_away > 1.13:
 
-                        if not _df_rank_lh.empty:
+                        if not df_rank_lh.empty:
 
                             away_key = (
 
@@ -6120,9 +6546,9 @@ def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtim
 
                             )
 
-                            linha_rank = _df_rank_lh[
+                            linha_rank = df_rank_lh[
 
-                                _df_rank_lh["Away_Key"]
+                                df_rank_lh["Away_Key"]
                                 == away_key
 
                             ]
@@ -6210,9 +6636,9 @@ def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtim
                 ht_a
 
             ]
-
+ 
             if not any(pd.isna(v) for v in valores):
-
+                
            # =====================================
            # ⭐ DEFINE FAVORITO / ZEBRA
            # =====================================
@@ -6264,7 +6690,7 @@ def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtim
                     +
 
                     ((favorito_mgc - zebra_mgc) * 0.8))
-
+                
         # =====================================
         # 🧠 SCORE ZEBRA
         # =====================================
@@ -6524,7 +6950,7 @@ def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtim
 
             stake = 13
 
-
+        
         # =========================================
         # 🟡 HANDICAP
         # =========================================
@@ -6538,7 +6964,7 @@ def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtim
 
             elif "VALUE" in tier_ha:
                 stake = 40
-
+                
         # =========================================
         # 📋 APPEND FINAL
         # =========================================
@@ -6648,31 +7074,30 @@ def montar_lista_aba_ia(_df_clean, _df_rank_la, _df_rank_lh, fonte_poisson, mtim
                 ""
             )})
 
-    return lista
+    # =========================================
+    # 📈 OUTPUT FINAL
+    # =========================================
 
-lista = montar_lista_aba_ia(df_clean, df_rank_la, df_rank_lh, _fonte_poisson, _mtime_poisson)
+    if lista:
 
-# =========================================
-# 📈 OUTPUT FINAL
-# =========================================
+        df_final_aba7 = pd.DataFrame(lista)
+        # =========================================
+        # GARANTE TIPO NUMÉRICO
+        # =========================================
+        df_final_aba7["Score_Zebra"] = pd.to_numeric(
+            df_final_aba7["Score_Zebra"],
+            errors="coerce"
+        )
 
-if lista:
+        st.dataframe(
+            df_final_aba7,
+            use_container_width=True,
+            hide_index=True)
 
-    df_final_aba7 = pd.DataFrame(lista)
-    df_final_aba7["Score_Zebra"] = pd.to_numeric(
-        df_final_aba7["Score_Zebra"],
-        errors="coerce"
-    )
+    else:
 
-    st.dataframe(
-        df_final_aba7,
-        use_container_width=True,
-        hide_index=True)
+        st.info("Sem jogos válidos após filtro")
 
-else:
-
-    st.info("Sem jogos válidos após filtro")
-    
 # =========================================
 # ABA 8 — CLEAN SHEET (CS)
 # =========================================
@@ -8281,24 +8706,6 @@ with tab8:
 
     lista_cs = []
 
-# ============================================================
-# 🔧 FIX 4 — SCANNER OPERACIONAL CS (linhas ~8709–9172)
-# Loop que roda gerar_perfil_tatico() 2x por jogo, pra TODOS os
-# jogos do dia. Substitua o bloco original por este (o restante,
-# a partir de "DATAFRAME FINAL"/filtro de busca, continua igual
-# e fica FORA da função — é barato e usa lista_cs já pronta).
-# ============================================================
-
-@st.cache_data(show_spinner="Calculando Scanner Operacional CS...")
-def montar_scanner_cs(_df_exg, _df_consenso, fonte_poisson, mtime_poisson):
-
-    jogos = sorted(
-        _df_exg["JOGO"]
-        .dropna()
-        .unique()
-        .tolist()
-    )
-
     # =========================================================
     # 🎮 LISTA DE JOGOS
     # =========================================================
@@ -8326,11 +8733,11 @@ def montar_scanner_cs(_df_exg, _df_consenso, fonte_poisson, mtime_poisson):
             # ⚽ FILTRO JOGO
             # =================================================
 
-            linha_exg = _df_exg[
+            linha_exg = df_exg[
                 df_exg["JOGO"] == _jogo_scan
             ].iloc[0]
 
-            linha_consenso = _df_consenso[
+            linha_consenso = df_consenso[
                 df_consenso["JOGO"] == _jogo_scan
             ].iloc[0]
 
@@ -8758,15 +9165,10 @@ def montar_scanner_cs(_df_exg, _df_consenso, fonte_poisson, mtime_poisson):
 
         except Exception as e:
 
-            erros_cs.append(f"Erro em {_jogo_scan}: {e}")
-
-
-    return lista_cs, erros_cs
-
-lista_cs, erros_cs = montar_scanner_cs(df_exg, df_consenso, _fonte_poisson, _mtime_poisson)
-
-for _erro in erros_cs:
-    st.write(_erro)
+            st.write(
+                f"Erro em {_jogo_scan}:",
+                e
+            )
 
     # =========================================================
     # 📊 DATAFRAME FINAL
