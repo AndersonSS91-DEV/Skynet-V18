@@ -6128,22 +6128,62 @@ Home {home_emoji}   x   Away {away_emoji}
             "woman",
             "feminino",
             "fem",
+            " women",
+            "_w",
+            " w ",
 
             "reserve",
             "reserves",
+            "bolivia reserve",
 
             "friendly",
-            "amistoso", 
+            "amistoso",
             "serie c",
             "serie d",
             "nwsl",
-            "copa paulista"
+            "copa paulista",
+
+            "jamaica",
+            "nicaragua",
         ]
 
         if any(
             word in league
             for word in blacklist_keywords
         ):
+
+            passou_filtro_la = False
+            passou_filtro_lh = False
+
+        # =========================================
+        # 🚫 BLACKLIST DE LIGAS (NOME EXATO)
+        # =========================================
+        # Mesma lista usada no backtest (BLOCO SUPER) —
+        # precisa estar idêntica aqui para o tier_la do
+        # Streamlit refletir exatamente o que o backtest
+        # já excluiu ao gerar o ranking.
+
+        blacklist_ligas = [
+            "Taça Revelação U23",
+            "Premier League Cup",
+            "Sao Paolo Youth Cup",
+            "Paulista U20",
+            "Brasileiro U20",
+            "Carioca U20 - Series A1",
+            "Copa Do Brasil U20",
+            "Primera Division Women",
+            "Super League Women",
+            "Liga Mx Women",
+            "Brasileiro Women",
+            "Serie A Women",
+            "Women's Super League",
+            "Paulista Women",
+            "Eredivisie Women",
+            "NWSL",
+            "World Cup Women Qualification Europe",
+        ]
+
+        if row.get("League") in blacklist_ligas:
 
             passou_filtro_la = False
             passou_filtro_lh = False
@@ -6217,8 +6257,12 @@ Home {home_emoji}   x   Away {away_emoji}
             passou_filtro_la = False
 
         # =========================================
-        # 🚫 CV HOME
+        # 🎯 FILTRO CLASSIFICAÇÃO HOME (NUMÉRICO)
         # =========================================
+        # Igual ao "home_tem_classificacao()" do backtest
+        # (BLOCO SUPER). Faltava esse filtro aqui — sem ele
+        # o Streamlit deixava passar jogos que o backtest já
+        # tinha descartado antes de gerar o Tier_LA.
 
         CV_CG_H_01 = row.get(
             "CV_CG_H_01",
@@ -6229,6 +6273,63 @@ Home {home_emoji}   x   Away {away_emoji}
             "Media_CG_H_01",
             np.nan
         )
+
+        Media_CG_H_02 = row.get(
+            "Media_CG_H_02",
+            np.nan
+        )
+
+        CV_CG_H_02 = row.get(
+            "CV_CG_H_02",
+            np.nan
+        )
+
+        def home_tem_classificacao():
+
+            condicoes = []
+
+            condicoes.append(Media_CG_H_01 < 2.00)
+
+            condicoes.append(
+                2.00 <= Media_CG_H_01 < 2.70
+            )
+
+            condicoes.append(
+                2.70 <= Media_CG_H_01 <= 3.00
+                and CV_CG_H_01 <= 0.90
+            )
+
+            condicoes.append(
+                2.80 <= Media_CG_H_01 <= 5.50
+                and CV_CG_H_01 <= 0.80
+            )
+
+            condicoes.append(
+                Media_CG_H_01 > 5.50
+            )
+
+            condicoes.append(
+                Media_CG_H_02 < 0.90
+            )
+
+            condicoes.append(
+                0.90 <= Media_CG_H_02 <= 2.00
+                and CV_CG_H_02 <= 0.80
+            )
+
+            condicoes.append(
+                Media_CG_H_02 > 2.00
+            )
+
+            return any(condicoes)
+
+        if not home_tem_classificacao():
+
+            passou_filtro_la = False
+
+        # =========================================
+        # 🚫 CV HOME
+        # =========================================
 
         if pd.notna(CV_CG_H_01):
 
@@ -6358,7 +6459,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
                 if pd.notna(odd_home):
 
-                    if odd_home > 1.13:
+                    if odd_home > 1.13 and odd_home < 5.01:
 
                         if not df_rank_la.empty:
 
