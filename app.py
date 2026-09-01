@@ -3581,11 +3581,11 @@ def _ig_prob_mercado(chave):
     return None
 
 _ig_icone_mercado = {
-    "LAY00": "🥅", "LAY01": "👟⚽", "LAY10": "👟⚽",
-    "LAYGH": "🥅", "LAYGA": "🥅",
-    "OVER05HT": "⏱️⚽", "UNDER15HT": "🧊⚽",
-    "OVER15FT": "🔥⚽", "OVER25FT": "🔥⚽", "UNDER25FT": "🧊⚽",
-    "BTTS_YES": "🤝⚽",
+    "LAY00": "goal", "LAY01": "boot", "LAY10": "boot",
+    "LAYGH": "goal", "LAYGA": "goal",
+    "OVER05HT": "boot", "UNDER15HT": "goal",
+    "OVER15FT": "boot", "OVER25FT": "boot", "UNDER25FT": "goal",
+    "BTTS_YES": "boot",
 }
 
 _ig_paleta = ["#ef4444", "#f97316", "#3b82f6", "#a855f7", "#22c55e", "#eab308"]
@@ -3662,7 +3662,6 @@ st.download_button(
     mime="image/png",
     use_container_width=True,
 )
-
 
 # =========================================
 # ABA 2 — DADOS COMPLETOS
