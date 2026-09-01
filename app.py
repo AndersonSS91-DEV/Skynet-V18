@@ -6443,11 +6443,9 @@ Home {home_emoji}   x   Away {away_emoji}
         tier_la = ""
 
         if (
-
             passou_filtro_la
             or
             elite_bloqueado_la
-
         ):
 
             if "lay away" in dir_ia.lower():
@@ -6464,21 +6462,23 @@ Home {home_emoji}   x   Away {away_emoji}
                         if not df_rank_la.empty:
 
                             home_key = (
-
                                 str(row["Home_Team"])
                                 .strip()
                                 .lower()
-
                             )
 
                             linha_rank = df_rank_la[
-
                                 df_rank_la["Home_Key"]
                                 == home_key
-
                             ]
-                            
-                            if not linha_rank.empty:
+
+                            # 🚫 HOME NÃO ESTÁ NO TOP600
+                            if linha_rank.empty:
+
+                                tier_la = ""
+                                passou_filtro_la = False
+
+                            else:
 
                                 tier_original = linha_rank.iloc[0].get(
                                     "Tier_LA",
@@ -6549,27 +6549,41 @@ Home {home_emoji}   x   Away {away_emoji}
                         if not df_rank_lh.empty:
 
                             away_key = (
-
                                 str(row["Visitor_Team"])
                                 .strip()
                                 .lower()
-
                             )
 
                             linha_rank = df_rank_lh[
-
                                 df_rank_lh["Away_Key"]
                                 == away_key
-
                             ]
 
-                            if not linha_rank.empty:
+                            # 🚫 AWAY NÃO ESTÁ NO TOP200
+                            if linha_rank.empty:
+
+                                tier_lh = ""
+                                passou_filtro_lh = False
+
+                            else:
 
                                 tier_lh = linha_rank.iloc[0].get(
                                     "Tier_LH",
                                     ""
                                 )
 
+                                if tier_lh is None:
+
+                                    tier_lh = ""
+
+                                elif pd.isna(tier_lh):
+
+                                    tier_lh = ""
+
+                                tier_lh = str(
+                                    tier_lh
+                                ).strip()
+                                
         # =========================================
         # 🧠 TIER HANDICAP VALUE
         # =========================================
