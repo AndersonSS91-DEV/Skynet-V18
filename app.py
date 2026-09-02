@@ -6242,6 +6242,14 @@ Home {home_emoji}   x   Away {away_emoji}
             "Tier_LH": tier_lh,
             "Tier_HA": tier_ha,
 
+            # 🔢 CLASSIFICAÇÃO NUMÉRICA
+            "Media_CG_H_01": row.get("Media_CG_H_01", np.nan),
+            "CV_CG_H_01": row.get("CV_CG_H_01", np.nan),
+            "Media_CG_H_02": row.get("Media_CG_H_02", np.nan),
+            "CV_CG_H_02": row.get("CV_CG_H_02", np.nan),
+            "Media_CG_A_01": row.get("Media_CG_A_01", np.nan),
+            "CV_CG_A_01": row.get("CV_CG_A_01", np.nan),
+
             # 🔥 SCORE
             "Score_Zebra": (
                 round(score_zebra, 2)
