@@ -7011,6 +7011,89 @@ with tab8:
     _pt_css = "\n".join(l.lstrip() for l in _pt_css.splitlines())
     st.markdown(_pt_css, unsafe_allow_html=True)
 
+    # =========================================================
+    # ⏱️ JANELA DE GOL DIRECIONAL (Home ataca Away / Away ataca Home)
+    # =========================================================
+    # Diferente do "faixas"/pressão global (que só soma GF+GC dos dois
+    # times juntos por janela), isso aqui é DIRECIONAL: cruza a forma
+    # de quando o ATACANTE costuma marcar (GF por janela de 15min) com
+    # a forma de quando o DEFENSOR costuma sofrer (GC por janela) —
+    # e devolve em qual janela esse confronto específico tende a sair
+    # o gol, com uma leitura extra de pressão baseada em chutes
+    # (CHM/CAM/CHS/CAS, já presentes no Poisson_Consenso).
+
+    _JANELAS_GOL = ["0-15", "16-30", "31-45", "46-60", "61-75", "76-90"]
+
+    def calcular_janela_gol(linha, atacante, defensor, alpha=0.15):
+
+        gf = np.array([
+            max(0.0, float(linha.get(f"GF_{w}_{atacante}", 0) or 0))
+            for w in _JANELAS_GOL
+        ])
+        gc = np.array([
+            max(0.0, float(linha.get(f"GC_{w}_{defensor}", 0) or 0))
+            for w in _JANELAS_GOL
+        ])
+
+        # suavização leve — evita 0%/100% quando a amostra histórica é
+        # curta e alguma janela zerou por acaso
+        gf_s = gf + alpha * (gf.mean() if gf.sum() > 0 else 1)
+        gc_s = gc + alpha * (gc.mean() if gc.sum() > 0 else 1)
+
+        gf_share = gf_s / gf_s.sum()
+        gc_share = gc_s / gc_s.sum()
+
+        combinado = gf_share * gc_share
+        combinado = combinado / combinado.sum()
+
+        ordem = np.argsort(combinado)[::-1]
+        i1, i2 = ordem[0], ordem[1]
+        p1, p2 = combinado[i1] * 100, combinado[i2] * 100
+        gap = p1 - p2
+
+        if gap >= 15:
+            confianca = "ALTA"
+        elif gap >= 7:
+            confianca = "MÉDIA"
+        else:
+            confianca = "BAIXA"
+
+        # pressão ofensiva cruzada (chutes criados x chutes que o
+        # adversário costuma sofrer) — leitura extra, não decide a janela
+        if atacante == "Home":
+            chutes_criados = linha.get("CHM", np.nan)
+            chutes_sofridos_adv = linha.get("CAS", np.nan)
+        else:
+            chutes_criados = linha.get("CAM", np.nan)
+            chutes_sofridos_adv = linha.get("CHS", np.nan)
+
+        indice_pressao = None
+        if (
+            pd.notna(chutes_criados)
+            and pd.notna(chutes_sofridos_adv)
+            and chutes_sofridos_adv > 0
+        ):
+            indice_pressao = round(chutes_criados / chutes_sofridos_adv, 2)
+
+        if indice_pressao is None:
+            leitura_pressao = ""
+        elif indice_pressao >= 1.15:
+            leitura_pressao = "🔥 pressão ofensiva favorável"
+        elif indice_pressao <= 0.85:
+            leitura_pressao = "🧊 pressão ofensiva desfavorável"
+        else:
+            leitura_pressao = "⚖ pressão equilibrada"
+
+        return {
+            "janela_top1": _JANELAS_GOL[i1],
+            "prob_top1": round(p1, 1),
+            "janela_top2": _JANELAS_GOL[i2],
+            "prob_top2": round(p2, 1),
+            "confianca": confianca,
+            "indice_pressao": indice_pressao,
+            "leitura_pressao": leitura_pressao,
+        }
+
     def cor_faixa_tatica(score):
         if score >= 70:
             return {"accent": "#22c55e", "bg": "rgba(34,197,94,0.05)",
@@ -8031,6 +8114,47 @@ with tab8:
         )
 
     # =========================================================
+    # 🎯 JANELA PROVÁVEL DE GOL (HOME x AWAY)
+    # =========================================================
+    # Direcional: em qual janela de 15min o HOME tende a marcar no
+    # AWAY, e em qual janela o AWAY tende a marcar no HOME — cruzando
+    # o próprio ataque (GF) com a fragilidade defensiva do adversário
+    # naquele intervalo (GC), com leitura extra de pressão por chutes.
+
+    st.markdown("### 🎯 Janela Provável de Gol")
+
+    _jg_home_vs_away = calcular_janela_gol(linha_consenso, "Home", "Away")
+    _jg_away_vs_home = calcular_janela_gol(linha_consenso, "Away", "Home")
+
+    _jg_col1, _jg_col2 = st.columns(2)
+
+    with _jg_col1:
+        st.info(
+            f"""
+🏠 **{home}** tende a marcar no **{away}**
+
+⏱ **{_jg_home_vs_away['janela_top1']}'** ({_jg_home_vs_away['prob_top1']}%) — confiança {_jg_home_vs_away['confianca']}
+
+2ª janela: {_jg_home_vs_away['janela_top2']}' ({_jg_home_vs_away['prob_top2']}%)
+
+{_jg_home_vs_away['leitura_pressao']}
+"""
+        )
+
+    with _jg_col2:
+        st.info(
+            f"""
+✈ **{away}** tende a marcar no **{home}**
+
+⏱ **{_jg_away_vs_home['janela_top1']}'** ({_jg_away_vs_home['prob_top1']}%) — confiança {_jg_away_vs_home['confianca']}
+
+2ª janela: {_jg_away_vs_home['janela_top2']}' ({_jg_away_vs_home['prob_top2']}%)
+
+{_jg_away_vs_home['leitura_pressao']}
+"""
+        )
+
+    # =========================================================
     # 📋 SCANNER OPERACIONAL CS
     # =========================================================
 
@@ -8399,6 +8523,18 @@ with tab8:
             proximo_cs = ranking_cs[1]
 
             # =================================================
+            # 🎯 JANELA PROVÁVEL DE GOL (HOME x AWAY)
+            # =================================================
+
+            _jg_home_vs_away = calcular_janela_gol(
+                linha_consenso, "Home", "Away"
+            )
+
+            _jg_away_vs_home = calcular_janela_gol(
+                linha_consenso, "Away", "Home"
+            )
+
+            # =================================================
             # 📋 LISTA FINAL
             # =================================================
 
@@ -8481,6 +8617,18 @@ with tab8:
 
                 "JANELA":
                     melhor_cs["janela"],
+
+                "JANELA GOL HOME":
+                    (
+                        f"{_jg_home_vs_away['janela_top1']}' "
+                        f"({_jg_home_vs_away['prob_top1']}%)"
+                    ),
+
+                "JANELA GOL AWAY":
+                    (
+                        f"{_jg_away_vs_home['janela_top1']}' "
+                        f"({_jg_away_vs_home['prob_top1']}%)"
+                    ),
 
                 "DADOS CS":
                     " | ".join(
