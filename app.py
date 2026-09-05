@@ -2622,86 +2622,100 @@ with tab1:
 
 
  
-     matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
- 
--    exibir_matriz(
--        matriz_consenso,
--        linha_exg["Home_Team"],
--        linha_exg["Visitor_Team"],
--        "Probabilidades de Placar (Consenso)"
--    )
-+    # =========================================
-+    # 🧱 LAYOUT — os três lado a lado, alinhados
-+    # =========================================
-+    _col_matriz, _col_ou, _col_radar = st.columns(3)
- 
--    mostrar_over_under(
--        matriz_consenso,
--        "Over/Under — Consenso"
--    )
-+    with _col_matriz:
-+        exibir_matriz(
-+            matriz_consenso,
-+            linha_exg["Home_Team"],
-+            linha_exg["Visitor_Team"],
-+            "Probabilidades de Placar (Consenso)"
-+        )
-+
-+    with _col_ou:
-+        mostrar_over_under(
-+            matriz_consenso,
-+            "Over/Under — Consenso"
-+        )
- 
-     # =========================================
-     # 🎯 RADAR CONSENSO
-@@ -2711,22 +2718,34 @@
-         [radar_away_mgf, radar_away_exg, radar_away_vg], axis=0
-     )
- 
--    st.markdown("### 🎯 Radar Ofensivo Consenso")
-+    with _col_radar:
-+        st.markdown("### 🎯 Radar Ofensivo Consenso")
- 
--    st.markdown(
--        f"### <span style='color:#00BFFF'>{linha_exg['Home_Team']}</span> x "
--        f"<span style='color:#FF7A00'>{linha_exg['Visitor_Team']}</span>",
--        unsafe_allow_html=True
--    )
--
--    fig = radar_comparativo(
--        radar_home_consenso,
--        radar_away_consenso,
--        linha_exg["Home_Team"],
--        linha_exg["Visitor_Team"]
--    )
-+        st.markdown(
-+            f"""
-+            <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:4px;">
-+                <div style="text-align:right;">
-+                    <div class="mc-name" style="font-size:15px;">{linha_exg['Home_Team'].upper()}</div>
-+                    <div class="mc-role" style="color:#7ee787; font-size:11px;">🏠 MANDANTE</div>
-+                </div>
-+                <div class="mc-vs" style="font-size:14px; padding:0 4px;">X</div>
-+                <div style="text-align:left;">
-+                    <div class="mc-name" style="font-size:15px;">{linha_exg['Visitor_Team'].upper()}</div>
-+                    <div class="mc-role" style="color:#7fb3ff; font-size:11px;">✈ VISITANTE</div>
-+                </div>
-+            </div>
-+            """,
-+            unsafe_allow_html=True
-+        )
-+
-+        fig = radar_comparativo(
-+            radar_home_consenso,
-+            radar_away_consenso,
-+            linha_exg["Home_Team"],
-+            linha_exg["Visitor_Team"]
-+        )
- 
--    st.pyplot(fig, use_container_width=False)
-+        st.pyplot(fig, use_container_width=False)
- 
+    matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
+
+    # =========================================
+    # 🧱 LAYOUT — os três lado a lado, alinhados
+    # =========================================
+    _col_matriz, _col_ou, _col_radar = st.columns(3)
+
+    # =========================================
+    # 📊 MATRIZ DE PLACARES
+    # =========================================
+    with _col_matriz:
+        exibir_matriz(
+            matriz_consenso,
+            linha_exg["Home_Team"],
+            linha_exg["Visitor_Team"],
+            "Probabilidades de Placar (Consenso)"
+        )
+
+    # =========================================
+    # ⚽ OVER / UNDER
+    # =========================================
+    with _col_ou:
+        mostrar_over_under(
+            matriz_consenso,
+            "Over/Under — Consenso"
+        )
+
+    # =========================================
+    # 🎯 RADAR CONSENSO
+    # =========================================
+    radar_home_consenso = np.mean(
+        [radar_home_mgf, radar_home_exg, radar_home_vg],
+        axis=0
+    )
+
+    radar_away_consenso = np.mean(
+        [radar_away_mgf, radar_away_exg, radar_away_vg],
+        axis=0
+    )
+
+    with _col_radar:
+        st.markdown("### 🎯 Radar Ofensivo Consenso")
+
+        st.markdown(
+            f"""
+            <div style="
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                gap:10px;
+                margin-bottom:4px;
+            ">
+                <div style="text-align:right;">
+                    <div class="mc-name" style="font-size:15px;">
+                        {linha_exg['Home_Team'].upper()}
+                    </div>
+
+                    <div class="mc-role"
+                         style="color:#7ee787; font-size:11px;">
+                        🏠 MANDANTE
+                    </div>
+                </div>
+
+                <div class="mc-vs"
+                     style="font-size:14px; padding:0 4px;">
+                    X
+                </div>
+
+                <div style="text-align:left;">
+                    <div class="mc-name" style="font-size:15px;">
+                        {linha_exg['Visitor_Team'].upper()}
+                    </div>
+
+                    <div class="mc-role"
+                         style="color:#7fb3ff; font-size:11px;">
+                        ✈ VISITANTE
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        fig = radar_comparativo(
+            radar_home_consenso,
+            radar_away_consenso,
+            linha_exg["Home_Team"],
+            linha_exg["Visitor_Team"]
+        )
+
+        st.pyplot(
+            fig,
+            use_container_width=True
+        )
 
     # ⚠️ ALERTA MATCH ODDS (COLE AQUI)
     # =========================================
