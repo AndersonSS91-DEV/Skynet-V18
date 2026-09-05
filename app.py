@@ -2622,16 +2622,34 @@ with tab1:
 
 
  
-    matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
+    # =========================================
+    # 🎯 CONSENSO DOS λ
+    # =========================================
+    lambda_home = np.mean([
+        lambda_home_mgf,
+        lambda_home_exg,
+        lambda_home_vg
+    ])
+
+    lambda_away = np.mean([
+        lambda_away_mgf,
+        lambda_away_exg,
+        lambda_away_vg
+    ])
 
     # =========================================
-    # 🧱 LAYOUT — os três lado a lado, alinhados
+    # 📊 MATRIZ POISSON — CONSENSO
+    # =========================================
+    matriz_consenso = calcular_matriz_poisson(
+        lambda_home,
+        lambda_away
+    )
+
+    # =========================================
+    # 🧱 LAYOUT — 3 BLOCOS LADO A LADO
     # =========================================
     _col_matriz, _col_ou, _col_radar = st.columns(3)
 
-    # =========================================
-    # 📊 MATRIZ DE PLACARES
-    # =========================================
     with _col_matriz:
         exibir_matriz(
             matriz_consenso,
@@ -2640,9 +2658,6 @@ with tab1:
             "Probabilidades de Placar (Consenso)"
         )
 
-    # =========================================
-    # ⚽ OVER / UNDER
-    # =========================================
     with _col_ou:
         mostrar_over_under(
             matriz_consenso,
@@ -2678,7 +2693,6 @@ with tab1:
                     <div class="mc-name" style="font-size:15px;">
                         {linha_exg['Home_Team'].upper()}
                     </div>
-
                     <div class="mc-role"
                          style="color:#7ee787; font-size:11px;">
                         🏠 MANDANTE
@@ -2694,7 +2708,6 @@ with tab1:
                     <div class="mc-name" style="font-size:15px;">
                         {linha_exg['Visitor_Team'].upper()}
                     </div>
-
                     <div class="mc-role"
                          style="color:#7fb3ff; font-size:11px;">
                         ✈ VISITANTE
