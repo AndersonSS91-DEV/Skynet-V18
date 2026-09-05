@@ -2665,8 +2665,7 @@ with tab1:
     with _col_ou:
         mostrar_over_under(
             matriz_consenso,
-            "Over/Under",
-            figsize=(2.6, 2.8)
+            "Over/Under"
         )
 
     # =========================================
