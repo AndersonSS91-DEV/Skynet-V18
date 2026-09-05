@@ -2619,9 +2619,8 @@ with tab1:
                   
     st.markdown("---")
 
---- /mnt/user-data/uploads/app__11_.py	2026-09-01 22:16:04.124998000 +0000
-+++ app_layout.py	2026-09-05 10:31:45.111260386 +0000
-@@ -2639,17 +2639,24 @@
+
+
  
      matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
  
