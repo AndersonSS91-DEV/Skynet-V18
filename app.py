@@ -2621,33 +2621,26 @@ with tab1:
 
 
 
- 
     # =========================================
-    # 🎯 CONSENSO DOS λ
+    # 🔢 POISSON CONSENSO
     # =========================================
+
     lambda_home = np.mean([
-        lambda_home_mgf,
-        lambda_home_exg,
-        lambda_home_vg
+        linha_mgf["ExG_Home_MGF"],
+        linha_exg["ExG_Home_ATKxDEF"],
+        linha_vg["ExG_Home_VG"]
     ])
 
     lambda_away = np.mean([
-        lambda_away_mgf,
-        lambda_away_exg,
-        lambda_away_vg
+        linha_mgf["ExG_Away_MGF"],
+        linha_exg["ExG_Away_ATKxDEF"],
+        linha_vg["ExG_Away_VG"]
     ])
 
-    # =========================================
-    # 📊 MATRIZ POISSON — CONSENSO
-    # =========================================
-    matriz_consenso = calcular_matriz_poisson(
-        lambda_home,
-        lambda_away
-    )
+    st.markdown("### 🔢⚽ Poisson Consenso")
 
-    # =========================================
-    # 🧱 LAYOUT — 3 BLOCOS LADO A LADO
-    # =========================================
+    matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
+
     _col_matriz, _col_ou, _col_radar = st.columns(3)
 
     with _col_matriz:
@@ -2667,14 +2660,61 @@ with tab1:
     # =========================================
     # 🎯 RADAR CONSENSO
     # =========================================
+
+    radar_home_mgf = [
+        eficiencia_finalizacao(linha_mgf["CHM"]),
+        norm_exg(linha_mgf["ExG_Home_MGF"]),
+        norm_shots(linha_mgf["CHM"]),
+        linha_exg["Precisao_CG_H"],
+        linha_mgf["BTTS_%"]
+    ]
+
+    radar_away_mgf = [
+        eficiencia_finalizacao(linha_mgf["CAM"]),
+        norm_exg(linha_mgf["ExG_Away_MGF"]),
+        norm_shots(linha_mgf["CAM"]),
+        linha_exg["Precisao_CG_A"],
+        linha_mgf["BTTS_%"]
+    ]
+
+    radar_home_exg = [
+        linha_exg["FAH"],
+        norm_exg(linha_exg["ExG_Home_ATKxDEF"]),
+        norm_shots(linha_mgf["CHM"]),
+        linha_exg["Precisao_CG_H"],
+        linha_exg["BTTS_%"]
+    ]
+
+    radar_away_exg = [
+        linha_exg["FAA"],
+        norm_exg(linha_exg["ExG_Away_ATKxDEF"]),
+        norm_shots(linha_mgf["CAM"]),
+        linha_exg["Precisao_CG_A"],
+        linha_exg["BTTS_%"]
+    ]
+
+    radar_home_vg = [
+        linha_exg["FAH"],
+        norm_exg(linha_vg["ExG_Home_VG"]),
+        norm_shots(linha_mgf["CHM"]),
+        linha_exg["Precisao_CG_H"],
+        linha_vg["BTTS_%"]
+    ]
+
+    radar_away_vg = [
+        linha_exg["FAA"],
+        norm_exg(linha_vg["ExG_Away_VG"]),
+        norm_shots(linha_mgf["CAM"]),
+        linha_exg["Precisao_CG_A"],
+        linha_vg["BTTS_%"]
+    ]
+
     radar_home_consenso = np.mean(
-        [radar_home_mgf, radar_home_exg, radar_home_vg],
-        axis=0
+        [radar_home_mgf, radar_home_exg, radar_home_vg], axis=0
     )
 
     radar_away_consenso = np.mean(
-        [radar_away_mgf, radar_away_exg, radar_away_vg],
-        axis=0
+        [radar_away_mgf, radar_away_exg, radar_away_vg], axis=0
     )
 
     with _col_radar:
@@ -2682,36 +2722,15 @@ with tab1:
 
         st.markdown(
             f"""
-            <div style="
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                gap:10px;
-                margin-bottom:4px;
-            ">
+            <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:4px;">
                 <div style="text-align:right;">
-                    <div class="mc-name" style="font-size:15px;">
-                        {linha_exg['Home_Team'].upper()}
-                    </div>
-                    <div class="mc-role"
-                         style="color:#7ee787; font-size:11px;">
-                        🏠 MANDANTE
-                    </div>
+                    <div class="mc-name" style="font-size:15px;">{linha_exg['Home_Team'].upper()}</div>
+                    <div class="mc-role" style="color:#7ee787; font-size:11px;">MANDANTE</div>
                 </div>
-
-                <div class="mc-vs"
-                     style="font-size:14px; padding:0 4px;">
-                    X
-                </div>
-
+                <div class="mc-vs" style="font-size:14px; padding:0 4px;">X</div>
                 <div style="text-align:left;">
-                    <div class="mc-name" style="font-size:15px;">
-                        {linha_exg['Visitor_Team'].upper()}
-                    </div>
-                    <div class="mc-role"
-                         style="color:#7fb3ff; font-size:11px;">
-                        ✈ VISITANTE
-                    </div>
+                    <div class="mc-name" style="font-size:15px;">{linha_exg['Visitor_Team'].upper()}</div>
+                    <div class="mc-role" style="color:#7fb3ff; font-size:11px;">VISITANTE</div>
                 </div>
             </div>
             """,
@@ -2725,11 +2744,9 @@ with tab1:
             linha_exg["Visitor_Team"]
         )
 
-        st.pyplot(
-            fig,
-            use_container_width=True
-        )
+        st.pyplot(fig, use_container_width=False)
 
+    # =========================================
     # ⚠️ ALERTA MATCH ODDS (COLE AQUI)
     # =========================================
     if (
