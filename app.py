@@ -7,6 +7,7 @@ import numpy as np
 import os
 import re
 import glob
+import textwrap
 from pathlib import Path
 from scipy.stats import poisson
 import matplotlib.pyplot as plt
@@ -2739,42 +2740,46 @@ with tab1:
         st.markdown("### 🎯 Radar Ofensivo")
 
         st.markdown(
-            f"""
-            <div style="
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                gap:10px;
-                margin-bottom:4px;
-            ">
-                <div style="text-align:right;">
-                    <div class="mc-name" style="font-size:15px;">
-                        {linha_exg['Home_Team'].upper()}
+            textwrap.dedent(
+                f"""
+                <div style="
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    gap:10px;
+                    margin-bottom:4px;
+                ">
+
+                    <div style="text-align:right;">
+                        <div class="mc-name" style="font-size:15px;">
+                            {linha_exg['Home_Team'].upper()}
+                        </div>
+
+                        <div class="mc-role"
+                             style="color:#7ee787; font-size:11px;">
+                            MANDANTE
+                        </div>
                     </div>
 
-                    <div class="mc-role"
-                         style="color:#7ee787; font-size:11px;">
-                        MANDANTE
+                    <div class="mc-vs"
+                         style="font-size:14px; padding:0 4px;">
+                        X
                     </div>
+
+                    <div style="text-align:left;">
+                        <div class="mc-name" style="font-size:15px;">
+                            {linha_exg['Visitor_Team'].upper()}
+                        </div>
+
+                        <div class="mc-role"
+                             style="color:#7fb3ff; font-size:11px;">
+                            VISITANTE
+                        </div>
+                    </div>
+
                 </div>
-
-                <div class="mc-vs"
-                     style="font-size:14px; padding:0 4px;">
-                    X
-                </div>
-
-                <div style="text-align:left;">
-                    <div class="mc-name" style="font-size:15px;">
-                        {linha_exg['Visitor_Team'].upper()}
-                    </div>
-
-                    <div class="mc-role"
-                         style="color:#7fb3ff; font-size:11px;">
-                        VISITANTE
-                    </div>
-                </div>
-            </div>
-            """,
+                """
+            ).strip(),
             unsafe_allow_html=True
         )
 
@@ -2787,7 +2792,7 @@ with tab1:
 
         st.pyplot(
             fig,
-            use_container_width=False
+            use_container_width=True
         )
 
  
