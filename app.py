@@ -2739,49 +2739,32 @@ with tab1:
 
         st.markdown("### 🎯 Radar Ofensivo")
 
-        st.markdown(
-            textwrap.dedent(
-                f"""
-                <div style="
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    gap:10px;
-                    margin-bottom:4px;
-                ">
+        # -----------------------------------------
+        # 🏠 X ✈️ — TIMES
+        # -----------------------------------------
 
-                    <div style="text-align:right;">
-                        <div class="mc-name" style="font-size:15px;">
-                            {linha_exg['Home_Team'].upper()}
-                        </div>
-
-                        <div class="mc-role"
-                             style="color:#7ee787; font-size:11px;">
-                            MANDANTE
-                        </div>
-                    </div>
-
-                    <div class="mc-vs"
-                         style="font-size:14px; padding:0 4px;">
-                        X
-                    </div>
-
-                    <div style="text-align:left;">
-                        <div class="mc-name" style="font-size:15px;">
-                            {linha_exg['Visitor_Team'].upper()}
-                        </div>
-
-                        <div class="mc-role"
-                             style="color:#7fb3ff; font-size:11px;">
-                            VISITANTE
-                        </div>
-                    </div>
-
-                </div>
-                """
-            ).strip(),
-            unsafe_allow_html=True
+        _r_home, _r_vs, _r_away = st.columns(
+            [2, 0.5, 2]
         )
+
+        with _r_home:
+            st.markdown(
+                f"**{linha_exg['Home_Team'].upper()}**"
+            )
+            st.caption("🏠 MANDANTE")
+
+        with _r_vs:
+            st.markdown("### X")
+
+        with _r_away:
+            st.markdown(
+                f"**{linha_exg['Visitor_Team'].upper()}**"
+            )
+            st.caption("✈ VISITANTE")
+
+        # -----------------------------------------
+        # 📡 RADAR
+        # -----------------------------------------
 
         fig = radar_comparativo(
             radar_home_consenso,
@@ -2790,12 +2773,16 @@ with tab1:
             linha_exg["Visitor_Team"]
         )
 
+        try:
+            fig.set_size_inches(4.0, 4.0)
+        except Exception:
+            pass
+
         st.pyplot(
             fig,
-            use_container_width=True
+            use_container_width=False
         )
-
- 
+        
     # =========================================
     # ⚠️ ALERTA MATCH ODDS (COLE AQUI)
     # =========================================
