@@ -2648,13 +2648,13 @@ with tab1:
             matriz_consenso,
             linha_exg["Home_Team"],
             linha_exg["Visitor_Team"],
-            "Probabilidades de Placar (Consenso)"
+            "Probabilidades de Placar"
         )
 
     with _col_ou:
         mostrar_over_under(
             matriz_consenso,
-            "Over/Under — Consenso"
+            "Over/Under"
         )
 
     # =========================================
@@ -2718,7 +2718,7 @@ with tab1:
     )
 
     with _col_radar:
-        st.markdown("### 🎯 Radar Ofensivo Consenso")
+        st.markdown("### 🎯 Radar Ofensivo")
 
         st.markdown(
             f"""
