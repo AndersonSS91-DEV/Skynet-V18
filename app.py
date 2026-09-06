@@ -7,6 +7,7 @@ import numpy as np
 import os
 import re
 import glob
+import textwrap
 from pathlib import Path
 from scipy.stats import poisson
 import matplotlib.pyplot as plt
@@ -2619,6 +2620,8 @@ with tab1:
                   
     st.markdown("---")
 
+
+
     # =========================================
     # 🔢 POISSON CONSENSO
     # =========================================
@@ -2637,19 +2640,34 @@ with tab1:
 
     st.markdown("### 🔢⚽ Poisson Consenso")
 
-    matriz_consenso = calcular_matriz_poisson(lambda_home, lambda_away)
-
-    exibir_matriz(
-        matriz_consenso,
-        linha_exg["Home_Team"],
-        linha_exg["Visitor_Team"],
-        "Probabilidades de Placar (Consenso)"
+    matriz_consenso = calcular_matriz_poisson(
+        lambda_home,
+        lambda_away
     )
 
-    mostrar_over_under(
-        matriz_consenso,
-        "Over/Under — Consenso"
-    )
+    _col_matriz, _col_ou, _col_radar = st.columns(3)
+
+    # =========================================
+    # 📊 MATRIZ DE PLACARES
+    # =========================================
+
+    with _col_matriz:
+        exibir_matriz(
+            matriz_consenso,
+            linha_exg["Home_Team"],
+            linha_exg["Visitor_Team"],
+            "Probabilidades de Placar"
+        )
+
+    # =========================================
+    # ⚽ OVER / UNDER
+    # =========================================
+
+    with _col_ou:
+        mostrar_over_under(
+            matriz_consenso,
+            "Over/Under"
+        )
 
     # =========================================
     # 🎯 RADAR CONSENSO
@@ -2704,31 +2722,68 @@ with tab1:
     ]
 
     radar_home_consenso = np.mean(
-        [radar_home_mgf, radar_home_exg, radar_home_vg], axis=0
+        [radar_home_mgf, radar_home_exg, radar_home_vg],
+        axis=0
     )
 
     radar_away_consenso = np.mean(
-        [radar_away_mgf, radar_away_exg, radar_away_vg], axis=0
+        [radar_away_mgf, radar_away_exg, radar_away_vg],
+        axis=0
     )
 
-    st.markdown("### 🎯 Radar Ofensivo Consenso")
+    # =========================================
+    # 🎯 RADAR OFENSIVO
+    # =========================================
 
-    st.markdown(
-        f"### <span style='color:#00BFFF'>{linha_exg['Home_Team']}</span> x "
-        f"<span style='color:#FF7A00'>{linha_exg['Visitor_Team']}</span>",
-        unsafe_allow_html=True
-    )
+    with _col_radar:
 
-    fig = radar_comparativo(
-        radar_home_consenso,
-        radar_away_consenso,
-        linha_exg["Home_Team"],
-        linha_exg["Visitor_Team"]
-    )
+        st.markdown("### 🎯 Radar Ofensivo")
 
-    st.pyplot(fig, use_container_width=False)
+        # -----------------------------------------
+        # 🏠 X ✈️ — TIMES
+        # -----------------------------------------
 
-        # =========================================
+        _r_home, _r_vs, _r_away = st.columns(
+            [2, 0.5, 2]
+        )
+
+        with _r_home:
+            st.markdown(
+                f"**{linha_exg['Home_Team'].upper()}**"
+            )
+            st.caption("🏠 MANDANTE")
+
+        with _r_vs:
+            st.markdown("### X")
+
+        with _r_away:
+            st.markdown(
+                f"**{linha_exg['Visitor_Team'].upper()}**"
+            )
+            st.caption("✈ VISITANTE")
+
+        # -----------------------------------------
+        # 📡 RADAR
+        # -----------------------------------------
+
+        fig = radar_comparativo(
+            radar_home_consenso,
+            radar_away_consenso,
+            linha_exg["Home_Team"],
+            linha_exg["Visitor_Team"]
+        )
+
+        try:
+            fig.set_size_inches(4.0, 4.0)
+        except Exception:
+            pass
+
+        st.pyplot(
+            fig,
+            use_container_width=False
+        )
+        
+    # =========================================
     # ⚠️ ALERTA MATCH ODDS (COLE AQUI)
     # =========================================
     if (
