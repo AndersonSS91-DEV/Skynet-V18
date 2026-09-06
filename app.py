@@ -9270,54 +9270,146 @@ with tab10:
 
         st.markdown("---")
 
-        # ========================================================
-        # 📊 TODOS OS MERCADOS (tabela colorida)
-        # ========================================================
+    # ========================================================
+    # 📊 TODOS OS MERCADOS (tabela colorida)
+    # ========================================================
 
-        st.markdown("#### 📊 Todos os Mercados")
-        st.caption("🟢 ≥90   🟡 80–90   ⚪ 70–80   🔴 <70")
+    st.markdown("#### 📊 Todos os Mercados")
+    st.caption("🟢 ≥90   🟡 80–90   ⚪ 70–80   🔴 <70")
 
-        _cols_tabela = ["Hour", "Home_Team", "Visitor_Team"] if "Hour" in df_ml_todos.columns else ["Home_Team", "Visitor_Team"]
-        _mapa_sigla = {}
-        for m in MERCADOS_ML_DIA:
-            col_prob = f"{m}_Prob"
-            if col_prob in df_ml_todos.columns:
-                _cols_tabela.append(col_prob)
-                _mapa_sigla[col_prob] = SIGLA_MERCADO_ML.get(m, m)
+    _cols_tabela = (
+        ["Hour", "Home_Team", "Visitor_Team",
+         "Result Home", "Result Visitor",
+         "Result_Home_HT", "Result_Visitor_HT"]
+        if "Hour" in df_ml_todos.columns
+        else
+        ["Home_Team", "Visitor_Team",
+         "Result Home", "Result Visitor",
+         "Result_Home_HT", "Result_Visitor_HT"]
+    )
 
-        _df_tabela = df_ml_todos[_cols_tabela].copy()
-        if "Hour" in _df_tabela.columns:
-            try:
-                _df_tabela["Hour"] = pd.to_datetime(_df_tabela["Hour"]).dt.strftime("%H:%M")
-            except Exception:
-                pass
-        _df_tabela = _df_tabela.rename(columns=_mapa_sigla).rename(columns={
-            "Hour": "Hora", "Home_Team": "Casa", "Visitor_Team": "Visitante"
-        })
+    _mapa_sigla = {}
 
-        _colunas_valor = list(_mapa_sigla.values())
+    for m in MERCADOS_ML_DIA:
+        col_prob = f"{m}_Prob"
+        if col_prob in df_ml_todos.columns:
+            _cols_tabela.append(col_prob)
+            _mapa_sigla[col_prob] = SIGLA_MERCADO_ML.get(m, m)
 
-        def _ml_estilo_tabela(v):
-            if isinstance(v, (int, float)) and not pd.isna(v):
-                cor = _ml_cor_valor(v)
-                return f"color:{cor}; font-weight:700;"
-            return ""
+    _df_tabela = df_ml_todos[_cols_tabela].copy()
 
-        _ml_styler = _df_tabela.style
-        if hasattr(_ml_styler, "map"):
-            _ml_styler = _ml_styler.map(_ml_estilo_tabela, subset=_colunas_valor)
-        else:
-            _ml_styler = _ml_styler.applymap(_ml_estilo_tabela, subset=_colunas_valor)
+    # ========================================================
+    # ⚽ PLACAR FT
+    # ========================================================
 
-        st.dataframe(
-            _ml_styler.format(
-                {c: "{:.0f}" for c in _colunas_valor}
-            ),
-            use_container_width=True,
-            hide_index=True
+    def _montar_placar_resultado(home, away):
+        if pd.isna(home) or pd.isna(away):
+            return "-"
+
+        if str(home).strip() == "" or str(away).strip() == "":
+            return "-"
+
+        try:
+            return f"{int(float(home))}-{int(float(away))}"
+        except Exception:
+            return "-"
+
+    _df_tabela["FT"] = [
+        _montar_placar_resultado(home, away)
+        for home, away in zip(
+            _df_tabela["Result Home"],
+            _df_tabela["Result Visitor"]
+        )
+    ]
+
+    # ========================================================
+    # ⏱️ PLACAR HT
+    # ========================================================
+
+    _df_tabela["HT"] = [
+        _montar_placar_resultado(home, away)
+        for home, away in zip(
+            _df_tabela["Result_Home_HT"],
+            _df_tabela["Result_Visitor_HT"]
+        )
+    ]
+
+    # Remove as colunas individuais dos resultados
+    _df_tabela = _df_tabela.drop(
+        columns=[
+            "Result Home",
+            "Result Visitor",
+            "Result_Home_HT",
+            "Result_Visitor_HT"
+        ]
+    )
+
+    # ========================================================
+    # 🕐 FORMATA HORA
+    # ========================================================
+
+    if "Hour" in _df_tabela.columns:
+        try:
+            _df_tabela["Hour"] = pd.to_datetime(
+                _df_tabela["Hour"]
+            ).dt.strftime("%H:%M")
+        except Exception:
+            pass
+
+    # ========================================================
+    # 🏷️ RENOMEIA COLUNAS
+    # ========================================================
+
+    _df_tabela = _df_tabela.rename(
+        columns=_mapa_sigla
+    ).rename(columns={
+        "Hour": "Hora",
+        "Home_Team": "Casa",
+        "Visitor_Team": "Visitante"
+    })
+
+    # ========================================================
+    # 🎨 COLUNAS DE VALOR
+    # ========================================================
+
+    _colunas_valor = list(_mapa_sigla.values())
+
+    def _ml_estilo_tabela(v):
+        if isinstance(v, (int, float)) and not pd.isna(v):
+            cor = _ml_cor_valor(v)
+            return f"color:{cor}; font-weight:700;"
+        return ""
+
+    # ========================================================
+    # 🎨 STYLER
+    # ========================================================
+
+    _ml_styler = _df_tabela.style
+
+    if hasattr(_ml_styler, "map"):
+        _ml_styler = _ml_styler.map(
+            _ml_estilo_tabela,
+            subset=_colunas_valor
+        )
+    else:
+        _ml_styler = _ml_styler.applymap(
+            _ml_estilo_tabela,
+            subset=_colunas_valor
         )
 
-        st.markdown("---")
+    # ========================================================
+    # 📊 EXIBE TABELA
+    # ========================================================
+
+    st.dataframe(
+        _ml_styler.format(
+            {c: "{:.0f}" for c in _colunas_valor}
+        ),
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.markdown("---")
 
         # ========================================================
         # 🎯 DETALHE DO JOGO (usa o mesmo seletor global "jogo")
