@@ -9299,36 +9299,42 @@ with tab10:
     _df_tabela = df_ml_todos[_cols_tabela].copy()
 
     # ========================================================
-    # ⚽ PLACAR FT / HT
+    # ⚽ PLACAR FT
     # ========================================================
 
-    def _montar_placar_resultado(home, away):
-        if pd.isna(home) or pd.isna(away):
-            return "-"
+    _df_tabela["FT"] = (
+        _df_tabela["Result Home"].fillna("-").astype(str)
+        + "-"
+        + _df_tabela["Result Visitor"].fillna("-").astype(str)
+    )
 
-        if str(home).strip() == "" or str(away).strip() == "":
-            return "-"
+    # ========================================================
+    # ⏱️ PLACAR HT
+    # ========================================================
 
-        try:
-            return f"{int(float(home))}-{int(float(away))}"
-        except Exception:
-            return "-"
+    _df_tabela["HT"] = (
+        _df_tabela["Result_Home_HT"].fillna("-").astype(str)
+        + "-"
+        + _df_tabela["Result_Visitor_HT"].fillna("-").astype(str)
+    )
 
-    _df_tabela["FT"] = [
-        _montar_placar_resultado(home, away)
-        for home, away in zip(
-            _df_tabela["Result Home"],
-            _df_tabela["Result Visitor"]
-        )
-    ]
+    # ========================================================
+    # 🔧 CORRIGE PLACARES VAZIOS
+    # ========================================================
 
-    _df_tabela["HT"] = [
-        _montar_placar_resultado(home, away)
-        for home, away in zip(
-            _df_tabela["Result_Home_HT"],
-            _df_tabela["Result_Visitor_HT"]
-        )
-    ]
+    _df_tabela["FT"] = _df_tabela["FT"].replace(
+        ["--", "-nan", "nan-", "nan-nan"],
+        "-"
+    )
+
+    _df_tabela["HT"] = _df_tabela["HT"].replace(
+        ["--", "-nan", "nan-", "nan-nan"],
+        "-"
+    )
+
+    # ========================================================
+    # 🗑️ REMOVE COLUNAS ORIGINAIS DOS RESULTADOS
+    # ========================================================
 
     _df_tabela = _df_tabela.drop(
         columns=[
@@ -9339,6 +9345,10 @@ with tab10:
         ]
     )
 
+    # ========================================================
+    # 🕐 FORMATA HORA
+    # ========================================================
+
     if "Hour" in _df_tabela.columns:
         try:
             _df_tabela["Hour"] = pd.to_datetime(
@@ -9346,6 +9356,10 @@ with tab10:
             ).dt.strftime("%H:%M")
         except Exception:
             pass
+
+    # ========================================================
+    # 🏷️ RENOMEIA COLUNAS
+    # ========================================================
 
     _df_tabela = _df_tabela.rename(
         columns=_mapa_sigla
@@ -9355,6 +9369,36 @@ with tab10:
         "Visitor_Team": "Visitante"
     })
 
+    # ========================================================
+    # 📐 ORDEM DAS COLUNAS
+    # ========================================================
+
+    _cols_fixas = [
+        "Hora",
+        "Casa",
+        "Visitante",
+        "FT",
+        "HT"
+    ]
+
+    _cols_fixas = [
+        c for c in _cols_fixas
+        if c in _df_tabela.columns
+    ]
+
+    _cols_mercados = [
+        c for c in _df_tabela.columns
+        if c not in _cols_fixas
+    ]
+
+    _df_tabela = _df_tabela[
+        _cols_fixas + _cols_mercados
+    ]
+
+    # ========================================================
+    # 🎨 COLUNAS DE VALOR
+    # ========================================================
+
     _colunas_valor = list(_mapa_sigla.values())
 
     def _ml_estilo_tabela(v):
@@ -9363,18 +9407,27 @@ with tab10:
             return f"color:{cor}; font-weight:700;"
         return ""
 
+    # ========================================================
+    # 🎨 STYLER
+    # ========================================================
+
     _ml_styler = _df_tabela.style
 
-    if hasattr(_ml_styler, "map"):
-        _ml_styler = _ml_styler.map(
-            _ml_estilo_tabela,
-            subset=_colunas_valor
-        )
-    else:
-        _ml_styler = _ml_styler.applymap(
-            _ml_estilo_tabela,
-            subset=_colunas_valor
-        )
+    if _colunas_valor:
+        if hasattr(_ml_styler, "map"):
+            _ml_styler = _ml_styler.map(
+                _ml_estilo_tabela,
+                subset=_colunas_valor
+            )
+        else:
+            _ml_styler = _ml_styler.applymap(
+                _ml_estilo_tabela,
+                subset=_colunas_valor
+            )
+
+    # ========================================================
+    # 📊 EXIBE TABELA
+    # ========================================================
 
     st.dataframe(
         _ml_styler.format(
