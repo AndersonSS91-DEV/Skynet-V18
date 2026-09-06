@@ -9299,7 +9299,7 @@ with tab10:
     _df_tabela = df_ml_todos[_cols_tabela].copy()
 
     # ========================================================
-    # ⚽ PLACAR FT
+    # ⚽ PLACAR FT / HT
     # ========================================================
 
     def _montar_placar_resultado(home, away):
@@ -9322,10 +9322,6 @@ with tab10:
         )
     ]
 
-    # ========================================================
-    # ⏱️ PLACAR HT
-    # ========================================================
-
     _df_tabela["HT"] = [
         _montar_placar_resultado(home, away)
         for home, away in zip(
@@ -9334,7 +9330,6 @@ with tab10:
         )
     ]
 
-    # Remove as colunas individuais dos resultados
     _df_tabela = _df_tabela.drop(
         columns=[
             "Result Home",
@@ -9344,10 +9339,6 @@ with tab10:
         ]
     )
 
-    # ========================================================
-    # 🕐 FORMATA HORA
-    # ========================================================
-
     if "Hour" in _df_tabela.columns:
         try:
             _df_tabela["Hour"] = pd.to_datetime(
@@ -9355,10 +9346,6 @@ with tab10:
             ).dt.strftime("%H:%M")
         except Exception:
             pass
-
-    # ========================================================
-    # 🏷️ RENOMEIA COLUNAS
-    # ========================================================
 
     _df_tabela = _df_tabela.rename(
         columns=_mapa_sigla
@@ -9368,10 +9355,6 @@ with tab10:
         "Visitor_Team": "Visitante"
     })
 
-    # ========================================================
-    # 🎨 COLUNAS DE VALOR
-    # ========================================================
-
     _colunas_valor = list(_mapa_sigla.values())
 
     def _ml_estilo_tabela(v):
@@ -9379,10 +9362,6 @@ with tab10:
             cor = _ml_cor_valor(v)
             return f"color:{cor}; font-weight:700;"
         return ""
-
-    # ========================================================
-    # 🎨 STYLER
-    # ========================================================
 
     _ml_styler = _df_tabela.style
 
@@ -9396,10 +9375,6 @@ with tab10:
             _ml_estilo_tabela,
             subset=_colunas_valor
         )
-
-    # ========================================================
-    # 📊 EXIBE TABELA
-    # ========================================================
 
     st.dataframe(
         _ml_styler.format(
