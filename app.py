@@ -9470,42 +9470,44 @@ with tab10:
         st.markdown("---")
 
         
-            # --------------------------------------------------
-            # 🧠 EXPLICAÇÃO DA IA (motivos dos mercados aprovados)
-            # --------------------------------------------------
+        st.markdown("---")
 
-            st.markdown("#### 🧠 Explicação da IA")
+        # --------------------------------------------------
+        # 🧠 EXPLICAÇÃO DA IA (motivos dos mercados aprovados)
+        # --------------------------------------------------
 
-            _aprovados_jogo = [
-                m for m in MERCADOS_ML_DIA
-                if f"{m}_Motivo" in linha_ml.index and str(linha_ml.get(f"{m}_Aprovado", "")) == "✅"
-            ]
+        st.markdown("#### 🧠 Explicação da IA")
 
-            if not _aprovados_jogo and MERCADOS_ML_DIA:
-                # fallback: mostra o mercado de maior confiança mesmo sem aprovação
-                _confs = {
-                    m: linha_ml[f"{m}_Confidence"]
-                    for m in MERCADOS_ML_DIA
-                    if f"{m}_Confidence" in linha_ml.index and pd.notna(linha_ml[f"{m}_Confidence"])
-                }
-                if _confs:
-                    _aprovados_jogo = [max(_confs, key=_confs.get)]
+        _aprovados_jogo = [
+            m for m in MERCADOS_ML_DIA
+            if f"{m}_Motivo" in linha_ml.index and str(linha_ml.get(f"{m}_Aprovado", "")) == "✅"
+        ]
 
-            if not _aprovados_jogo:
-                st.caption("Sem sinais para este jogo.")
-            else:
-                for m in _aprovados_jogo:
-                    st.markdown(f"**{LABEL_MERCADO_ML.get(m,m)}**")
-                    st.write(linha_ml.get(f"{m}_Motivo", "—"))
+        if not _aprovados_jogo and MERCADOS_ML_DIA:
+            # fallback: mostra o mercado de maior confiança mesmo sem aprovação
+            _confs = {
+                m: linha_ml[f"{m}_Confidence"]
+                for m in MERCADOS_ML_DIA
+                if f"{m}_Confidence" in linha_ml.index and pd.notna(linha_ml[f"{m}_Confidence"])
+            }
+            if _confs:
+                _aprovados_jogo = [max(_confs, key=_confs.get)]
 
-            st.markdown("---")
+        if not _aprovados_jogo:
+            st.caption("Sem sinais para este jogo.")
+        else:
+            for m in _aprovados_jogo:
+                st.markdown(f"**{LABEL_MERCADO_ML.get(m,m)}**")
+                st.write(linha_ml.get(f"{m}_Motivo", "—"))
 
-            # --------------------------------------------------
-            # 🎴 CARDS POR MERCADO (V2) — usa jogos_semelhantes já
-            # calculado globalmente (motor KNN) pro jogo selecionado
-            # --------------------------------------------------
+        st.markdown("---")
 
-            st.markdown("#### 🎴 Cards por Mercado")
+        # --------------------------------------------------
+        # 🎴 CARDS POR MERCADO (V2) — usa jogos_semelhantes já
+        # calculado globalmente (motor KNN) pro jogo selecionado
+        # --------------------------------------------------
+
+        st.markdown("#### 🎴 Cards por Mercado")
             st.caption(
                 "Score IA = previsão do modelo treinado · Histórico = taxa real entre os jogos "
                 "semelhantes (motor KNN) · Poisson = probabilidade pela matriz de gols do jogo · "
