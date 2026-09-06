@@ -8990,6 +8990,8 @@ with tab9:
 
 with tab10:
 
+with tab10:
+
     # ============================================================
     # 🤖 MACHINE LEARNING SKYNET — helpers e metadados dos mercados
     # ============================================================
@@ -9339,7 +9341,6 @@ with tab10:
                 _df_tabela["Hour"] = pd.to_datetime(_df_tabela["Hour"]).dt.strftime("%H:%M")
             except Exception:
                 pass
-
         _df_tabela = _df_tabela.rename(columns=_mapa_sigla).rename(columns={
             "Hour": "Hora", "Home_Team": "Casa", "Visitor_Team": "Visitante"
         })
