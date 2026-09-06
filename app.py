@@ -9277,24 +9277,8 @@ with tab10:
         st.markdown("#### 📊 Todos os Mercados")
         st.caption("🟢 ≥90   🟡 80–90   ⚪ 70–80   🔴 <70")
 
-        _cols_tabela = (
-            ["Hour", "Home_Team", "Visitor_Team",
-             "Result Home", "Result Visitor",
-             "Result_Home_HT", "Result_Visitor_HT"]
-            if "Hour" in df_ml_todos.columns
-            else
-            ["Home_Team", "Visitor_Team",
-             "Result Home", "Result Visitor",
-             "Result_Home_HT", "Result_Visitor_HT"]
-        )
-
-        _cols_tabela = [
-            c for c in _cols_tabela
-            if c in df_ml_todos.columns
-        ]
-
+        _cols_tabela = ["Hour", "Home_Team", "Visitor_Team"] if "Hour" in df_ml_todos.columns else ["Home_Team", "Visitor_Team"]
         _mapa_sigla = {}
-
         for m in MERCADOS_ML_DIA:
             col_prob = f"{m}_Prob"
             if col_prob in df_ml_todos.columns:
@@ -9303,24 +9287,45 @@ with tab10:
 
         _df_tabela = df_ml_todos[_cols_tabela].copy()
 
+        # --------------------------------------------------------
+        # 🔧 NOVO — Placar FT e Placar HT, logo depois dos times
+        # (juntos num "2x1" em vez de 4 colunas soltas)
+        # --------------------------------------------------------
+
+        def _ml_formatar_placar(row, col_home, col_away):
+            h = row.get(col_home, np.nan)
+            a = row.get(col_away, np.nan)
+            if pd.isna(h) or pd.isna(a):
+                return "—"
+            return f"{int(h)}x{int(a)}"
+
+        if "Result Home" in df_ml_todos.columns and "Result Visitor" in df_ml_todos.columns:
+            _df_tabela.insert(
+                _df_tabela.columns.get_loc("Visitor_Team") + 1,
+                "Placar FT",
+                df_ml_todos.apply(lambda r: _ml_formatar_placar(r, "Result Home", "Result Visitor"), axis=1)
+            )
+
+        if "Result_Home_HT" in df_ml_todos.columns and "Result_Visitor_HT" in df_ml_todos.columns:
+            _pos_ht = (
+                _df_tabela.columns.get_loc("Placar FT") + 1
+                if "Placar FT" in _df_tabela.columns
+                else _df_tabela.columns.get_loc("Visitor_Team") + 1
+            )
+            _df_tabela.insert(
+                _pos_ht,
+                "Placar HT",
+                df_ml_todos.apply(lambda r: _ml_formatar_placar(r, "Result_Home_HT", "Result_Visitor_HT"), axis=1)
+            )
+
         if "Hour" in _df_tabela.columns:
             try:
-                _df_tabela["Hour"] = pd.to_datetime(
-                    _df_tabela["Hour"]
-                ).dt.strftime("%H:%M")
+                _df_tabela["Hour"] = pd.to_datetime(_df_tabela["Hour"]).dt.strftime("%H:%M")
             except Exception:
                 pass
 
-        _df_tabela = _df_tabela.rename(
-            columns=_mapa_sigla
-        ).rename(columns={
-            "Hour": "Hora",
-            "Home_Team": "Casa",
-            "Visitor_Team": "Visitante",
-            "Result Home": "FT Casa",
-            "Result Visitor": "FT Visitante",
-            "Result_Home_HT": "HT Casa",
-            "Result_Visitor_HT": "HT Visitante"
+        _df_tabela = _df_tabela.rename(columns=_mapa_sigla).rename(columns={
+            "Hour": "Hora", "Home_Team": "Casa", "Visitor_Team": "Visitante"
         })
 
         _colunas_valor = list(_mapa_sigla.values())
