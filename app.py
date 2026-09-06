@@ -9277,16 +9277,19 @@ with tab10:
         st.markdown("#### 📊 Todos os Mercados")
         st.caption("🟢 ≥90   🟡 80–90   ⚪ 70–80   🔴 <70")
 
+        _cols_tabela = (
+            ["Hour", "Home_Team", "Visitor_Team",
+             "Result Home", "Result Visitor",
+             "Result_Home_HT", "Result_Visitor_HT"]
+            if "Hour" in df_ml_todos.columns
+            else
+            ["Home_Team", "Visitor_Team",
+             "Result Home", "Result Visitor",
+             "Result_Home_HT", "Result_Visitor_HT"]
+        )
+
         _cols_tabela = [
-            c for c in [
-                "Hour",
-                "Home_Team",
-                "Visitor_Team",
-                "Result Home",
-                "Result Visitor",
-                "Result_Home_HT",
-                "Result_Visitor_HT"
-            ]
+            c for c in _cols_tabela
             if c in df_ml_todos.columns
         ]
 
@@ -9300,164 +9303,39 @@ with tab10:
 
         _df_tabela = df_ml_todos[_cols_tabela].copy()
 
-        # ========================================================
-        # ⚽ PLACAR FT
-        # ========================================================
-
-        if "Result Home" in _df_tabela.columns and "Result Visitor" in _df_tabela.columns:
-
-            _df_tabela["FT"] = (
-                _df_tabela["Result Home"].fillna("-").astype(str)
-                + "-"
-                + _df_tabela["Result Visitor"].fillna("-").astype(str)
-            )
-
-        else:
-
-            _df_tabela["FT"] = "-"
-
-        # ========================================================
-        # ⏱️ PLACAR HT
-        # ========================================================
-
-        if "Result_Home_HT" in _df_tabela.columns and "Result_Visitor_HT" in _df_tabela.columns:
-
-            _df_tabela["HT"] = (
-                _df_tabela["Result_Home_HT"].fillna("-").astype(str)
-                + "-"
-                + _df_tabela["Result_Visitor_HT"].fillna("-").astype(str)
-            )
-
-        else:
-
-            _df_tabela["HT"] = "-"
-
-        # ========================================================
-        # 🔧 CORRIGE PLACARES VAZIOS
-        # ========================================================
-
-        _df_tabela["FT"] = _df_tabela["FT"].replace(
-            ["--", "-nan", "nan-", "nan-nan"],
-            "-"
-        )
-
-        _df_tabela["HT"] = _df_tabela["HT"].replace(
-            ["--", "-nan", "nan-", "nan-nan"],
-            "-"
-        )
-
-        # ========================================================
-        # 🗑️ REMOVE COLUNAS ORIGINAIS DOS RESULTADOS
-        # ========================================================
-
-        _df_tabela = _df_tabela.drop(
-            columns=[
-                "Result Home",
-                "Result Visitor",
-                "Result_Home_HT",
-                "Result_Visitor_HT"
-            ],
-            errors="ignore"
-        )
-
-        # ========================================================
-        # 🕐 FORMATA HORA
-        # ========================================================
-
         if "Hour" in _df_tabela.columns:
-
             try:
-
                 _df_tabela["Hour"] = pd.to_datetime(
                     _df_tabela["Hour"]
                 ).dt.strftime("%H:%M")
-
             except Exception:
-
                 pass
-
-        # ========================================================
-        # 🏷️ RENOMEIA COLUNAS
-        # ========================================================
 
         _df_tabela = _df_tabela.rename(
             columns=_mapa_sigla
         ).rename(columns={
             "Hour": "Hora",
             "Home_Team": "Casa",
-            "Visitor_Team": "Visitante"
+            "Visitor_Team": "Visitante",
+            "Result Home": "FT Casa",
+            "Result Visitor": "FT Visitante",
+            "Result_Home_HT": "HT Casa",
+            "Result_Visitor_HT": "HT Visitante"
         })
 
-        # ========================================================
-        # 📐 ORDEM DAS COLUNAS
-        # ========================================================
-
-        _cols_fixas = [
-            "Hora",
-            "Casa",
-            "Visitante",
-            "FT",
-            "HT"
-        ]
-
-        _cols_fixas = [
-            c for c in _cols_fixas
-            if c in _df_tabela.columns
-        ]
-
-        _cols_mercados = [
-            c for c in _df_tabela.columns
-            if c not in _cols_fixas
-        ]
-
-        _df_tabela = _df_tabela[
-            _cols_fixas + _cols_mercados
-        ]
-
-        # ========================================================
-        # 🎨 COLUNAS DE VALOR
-        # ========================================================
-
-        _colunas_valor = [
-            c for c in _mapa_sigla.values()
-            if c in _df_tabela.columns
-        ]
+        _colunas_valor = list(_mapa_sigla.values())
 
         def _ml_estilo_tabela(v):
-
             if isinstance(v, (int, float)) and not pd.isna(v):
-
                 cor = _ml_cor_valor(v)
-
                 return f"color:{cor}; font-weight:700;"
-
             return ""
 
-        # ========================================================
-        # 🎨 STYLER
-        # ========================================================
-
         _ml_styler = _df_tabela.style
-
-        if _colunas_valor:
-
-            if hasattr(_ml_styler, "map"):
-
-                _ml_styler = _ml_styler.map(
-                    _ml_estilo_tabela,
-                    subset=_colunas_valor
-                )
-
-            else:
-
-                _ml_styler = _ml_styler.applymap(
-                    _ml_estilo_tabela,
-                    subset=_colunas_valor
-                )
-
-        # ========================================================
-        # 📊 EXIBE TABELA
-        # ========================================================
+        if hasattr(_ml_styler, "map"):
+            _ml_styler = _ml_styler.map(_ml_estilo_tabela, subset=_colunas_valor)
+        else:
+            _ml_styler = _ml_styler.applymap(_ml_estilo_tabela, subset=_colunas_valor)
 
         st.dataframe(
             _ml_styler.format(
@@ -9469,45 +9347,143 @@ with tab10:
 
         st.markdown("---")
 
-        
-        st.markdown("---")
+        # ========================================================
+        # 🎯 DETALHE DO JOGO (usa o mesmo seletor global "jogo")
+        # ========================================================
 
-        # --------------------------------------------------
-        # 🧠 EXPLICAÇÃO DA IA (motivos dos mercados aprovados)
-        # --------------------------------------------------
+        st.markdown("#### 🎯 Detalhe do Jogo")
 
-        st.markdown("#### 🧠 Explicação da IA")
+        _linha_ml_jogo = df_ml_todos[df_ml_todos["JOGO"] == jogo]
 
-        _aprovados_jogo = [
-            m for m in MERCADOS_ML_DIA
-            if f"{m}_Motivo" in linha_ml.index and str(linha_ml.get(f"{m}_Aprovado", "")) == "✅"
-        ]
+        if _linha_ml_jogo.empty:
 
-        if not _aprovados_jogo and MERCADOS_ML_DIA:
-            # fallback: mostra o mercado de maior confiança mesmo sem aprovação
-            _confs = {
-                m: linha_ml[f"{m}_Confidence"]
-                for m in MERCADOS_ML_DIA
-                if f"{m}_Confidence" in linha_ml.index and pd.notna(linha_ml[f"{m}_Confidence"])
-            }
-            if _confs:
-                _aprovados_jogo = [max(_confs, key=_confs.get)]
+            st.info("Esse jogo não está nas previsões do Machine Learning de hoje.")
 
-        if not _aprovados_jogo:
-            st.caption("Sem sinais para este jogo.")
         else:
-            for m in _aprovados_jogo:
-                st.markdown(f"**{LABEL_MERCADO_ML.get(m,m)}**")
-                st.write(linha_ml.get(f"{m}_Motivo", "—"))
 
-        st.markdown("---")
+            linha_ml = _linha_ml_jogo.iloc[0]
 
-        # --------------------------------------------------
-        # 🎴 CARDS POR MERCADO (V2) — usa jogos_semelhantes já
-        # calculado globalmente (motor KNN) pro jogo selecionado
-        # --------------------------------------------------
+            _home_nome = linha_ml.get("Home_Team", jogo.split(" x ")[0])
+            _away_nome = linha_ml.get("Visitor_Team", jogo.split(" x ")[-1])
 
-        st.markdown("#### 🎴 Cards por Mercado")
+            _crest_h = escudo_base64(_home_nome)
+            _crest_a = escudo_base64(_away_nome)
+            _crest_h_html = f'<img src="{_crest_h}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">' if _crest_h else "⚽"
+            _crest_a_html = f'<img src="{_crest_a}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">' if _crest_a else "⚽"
+
+            _odd_c = linha_csv.get("Odds_Casa", np.nan) if not linha_csv.empty else np.nan
+            _odd_e = linha_csv.get("Odds_Empate", np.nan) if not linha_csv.empty else np.nan
+            _odd_v = linha_csv.get("Odds_Visitante", np.nan) if not linha_csv.empty else np.nan
+
+            _header_jogo_html = f"""
+            <div class="ml-header-jogo">
+                <div class="ml-team-block">
+                    <div class="ml-crest-sm">{_crest_h_html}</div>
+                    <div class="ml-team-name">{_home_nome}</div>
+                </div>
+                <div class="ml-odds-block">
+                    <div>Casa: <b>{_ml_fmt_pct(_odd_c,2)}</b></div>
+                    <div>Empate: <b>{_ml_fmt_pct(_odd_e,2)}</b></div>
+                    <div>Visitante: <b>{_ml_fmt_pct(_odd_v,2)}</b></div>
+                </div>
+                <div class="ml-team-block">
+                    <div class="ml-team-name">{_away_nome}</div>
+                    <div class="ml-crest-sm">{_crest_a_html}</div>
+                </div>
+            </div>
+            """
+            st.markdown(_ml_dedent(_header_jogo_html), unsafe_allow_html=True)
+
+            # --------------------------------------------------
+            # IA GERAL (média dos mercados aprovados do jogo)
+            # --------------------------------------------------
+            _probs_jogo = [
+                linha_ml[f"{m}_Prob"]
+                for m in MERCADOS_ML_DIA
+                if f"{m}_Prob" in linha_ml.index and pd.notna(linha_ml[f"{m}_Prob"])
+            ]
+            _ia_geral = float(np.mean(_probs_jogo)) if _probs_jogo else None
+            _cor_ia_geral = _ml_cor_valor(_ia_geral)
+            _situacao_geral = _ml_situacao(_ia_geral)
+
+            # --------------------------------------------------
+            # 🔧 NOVO — resumo estilizado (substitui st.metric solto)
+            # + mini-cards por grupo em grid, sem coluna vazia gigante
+            # --------------------------------------------------
+            _resumo_html = f"""
+            <div class="ml-card" style="display:flex; justify-content:space-around; align-items:center; margin-bottom:14px;">
+                <div style="text-align:center;">
+                    <div style="font-size:11px; color:#8a93a3; font-weight:700;">IA GERAL</div>
+                    <div style="font-size:30px; font-weight:900; color:{_cor_ia_geral};">{_ml_fmt_pct(_ia_geral)}</div>
+                </div>
+                <div style="width:1px; height:40px; background:#232c3d;"></div>
+                <div style="text-align:center;">
+                    <div style="font-size:11px; color:#8a93a3; font-weight:700;">CONFIANÇA</div>
+                    <div style="font-size:20px; font-weight:900; color:{_cor_ia_geral};">{_situacao_geral}</div>
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; margin-bottom:14px;">
+            """
+
+            for _nome_grupo, _mercados_grupo in GRUPO_MERCADO_ML.items():
+                _linhas_grupo = ""
+                for m in _mercados_grupo:
+                    col_prob = f"{m}_Prob"
+                    if col_prob in linha_ml.index and pd.notna(linha_ml[col_prob]):
+                        _v = linha_ml[col_prob]
+                        _linhas_grupo += (
+                            f'<div class="ml-card-row"><span>{LABEL_MERCADO_ML[m]}</span>'
+                            f'<b style="color:{_ml_cor_valor(_v)};">{_ml_fmt_pct(_v)}</b></div>'
+                        )
+                if _linhas_grupo:
+                    _resumo_html += f"""
+                    <div class="ml-card">
+                        <div class="ml-card-title">{_nome_grupo.upper()}</div>
+                        {_linhas_grupo}
+                    </div>
+                    """
+
+            _resumo_html += "</div>"
+            st.markdown(_ml_dedent(_resumo_html), unsafe_allow_html=True)
+
+            st.markdown("---")
+
+            # --------------------------------------------------
+            # 🧠 EXPLICAÇÃO DA IA (motivos dos mercados aprovados)
+            # --------------------------------------------------
+
+            st.markdown("#### 🧠 Explicação da IA")
+
+            _aprovados_jogo = [
+                m for m in MERCADOS_ML_DIA
+                if f"{m}_Motivo" in linha_ml.index and str(linha_ml.get(f"{m}_Aprovado", "")) == "✅"
+            ]
+
+            if not _aprovados_jogo and MERCADOS_ML_DIA:
+                # fallback: mostra o mercado de maior confiança mesmo sem aprovação
+                _confs = {
+                    m: linha_ml[f"{m}_Confidence"]
+                    for m in MERCADOS_ML_DIA
+                    if f"{m}_Confidence" in linha_ml.index and pd.notna(linha_ml[f"{m}_Confidence"])
+                }
+                if _confs:
+                    _aprovados_jogo = [max(_confs, key=_confs.get)]
+
+            if not _aprovados_jogo:
+                st.caption("Sem sinais para este jogo.")
+            else:
+                for m in _aprovados_jogo:
+                    st.markdown(f"**{LABEL_MERCADO_ML.get(m,m)}**")
+                    st.write(linha_ml.get(f"{m}_Motivo", "—"))
+
+            st.markdown("---")
+
+            # --------------------------------------------------
+            # 🎴 CARDS POR MERCADO (V2) — usa jogos_semelhantes já
+            # calculado globalmente (motor KNN) pro jogo selecionado
+            # --------------------------------------------------
+
+            st.markdown("#### 🎴 Cards por Mercado")
             st.caption(
                 "Score IA = previsão do modelo treinado · Histórico = taxa real entre os jogos "
                 "semelhantes (motor KNN) · Poisson = probabilidade pela matriz de gols do jogo · "
