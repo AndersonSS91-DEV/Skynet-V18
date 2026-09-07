@@ -5487,21 +5487,11 @@ SINAIS_TODOS = [
     "UNDER15HT",]
 
 def montar_sinais(row, separador=" | "):
-    """Roda os 13 filtros sobre um 'row' (Series/dict) e devolve uma
-    string com os sinais que bateram. Nunca levanta exceção: qualquer
-    filtro com dado ausente/malformado simplesmente não entra na lista."""
+    """Roda todos os filtros sobre o mesmo jogo e mostra
+    TODOS os sinais que bateram."""
     ativos = []
 
-    for grupo in (GRUPO_OVER_FT, GRUPO_OVER_HT):
-        for nome in grupo:
-            try:
-                if FILTROS[nome](row):
-                    ativos.append(LABEL[nome])
-                    break
-            except Exception:
-                continue
-
-    for nome in SINAIS_LIVRES:
+    for nome in SINAIS_TODOS:
         try:
             if FILTROS[nome](row):
                 ativos.append(LABEL[nome])
