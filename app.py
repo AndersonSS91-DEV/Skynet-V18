@@ -5652,33 +5652,8 @@ Home {home_emoji}   x   Away {away_emoji}
     else:
         st.info("Nenhum jogo A+/A encontrado")
 
-    # =========================================
-    # 📋 TABELA FINAL
-    # =========================================
-    st.markdown("### 📋 Todos os Jogos Filtrados")
 
-    cols_odds = [
-        "Odd_BTTS_YES",
-        "Odds_Over_2,5FT",
-        "Odds_Casa",
-        "Odds_Visitante"
-    ]
-
-    for col in cols_odds:
-        base_df[col] = (
-            base_df[col]
-            .astype(str)
-            .str.replace(",", ".", regex=False)
-        )
-        base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
-
-    df_clean = base_df[
-        (base_df["Odd_BTTS_YES"] > 0) &
-        (base_df["Odds_Over_2,5FT"] > 0) &
-        (base_df["Odds_Casa"] > 0) &
-        (base_df["Odds_Visitante"] > 0)
-    ].copy()
-
+            
 # =========================================
 # 🤖 ABA IA (ISOLADA CORRETA)
 # =========================================
@@ -6005,33 +5980,6 @@ Home {home_emoji}   x   Away {away_emoji}
         base_df["ExG_Away_ATKxDEF"] +
         base_df["ExG_Away_VG"]
     ) / 3
-
-    # =========================================
-    # 📋 TABELA FINAL
-    # =========================================
-    st.markdown("### 📋 Todos os Jogos Filtrados")
-
-    cols_odds = [
-        "Odd_BTTS_YES",
-        "Odds_Over_2,5FT",
-        "Odds_Casa",
-        "Odds_Visitante"
-    ]
-
-    for col in cols_odds:
-        base_df[col] = (
-            base_df[col]
-            .astype(str)
-            .str.replace(",", ".", regex=False)
-        )
-        base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
-
-    df_clean = base_df[
-        (base_df["Odd_BTTS_YES"] > 0) &
-        (base_df["Odds_Over_2,5FT"] > 0) &
-        (base_df["Odds_Casa"] > 0) &
-        (base_df["Odds_Visitante"] > 0)
-    ].copy()
 
 # =========================================
 # 🤖 ABA IA (ISOLADA CORRETA)
