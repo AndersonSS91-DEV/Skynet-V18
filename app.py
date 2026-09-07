@@ -6831,6 +6831,1474 @@ Home {home_emoji}   x   Away {away_emoji}
 
     else:
 
+        st.info("Sem jogos válidos após filtro")# =========================================
+# 🤖 ABA IA (ISOLADA CORRETA)
+# =========================================
+#
+# 🔧 NOVO — filtros/sinais (ranking600) colados aqui embaixo (sem
+# import de outro arquivo — Streamlit Cloud só enxerga o que está
+# no repositório do GitHub, e um módulo à parte que não sobe junto
+# quebra com ModuleNotFoundError).
+#
+# v2: os valores de "CS 0X0/0X1/1X1/2X2/3X3" no CSV_LIMPO vêm com
+# formato MISTO (parte usa ponto decimal, parte usa vírgula), então
+# chegam como texto. Todo acesso agora passa pelo helper `_num()`,
+# que também protege contra coluna ausente — se um filtro não achar
+# o dado, ele só não bate (não derruba a página).
+
+import numpy as np
+
+
+def _num(v):
+    """Converte com segurança pra float — aceita string com vírgula
+    ou ponto, None, NaN, ou já numérico. Retorna np.nan se não der
+    pra converter (comparação com np.nan é sempre False, então o
+    filtro correspondente só não bate, nunca quebra a página)."""
+    if v is None:
+        return np.nan
+    if isinstance(v, str):
+        v = v.strip().replace(",", ".")
+        if v == "":
+            return np.nan
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return np.nan
+
+
+def filtro_over05ht(row):
+    cs00 = _num(row.get("CS 0X0"))
+    odd = _num(row.get("Odd_Over_0,5HT"))
+    return (cs00 > 18.535) and (1.05 <= odd <= 1.30)
+    # backtest: n=1278 | winrate=82,8% (base ranking600=69,0%) | odd média 1,17
+
+
+def filtro_over15ht(row):
+    cs00 = _num(row.get("CS 0X0"))
+    mgf_ht_h = _num(row.get("MGF_HT_Home"))
+    odd = _num(row.get("Odd_Over_1,5HT"))
+    return (cs00 > 18.195) and (mgf_ht_h > 1.250) and (1.50 <= odd <= 2.20)
+    # backtest: n=419 | winrate=57,0% (base ranking600=34,0%) | odd média 1,90
+
+
+def filtro_over15ft(row):
+    mg_global = _num(row.get("MG_Global"))
+    over15_global = _num(row.get("Over 1,5FT - Global"))
+    odd = _num(row.get("Odd_Over_1,5FT"))
+    return (mg_global > 3.450) and (over15_global > 84.500) and (1.00 <= odd <= 1.35)
+    # backtest: n=2055 | winrate=83,3% (base ranking600=73,9%) | odd média 1,16
+
+
+def filtro_over25ft(row):
+    mg_global = _num(row.get("MG_Global"))
+    exg_total = _num(row.get("ExG_Total"))
+    odd = _num(row.get("Odds_Over_2,5FT"))
+    return (mg_global > 3.350) and (exg_total > 4.305) and (1.15 <= odd <= 1.80)
+    # backtest: n=379 | winrate=71,0% (base ranking600=50,4%) | odd média 1,43
+    # precisa de ExG_Total (só existe nos jogos cobertos pelas planilhas
+    # Poisson — cobertura parcial do período)
+
+
+def filtro_over30ft_asian(row):
+    mg_global = _num(row.get("MG_Global"))
+    media25_global = _num(row.get("Média_2,5FT_Global"))
+    return (mg_global > 3.350) and (media25_global > 89.000)
+    # backtest: n=415 | winrate=62,7% (excluindo pushes; base ranking600=37,0%)
+    # sem odd própria da linha 3,0 no dataset
+
+
+def filtro_btts_sim(row):
+    fdh = _num(row.get("FDH"))
+    clean_games_a = _num(row.get("Clean_Games_A"))
+    faa = _num(row.get("FAA"))
+    odd = _num(row.get("Odd_BTTS_YES"))
+    return (fdh <= 58.000) and (clean_games_a <= 15.000) and (faa > 49.500) and (1.30 <= odd <= 2.00)
+    # backtest: n=537 | winrate=63,7% (base ranking600=52,2%) | odd média 1,61
+
+
+def filtro_lay_goleada_away(row):
+    # "sair perto dos 45HT ou antes ao sofrer dois gols" é regra de
+    # trading AO VIVO — não reproduzível com dados só pré-jogo.
+    # Este filtro cobre só a seleção pré-jogo (reduz risco de cauda).
+    mgfa = _num(row.get("MGFA"))
+    fdh = _num(row.get("FDH"))
+    odd = _num(row.get("Odds_Visitante"))
+    return (mgfa <= 2.150) and (fdh >= 40.000) and (1.10 <= odd <= 6.50)
+    # referência: base ranking600 sem filtro já é n=18309, winrate=97,1%
+
+
+def filtro_lay_empate(row):
+    cs11 = _num(row.get("CS 1X1"))
+    cs22 = _num(row.get("CS 2X2"))
+    cs00 = _num(row.get("CS 0X0"))
+    odd = _num(row.get("Odds_Empate"))
+    return (cs11 > 7.515) and (cs22 > 19.995) and (cs00 > 12.730) and (5.00 <= odd <= 14.00)
+    # backtest: n=517 | winrate=91,9% (base ranking600=72,0%) | odd empate média 8,47
+
+
+def filtro_lay_away(row):
+    # "Classificação - Casa.1" no CSV_LIMPO é, na prática, a
+    # classificação do VISITANTE (cabeçalho duplicado no CSV original
+    # virou ".1" no pandas).
+    class_visit = _num(row.get("Classificação - Casa.1"))
+    class_casa = _num(row.get("Classificação - Casa"))
+    mgfh = _num(row.get("MGFH"))
+    odd = _num(row.get("Odds_Visitante"))
+    return (class_visit > 5.500) and (class_casa <= 5.500) and (mgfh > 2.050) and (1.80 <= odd <= 15.00)
+    # backtest: n=1584 | winrate=90,3% (base ranking600=77,5%) | odd visitante média 8,26
+
+
+def filtro_lay_0x0(row):
+    # "ficar até os 65FT": mesma limitação do LayGoleadaAway — regra
+    # de trading ao vivo, não reproduzível só com dados pré-jogo.
+    cs00 = _num(row.get("CS 0X0"))
+    return (cs00 > 9.825) and (cs00 <= 21.155)
+    # backtest: n=7591 | winrate=93,5% (base ranking600=90,7%)
+
+
+def filtro_lay_0x1(row):
+    cs01 = _num(row.get("CS 0X1"))
+    return (cs01 > 12.515) and (cs01 <= 22.805)
+    # backtest: n=3738 | winrate=97,1% (base ranking600=94,2%)
+
+
+def filtro_under25ft(row):
+    mg_global = _num(row.get("MG_Global"))
+    chutes_casa = _num(row.get("Chutes Pro Gol - Casa"))
+    odd = _num(row.get("Odds_Under_2,5FT"))
+    return (mg_global <= 1.850) and (chutes_casa > 2.900) and (1.30 <= odd <= 2.20)
+    # backtest: n=1206 | winrate=61,7% (base ranking600=49,6%) | odd média 1,64
+
+
+def filtro_under15ht(row):
+    cs00 = _num(row.get("CS 0X0"))
+    return (cs00 <= 8.995) and (cs00 > 0.900)
+    # backtest: n=6729 | winrate=73,5% (base ranking600=66,0%)
+
+
+FILTROS = {
+    "OVER05HT": filtro_over05ht,
+    "OVER15HT": filtro_over15ht,
+    "OVER15FT": filtro_over15ft,
+    "OVER25FT": filtro_over25ft,
+    "OVER30FT_ASIAN": filtro_over30ft_asian,
+    "BTTS_SIM": filtro_btts_sim,
+    "LAY_GOLEADA_AWAY": filtro_lay_goleada_away,
+    "LAY_EMPATE": filtro_lay_empate,
+    "LAY_AWAY": filtro_lay_away,
+    "LAY_0X0": filtro_lay_0x0,
+    "LAY_0X1": filtro_lay_0x1,
+    "UNDER25FT": filtro_under25ft,
+    "UNDER15HT": filtro_under15ht,
+}
+
+LABEL = {
+    "OVER05HT":         "Over 0,5HT",
+    "OVER15HT":         "Over 1,5HT",
+    "OVER15FT":         "Over 1,5FT",
+    "OVER25FT":         "Over 2,5FT",
+    "OVER30FT_ASIAN":   "Over 3,0FT (AH)",
+    "BTTS_SIM":         "BTTS",
+    "LAY_GOLEADA_AWAY": "Lay Goleada Away",
+    "LAY_EMPATE":       "Lay Empate",
+    "LAY_AWAY":         "Lay Away",
+    "LAY_0X0":          "Lay 0x0",
+    "LAY_0X1":          "Lay 0x1",
+    "UNDER25FT":        "Under 2,5FT",
+    "UNDER15HT":        "Under 1,5HT",
+}
+
+# do maior pro menor — pega o primeiro que bater e para (evita empilhar
+# mercados redundantes entre si, ex: Over3,0FT asiático já implica
+# Over2,5FT e Over1,5FT)
+GRUPO_OVER_FT = ["OVER30FT_ASIAN", "OVER25FT", "OVER15FT"]
+GRUPO_OVER_HT = ["OVER15HT", "OVER05HT"]
+
+# os demais sinais são independentes e podem aparecer juntos
+SINAIS_LIVRES = [
+    "BTTS_SIM", "LAY_GOLEADA_AWAY", "LAY_EMPATE", "LAY_AWAY",
+    "LAY_0X0", "LAY_0X1", "UNDER25FT", "UNDER15HT",
+]
+
+
+def montar_sinais(row, separador=" | "):
+    """Roda os 13 filtros sobre um 'row' (Series/dict) e devolve uma
+    string com os sinais que bateram. Nunca levanta exceção: qualquer
+    filtro com dado ausente/malformado simplesmente não entra na lista."""
+    ativos = []
+
+    for grupo in (GRUPO_OVER_FT, GRUPO_OVER_HT):
+        for nome in grupo:
+            try:
+                if FILTROS[nome](row):
+                    ativos.append(LABEL[nome])
+                    break
+            except Exception:
+                continue
+
+    for nome in SINAIS_LIVRES:
+        try:
+            if FILTROS[nome](row):
+                ativos.append(LABEL[nome])
+        except Exception:
+            continue
+
+    return separador.join(ativos)
+
+
+with tab7:
+
+    
+    if not df_mgf.empty:
+
+        df_jogo = df_mgf[df_mgf["JOGO"] == jogo]
+
+        if not df_jogo.empty:
+
+            linha = df_jogo.iloc[0]
+            resultado = classificar_jogo(linha)
+
+            if resultado:
+
+                detalhes = ""
+
+                if resultado.get("Principal"):
+                    detalhes += f"🥇 Principal: {resultado['Principal']}\n"
+
+                if resultado.get("Secundario"):
+                    detalhes += f"🥈 Secundário: {resultado['Secundario']}\n"
+
+                if resultado.get("Risco"):
+                    detalhes += f"⚠️ Risco: {resultado['Risco']}\n"
+
+                home_emoji = classificar_filtro_duplo(
+                    linha["Media_CG_H_01"], linha["CV_CG_H_01"],
+                    linha["Media_CG_H_02"], linha["CV_CG_H_02"]
+                )
+
+                away_emoji = classificar_filtro_duplo(
+                    linha["Media_CG_A_01"], linha["CV_CG_A_01"],
+                    linha["Media_CG_A_02"], linha["CV_CG_A_02"]
+                )
+
+                texto = f"""
+🧠 Tipo: {resultado['Tipo']}
+🎯 Entrada: {resultado['Entrada']}
+⏱️ Momento: {resultado['Momento']}
+🏷️ Classe: {resultado['Classe']}
+
+{detalhes}📊 Motivo:
+{resultado['Motivo']}
+
+Home {home_emoji}   x   Away {away_emoji}
+"""
+
+                try:
+                    if linha_consenso is not None:
+                        texto += f"\n⚔️ Direção Poisson: {linha_consenso.get('Poisson_Direcao', '-')}"
+                        texto += f"\n🤖 Direção IA: {linha_consenso.get('IA_Direcao', '-')}"
+                    else:
+                        texto += "\n🧠 IA: não disponível"
+                except:
+                    texto += "\n🧠 IA: erro ao carregar"
+
+                if resultado["Classe"] in ["A+", "A"]:
+                    st.success(texto)
+                elif resultado["Classe"] == "B":
+                    st.warning(texto)
+                else:
+                    st.info(texto)
+
+        else:
+            st.error("❌ Jogo não encontrado")
+
+    else:
+        st.error("❌ df_mgf vazio")
+
+    # =========================================
+    # 📊 RANKING IA (CORRIGIDO)
+    # =========================================
+    base_df = df_mgf.merge(
+        df_consenso[["JOGO", "Poisson_Direcao", "IA_Direcao"]],
+        on="JOGO",
+        how="left"
+    )
+
+    # 🔥 GARANTE QUE EXG ESTÁ NO DATAFRAME
+    base_df = base_df.merge(
+        df_exg[["JOGO", "ExG_Home_ATKxDEF", "ExG_Away_ATKxDEF"]],
+        on="JOGO",
+        how="left"
+    ).merge(
+        df_vg[["JOGO", "ExG_Home_VG", "ExG_Away_VG"]],
+        on="JOGO",
+        how="left")
+
+    
+    base_df = base_df.merge(
+        df_ht[[
+        "JOGO",
+        "MGF_HT_Home",
+        "MGF_HT_Away"]],
+        on="JOGO",
+        how="left")    
+
+    # =========================================
+    # 🔥 EXG CONSENSO
+    # =========================================
+    base_df["ExG_Home_Consenso"] = (
+        base_df["ExG_Home_MGF"] +
+        base_df["ExG_Home_ATKxDEF"] +
+        base_df["ExG_Home_VG"]
+    ) / 3
+
+    base_df["ExG_Away_Consenso"] = (
+        base_df["ExG_Away_MGF"] +
+        base_df["ExG_Away_ATKxDEF"] +
+        base_df["ExG_Away_VG"]
+    ) / 3
+
+    st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
+
+    lista_rank = []
+
+    for _, row in base_df.iterrows():
+
+        res = classificar_jogo(row)
+
+        if not res:
+            continue
+
+        if res["Classe"] not in ["A+", "A"]:
+            continue
+
+        lista_rank.append({
+            "Home_Team": row.get("Home_Team", ""),
+            "Result Home": row.get("Result Home", ""),
+            "Result Visitor": row.get("Result Visitor", ""),
+            "Away_Team": row.get("Visitor_Team", ""),
+            "Result_Home_HT": row.get("Result_Home_HT", ""),
+            "Result_Visitor_HT": row.get("Result_Visitor_HT", ""),
+
+            "Tipo": res["Tipo"],
+            "Entrada": res["Entrada"],
+            "Classe": res["Classe"]
+        })
+
+    if lista_rank:
+        df_rank = pd.DataFrame(lista_rank)
+        df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
+        df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
+        st.dataframe(df_rank, use_container_width=True, hide_index=True)
+    else:
+        st.info("Nenhum jogo A+/A encontrado")
+
+    # =========================================
+    # 📋 TABELA FINAL
+    # =========================================
+    st.markdown("### 📋 Todos os Jogos Filtrados")
+
+    cols_odds = [
+        "Odd_BTTS_YES",
+        "Odds_Over_2,5FT",
+        "Odds_Casa",
+        "Odds_Visitante"
+    ]
+
+    for col in cols_odds:
+        base_df[col] = (
+            base_df[col]
+            .astype(str)
+            .str.replace(",", ".", regex=False)
+        )
+        base_df[col] = pd.to_numeric(base_df[col], errors="coerce")
+
+    df_clean = base_df[
+        (base_df["Odd_BTTS_YES"] > 0) &
+        (base_df["Odds_Over_2,5FT"] > 0) &
+        (base_df["Odds_Casa"] > 0) &
+        (base_df["Odds_Visitante"] > 0)
+    ].copy()
+
+    # =========================================
+    # 🔧 NOVO — TRAZ AS COLUNAS DO df_base (CSV_LIMPO, JÁ CARREGADO
+    # E CACHEADO lá em cima no app — não relê o CSV aqui) QUE OS
+    # FILTROS DE SINAIS PRECISAM E QUE NÃO EXISTEM NAS PLANILHAS
+    # POISSON (MGFH, MG_Global, CS 0X0/0X1/1X1/2X2/3X3, Classificação,
+    # Chutes Pro Gol, etc). Join por uma chave própria, normalizada
+    # (strip + minúsculo dos nomes dos times) — não reaproveita a
+    # coluna "JOGO" de cada lado porque um dos lados pode não vir com
+    # strip() aplicado e aí o join perde jogo por diferença de espaço.
+    # =========================================
+    if not df_base.empty:
+
+        _cols_extra = [
+            "Home_Team", "Visitor_Team",
+            "MGFH", "MGFA", "MGCH", "MGCA",
+            "MG_Global", "Média_2,5FT_Global",
+            "Classificação - Casa", "Classificação - Casa.1",
+            "CS 0X0", "CS 0X1", "CS 1X1", "CS 2X2", "CS 3X3",
+            "Chutes Pro Gol - Casa", "Chutes Pro Gol - Visitante",
+            "Over 1,5FT - Global",
+            "FAH", "FAA", "FDH", "FDA",
+            "Clean_Games_A",
+        ]
+        _cols_extra = [c for c in _cols_extra if c in df_base.columns]
+
+        _extras = df_base[_cols_extra].copy()
+        _extras["_chave_jogo"] = (
+            _extras["Home_Team"].astype(str).str.strip().str.lower()
+            + " x " +
+            _extras["Visitor_Team"].astype(str).str.strip().str.lower()
+        )
+        _extras = _extras.drop(columns=["Home_Team", "Visitor_Team"])
+        # se o mesmo confronto aparecer mais de uma vez no histórico,
+        # fica só com o jogo mais recente pra não duplicar linha no merge
+        _extras = _extras.drop_duplicates(subset="_chave_jogo", keep="last")
+
+        df_clean["_chave_jogo"] = (
+            df_clean["Home_Team"].astype(str).str.strip().str.lower()
+            + " x " +
+            df_clean["Visitor_Team"].astype(str).str.strip().str.lower()
+        )
+
+        df_clean = df_clean.merge(_extras, on="_chave_jogo", how="left")
+        df_clean = df_clean.drop(columns=["_chave_jogo"])
+
+    df_clean["Home"] = df_clean.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_H_01"], x["CV_CG_H_01"],
+            x["Media_CG_H_02"], x["CV_CG_H_02"]
+        ), axis=1
+    )
+
+    df_clean["Away"] = df_clean.apply(
+        lambda x: classificar_filtro_duplo(
+            x["Media_CG_A_01"], x["CV_CG_A_01"],
+            x["Media_CG_A_02"], x["CV_CG_A_02"]
+        ), axis=1
+    )
+
+    # =========================================
+    # 🔥 FUNÇÃO SNIPER / CORE
+    # =========================================
+    def classificar_sniper_core(row):
+        try:
+            exg_home = row.get("ExG_Home_Consenso")
+            exg_away = row.get("ExG_Away_Consenso")
+
+            if pd.isna(exg_home) or pd.isna(exg_away):
+                return ""
+
+            odd_home = float(str(row.get("Odds_Casa", 0)).replace(",", "."))
+            odd_away = float(str(row.get("Odds_Visitante", 0)).replace(",", "."))
+
+            exg_diff = exg_home - exg_away
+            ratio = exg_home / (exg_away + 0.01)
+
+            forca_home = exg_home / odd_home
+            forca_away = exg_away / odd_away
+
+            diff_forca = forca_home - forca_away
+
+            if (
+                (exg_diff > 0.6) and
+                (ratio > 1.45) and
+                (diff_forca > 0.18) and
+                (odd_away >= 2.9) and
+                (odd_away <= 3.8) and
+                (odd_home >= 1.45)
+            ):
+                return "🔥 SNIPER"
+
+            elif (
+                (exg_diff > 0.4) and
+                (ratio > 1.30) and
+                (diff_forca > 0.12) and
+                (odd_away >= 2.5) and
+                (odd_away <= 4.0) and
+                (odd_home >= 1.35)
+            ):
+                return "🟢 CORE"
+
+            else:
+                return ""
+
+        except:
+            return ""
+            
+    # =========================================
+    # 🧠 LISTA FINAL
+    # =========================================
+    lista = []
+
+    for _, row in df_clean.iterrows():
+
+        # =========================================
+        # 🧠 CLASSIFICAÇÃO
+        # =========================================
+        res = classificar_jogo(row)
+
+        if not res:
+            continue
+
+        # =========================================
+        # 🎯 DIREÇÕES
+        # =========================================
+        dir_poisson = str(row.get("Poisson_Direcao", ""))
+        dir_ia = str(row.get("IA_Direcao", ""))
+        
+        # =========================================
+        # 🎯 FUNÇÕES
+        # =========================================
+        def is_lay_away(x):
+            return (
+                isinstance(x, str)
+                and "lay away" in x.lower()
+            )
+        def is_lay_home(x):
+            return (
+                isinstance(x, str)
+                and "lay home" in x.lower())
+
+        # =========================================
+        # 🎯 FLAGS
+        # =========================================
+        passou_filtro_la = True
+        passou_filtro_lh = True
+
+        # =========================================
+        # 🚫 CONFLITOS
+        # =========================================
+
+        if "conflito" in dir_poisson.lower():
+
+            passou_filtro_la = False
+            passou_filtro_lh = False
+
+        if "conflito" in dir_ia.lower():
+
+            passou_filtro_la = False
+            passou_filtro_lh = False
+
+        if "analisar" in dir_ia.lower():
+
+            passou_filtro_la = False
+            passou_filtro_lh = False
+
+        # =========================================
+        # 🚫 NÃO É LAY AWAY
+        # =========================================
+
+        if not (
+            is_lay_away(dir_poisson)
+            and
+            is_lay_away(dir_ia)
+        ):
+
+            passou_filtro_la = False
+
+        # =========================================
+        # 🚫 NÃO É LAY HOME
+        # =========================================
+
+        if not (
+            is_lay_home(dir_poisson)
+            or
+            is_lay_home(dir_ia)
+        ):
+
+            passou_filtro_lh = False
+
+        # =========================================
+        # 🚫 BLACKLIST
+        # =========================================
+
+        league = str(
+            row.get("League", "")
+        ).lower()
+
+        blacklist_keywords = [
+
+            "u17",
+            "u19",
+            "u20",
+            "u21",
+            "u23",
+            "youth",
+            "juniores",
+            "juvenil",
+
+            "women",
+            "woman",
+            "feminino",
+            "fem",
+
+            "reserve",
+            "reserves",
+
+            "friendly",
+            "amistoso", 
+            "serie c",
+            "serie d",
+            "nwsl",
+            "copa paulista"
+        ]
+
+        if any(
+            word in league
+            for word in blacklist_keywords
+        ):
+
+            passou_filtro_la = False
+            passou_filtro_lh = False
+
+        # =========================================
+        # 🚫 UNDER 2.5
+        # =========================================
+
+        odd_under25 = row.get(
+            "Odds_Under_2,5FT",
+            np.nan
+        )
+
+        if pd.notna(odd_under25):
+
+            if odd_under25 > 8.50:
+
+                passou_filtro_la = False
+                passou_filtro_lh = False
+
+        # =========================================
+        # 🚫 CV AWAY
+        # =========================================
+
+        CV_CG_A_01 = row.get(
+            "CV_CG_A_01",
+            np.nan
+        )
+
+        Media_CG_A_01 = row.get(
+            "Media_CG_A_01",
+            np.nan
+        )
+
+        if pd.notna(CV_CG_A_01):
+
+            if CV_CG_A_01 > 2.00:
+
+                passou_filtro_la = False
+
+        # =========================================
+        # 🚫 AWAY ROCKET
+        # =========================================
+
+        def away_is_rocket():
+
+            return (
+                2.70 <= Media_CG_A_01 <= 3.00
+                and
+                CV_CG_A_01 <= 0.90
+            )
+
+        # =========================================
+        # 🚫 AWAY VOLCANO
+        # =========================================
+
+        def away_is_volcano():
+
+            return (
+                2.80 <= Media_CG_A_01 <= 5.50
+                and
+                CV_CG_A_01 <= 0.80
+            )
+
+        if away_is_rocket():
+
+            passou_filtro_la = False
+
+        if away_is_volcano():
+
+            passou_filtro_la = False
+
+        # =========================================
+        # 🚫 CV HOME
+        # =========================================
+
+        CV_CG_H_01 = row.get(
+            "CV_CG_H_01",
+            np.nan
+        )
+
+        Media_CG_H_01 = row.get(
+            "Media_CG_H_01",
+            np.nan
+        )
+
+        Media_CG_H_02 = row.get(
+            "Media_CG_H_02",
+            np.nan
+        )
+
+        CV_CG_H_02 = row.get(
+            "CV_CG_H_02",
+            np.nan
+        )
+
+        # =========================================
+        # 🚫 CLASSIFICAÇÃO NUMÉRICA HOME — LAY AWAY
+        # =========================================
+        def home_tem_classificacao():
+
+            condicoes = []
+
+            condicoes.append(Media_CG_H_01 < 2.00)
+
+            condicoes.append(
+                2.00 <= Media_CG_H_01 < 2.70
+            )
+
+            condicoes.append(
+                2.70 <= Media_CG_H_01 <= 3.00
+                and
+                CV_CG_H_01 <= 0.90
+            )
+
+            condicoes.append(
+                2.80 <= Media_CG_H_01 <= 5.50
+                and
+                CV_CG_H_01 <= 0.80
+            )
+
+            condicoes.append(
+                Media_CG_H_01 > 5.50
+            )
+
+            condicoes.append(
+                Media_CG_H_02 < 0.90
+            )
+
+            condicoes.append(
+                0.90 <= Media_CG_H_02 <= 2.00
+                and
+                CV_CG_H_02 <= 0.80
+            )
+
+            condicoes.append(
+                Media_CG_H_02 > 2.00
+            )
+
+            return any(condicoes)
+
+        if not home_tem_classificacao():
+            passou_filtro_la = False
+
+        if pd.notna(CV_CG_H_01):
+
+            if CV_CG_H_01 > 2.00:
+
+                passou_filtro_lh = False
+
+        # =========================================
+        # 🚫 HOME ROCKET
+        # =========================================
+
+        def home_is_rocket():
+
+            return (
+                2.70 <= Media_CG_H_01 <= 3.00
+                and
+                CV_CG_H_01 <= 0.90
+            )
+
+        # =========================================
+        # 🚫 HOME VOLCANO
+        # =========================================
+
+        def home_is_volcano():
+
+            return (
+                2.80 <= Media_CG_H_01 <= 5.50
+                and
+                CV_CG_H_01 <= 0.80
+            )
+
+        if home_is_rocket():
+
+            passou_filtro_lh = False
+
+        if home_is_volcano():
+
+            passou_filtro_lh = False
+
+        # =========================================
+        # 💜 FLAG ELITE BLOQUEADO
+        # =========================================
+
+        elite_bloqueado_la = False
+
+        if (
+
+            is_lay_away(dir_poisson)
+            or
+            is_lay_away(dir_ia)
+
+        ):
+
+            if not df_rank_la.empty:
+
+                home_key = (
+
+                    str(row["Home_Team"])
+                    .strip()
+                    .lower()
+
+                )
+
+                linha_rank_elite = df_rank_la[
+
+                    df_rank_la["Home_Key"]
+                    == home_key
+
+                ]
+
+                if not linha_rank_elite.empty:
+
+                    # =====================================
+                    # 🚫 BLOQUEIOS ESPECÍFICOS
+                    # =====================================
+
+                    bloqueado_cv = (
+
+                        pd.notna(CV_CG_A_01)
+                        and
+                        CV_CG_A_01 > 2.00
+
+                    )
+
+                    bloqueado_rocket = away_is_rocket()
+
+                    bloqueado_volcano = away_is_volcano()
+
+                    if (
+
+                        not passou_filtro_la
+
+                        and
+
+                        (
+                            bloqueado_cv
+                            or
+                            bloqueado_rocket
+                            or
+                            bloqueado_volcano
+                        )
+
+                    ):
+
+                        elite_bloqueado_la = True
+
+        # =========================================
+        # 🧠 TIER LAY AWAY
+        # =========================================
+
+        tier_la = ""
+
+        if (
+            passou_filtro_la
+            or
+            elite_bloqueado_la
+        ):
+
+            if "lay away" in dir_ia.lower():
+
+                odd_home = row.get(
+                    "Odds_Casa",
+                    np.nan
+                )
+
+                if pd.notna(odd_home):
+
+                    if odd_home > 1.13 and odd_home < 5.01:
+
+                        if df_rank_la.empty:
+
+                            tier_la = ""
+                            passou_filtro_la = False
+
+                        else:
+
+                            home_key = (
+                                str(row["Home_Team"])
+                                .strip()
+                                .lower()
+                            )
+
+                            linha_rank = df_rank_la[
+                                df_rank_la["Home_Key"]
+                                == home_key
+                            ]
+
+                            # 🚫 HOME NÃO ESTÁ NO TOP600
+                            if linha_rank.empty:
+
+                                tier_la = ""
+                                passou_filtro_la = False
+
+                            else:
+
+                                tier_original = linha_rank.iloc[0].get(
+                                    "Tier_LA",
+                                    ""
+                                )
+
+                                if tier_original is None:
+
+                                    tier_original = ""
+
+                                elif pd.isna(tier_original):
+
+                                    tier_original = ""
+
+                                tier_original = str(
+                                    tier_original
+                                ).strip()
+
+                                # =============================
+                                # ✅ FILTRO NORMAL
+                                # =============================
+
+                                if passou_filtro_la:
+
+                                    tier_la = tier_original
+
+                                # =============================
+                                # 💜 ELITE BLOQUEADO
+                                # =============================
+
+                                else:
+
+                                    if "⭐⭐⭐⭐⭐" in tier_original:
+
+                                        tier_la = "LA💜💜💜💜💜"
+
+                                    elif "⭐⭐⭐" in tier_original:
+
+                                        tier_la = "LA💜💜💜"
+
+                                    elif "⭐" in tier_original:
+
+                                        tier_la = "LA💜"
+
+                                    else:
+
+                                        tier_la = ""
+
+        # =========================================
+        # 🧠 TIER LAY HOME
+        # =========================================
+
+        tier_lh = ""
+
+        if passou_filtro_lh:
+
+            if "lay home" in dir_ia.lower():
+
+                odd_away = row.get(
+                    "Odds_Visitante",
+                    np.nan
+                )
+
+                if pd.notna(odd_away):
+
+                    if odd_away > 1.13:
+
+                        if df_rank_lh.empty:
+
+                            tier_lh = ""
+                            passou_filtro_lh = False
+
+                        else:
+
+                            away_key = (
+                                str(row["Visitor_Team"])
+                                .strip()
+                                .lower()
+                            )
+
+                            linha_rank = df_rank_lh[
+                                df_rank_lh["Away_Key"]
+                                == away_key
+                            ]
+
+                            # 🚫 AWAY NÃO ESTÁ NO TOP200
+                            if linha_rank.empty:
+
+                                tier_lh = ""
+                                passou_filtro_lh = False
+
+                            else:
+
+                                tier_lh = linha_rank.iloc[0].get(
+                                    "Tier_LH",
+                                    ""
+                                )
+
+                                if tier_lh is None:
+
+                                    tier_lh = ""
+
+                                elif pd.isna(tier_lh):
+
+                                    tier_lh = ""
+
+                                tier_lh = str(
+                                    tier_lh
+                                ).strip()
+
+        # =========================================
+        # 🧠 TIER HANDICAP VALUE
+        # =========================================
+
+        tier_ha = ""
+
+        score_zebra = np.nan
+
+        try:
+
+            vr01 = row.get(
+                "VR01",
+                np.nan
+            )
+
+            odd_home = row.get(
+                "Odds_Casa",
+                np.nan
+            )
+
+            odd_away = row.get(
+                "Odds_Visitante",
+                np.nan
+            )
+
+            mgf_h = row.get(
+                "MGF_H",
+                np.nan
+            )
+
+            mgf_a = row.get(
+                "MGF_A",
+                np.nan
+            )
+
+            mgc_h = row.get(
+                "MGC_H",
+                np.nan
+            )
+
+            mgc_a = row.get(
+                "MGC_A",
+                np.nan
+            )
+
+            ht_h = row.get(
+                "MGF_HT_Home",
+                np.nan
+            )
+
+            ht_a = row.get(
+                "MGF_HT_Away",
+                np.nan
+            )
+
+            # =====================================
+            # 🚫 SEGURANÇA
+            # =====================================
+
+            valores = [
+
+                vr01,
+
+                odd_home,
+                odd_away,
+
+                mgf_h,
+                mgf_a,
+
+                mgc_h,
+                mgc_a,
+
+                ht_h,
+                ht_a
+
+            ]
+ 
+            if not any(pd.isna(v) for v in valores):
+                
+           # =====================================
+           # ⭐ DEFINE FAVORITO / ZEBRA
+           # =====================================
+                if odd_home < odd_away:
+
+                    odd_fav = odd_home
+
+                    favorito_mgf = mgf_h
+                    zebra_mgf = mgf_a
+
+                    favorito_mgc = mgc_h
+                    zebra_mgc = mgc_a
+
+                    favorito_ht = ht_h
+                    zebra_ht = ht_a
+
+                    zebra_nome = row.get("Away", "")
+
+                else:
+
+                    odd_fav = odd_away
+
+                    favorito_mgf = mgf_a
+                    zebra_mgf = mgf_h
+
+                    favorito_mgc = mgc_a
+                    zebra_mgc = mgc_h
+
+                    favorito_ht = ht_a
+                    zebra_ht = ht_h
+
+                    zebra_nome = row.get("Home", "")
+
+        # =====================================
+        # 🧠 SCORE ZEBRA
+        # =====================================
+                score_zebra = (
+
+                    (abs(vr01) * 2.2)
+
+                    +
+
+                    (zebra_mgf - favorito_mgf)
+
+                    +
+
+                    ((zebra_ht - favorito_ht) * 1.4)
+
+                    +
+
+                    ((favorito_mgc - zebra_mgc) * 0.8))
+                
+        # =====================================
+        # 🧠 SCORE ZEBRA
+        # =====================================
+                if (vr01 < 0
+                    and odd_fav < 2.30):
+
+                    if score_zebra >= 1.20:
+
+                        tier_ha = "🔥 HA+1.25 ELITE"
+
+                    elif score_zebra >= 0.80:
+
+                        tier_ha = "🟢 HA+1.25 FORTE"
+
+                    elif score_zebra >= 0.35:
+
+                        tier_ha = "🟡 HA+1.25 VALUE"
+
+        except:
+
+            pass
+
+        # =========================================
+        # 🔧 NOVO — COLUNA "SINAIS"
+        # Roda os 13 filtros dos mercados ranking600 sobre esse mesmo
+        # `row` (já tem as colunas extras do df_base mescladas lá em
+        # cima) e junta os que bateram numa string só.
+        # =========================================
+
+        sinais = montar_sinais(row)
+
+        # =========================================
+        # 💰 STAKE
+        # =========================================
+
+        stake = 0
+
+        odd_home = row.get(
+            "Odds_Casa",
+            np.nan
+        )
+
+        # =========================================
+        # 💰 STAKE LAY AWAY
+        # =========================================
+        # MESMA REGRA DO BACKTEST
+        # UNIDADE = R$ 1.000
+        # MÁXIMO = 2,5 UNIDADES = R$ 2.500
+        # Stake definida EXCLUSIVAMENTE pela Odd Casa
+        # =========================================
+
+        stake = 1000
+
+        if 1.00 <= odd_home < 1.12:
+            stake = 500
+
+        elif 1.12 <= odd_home < 1.20:
+            stake = 900
+
+        elif 1.20 <= odd_home < 1.30:
+            stake = 1100
+
+        elif 1.30 <= odd_home < 1.40:
+            stake = 1200
+
+        elif 1.40 <= odd_home < 1.50:
+            stake = 800
+
+        elif 1.50 <= odd_home < 1.60:
+            stake = 1100
+
+        elif 1.60 <= odd_home < 1.70:
+            stake = 1750
+
+        elif 1.70 <= odd_home < 1.80:
+            stake = 1400
+
+        elif 1.80 <= odd_home < 1.90:
+            stake = 1200
+
+        elif 1.90 <= odd_home < 2.00:
+            stake = 800
+
+        elif 2.00 <= odd_home < 2.20:
+            stake = 1500
+
+        elif 2.20 <= odd_home < 2.50:
+            stake = 2500
+
+        elif 2.50 <= odd_home < 3.00:
+            stake = 1400
+
+        elif 3.00 <= odd_home <= 5.00:
+            stake = 2250
+
+                # =====================================
+        # 💜💜💜💜💜
+        # =====================================
+
+        elif "💜💜💜💜💜" in tier_la:
+
+            if odd_home < 1.12:
+                stake = 13
+
+            elif odd_home < 1.20:
+                stake = 21
+
+            elif odd_home < 1.30:
+                stake = 26
+
+            elif odd_home < 1.40:
+                stake = 30
+
+            elif odd_home < 1.50:
+                stake = 21
+
+            elif odd_home < 1.60:
+                stake = 30
+
+            elif odd_home < 1.70:
+                stake = 43
+
+            elif odd_home < 1.80:
+                stake = 39
+
+            elif odd_home < 1.90:
+                stake = 30
+
+            elif odd_home < 2.00:
+                stake = 21
+
+            elif odd_home < 2.20:
+                stake = 39
+
+            elif odd_home < 2.50:
+                stake = 60
+
+            elif odd_home < 3.00:
+                stake = 39
+
+            elif odd_home <= 5:
+                stake = 51
+
+            else:
+                stake = 21
+
+        # =====================================
+        # 💜💜💜
+        # =====================================
+
+        elif "💜💜💜" in tier_la:
+
+            stake = 30
+
+        # =====================================
+        # 💜
+        # =====================================
+
+        elif "💜" in tier_la:
+
+            stake = 13
+
+        
+        # =========================================
+        # 🟡 HANDICAP
+        # =========================================
+        if isinstance(tier_ha, str):
+
+            if "ELITE" in tier_ha:
+                stake = 100
+
+            elif "FORTE" in tier_ha:
+                stake = 70
+
+            elif "VALUE" in tier_ha:
+                stake = 40
+                
+        # =========================================
+        # 📋 APPEND FINAL
+        # =========================================
+
+        lista.append({
+
+            "Home": row["Home"],
+            "Away": row["Away"],
+            "Stake": stake,
+
+            # 🔥 TIER
+            "Tier_LA": tier_la,
+            "Tier_LH": tier_lh,
+            "Tier_HA": tier_ha,
+
+            # 🔧 NOVO — sinais dos 13 mercados (ranking600), entre
+            # Tier_HA e Score_Zebra como pedido
+            "Sinais": sinais,
+
+            # 🔥 SCORE
+            "Score_Zebra": (
+                round(score_zebra, 2)
+                if pd.notna(score_zebra)
+                else np.nan
+            ),
+
+            # 🔥 TIMES
+            "Home_Team": row.get(
+                "Home_Team",
+                ""
+            ),
+
+            "Away_Team": row.get(
+                "Visitor_Team",
+                ""
+            ),
+
+            # 🔥 RESULTADOS
+            "Result Home": row.get(
+                "Result Home",
+                ""
+            ),
+
+            "Result Visitor": row.get(
+                "Result Visitor",
+                ""
+            ),
+
+            "Result_Home_HT": row.get(
+                "Result_Home_HT",
+                ""
+            ),
+
+            "Result_Visitor_HT": row.get(
+                "Result_Visitor_HT",
+                ""
+            ),
+
+            # 🔥 ODDS
+            "Odds_Casa": row.get(
+                "Odds_Casa",
+                ""
+            ),
+
+            "Odds_Empate": row.get(
+                "Odds_Empate",
+                ""
+            ),
+
+            "Odds_Visitante": row.get(
+                "Odds_Visitante",
+                ""
+            ),
+
+            "Odd_Over_1,5FT": row.get(
+                "Odd_Over_1,5FT",
+                ""
+            ),
+
+            "Odds_Over_2,5FT": row.get(
+                "Odds_Over_2,5FT",
+                ""
+            ),
+
+            "Odds_Under_2,5FT": row.get(
+                "Odds_Under_2,5FT",
+                ""
+            ),
+
+            "Odd_BTTS_YES": row.get(
+                "Odd_BTTS_YES",
+                ""
+            ),
+
+            # 🔥 MODELO
+            "Tipo": res["Tipo"],
+            "Entrada": res["Entrada"],
+            "Classe": res["Classe"],
+
+            "LAY": definir_lay(row),
+
+            "Modelo": classificar_sniper_core(row),
+
+            "Poisson_Direcao": row.get(
+                "Poisson_Direcao",
+                ""
+            ),
+
+            "IA_Direcao": row.get(
+                "IA_Direcao",
+                ""
+            )})
+
+    # =========================================
+    # 📈 OUTPUT FINAL
+    # =========================================
+
+    if lista:
+
+        df_final_aba7 = pd.DataFrame(lista)
+        # =========================================
+        # GARANTE TIPO NUMÉRICO
+        # =========================================
+        df_final_aba7["Score_Zebra"] = pd.to_numeric(
+            df_final_aba7["Score_Zebra"],
+            errors="coerce"
+        )
+
+        st.dataframe(
+            df_final_aba7,
+            use_container_width=True,
+            hide_index=True)
+
+    else:
+
         st.info("Sem jogos válidos após filtro")
 
 
