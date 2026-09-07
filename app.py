@@ -5293,11 +5293,306 @@ def definir_lay(row):
 # 🤖 ABA IA (ISOLADA CORRETA)
 # =========================================
 #
-# 🔧 NOVO — import do módulo de filtros/sinais (ranking600).
-# Idealmente isso vai lá no topo do arquivo principal do app,
-# junto com os outros imports (pandas, streamlit etc.) — deixei
-# aqui só pra ficar junto do resto do bloco.
-from filtros_ranking600 import montar_sinais
+# 🔧 NOVO — filtros/sinais (ranking600) colados direto aqui embaixo
+# (sem import de arquivo separado) porque o Streamlit Cloud só
+# enxerga o que estiver no repositório do GitHub — se o
+# filtros_ranking600.py não subir junto, o import quebra com
+# ModuleNotFoundError. Copiando o código pra dentro do próprio
+# app.py evita esse problema.
+
+# ============================================================
+# FILTROS — RANKING600 JOGANDO EM CASA
+# ============================================================
+# Metodologia:
+#   1. Base: CSV_LIMPO.csv (64.593 jogos, 2025-02-01 a 2026-09-07,
+#      resultado real conhecido em ~99,8% das linhas).
+#   2. Restrita aos jogos em que o Home_Team está na lista
+#      ranking_times_base_TOP600_LIMPO.xlsx (692 times, join por
+#      Country + Home_Team -> 18.309 jogos com resultado).
+#   3. Enriquecida com as 4 planilhas POISSON_GLOBAL_MATRIZES
+#      (Prob_Gol_HT, Selo_HT, BTTS_%, Clean_Sheet_%, ExG_Total etc.)
+#      via join Home_Team + Hour — cobertura de 11.686/18.309 jogos
+#      (fora desse período os campos Poisson ficam NaN).
+#   4. Para cada mercado, treinei uma árvore de decisão rasa
+#      (profundidade 3, sem usar a odd do próprio mercado como
+#      variável de corte — senão a árvore só reaprende a odd
+#      implícita, o que não é "alpha") sobre as estatísticas
+#      pré-jogo, e escolhi o nó-folha com melhor equilíbrio entre
+#      winrate e amostra.
+#   5. IMPORTANTE — limitações:
+#      - LayGoleadaAway: a regra de "sair perto dos 45HT ou antes
+#        ao sofrer dois gols" é uma decisão DE TRADING AO VIVO
+#        (in-play). Essa base é só pré-jogo, então NÃO dá pra
+#        reproduzir a saída antecipada — o filtro abaixo cobre só
+#        a seleção pré-jogo (evitar visitantes com risco real de
+#        goleada). A lógica de cash-out tem que vir de outra fonte
+#        de dados (odds ao vivo / minutagem de gols).
+#      - Over3,0FT asiático: não existe coluna de odd para essa
+#        linha no CSV_LIMPO/Poisson (só existe Odds_Over_2,5FT).
+#        O winrate abaixo já desconta os empurra (push, total=3),
+#        mas a odd mostrada é a de Over 2,5FT (proxy), não a real
+#        da linha 3,0 — ajuste a faixa de odd na hora de plugar
+#        a odd real da casa.
+#      - LayEmpate: o winrate é "não empatou no FT"; a mecânica de
+#        stake/comissão da exchange fica por sua conta — aqui só
+#        entra a seleção pré-jogo via probabilidade de placares de
+#        empate (CS 0x0/1x1/2x2/3x3).
+# ============================================================
+
+
+def filtro_over05ht(row):
+    return (
+        row["CS 0X0"] > 18.535
+        and 1.05 <= row["Odd_Over_0,5HT"] <= 1.30
+    )
+    # backtest: n=1278 | winrate=82,8% (base ranking600=69,0%) | odd média 1,17
+
+
+def filtro_over15ht(row):
+    return (
+        row["CS 0X0"] > 18.195
+        and row["MGF_HT_Home"] > 1.250
+        and 1.50 <= row["Odd_Over_1,5HT"] <= 2.20
+    )
+    # backtest: n=419 | winrate=57,0% (base ranking600=34,0%) | odd média 1,90
+
+
+def filtro_over15ft(row):
+    return (
+        row["MG_Global"] > 3.450
+        and row["Over 1,5FT - Global"] > 84.500
+        and 1.00 <= row["Odd_Over_1,5FT"] <= 1.35
+    )
+    # backtest: n=2055 | winrate=83,3% (base ranking600=73,9%) | odd média 1,16
+
+
+def filtro_over25ft(row):
+    return (
+        row["MG_Global"] > 3.350
+        and row["ExG_Total"] > 4.305
+        and 1.15 <= row["Odds_Over_2,5FT"] <= 1.80
+    )
+    # backtest: n=379 | winrate=71,0% (base ranking600=50,4%) | odd média 1,43
+    # ATENÇÃO: precisa de ExG_Total (só vem das planilhas Poisson,
+    # cobertura parcial do período — ver limitação acima)
+
+
+def filtro_over30ft_asian(row):
+    return (
+        row["MG_Global"] > 3.350
+        and row["Média_2,5FT_Global"] > 89.000
+    )
+    # backtest: n=415 | winrate=62,7% (excluindo pushes; base ranking600=37,0%)
+    # sem odd própria da linha 3,0 no dataset — ver limitação acima
+
+
+def filtro_btts_sim(row):
+    return (
+        row["FDH"] <= 58.000
+        and row["Clean_Games_A"] <= 15.000
+        and row["FAA"] > 49.500
+        and 1.30 <= row["Odd_BTTS_YES"] <= 2.00
+    )
+    # backtest: n=537 | winrate=63,7% (base ranking600=52,2%) | odd média 1,61
+
+
+def filtro_lay_goleada_away(row):
+    # Seleção pré-jogo (não cobre a saída ao vivo — ver limitação acima).
+    # Base ranking600 já sai em 97,1% sem filtro nenhum: a árvore não achou
+    # corte estatístico pré-jogo que bata isso com amostra relevante.
+    # Este filtro serve só pra reduzir risco de cauda (afastar os poucos
+    # jogos onde o visitante tem perfil ofensivo/artilheiro fora de série).
+    return (
+        row["MGFA"] <= 2.150
+        and row["FDH"] >= 40.000
+        and 1.10 <= row["Odds_Visitante"] <= 6.50
+    )
+    # backtest de referência: base ranking600 sem filtro já é n=18309, winrate=97,1%
+
+
+def filtro_lay_empate(row):
+    return (
+        row["CS 1X1"] > 7.515
+        and row["CS 2X2"] > 19.995
+        and row["CS 0X0"] > 12.730
+        and 5.00 <= row["Odds_Empate"] <= 14.00
+    )
+    # backtest: n=517 | winrate=91,9% (base ranking600=72,0%) | odd empate média 8,47
+
+
+def filtro_lay_away(row):
+    # "Classificação - Casa.1" no CSV_LIMPO é, na prática, a classificação
+    # do VISITANTE (o cabeçalho duplicado do CSV original virou ".1" no
+    # pandas) — cuidado se for reaproveitar essa coluna em outro lugar.
+    return (
+        row["Classificação - Casa.1"] > 5.500
+        and row["Classificação - Casa"] <= 5.500
+        and row["MGFH"] > 2.050
+        and 1.80 <= row["Odds_Visitante"] <= 15.00
+    )
+    # backtest: n=1584 | winrate=90,3% (base ranking600=77,5%) | odd visitante média 8,26
+
+
+def filtro_lay_0x0(row):
+    # "ficar até os 65FT": mesma limitação do LayGoleadaAway — é regra de
+    # trading ao vivo (cash-out se ainda 0x0 perto dos 65min), não dá pra
+    # reproduzir com dados só pré-jogo (não sabemos EM QUE MINUTO o gol saiu,
+    # só se saiu até o HT e o placar final). O filtro abaixo cobre só a
+    # seleção pré-jogo: jogos com correct-score 0x0 caro o suficiente pra
+    # long-shot 0x0 ser raro.
+    return (
+        row["CS 0X0"] > 9.825
+        and row["CS 0X0"] <= 21.155
+    )
+    # backtest: n=7591 | winrate=93,5% (base ranking600=90,7%)
+    # usa a odd de correct-score 0x0 da própria casa como feature —
+    # não existe produto "Lay 0x0" com odd própria no dataset
+
+
+def filtro_lay_0x1(row):
+    return (
+        row["CS 0X1"] > 12.515
+        and row["CS 0X1"] <= 22.805
+    )
+    # backtest: n=3738 | winrate=97,1% (base ranking600=94,2%)
+    # mesma observação do Lay 0x0: usa a odd de correct-score 0x1
+
+
+def filtro_under25ft(row):
+    return (
+        row["MG_Global"] <= 1.850
+        and row["Chutes Pro Gol - Casa"] > 2.900
+        and 1.30 <= row["Odds_Under_2,5FT"] <= 2.20
+    )
+    # backtest: n=1206 | winrate=61,7% (base ranking600=49,6%) | odd média 1,64
+
+
+def filtro_under15ht(row):
+    return (
+        row["CS 0X0"] <= 8.995
+        and row["CS 0X0"] > 0.900
+    )
+    # backtest: n=6729 | winrate=73,5% (base ranking600=66,0%)
+    # sem odd própria de Under1,5HT no dataset — usa CS 0x0 como proxy
+    # (placar final "baixo" tende a vir com CS 0x0 mais barato)
+
+
+FILTROS = {
+    "OVER05HT": filtro_over05ht,
+    "OVER15HT": filtro_over15ht,
+    "OVER15FT": filtro_over15ft,
+    "OVER25FT": filtro_over25ft,
+    "OVER30FT_ASIAN": filtro_over30ft_asian,
+    "BTTS_SIM": filtro_btts_sim,
+    "LAY_GOLEADA_AWAY": filtro_lay_goleada_away,
+    "LAY_EMPATE": filtro_lay_empate,
+    "LAY_AWAY": filtro_lay_away,
+    "LAY_0X0": filtro_lay_0x0,
+    "LAY_0X1": filtro_lay_0x1,
+    "UNDER25FT": filtro_under25ft,
+    "UNDER15HT": filtro_under15ht,
+}
+
+# ============================================================
+# COLUNA "SINAIS" — agrega os sinais que o jogo bateu
+# ============================================================
+# Regra do usuário: nas famílias de Over Gols FT e Over Gols HT,
+# os mercados são redundantes entre si (quem bate Over3,0FT
+# asiático também bateria Over2,5/Over1,5; quem bate Over1,5HT
+# também bateria Over0,5HT) — então mostra só o MAIOR nível batido,
+# não os três/dois empilhados. Os outros 9 sinais são independentes
+# e podem aparecer juntos, um jogo pode ter vários ao mesmo tempo.
+# ============================================================
+
+LABEL = {
+    "OVER05HT":         "Over 0,5HT",
+    "OVER15HT":         "Over 1,5HT",
+    "OVER15FT":         "Over 1,5FT",
+    "OVER25FT":         "Over 2,5FT",
+    "OVER30FT_ASIAN":   "Over 3,0FT (AH)",
+    "BTTS_SIM":         "BTTS",
+    "LAY_GOLEADA_AWAY": "Lay Goleada Away",
+    "LAY_EMPATE":       "Lay Empate",
+    "LAY_AWAY":         "Lay Away",
+    "LAY_0X0":          "Lay 0x0",
+    "LAY_0X1":          "Lay 0x1",
+    "UNDER25FT":        "Under 2,5FT",
+    "UNDER15HT":        "Under 1,5HT",
+}
+
+# do maior pro menor — pega o primeiro que bater e para
+GRUPO_OVER_FT = ["OVER30FT_ASIAN", "OVER25FT", "OVER15FT"]
+GRUPO_OVER_HT = ["OVER15HT", "OVER05HT"]
+
+# os demais sinais, todos independentes (podem empilhar)
+SINAIS_LIVRES = [
+    "BTTS_SIM", "LAY_GOLEADA_AWAY", "LAY_EMPATE", "LAY_AWAY",
+    "LAY_0X0", "LAY_0X1", "UNDER25FT", "UNDER15HT",
+]
+
+
+def montar_sinais(row, separador=" | "):
+    """
+    Roda todos os filtros num 'row' (dict-like: linha de DataFrame,
+    Series ou dict) e devolve uma string com os sinais que bateram,
+    pronta pra virar a coluna "Sinais" na tabela.
+    Se nenhum filtro bater, devolve "".
+    """
+    ativos = []
+
+    for grupo in (GRUPO_OVER_FT, GRUPO_OVER_HT):
+        for nome in grupo:
+            try:
+                if FILTROS[nome](row):
+                    ativos.append(LABEL[nome])
+                    break  # já achou o maior nível, não desce pros menores
+            except (KeyError, TypeError):
+                continue  # coluna ausente nesse row -> pula o mercado
+
+    for nome in SINAIS_LIVRES:
+        try:
+            if FILTROS[nome](row):
+                ativos.append(LABEL[nome])
+        except (KeyError, TypeError):
+            continue
+
+    return separador.join(ativos)
+
+
+# ============================================================
+# ⚠️ PRA PLUGAR NA ABA IA (streamlit):
+# ============================================================
+# O "row" do loop da Aba IA (df_clean/base_df, vindo das planilhas
+# Poisson_*) usa OUTRA convenção de nomes de coluna da que o
+# CSV_LIMPO usa nestes filtros — ex: lá é "MGF_H"/"MGF_A" (com
+# underscore), aqui é "MGFH"/"MGFA"; lá não existem "MG_Global",
+# "Classificação - Casa", "CS 0X0/0X1/1X1/2X2/3X3", "Chutes Pro Gol -
+# Casa" nem "Over 1,5FT - Global" (essas só existem no CSV_LIMPO).
+# As odds (Odds_Casa/Empate/Visitante, Odd_BTTS_YES, Odds_Over_2,5FT,
+# Odds_Under_2,5FT, Odd_Over_0,5HT/1,5HT) existem nos dois lados e
+# batem certinho.
+#
+# Pra "montar_sinais(row)" funcionar dentro do loop da Aba IA, faça
+# ANTES do loop um merge trazendo as colunas que faltam do CSV_LIMPO
+# pro seu base_df/df_clean, pela mesma chave Home_Team + Hour:
+#
+#   extras = pd.read_csv("CSV_LIMPO.csv", sep=";", encoding="utf-8-sig")[[
+#       "Home_Team", "Hour", "MGFH", "MGFA", "MGCH", "MGCA", "MG_Global",
+#       "Média_2,5FT_Global", "Classificação - Casa", "Classificação - Casa.1",
+#       "CS 0X0", "CS 0X1", "CS 1X1", "CS 2X2", "CS 3X3",
+#       "Chutes Pro Gol - Casa", "Chutes Pro Gol - Visitante",
+#       "Over 1,5FT - Global", "FAH", "FAA", "FDH", "FDA", "Clean_Games_A",
+#   ]]
+#   df_clean = df_clean.merge(extras, on=["Home_Team", "Hour"], how="left")
+#
+# Depois, dentro do loop `for _, row in df_clean.iterrows():`, é só:
+#
+#   sinais = montar_sinais(row)
+#
+# ...e incluir "Sinais": sinais no dict de lista.append(...), na posição
+# entre "Tier_HA" e "Score_Zebra" (mesma ordem em que os dicts do Python
+# aparecem já vira a ordem das colunas no DataFrame final / na tabela).
+
 
 with tab7:
 
@@ -6537,6 +6832,8 @@ Home {home_emoji}   x   Away {away_emoji}
     else:
 
         st.info("Sem jogos válidos após filtro")
+
+
 
 # =========================================
 # ABA 8 — CLEAN SHEET (CS)
