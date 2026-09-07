@@ -5292,6 +5292,13 @@ def definir_lay(row):
 # =========================================
 # 🤖 ABA IA (ISOLADA CORRETA)
 # =========================================
+#
+# 🔧 NOVO — import do módulo de filtros/sinais (ranking600).
+# Idealmente isso vai lá no topo do arquivo principal do app,
+# junto com os outros imports (pandas, streamlit etc.) — deixei
+# aqui só pra ficar junto do resto do bloco.
+from filtros_ranking600 import montar_sinais
+
 with tab7:
 
     
@@ -5465,6 +5472,35 @@ Home {home_emoji}   x   Away {away_emoji}
         (base_df["Odds_Casa"] > 0) &
         (base_df["Odds_Visitante"] > 0)
     ].copy()
+
+    # =========================================
+    # 🔧 NOVO — TRAZ AS COLUNAS DO CSV_LIMPO QUE OS FILTROS
+    # DE SINAIS (filtros_ranking600.py) PRECISAM E QUE NÃO
+    # EXISTEM NAS PLANILHAS POISSON (MGFH, MG_Global, CS 0X0/0X1/
+    # 1X1/2X2/3X3, Classificação, Chutes Pro Gol, etc.).
+    # Join pela mesma chave Home_Team + Hour.
+    # =========================================
+    _csv_limpo = pd.read_csv(
+        "CSV_LIMPO.csv",
+        sep=";",
+        encoding="utf-8-sig"
+    )[[
+        "Home_Team", "Hour",
+        "MGFH", "MGFA", "MGCH", "MGCA",
+        "MG_Global", "Média_2,5FT_Global",
+        "Classificação - Casa", "Classificação - Casa.1",
+        "CS 0X0", "CS 0X1", "CS 1X1", "CS 2X2", "CS 3X3",
+        "Chutes Pro Gol - Casa", "Chutes Pro Gol - Visitante",
+        "Over 1,5FT - Global",
+        "FAH", "FAA", "FDH", "FDA",
+        "Clean_Games_A",
+    ]]
+
+    df_clean = df_clean.merge(
+        _csv_limpo,
+        on=["Home_Team", "Hour"],
+        how="left"
+    )
 
     df_clean["Home"] = df_clean.apply(
         lambda x: classificar_filtro_duplo(
@@ -6211,6 +6247,15 @@ Home {home_emoji}   x   Away {away_emoji}
             pass
 
         # =========================================
+        # 🔧 NOVO — COLUNA "SINAIS"
+        # Roda os 13 filtros de filtros_ranking600.py sobre esse
+        # mesmo `row` (que já tem as colunas do CSV_LIMPO mescladas
+        # lá em cima) e junta os que bateram numa string só.
+        # =========================================
+
+        sinais = montar_sinais(row)
+
+        # =========================================
         # 💰 STAKE
         # =========================================
 
@@ -6370,6 +6415,10 @@ Home {home_emoji}   x   Away {away_emoji}
             "Tier_LA": tier_la,
             "Tier_LH": tier_lh,
             "Tier_HA": tier_ha,
+
+            # 🔧 NOVO — sinais dos 13 mercados (ranking600), entre
+            # Tier_HA e Score_Zebra como pedido
+            "Sinais": sinais,
 
             # 🔥 SCORE
             "Score_Zebra": (
