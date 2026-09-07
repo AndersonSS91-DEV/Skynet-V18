@@ -6006,41 +6006,6 @@ Home {home_emoji}   x   Away {away_emoji}
         base_df["ExG_Away_VG"]
     ) / 3
 
-    st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
-
-    lista_rank = []
-
-    for _, row in base_df.iterrows():
-
-        res = classificar_jogo(row)
-
-        if not res:
-            continue
-
-        if res["Classe"] not in ["A+", "A"]:
-            continue
-
-        lista_rank.append({
-            "Home_Team": row.get("Home_Team", ""),
-            "Result Home": row.get("Result Home", ""),
-            "Result Visitor": row.get("Result Visitor", ""),
-            "Away_Team": row.get("Visitor_Team", ""),
-            "Result_Home_HT": row.get("Result_Home_HT", ""),
-            "Result_Visitor_HT": row.get("Result_Visitor_HT", ""),
-
-            "Tipo": res["Tipo"],
-            "Entrada": res["Entrada"],
-            "Classe": res["Classe"]
-        })
-
-    if lista_rank:
-        df_rank = pd.DataFrame(lista_rank)
-        df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
-        df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
-        st.dataframe(df_rank, use_container_width=True, hide_index=True)
-    else:
-        st.info("Nenhum jogo A+/A encontrado")
-
     # =========================================
     # 📋 TABELA FINAL
     # =========================================
@@ -6394,41 +6359,6 @@ Home {home_emoji}   x   Away {away_emoji}
         base_df["ExG_Away_ATKxDEF"] +
         base_df["ExG_Away_VG"]
     ) / 3
-
-    st.markdown("### 🔥 Top Jogos do Dia (A+ / A)")
-
-    lista_rank = []
-
-    for _, row in base_df.iterrows():
-
-        res = classificar_jogo(row)
-
-        if not res:
-            continue
-
-        if res["Classe"] not in ["A+", "A"]:
-            continue
-
-        lista_rank.append({
-            "Home_Team": row.get("Home_Team", ""),
-            "Result Home": row.get("Result Home", ""),
-            "Result Visitor": row.get("Result Visitor", ""),
-            "Away_Team": row.get("Visitor_Team", ""),
-            "Result_Home_HT": row.get("Result_Home_HT", ""),
-            "Result_Visitor_HT": row.get("Result_Visitor_HT", ""),
-
-            "Tipo": res["Tipo"],
-            "Entrada": res["Entrada"],
-            "Classe": res["Classe"]
-        })
-
-    if lista_rank:
-        df_rank = pd.DataFrame(lista_rank)
-        df_rank["ordem"] = df_rank["Classe"].map({"A+": 0, "A": 1})
-        df_rank = df_rank.sort_values("ordem").drop(columns="ordem")
-        st.dataframe(df_rank, use_container_width=True, hide_index=True)
-    else:
-        st.info("Nenhum jogo A+/A encontrado")
 
     # =========================================
     # 📋 TABELA FINAL
