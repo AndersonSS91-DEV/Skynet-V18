@@ -8987,7 +8987,6 @@ with tab9:
 
         )
 
-
 with tab10:
 
     # ============================================================
@@ -9285,7 +9284,55 @@ with tab10:
                 _cols_tabela.append(col_prob)
                 _mapa_sigla[col_prob] = SIGLA_MERCADO_ML.get(m, m)
 
-        _df_tabela = df_ml_todos[_cols_tabela].copy()
+        _df_tabela = df_ml_todos[_cols_tabela + ["JOGO"]].copy()
+
+        # --------------------------------------------------------
+        # 🔧 NOVO — Placar FT e Placar HT
+        # df_ml_todos (vem do PIPELINE2_RESULTADOS.xlsx) não tem
+        # placar nenhum — quem tem é o df_base (mesma base usada no
+        # Similar Games Engine / Scanner Global). Cruza pelo "JOGO".
+        # --------------------------------------------------------
+
+        def _ml_formatar_placar(row, col_home, col_away):
+            h = row.get(col_home, np.nan)
+            a = row.get(col_away, np.nan)
+            if pd.isna(h) or pd.isna(a):
+                return "—"
+            return f"{int(h)}x{int(a)}"
+
+        if not df_base.empty and "JOGO" in df_base.columns:
+
+            _cols_placar_base = [
+                c for c in ["JOGO", "Result Home", "Result Visitor", "Result_Home_HT", "Result_Visitor_HT"]
+                if c in df_base.columns
+            ]
+            _placar_base = df_base[_cols_placar_base].drop_duplicates(subset="JOGO")
+
+            _df_tabela = _df_tabela.merge(_placar_base, on="JOGO", how="left")
+
+            if "Result Home" in _df_tabela.columns and "Result Visitor" in _df_tabela.columns:
+                _df_tabela.insert(
+                    _df_tabela.columns.get_loc("Visitor_Team") + 1,
+                    "Placar FT",
+                    _df_tabela.apply(lambda r: _ml_formatar_placar(r, "Result Home", "Result Visitor"), axis=1)
+                )
+
+            if "Result_Home_HT" in _df_tabela.columns and "Result_Visitor_HT" in _df_tabela.columns:
+                _pos_ht = (
+                    _df_tabela.columns.get_loc("Placar FT") + 1
+                    if "Placar FT" in _df_tabela.columns
+                    else _df_tabela.columns.get_loc("Visitor_Team") + 1
+                )
+                _df_tabela.insert(
+                    _pos_ht,
+                    "Placar HT",
+                    _df_tabela.apply(lambda r: _ml_formatar_placar(r, "Result_Home_HT", "Result_Visitor_HT"), axis=1)
+                )
+
+            _df_tabela = _df_tabela.drop(columns=["Result Home", "Result Visitor", "Result_Home_HT", "Result_Visitor_HT"], errors="ignore")
+
+        _df_tabela = _df_tabela.drop(columns=["JOGO"], errors="ignore")
+
         if "Hour" in _df_tabela.columns:
             try:
                 _df_tabela["Hour"] = pd.to_datetime(_df_tabela["Hour"]).dt.strftime("%H:%M")
