@@ -5471,15 +5471,20 @@ LABEL = {
 # do maior pro menor — pega o primeiro que bater e para (evita empilhar
 # mercados redundantes entre si, ex: Over3,0FT asiático já implica
 # Over2,5FT e Over1,5FT)
-GRUPO_OVER_FT = ["OVER30FT_ASIAN", "OVER25FT", "OVER15FT"]
-GRUPO_OVER_HT = ["OVER15HT", "OVER05HT"]
-
-# os demais sinais são independentes e podem aparecer juntos
-SINAIS_LIVRES = [
-    "BTTS_SIM", "LAY_GOLEADA_AWAY", "LAY_EMPATE", "LAY_AWAY",
-    "LAY_0X0", "LAY_0X1", "UNDER25FT", "UNDER15HT",
-]
-
+SINAIS_TODOS = [
+    "OVER05HT",
+    "OVER15HT",
+    "OVER15FT",
+    "OVER25FT",
+    "OVER30FT_ASIAN",
+    "BTTS_SIM",
+    "LAY_GOLEADA_AWAY",
+    "LAY_EMPATE",
+    "LAY_AWAY",
+    "LAY_0X0",
+    "LAY_0X1",
+    "UNDER25FT",
+    "UNDER15HT",]
 
 def montar_sinais(row, separador=" | "):
     """Roda os 13 filtros sobre um 'row' (Series/dict) e devolve uma
@@ -5505,19 +5510,14 @@ def montar_sinais(row, separador=" | "):
 
     return separador.join(ativos)
 
-
 with tab7:
-
     
     if not df_mgf.empty:
-
         df_jogo = df_mgf[df_mgf["JOGO"] == jogo]
-
         if not df_jogo.empty:
 
             linha = df_jogo.iloc[0]
             resultado = classificar_jogo(linha)
-
             if resultado:
 
                 detalhes = ""
@@ -5694,15 +5694,24 @@ Home {home_emoji}   x   Away {away_emoji}
 
         _cols_extra = [
             "Home_Team", "Visitor_Team",
+
             "MGFH", "MGFA", "MGCH", "MGCA",
             "MG_Global", "Média_2,5FT_Global",
+
+            "MGF_HT_Home", "MGF_HT_Away",
+            "ExG_Total",
+
+            "Odd_Over_0,5HT",
+            "Odd_Over_1,5HT",
+            "Odd_Over_1,5FT",
+
             "Classificação - Casa", "Classificação - Casa.1",
+
             "CS 0X0", "CS 0X1", "CS 1X1", "CS 2X2", "CS 3X3",
             "Chutes Pro Gol - Casa", "Chutes Pro Gol - Visitante",
             "Over 1,5FT - Global",
-            "FAH", "FAA", "FDH", "FDA",
-            "Clean_Games_A",
-        ]
+            "FAH", "FAA", "FDH", "FDA", "Clean_Games_A",]
+        
         _cols_extra = [c for c in _cols_extra if c in df_base.columns]
 
         _extras = df_base[_cols_extra].copy()
