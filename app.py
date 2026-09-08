@@ -5295,16 +5295,15 @@ st.info("Sem jogos válidos após filtro")
 # 🤖 ABA IA (ISOLADA CORRETA)
 # =========================================
 #
-# 🔧 NOVO — filtros/sinais (ranking600) colados aqui embaixo (sem
-# import de outro arquivo — Streamlit Cloud só enxerga o que está
-# no repositório do GitHub, e um módulo à parte que não sobe junto
-# quebra com ModuleNotFoundError).
-#
-# v2: os valores de "CS 0X0/0X1/1X1/2X2/3X3" no CSV_LIMPO vêm com
-# formato MISTO (parte usa ponto decimal, parte usa vírgula), então
-# chegam como texto. Todo acesso agora passa pelo helper `_num()`,
-# que também protege contra coluna ausente — se um filtro não achar
-# o dado, ele só não bate (não derruba a página).
+# 🔧 v3 — filtros/sinais (ranking600) colados aqui embaixo, SEM ler
+# nenhum arquivo do disco (nem CSV nem xlsx) — usa só o df_base que
+# o app já carregou lá em cima. A versão anterior tentava reler
+# CSV_LIMPO.csv com caminho relativo dentro do bloco, o que quebra
+# no Streamlit Cloud (o arquivo não existe nesse caminho lá).
+# Filtros minerados com validação fora da amostra (treino até
+# 30/04/2026, teste em jogos de 01/05/2026 em diante que o processo
+# de mineração nunca viu) — números de backtest no comentário de
+# cada função já são os de TESTE (fora da amostra).
 
 import numpy as np
 
@@ -5326,114 +5325,119 @@ def _num(v):
         return np.nan
 
 
+# ============================================================
+# v3 — todos os 13 filtros foram testados com split temporal:
+# minerados em jogos até 30/04/2026 (14.770 jogos) e VALIDADOS
+# em jogos de 01/05/2026 em diante (3.539 jogos) que o processo
+# de mineração nunca viu. Os números "TESTE" abaixo são sempre
+# fora da amostra — é a validação real, não só ajuste na base
+# de treino.
+# ============================================================
+
+
 def filtro_over05ht(row):
     cs00 = _num(row.get("CS 0X0"))
     odd = _num(row.get("Odd_Over_0,5HT"))
-    return (cs00 > 18.535) and (1.05 <= odd <= 1.30)
-    # backtest: n=1278 | winrate=82,8% (base ranking600=69,0%) | odd média 1,17
+    return (cs00 > 18.535) and (1.05 <= odd <= 1.25)
+    # TREINO n=957 wr=81,9% | TESTE n=321 wr=85,4% (base~69-70%)
 
 
 def filtro_over15ht(row):
     cs00 = _num(row.get("CS 0X0"))
-    mgf_ht_h = _num(row.get("MGF_HT_Home"))
     odd = _num(row.get("Odd_Over_1,5HT"))
-    return (cs00 > 18.195) and (mgf_ht_h > 1.250) and (1.50 <= odd <= 2.20)
-    # backtest: n=419 | winrate=57,0% (base ranking600=34,0%) | odd média 1,90
+    return (cs00 > 18.195) and (1.55 <= odd <= 2.15)
+    # TREINO n=1034 wr=51,7% | TESTE n=346 wr=52,3% (base~34-36%)
 
 
 def filtro_over15ft(row):
     mg_global = _num(row.get("MG_Global"))
-    over15_global = _num(row.get("Over 1,5FT - Global"))
+    chutes_casa = _num(row.get("Chutes Pro Gol - Casa"))
     odd = _num(row.get("Odd_Over_1,5FT"))
-    return (mg_global > 3.450) and (over15_global > 84.500) and (1.00 <= odd <= 1.35)
-    # backtest: n=2055 | winrate=83,3% (base ranking600=73,9%) | odd média 1,16
+    return (mg_global > 2.650) and (chutes_casa > 4.750) and (1.05 <= odd <= 1.40)
+    # TREINO n=4935 wr=78,4% | TESTE n=1301 wr=80,9% (base~74-75%)
 
 
 def filtro_over25ft(row):
     mg_global = _num(row.get("MG_Global"))
-    exg_total = _num(row.get("ExG_Total"))
+    efic_2nd_a = _num(row.get("Eficiência_2nd_A"))
     odd = _num(row.get("Odds_Over_2,5FT"))
-    return (mg_global > 3.350) and (exg_total > 4.305) and (1.15 <= odd <= 1.80)
-    # backtest: n=379 | winrate=71,0% (base ranking600=50,4%) | odd média 1,43
-    # precisa de ExG_Total (só existe nos jogos cobertos pelas planilhas
-    # Poisson — cobertura parcial do período)
+    return (mg_global > 3.350) and (efic_2nd_a > 24.000) and (1.25 <= odd <= 2.20)
+    # TREINO n=2254 wr=57,6% | TESTE n=566 wr=65,7% (base~50-52%)
 
 
 def filtro_over30ft_asian(row):
     mg_global = _num(row.get("MG_Global"))
     media25_global = _num(row.get("Média_2,5FT_Global"))
     return (mg_global > 3.350) and (media25_global > 89.000)
-    # backtest: n=415 | winrate=62,7% (excluindo pushes; base ranking600=37,0%)
+    # TREINO n=308 wr=61,4% | TESTE n=107 wr=66,4% (base~36-39%, excluindo push)
     # sem odd própria da linha 3,0 no dataset
 
 
 def filtro_btts_sim(row):
-    fdh = _num(row.get("FDH"))
-    clean_games_a = _num(row.get("Clean_Games_A"))
     faa = _num(row.get("FAA"))
+    fda = _num(row.get("FDA"))
+    scored_times_h = _num(row.get("Scored_Times_H"))
     odd = _num(row.get("Odd_BTTS_YES"))
-    return (fdh <= 58.000) and (clean_games_a <= 15.000) and (faa > 49.500) and (1.30 <= odd <= 2.00)
-    # backtest: n=537 | winrate=63,7% (base ranking600=52,2%) | odd média 1,61
+    return (faa <= 29.000) and (fda <= 40.000) and (scored_times_h > 27.500) and (1.45 <= odd <= 2.45)
+    # TREINO n=573 wr=56,2% | TESTE n=136 wr=56,6% (base~52-54%)
 
 
 def filtro_lay_goleada_away(row):
     # "sair perto dos 45HT ou antes ao sofrer dois gols" é regra de
-    # trading AO VIVO — não reproduzível com dados só pré-jogo.
-    # Este filtro cobre só a seleção pré-jogo (reduz risco de cauda).
+    # trading AO VIVO — não reproduzível com dados só pré-jogo. Este
+    # filtro cobre só a seleção pré-jogo (reduz risco de cauda); a
+    # base já é ~96-97% sem filtro nenhum, então o ganho aqui é fino.
     mgfa = _num(row.get("MGFA"))
     fdh = _num(row.get("FDH"))
-    odd = _num(row.get("Odds_Visitante"))
-    return (mgfa <= 2.150) and (fdh >= 40.000) and (1.10 <= odd <= 6.50)
-    # referência: base ranking600 sem filtro já é n=18309, winrate=97,1%
+    return (mgfa <= 2.150) and (fdh >= 40.000)
+    # TREINO n=12071 wr=97,9% | TESTE n=2916 wr=96,8% (base~96-97%)
 
 
 def filtro_lay_empate(row):
     cs11 = _num(row.get("CS 1X1"))
     cs22 = _num(row.get("CS 2X2"))
-    cs00 = _num(row.get("CS 0X0"))
     odd = _num(row.get("Odds_Empate"))
-    return (cs11 > 7.515) and (cs22 > 19.995) and (cs00 > 12.730) and (5.00 <= odd <= 14.00)
-    # backtest: n=517 | winrate=91,9% (base ranking600=72,0%) | odd empate média 8,47
+    return (cs11 > 8.925) and (cs22 > 19.995) and (5.00 <= odd <= 13.00)
+    # TREINO n=574 wr=89,9% | TESTE n=103 wr=93,2% (base~72-73%)
 
 
 def filtro_lay_away(row):
     # "Classificação - Casa.1" no CSV_LIMPO é, na prática, a
     # classificação do VISITANTE (cabeçalho duplicado no CSV original
     # virou ".1" no pandas).
-    class_visit = _num(row.get("Classificação - Casa.1"))
+    efic_a = _num(row.get("Eficiência_A"))
     class_casa = _num(row.get("Classificação - Casa"))
-    mgfh = _num(row.get("MGFH"))
+    class_visit = _num(row.get("Classificação - Casa.1"))
     odd = _num(row.get("Odds_Visitante"))
-    return (class_visit > 5.500) and (class_casa <= 5.500) and (mgfh > 2.050) and (1.80 <= odd <= 15.00)
-    # backtest: n=1584 | winrate=90,3% (base ranking600=77,5%) | odd visitante média 8,26
+    return (efic_a <= 51.500) and (class_casa <= 5.500) and (class_visit > 8.500) and (3.00 <= odd <= 18.00)
+    # TREINO n=1879 wr=90,5% | TESTE n=387 wr=84,8% (base~74-78%)
 
 
 def filtro_lay_0x0(row):
     # "ficar até os 65FT": mesma limitação do LayGoleadaAway — regra
     # de trading ao vivo, não reproduzível só com dados pré-jogo.
     cs00 = _num(row.get("CS 0X0"))
-    return (cs00 > 9.825) and (cs00 <= 21.155)
-    # backtest: n=7591 | winrate=93,5% (base ranking600=90,7%)
+    return (cs00 > 11.635) and (cs00 <= 21.355)
+    # TREINO n=3615 wr=93,7% | TESTE n=985 wr=94,8% (base~91%)
 
 
 def filtro_lay_0x1(row):
     cs01 = _num(row.get("CS 0X1"))
-    return (cs01 > 12.515) and (cs01 <= 22.805)
-    # backtest: n=3738 | winrate=97,1% (base ranking600=94,2%)
+    return cs01 > 22.015
+    # TREINO n=954 wr=99,4% | TESTE n=223 wr=98,2% (base~94%)
 
 
 def filtro_under25ft(row):
     mg_global = _num(row.get("MG_Global"))
-    chutes_casa = _num(row.get("Chutes Pro Gol - Casa"))
     odd = _num(row.get("Odds_Under_2,5FT"))
-    return (mg_global <= 1.850) and (chutes_casa > 2.900) and (1.30 <= odd <= 2.20)
-    # backtest: n=1206 | winrate=61,7% (base ranking600=49,6%) | odd média 1,64
+    return (mg_global <= 1.850) and (1.30 <= odd <= 2.25)
+    # TREINO n=1397 wr=63,2% | TESTE n=289 wr=63,7% (base~48-50%)
 
 
 def filtro_under15ht(row):
     cs00 = _num(row.get("CS 0X0"))
     return (cs00 <= 8.995) and (cs00 > 0.900)
-    # backtest: n=6729 | winrate=73,5% (base ranking600=66,0%)
+    # TREINO n=5506 wr=73,7% | TESTE n=1223 wr=72,4% (base~64-66%)
 
 
 FILTROS = {
@@ -5471,27 +5475,32 @@ LABEL = {
 # do maior pro menor — pega o primeiro que bater e para (evita empilhar
 # mercados redundantes entre si, ex: Over3,0FT asiático já implica
 # Over2,5FT e Over1,5FT)
-SINAIS_TODOS = [
-    "OVER05HT",
-    "OVER15HT",
-    "OVER15FT",
-    "OVER25FT",
-    "OVER30FT_ASIAN",
-    "BTTS_SIM",
-    "LAY_GOLEADA_AWAY",
-    "LAY_EMPATE",
-    "LAY_AWAY",
-    "LAY_0X0",
-    "LAY_0X1",
-    "UNDER25FT",
-    "UNDER15HT",]
+GRUPO_OVER_FT = ["OVER30FT_ASIAN", "OVER25FT", "OVER15FT"]
+GRUPO_OVER_HT = ["OVER15HT", "OVER05HT"]
+
+# os demais sinais são independentes e podem aparecer juntos
+SINAIS_LIVRES = [
+    "BTTS_SIM", "LAY_GOLEADA_AWAY", "LAY_EMPATE", "LAY_AWAY",
+    "LAY_0X0", "LAY_0X1", "UNDER25FT", "UNDER15HT",
+]
+
 
 def montar_sinais(row, separador=" | "):
-    """Roda todos os filtros sobre o mesmo jogo e mostra
-    TODOS os sinais que bateram."""
+    """Roda os 13 filtros sobre um 'row' (Series/dict) e devolve uma
+    string com os sinais que bateram. Nunca levanta exceção: qualquer
+    filtro com dado ausente/malformado simplesmente não entra na lista."""
     ativos = []
 
-    for nome in SINAIS_TODOS:
+    for grupo in (GRUPO_OVER_FT, GRUPO_OVER_HT):
+        for nome in grupo:
+            try:
+                if FILTROS[nome](row):
+                    ativos.append(LABEL[nome])
+                    break
+            except Exception:
+                continue
+
+    for nome in SINAIS_LIVRES:
         try:
             if FILTROS[nome](row):
                 ativos.append(LABEL[nome])
@@ -5500,14 +5509,19 @@ def montar_sinais(row, separador=" | "):
 
     return separador.join(ativos)
 
+
 with tab7:
+
     
     if not df_mgf.empty:
+
         df_jogo = df_mgf[df_mgf["JOGO"] == jogo]
+
         if not df_jogo.empty:
 
             linha = df_jogo.iloc[0]
             resultado = classificar_jogo(linha)
+
             if resultado:
 
                 detalhes = ""
@@ -5684,24 +5698,15 @@ Home {home_emoji}   x   Away {away_emoji}
 
         _cols_extra = [
             "Home_Team", "Visitor_Team",
-
             "MGFH", "MGFA", "MGCH", "MGCA",
             "MG_Global", "Média_2,5FT_Global",
-
-            "MGF_HT_Home", "MGF_HT_Away",
-            "ExG_Total",
-
-            "Odd_Over_0,5HT",
-            "Odd_Over_1,5HT",
-            "Odd_Over_1,5FT",
-
             "Classificação - Casa", "Classificação - Casa.1",
-
             "CS 0X0", "CS 0X1", "CS 1X1", "CS 2X2", "CS 3X3",
             "Chutes Pro Gol - Casa", "Chutes Pro Gol - Visitante",
             "Over 1,5FT - Global",
-            "FAH", "FAA", "FDH", "FDA", "Clean_Games_A",]
-        
+            "FAH", "FAA", "FDH", "FDA",
+            "Clean_Games_A",
+        ]
         _cols_extra = [c for c in _cols_extra if c in df_base.columns]
 
         _extras = df_base[_cols_extra].copy()
