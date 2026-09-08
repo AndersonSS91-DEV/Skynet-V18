@@ -5290,7 +5290,6 @@ def definir_lay(row):
 
 st.info("Sem jogos válidos após filtro")
 
-
 # =========================================
 # 🤖 ABA IA (ISOLADA CORRETA)
 # =========================================
@@ -5694,7 +5693,21 @@ Home {home_emoji}   x   Away {away_emoji}
     # coluna "JOGO" de cada lado porque um dos lados pode não vir com
     # strip() aplicado e aí o join perde jogo por diferença de espaço.
     # =========================================
-    if not df_base.empty:
+    if df_base.empty:
+
+        # 🔎 DIAGNÓSTICO — se cair aqui, a coluna "Sinais" vai ficar
+        # vazia pra TODAS as linhas (o resto da tabela continua normal,
+        # porque vem do df_mgf/Poisson, não do df_base). Causa mais
+        # provável: o arquivo em CSV_BASE ("data/CSV_LIMPO.csv") não
+        # existe nesse caminho no ambiente de deploy.
+        st.warning(
+            "⚠️ Sinais (ranking600) indisponível nesta rodada: "
+            "df_base veio vazio (o CSV em `data/CSV_LIMPO.csv` não foi "
+            "encontrado). O resto da tabela segue normal, só a coluna "
+            "Sinais fica em branco até o CSV voltar a carregar."
+        )
+
+    else:
 
         _cols_extra = [
             "Home_Team", "Visitor_Team",
@@ -5707,9 +5720,17 @@ Home {home_emoji}   x   Away {away_emoji}
             "FAH", "FAA", "FDH", "FDA",
             "Clean_Games_A",
         ]
-        _cols_extra = [c for c in _cols_extra if c in df_base.columns]
+        _cols_achadas = [c for c in _cols_extra if c in df_base.columns]
+        _cols_faltando = [c for c in _cols_extra if c not in df_base.columns]
 
-        _extras = df_base[_cols_extra].copy()
+        if _cols_faltando:
+            st.warning(
+                "⚠️ Sinais (ranking600): faltam no df_base as colunas "
+                f"{_cols_faltando} — os filtros que dependem delas não "
+                "vão bater (os outros continuam funcionando)."
+            )
+
+        _extras = df_base[_cols_achadas].copy()
         _extras["_chave_jogo"] = (
             _extras["Home_Team"].astype(str).str.strip().str.lower()
             + " x " +
@@ -5726,8 +5747,22 @@ Home {home_emoji}   x   Away {away_emoji}
             df_clean["Visitor_Team"].astype(str).str.strip().str.lower()
         )
 
+        _n_antes = df_clean["_chave_jogo"].isin(_extras["_chave_jogo"]).sum()
+
         df_clean = df_clean.merge(_extras, on="_chave_jogo", how="left")
         df_clean = df_clean.drop(columns=["_chave_jogo"])
+
+        # 🔎 DIAGNÓSTICO — se o merge não achar quase nenhum confronto em
+        # comum entre as planilhas Poisson (Home_Team x Visitor_Team) e o
+        # df_base (Home_Team/Visitor_Team do CSV_LIMPO), a causa costuma
+        # ser grafia diferente do nome dos times entre as duas fontes.
+        if len(df_clean) > 0 and _n_antes == 0:
+            st.warning(
+                "⚠️ Sinais (ranking600): nenhum dos jogos desta rodada "
+                "bateu com o histórico do df_base pela chave Home_Team + "
+                "Visitor_Team — confira se o nome dos times está escrito "
+                "igual nas planilhas Poisson e no CSV_LIMPO."
+            )
 
     df_clean["Home"] = df_clean.apply(
         lambda x: classificar_filtro_duplo(
