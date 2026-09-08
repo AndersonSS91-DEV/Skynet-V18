@@ -5290,225 +5290,13 @@ def definir_lay(row):
 
 st.info("Sem jogos válidos após filtro")
 
+# IMPORTANTE: adicione esta linha junto dos outros imports, no TOPO do app.py:
+#   import filtros_mercados_v2 as fm
+# (e coloque o arquivo filtros_mercados_v2.py na mesma pasta do app.py)
+
 # =========================================
 # 🤖 ABA IA (ISOLADA CORRETA)
 # =========================================
-#
-# 🔧 v3 — filtros/sinais (ranking600) colados aqui embaixo, SEM ler
-# nenhum arquivo do disco (nem CSV nem xlsx) — usa só o df_base que
-# o app já carregou lá em cima. A versão anterior tentava reler
-# CSV_LIMPO.csv com caminho relativo dentro do bloco, o que quebra
-# no Streamlit Cloud (o arquivo não existe nesse caminho lá).
-# Filtros minerados com validação fora da amostra (treino até
-# 30/04/2026, teste em jogos de 01/05/2026 em diante que o processo
-# de mineração nunca viu) — números de backtest no comentário de
-# cada função já são os de TESTE (fora da amostra).
-
-import numpy as np
-
-
-def _num(v):
-    """Converte com segurança pra float — aceita string com vírgula
-    ou ponto, None, NaN, ou já numérico. Retorna np.nan se não der
-    pra converter (comparação com np.nan é sempre False, então o
-    filtro correspondente só não bate, nunca quebra a página)."""
-    if v is None:
-        return np.nan
-    if isinstance(v, str):
-        v = v.strip().replace(",", ".")
-        if v == "":
-            return np.nan
-    try:
-        return float(v)
-    except (TypeError, ValueError):
-        return np.nan
-
-
-# ============================================================
-# v3 — todos os 13 filtros foram testados com split temporal:
-# minerados em jogos até 30/04/2026 (14.770 jogos) e VALIDADOS
-# em jogos de 01/05/2026 em diante (3.539 jogos) que o processo
-# de mineração nunca viu. Os números "TESTE" abaixo são sempre
-# fora da amostra — é a validação real, não só ajuste na base
-# de treino.
-# ============================================================
-
-
-def filtro_over05ht(row):
-    cs00 = _num(row.get("CS 0X0"))
-    odd = _num(row.get("Odd_Over_0,5HT"))
-    return (cs00 > 18.535) and (1.05 <= odd <= 1.25)
-    # TREINO n=957 wr=81,9% | TESTE n=321 wr=85,4% (base~69-70%)
-
-
-def filtro_over15ht(row):
-    cs00 = _num(row.get("CS 0X0"))
-    odd = _num(row.get("Odd_Over_1,5HT"))
-    return (cs00 > 18.195) and (1.55 <= odd <= 2.15)
-    # TREINO n=1034 wr=51,7% | TESTE n=346 wr=52,3% (base~34-36%)
-
-
-def filtro_over15ft(row):
-    mg_global = _num(row.get("MG_Global"))
-    chutes_casa = _num(row.get("Chutes Pro Gol - Casa"))
-    odd = _num(row.get("Odd_Over_1,5FT"))
-    return (mg_global > 2.650) and (chutes_casa > 4.750) and (1.05 <= odd <= 1.40)
-    # TREINO n=4935 wr=78,4% | TESTE n=1301 wr=80,9% (base~74-75%)
-
-
-def filtro_over25ft(row):
-    mg_global = _num(row.get("MG_Global"))
-    efic_2nd_a = _num(row.get("Eficiência_2nd_A"))
-    odd = _num(row.get("Odds_Over_2,5FT"))
-    return (mg_global > 3.350) and (efic_2nd_a > 24.000) and (1.25 <= odd <= 2.20)
-    # TREINO n=2254 wr=57,6% | TESTE n=566 wr=65,7% (base~50-52%)
-
-
-def filtro_over30ft_asian(row):
-    mg_global = _num(row.get("MG_Global"))
-    media25_global = _num(row.get("Média_2,5FT_Global"))
-    return (mg_global > 3.350) and (media25_global > 89.000)
-    # TREINO n=308 wr=61,4% | TESTE n=107 wr=66,4% (base~36-39%, excluindo push)
-    # sem odd própria da linha 3,0 no dataset
-
-
-def filtro_btts_sim(row):
-    faa = _num(row.get("FAA"))
-    fda = _num(row.get("FDA"))
-    scored_times_h = _num(row.get("Scored_Times_H"))
-    odd = _num(row.get("Odd_BTTS_YES"))
-    return (faa <= 29.000) and (fda <= 40.000) and (scored_times_h > 27.500) and (1.45 <= odd <= 2.45)
-    # TREINO n=573 wr=56,2% | TESTE n=136 wr=56,6% (base~52-54%)
-
-
-def filtro_lay_goleada_away(row):
-    # "sair perto dos 45HT ou antes ao sofrer dois gols" é regra de
-    # trading AO VIVO — não reproduzível com dados só pré-jogo. Este
-    # filtro cobre só a seleção pré-jogo (reduz risco de cauda); a
-    # base já é ~96-97% sem filtro nenhum, então o ganho aqui é fino.
-    mgfa = _num(row.get("MGFA"))
-    fdh = _num(row.get("FDH"))
-    return (mgfa <= 2.150) and (fdh >= 40.000)
-    # TREINO n=12071 wr=97,9% | TESTE n=2916 wr=96,8% (base~96-97%)
-
-
-def filtro_lay_empate(row):
-    cs11 = _num(row.get("CS 1X1"))
-    cs22 = _num(row.get("CS 2X2"))
-    odd = _num(row.get("Odds_Empate"))
-    return (cs11 > 8.925) and (cs22 > 19.995) and (5.00 <= odd <= 13.00)
-    # TREINO n=574 wr=89,9% | TESTE n=103 wr=93,2% (base~72-73%)
-
-
-def filtro_lay_away(row):
-    # "Classificação - Casa.1" no CSV_LIMPO é, na prática, a
-    # classificação do VISITANTE (cabeçalho duplicado no CSV original
-    # virou ".1" no pandas).
-    efic_a = _num(row.get("Eficiência_A"))
-    class_casa = _num(row.get("Classificação - Casa"))
-    class_visit = _num(row.get("Classificação - Casa.1"))
-    odd = _num(row.get("Odds_Visitante"))
-    return (efic_a <= 51.500) and (class_casa <= 5.500) and (class_visit > 8.500) and (3.00 <= odd <= 18.00)
-    # TREINO n=1879 wr=90,5% | TESTE n=387 wr=84,8% (base~74-78%)
-
-
-def filtro_lay_0x0(row):
-    # "ficar até os 65FT": mesma limitação do LayGoleadaAway — regra
-    # de trading ao vivo, não reproduzível só com dados pré-jogo.
-    cs00 = _num(row.get("CS 0X0"))
-    return (cs00 > 11.635) and (cs00 <= 21.355)
-    # TREINO n=3615 wr=93,7% | TESTE n=985 wr=94,8% (base~91%)
-
-
-def filtro_lay_0x1(row):
-    cs01 = _num(row.get("CS 0X1"))
-    return cs01 > 22.015
-    # TREINO n=954 wr=99,4% | TESTE n=223 wr=98,2% (base~94%)
-
-
-def filtro_under25ft(row):
-    mg_global = _num(row.get("MG_Global"))
-    odd = _num(row.get("Odds_Under_2,5FT"))
-    return (mg_global <= 1.850) and (1.30 <= odd <= 2.25)
-    # TREINO n=1397 wr=63,2% | TESTE n=289 wr=63,7% (base~48-50%)
-
-
-def filtro_under15ht(row):
-    cs00 = _num(row.get("CS 0X0"))
-    return (cs00 <= 8.995) and (cs00 > 0.900)
-    # TREINO n=5506 wr=73,7% | TESTE n=1223 wr=72,4% (base~64-66%)
-
-
-FILTROS = {
-    "OVER05HT": filtro_over05ht,
-    "OVER15HT": filtro_over15ht,
-    "OVER15FT": filtro_over15ft,
-    "OVER25FT": filtro_over25ft,
-    "OVER30FT_ASIAN": filtro_over30ft_asian,
-    "BTTS_SIM": filtro_btts_sim,
-    "LAY_GOLEADA_AWAY": filtro_lay_goleada_away,
-    "LAY_EMPATE": filtro_lay_empate,
-    "LAY_AWAY": filtro_lay_away,
-    "LAY_0X0": filtro_lay_0x0,
-    "LAY_0X1": filtro_lay_0x1,
-    "UNDER25FT": filtro_under25ft,
-    "UNDER15HT": filtro_under15ht,
-}
-
-LABEL = {
-    "OVER05HT":         "Over 0,5HT",
-    "OVER15HT":         "Over 1,5HT",
-    "OVER15FT":         "Over 1,5FT",
-    "OVER25FT":         "Over 2,5FT",
-    "OVER30FT_ASIAN":   "Over 3,0FT (AH)",
-    "BTTS_SIM":         "BTTS",
-    "LAY_GOLEADA_AWAY": "Lay Goleada Away",
-    "LAY_EMPATE":       "Lay Empate",
-    "LAY_AWAY":         "Lay Away",
-    "LAY_0X0":          "Lay 0x0",
-    "LAY_0X1":          "Lay 0x1",
-    "UNDER25FT":        "Under 2,5FT",
-    "UNDER15HT":        "Under 1,5HT",
-}
-
-# do maior pro menor — pega o primeiro que bater e para (evita empilhar
-# mercados redundantes entre si, ex: Over3,0FT asiático já implica
-# Over2,5FT e Over1,5FT)
-GRUPO_OVER_FT = ["OVER30FT_ASIAN", "OVER25FT", "OVER15FT"]
-GRUPO_OVER_HT = ["OVER15HT", "OVER05HT"]
-
-# os demais sinais são independentes e podem aparecer juntos
-SINAIS_LIVRES = [
-    "BTTS_SIM", "LAY_GOLEADA_AWAY", "LAY_EMPATE", "LAY_AWAY",
-    "LAY_0X0", "LAY_0X1", "UNDER25FT", "UNDER15HT",
-]
-
-
-def montar_sinais(row, separador=" | "):
-    """Roda os 13 filtros sobre um 'row' (Series/dict) e devolve uma
-    string com os sinais que bateram. Nunca levanta exceção: qualquer
-    filtro com dado ausente/malformado simplesmente não entra na lista."""
-    ativos = []
-
-    for grupo in (GRUPO_OVER_FT, GRUPO_OVER_HT):
-        for nome in grupo:
-            try:
-                if FILTROS[nome](row):
-                    ativos.append(LABEL[nome])
-                    break
-            except Exception:
-                continue
-
-    for nome in SINAIS_LIVRES:
-        try:
-            if FILTROS[nome](row):
-                ativos.append(LABEL[nome])
-        except Exception:
-            continue
-
-    return separador.join(ativos)
-
-
 with tab7:
 
     
@@ -5684,85 +5472,29 @@ Home {home_emoji}   x   Away {away_emoji}
     ].copy()
 
     # =========================================
-    # 🔧 NOVO — TRAZ AS COLUNAS DO df_base (CSV_LIMPO, JÁ CARREGADO
-    # E CACHEADO lá em cima no app — não relê o CSV aqui) QUE OS
-    # FILTROS DE SINAIS PRECISAM E QUE NÃO EXISTEM NAS PLANILHAS
-    # POISSON (MGFH, MG_Global, CS 0X0/0X1/1X1/2X2/3X3, Classificação,
-    # Chutes Pro Gol, etc). Join por uma chave própria, normalizada
-    # (strip + minúsculo dos nomes dos times) — não reaproveita a
-    # coluna "JOGO" de cada lado porque um dos lados pode não vir com
-    # strip() aplicado e aí o join perde jogo por diferença de espaço.
+    # 🔗 TRAZ COLUNAS DOS FILTROS DE MERCADO (via df_base, SEM reler o CSV)
+    #
+    # IMPORTANTE: sempre renomeia com sufixo "__CL", SEM checar se a coluna já
+    # existe em df_clean. Várias colunas (FAH, FAA, FDH, FDA, Clean_Games_A...)
+    # existem TANTO no CSV_LIMPO quanto nas planilhas Poisson já usadas nesta
+    # aba, com semânticas diferentes — mesclar "só se não existir" faz o
+    # código silenciosamente usar a coluna ERRADA (bug já identificado).
+    # Com o sufixo, os filtros de fm.py NUNCA leem por engano a versão Poisson.
     # =========================================
-    if df_base.empty:
+    df_clean["JOGO"] = (
+        df_clean["Home_Team"].astype(str).str.strip()
+        + " x " +
+        df_clean["Visitor_Team"].astype(str).str.strip()
+    )
 
-        # 🔎 DIAGNÓSTICO — se cair aqui, a coluna "Sinais" vai ficar
-        # vazia pra TODAS as linhas (o resto da tabela continua normal,
-        # porque vem do df_mgf/Poisson, não do df_base). Causa mais
-        # provável: o arquivo em CSV_BASE ("data/CSV_LIMPO.csv") não
-        # existe nesse caminho no ambiente de deploy.
-        st.warning(
-            "⚠️ Sinais (ranking600) indisponível nesta rodada: "
-            "df_base veio vazio (o CSV em `data/CSV_LIMPO.csv` não foi "
-            "encontrado). O resto da tabela segue normal, só a coluna "
-            "Sinais fica em branco até o CSV voltar a carregar."
-        )
+    df_clean = df_clean.merge(
+        df_base[["JOGO"] + fm.COLUNAS_NECESSARIAS]
+            .drop_duplicates(subset="JOGO")
+            .rename(columns={c: c + "__CL" for c in fm.COLUNAS_NECESSARIAS}),
+        on="JOGO",
+        how="left"
+    )
 
-    else:
-
-        _cols_extra = [
-            "Home_Team", "Visitor_Team",
-            "MGFH", "MGFA", "MGCH", "MGCA",
-            "MG_Global", "Média_2,5FT_Global",
-            "Classificação - Casa", "Classificação - Casa.1",
-            "CS 0X0", "CS 0X1", "CS 1X1", "CS 2X2", "CS 3X3",
-            "Chutes Pro Gol - Casa", "Chutes Pro Gol - Visitante",
-            "Over 1,5FT - Global",
-            "FAH", "FAA", "FDH", "FDA",
-            "Clean_Games_A",
-        ]
-        _cols_achadas = [c for c in _cols_extra if c in df_base.columns]
-        _cols_faltando = [c for c in _cols_extra if c not in df_base.columns]
-
-        if _cols_faltando:
-            st.warning(
-                "⚠️ Sinais (ranking600): faltam no df_base as colunas "
-                f"{_cols_faltando} — os filtros que dependem delas não "
-                "vão bater (os outros continuam funcionando)."
-            )
-
-        _extras = df_base[_cols_achadas].copy()
-        _extras["_chave_jogo"] = (
-            _extras["Home_Team"].astype(str).str.strip().str.lower()
-            + " x " +
-            _extras["Visitor_Team"].astype(str).str.strip().str.lower()
-        )
-        _extras = _extras.drop(columns=["Home_Team", "Visitor_Team"])
-        # se o mesmo confronto aparecer mais de uma vez no histórico,
-        # fica só com o jogo mais recente pra não duplicar linha no merge
-        _extras = _extras.drop_duplicates(subset="_chave_jogo", keep="last")
-
-        df_clean["_chave_jogo"] = (
-            df_clean["Home_Team"].astype(str).str.strip().str.lower()
-            + " x " +
-            df_clean["Visitor_Team"].astype(str).str.strip().str.lower()
-        )
-
-        _n_antes = df_clean["_chave_jogo"].isin(_extras["_chave_jogo"]).sum()
-
-        df_clean = df_clean.merge(_extras, on="_chave_jogo", how="left")
-        df_clean = df_clean.drop(columns=["_chave_jogo"])
-
-        # 🔎 DIAGNÓSTICO — se o merge não achar quase nenhum confronto em
-        # comum entre as planilhas Poisson (Home_Team x Visitor_Team) e o
-        # df_base (Home_Team/Visitor_Team do CSV_LIMPO), a causa costuma
-        # ser grafia diferente do nome dos times entre as duas fontes.
-        if len(df_clean) > 0 and _n_antes == 0:
-            st.warning(
-                "⚠️ Sinais (ranking600): nenhum dos jogos desta rodada "
-                "bateu com o histórico do df_base pela chave Home_Team + "
-                "Visitor_Team — confira se o nome dos times está escrito "
-                "igual nas planilhas Poisson e no CSV_LIMPO."
-            )
 
     df_clean["Home"] = df_clean.apply(
         lambda x: classificar_filtro_duplo(
@@ -6509,15 +6241,6 @@ Home {home_emoji}   x   Away {away_emoji}
             pass
 
         # =========================================
-        # 🔧 NOVO — COLUNA "SINAIS"
-        # Roda os 13 filtros dos mercados ranking600 sobre esse mesmo
-        # `row` (já tem as colunas extras do df_base mescladas lá em
-        # cima) e junta os que bateram numa string só.
-        # =========================================
-
-        sinais = montar_sinais(row)
-
-        # =========================================
         # 💰 STAKE
         # =========================================
 
@@ -6678,9 +6401,8 @@ Home {home_emoji}   x   Away {away_emoji}
             "Tier_LH": tier_lh,
             "Tier_HA": tier_ha,
 
-            # 🔧 NOVO — sinais dos 13 mercados (ranking600), entre
-            # Tier_HA e Score_Zebra como pedido
-            "Sinais": sinais,
+            # 🏷️ SINAIS (mercados minerados: Over/Under/BTTS/Lay — ranking600 em casa)
+            "Sinais": fm.montar_sinais(row),
 
             # 🔥 SCORE
             "Score_Zebra": (
