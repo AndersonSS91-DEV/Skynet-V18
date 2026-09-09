@@ -5439,6 +5439,28 @@ def filtro_under15ht(row):
     # TREINO n=5506 wr=73,7% | TESTE n=1223 wr=72,4% (base~64-66%)
 
 
+def filtro_lay_home(row):
+    # espelho do Lay Away: "Classificação - Casa.1" no CSV_LIMPO é, na
+    # prática, a classificação do VISITANTE (cabeçalho duplicado no
+    # CSV original virou ".1" no pandas).
+    class_visit = _num(row.get("Classificação - Casa.1"))
+    class_casa = _num(row.get("Classificação - Casa"))
+    odd = _num(row.get("Odds_Casa"))
+    return (class_visit <= 5.500) and (class_casa > 8.500) and (1.80 <= odd <= 8.00)
+    # TREINO n=1455 wr=70,3% | TESTE n=337 wr=70,0% (base~50-52%)
+
+
+def filtro_lay_goleada_home(row):
+    # espelho do Lay Goleada Away — mesma limitação de trading ao vivo
+    # (se o objetivo for sair antes ao ver o mandante fazer 2-3 gols,
+    # isso não dá pra backtestar só com dados pré-jogo).
+    mgfh = _num(row.get("MGFH"))
+    chutes_casa = _num(row.get("Chutes Pro Gol - Casa"))
+    fda = _num(row.get("FDA_csv600", row.get("FDA")))
+    return (mgfh <= 1.650) and (chutes_casa <= 4.750) and (fda > 50.500)
+    # TREINO n=3397 wr=96,3% | TESTE n=698 wr=95,0% (base~90-91%)
+
+
 FILTROS = {
     "OVER05HT": filtro_over05ht,
     "OVER15HT": filtro_over15ht,
@@ -5447,8 +5469,10 @@ FILTROS = {
     "OVER30FT_ASIAN": filtro_over30ft_asian,
     "BTTS_SIM": filtro_btts_sim,
     "LAY_GOLEADA_AWAY": filtro_lay_goleada_away,
+    "LAY_GOLEADA_HOME": filtro_lay_goleada_home,
     "LAY_EMPATE": filtro_lay_empate,
     "LAY_AWAY": filtro_lay_away,
+    "LAY_HOME": filtro_lay_home,
     "LAY_0X0": filtro_lay_0x0,
     "LAY_0X1": filtro_lay_0x1,
     "UNDER25FT": filtro_under25ft,
@@ -5463,8 +5487,10 @@ LABEL = {
     "OVER30FT_ASIAN":   "Over 3,0FT (AH)",
     "BTTS_SIM":         "BTTS",
     "LAY_GOLEADA_AWAY": "Lay Goleada Away",
+    "LAY_GOLEADA_HOME": "Lay Goleada Home",
     "LAY_EMPATE":       "Lay Empate",
     "LAY_AWAY":         "Lay Away",
+    "LAY_HOME":         "Lay Home",
     "LAY_0X0":          "Lay 0x0",
     "LAY_0X1":          "Lay 0x1",
     "UNDER25FT":        "Under 2,5FT",
@@ -5479,15 +5505,17 @@ GRUPO_OVER_HT = ["OVER15HT", "OVER05HT"]
 
 # os demais sinais são independentes e podem aparecer juntos
 SINAIS_LIVRES = [
-    "BTTS_SIM", "LAY_GOLEADA_AWAY", "LAY_EMPATE", "LAY_AWAY",
-    "LAY_0X0", "LAY_0X1", "UNDER25FT", "UNDER15HT",
+    "BTTS_SIM", "LAY_GOLEADA_AWAY", "LAY_GOLEADA_HOME", "LAY_EMPATE",
+    "LAY_AWAY", "LAY_HOME", "LAY_0X0", "LAY_0X1", "UNDER25FT", "UNDER15HT",
 ]
 
 
 def montar_sinais(row, separador=" | "):
-    """Roda os 13 filtros sobre um 'row' (Series/dict) e devolve uma
+    """Roda os 15 filtros sobre um 'row' (Series/dict) e devolve uma
     string com os sinais que bateram. Nunca levanta exceção: qualquer
-    filtro com dado ausente/malformado simplesmente não entra na lista."""
+    filtro com dado ausente/malformado simplesmente não entra na lista.
+    Se nada bateu (ou faltou dado pra avaliar), devolve "-" em vez de
+    string vazia."""
     ativos = []
 
     for grupo in (GRUPO_OVER_FT, GRUPO_OVER_HT):
@@ -5506,7 +5534,7 @@ def montar_sinais(row, separador=" | "):
         except Exception:
             continue
 
-    return separador.join(ativos)
+    return separador.join(ativos) if ativos else "-"
 
 
 with tab7:
@@ -5831,20 +5859,6 @@ Home {home_emoji}   x   Away {away_emoji}
         except:
             return ""
             
-    # =========================================
-    # 🔧 FIX — chave dos times do ranking600, pra restringir a coluna
-    # "Sinais" só a jogos com o Home_Team nessa lista (os 13 filtros
-    # só foram validados pra esse grupo de times jogando em casa).
-    # =========================================
-    if df_rank_la.empty:
-        st.warning(
-            "⚠️ Sinais (ranking600) indisponível nesta rodada: "
-            "df_rank_la (lista dos times ranking600) veio vazia."
-        )
-        _ranking600_keys = set()
-    else:
-        _ranking600_keys = set(df_rank_la["Home_Key"])
-
     # =========================================
     # 🧠 LISTA FINAL
     # =========================================
@@ -6528,17 +6542,13 @@ Home {home_emoji}   x   Away {away_emoji}
             pass
 
         # =========================================
-        # 🔧 FIX — COLUNA "SINAIS"
-        # Só roda os 13 filtros se o Home_Team estiver no ranking600
-        # (os limiares só foram validados pra esse grupo específico).
+        # 🔧 COLUNA "SINAIS"
+        # Roda os 15 filtros pra TODOS os jogos do dia com dados
+        # válidos (sem restringir ao ranking600) — o que não tiver
+        # dado suficiente ou não bater nenhum filtro vira "-".
         # =========================================
 
-        _home_key_atual = str(row.get("Home_Team", "")).strip().lower()
-
-        if _home_key_atual in _ranking600_keys:
-            sinais = montar_sinais(row)
-        else:
-            sinais = ""
+        sinais = montar_sinais(row)
 
         # =========================================
         # 💰 STAKE
