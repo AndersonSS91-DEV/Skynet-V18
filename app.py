@@ -5373,11 +5373,8 @@ def filtro_over30ft_asian(row):
 
 
 def filtro_btts_sim(row):
-    # FAA/FDA existem também na planilha Poisson — usamos a versão do
-    # CSV_LIMPO (sufixo "_csv600" adicionado no merge) porque foi essa
-    # que entrou no backtest.
-    faa = _num(row.get("FAA_csv600", row.get("FAA")))
-    fda = _num(row.get("FDA_csv600", row.get("FDA")))
+    faa = _num(row.get("FAA"))
+    fda = _num(row.get("FDA"))
     scored_times_h = _num(row.get("Scored_Times_H"))
     odd = _num(row.get("Odd_BTTS_YES"))
     return (faa <= 29.000) and (fda <= 40.000) and (scored_times_h > 27.500) and (1.45 <= odd <= 2.45)
@@ -5389,10 +5386,8 @@ def filtro_lay_goleada_away(row):
     # trading AO VIVO — não reproduzível com dados só pré-jogo. Este
     # filtro cobre só a seleção pré-jogo (reduz risco de cauda); a
     # base já é ~96-97% sem filtro nenhum, então o ganho aqui é fino.
-    # FDH existe também na planilha Poisson — usamos a versão do
-    # CSV_LIMPO (sufixo "_csv600"), a que entrou no backtest.
     mgfa = _num(row.get("MGFA"))
-    fdh = _num(row.get("FDH_csv600", row.get("FDH")))
+    fdh = _num(row.get("FDH"))
     return (mgfa <= 2.150) and (fdh >= 40.000)
     # TREINO n=12071 wr=97,9% | TESTE n=2916 wr=96,8% (base~96-97%)
 
@@ -5607,13 +5602,7 @@ Home {home_emoji}   x   Away {away_emoji}
         df_ht[[
         "JOGO",
         "MGF_HT_Home",
-        "MGF_HT_Away",
-        # 🔧 FIX — essas duas odds vivem na planilha Poisson_HT (df_ht)
-        # e não estavam sendo trazidas pro base_df. Sem elas, os
-        # filtros de Over0,5HT e Over1,5HT nunca tinham odd pra
-        # comparar e por isso nunca batiam.
-        "Odd_Over_0,5HT",
-        "Odd_Over_1,5HT"]],
+        "MGF_HT_Away"]],
         on="JOGO",
         how="left")    
 
@@ -5730,11 +5719,6 @@ Home {home_emoji}   x   Away {away_emoji}
             "Over 1,5FT - Global",
             "FAH", "FAA", "FDH", "FDA",
             "Clean_Games_A",
-            # 🔧 FIX — faltavam estas 3: sem elas, Over2,5FT (precisa
-            # de Eficiência_2nd_A), Lay Away (Eficiência_A) e BTTS
-            # (Scored_Times_H) nunca batiam, porque row.get() voltava
-            # None pra sempre nessas contas.
-            "Eficiência_2nd_A", "Eficiência_A", "Scored_Times_H",
         ]
         _cols_achadas = [c for c in _cols_extra if c in df_base.columns]
         _cols_faltando = [c for c in _cols_extra if c not in df_base.columns]
@@ -5765,15 +5749,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
         _n_antes = df_clean["_chave_jogo"].isin(_extras["_chave_jogo"]).sum()
 
-        # 🔧 FIX — "FAA"/"FDA"/"FDH" (e "Clean_Games_A") existem tanto
-        # na planilha Poisson (df_mgf) quanto no CSV_LIMPO (df_base).
-        # Sem "suffixes" explícito, o pandas renomeava os dois lados
-        # pra "FAA_x"/"FAA_y" — e como os filtros pediam "FAA" puro,
-        # sempre vinha None. Agora a versão do CSV_LIMPO (a que foi
-        # validada no backtest) fica com sufixo "_csv600" explícito.
-        df_clean = df_clean.merge(
-            _extras, on="_chave_jogo", how="left", suffixes=("", "_csv600")
-        )
+        df_clean = df_clean.merge(_extras, on="_chave_jogo", how="left")
         df_clean = df_clean.drop(columns=["_chave_jogo"])
 
         # 🔎 DIAGNÓSTICO — se o merge não achar quase nenhum confronto em
@@ -5850,22 +5826,6 @@ Home {home_emoji}   x   Away {away_emoji}
         except:
             return ""
             
-    # =========================================
-    # 🔧 FIX — chave dos times do ranking600, pra restringir a coluna
-    # "Sinais" só a jogos com o Home_Team nessa lista (mesma fonte que
-    # já alimenta o Tier_LA, "Home_Key" em df_rank_la).
-    # =========================================
-    if df_rank_la.empty:
-        st.warning(
-            "⚠️ Sinais (ranking600) indisponível nesta rodada: "
-            "df_rank_la (lista dos times ranking600) veio vazia — sem "
-            "ela não dá pra saber quais jogos são de time ranking600 "
-            "jogando em casa, então a coluna Sinais fica em branco."
-        )
-        _ranking600_keys = set()
-    else:
-        _ranking600_keys = set(df_rank_la["Home_Key"])
-
     # =========================================
     # 🧠 LISTA FINAL
     # =========================================
@@ -6549,25 +6509,13 @@ Home {home_emoji}   x   Away {away_emoji}
             pass
 
         # =========================================
-        # 🔧 FIX — COLUNA "SINAIS"
-        # Os 13 filtros foram minerados e validados SÓ em jogos de
-        # times do ranking600 jogando em casa — era o pedido original
-        # ("operar apenas a favor dos times do ranking600 jogando em
-        # casa"). Isso nunca tinha sido aplicado aqui: os filtros
-        # rodavam em cima de QUALQUER time da rodada, não só do
-        # ranking600, então os limiares (calibrados pra esse grupo
-        # específico) ficavam avaliando times fora do universo em que
-        # foram validados. Agora só roda montar_sinais se o Home_Team
-        # do jogo estiver na lista ranking600 (mesma chave já usada
-        # no Tier_LA, "Home_Key").
+        # 🔧 NOVO — COLUNA "SINAIS"
+        # Roda os 13 filtros dos mercados ranking600 sobre esse mesmo
+        # `row` (já tem as colunas extras do df_base mescladas lá em
+        # cima) e junta os que bateram numa string só.
         # =========================================
 
-        _home_key_atual = str(row.get("Home_Team", "")).strip().lower()
-
-        if _home_key_atual in _ranking600_keys:
-            sinais = montar_sinais(row)
-        else:
-            sinais = ""
+        sinais = montar_sinais(row)
 
         # =========================================
         # 💰 STAKE
