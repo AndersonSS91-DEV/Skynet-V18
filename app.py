@@ -5373,8 +5373,8 @@ def filtro_over30ft_asian(row):
 
 
 def filtro_btts_sim(row):
-    faa = _num(row.get("FAA"))
-    fda = _num(row.get("FDA"))
+    faa = _num(row.get("FAA_csv600", row.get("FAA")))
+    fda = _num(row.get("FDA_csv600", row.get("FDA")))
     scored_times_h = _num(row.get("Scored_Times_H"))
     odd = _num(row.get("Odd_BTTS_YES"))
     return (faa <= 29.000) and (fda <= 40.000) and (scored_times_h > 27.500) and (1.45 <= odd <= 2.45)
@@ -5387,7 +5387,7 @@ def filtro_lay_goleada_away(row):
     # filtro cobre só a seleção pré-jogo (reduz risco de cauda); a
     # base já é ~96-97% sem filtro nenhum, então o ganho aqui é fino.
     mgfa = _num(row.get("MGFA"))
-    fdh = _num(row.get("FDH"))
+    fdh = _num(row.get("FDH_csv600", row.get("FDH")))
     return (mgfa <= 2.150) and (fdh >= 40.000)
     # TREINO n=12071 wr=97,9% | TESTE n=2916 wr=96,8% (base~96-97%)
 
@@ -5602,7 +5602,9 @@ Home {home_emoji}   x   Away {away_emoji}
         df_ht[[
         "JOGO",
         "MGF_HT_Home",
-        "MGF_HT_Away"]],
+        "MGF_HT_Away",
+        "Odd_Over_0,5HT",
+        "Odd_Over_1,5HT"]],
         on="JOGO",
         how="left")    
 
@@ -5719,6 +5721,7 @@ Home {home_emoji}   x   Away {away_emoji}
             "Over 1,5FT - Global",
             "FAH", "FAA", "FDH", "FDA",
             "Clean_Games_A",
+            "Eficiência_2nd_A", "Eficiência_A", "Scored_Times_H",
         ]
         _cols_achadas = [c for c in _cols_extra if c in df_base.columns]
         _cols_faltando = [c for c in _cols_extra if c not in df_base.columns]
@@ -5749,7 +5752,9 @@ Home {home_emoji}   x   Away {away_emoji}
 
         _n_antes = df_clean["_chave_jogo"].isin(_extras["_chave_jogo"]).sum()
 
-        df_clean = df_clean.merge(_extras, on="_chave_jogo", how="left")
+        df_clean = df_clean.merge(
+            _extras, on="_chave_jogo", how="left", suffixes=("", "_csv600")
+        )
         df_clean = df_clean.drop(columns=["_chave_jogo"])
 
         # 🔎 DIAGNÓSTICO — se o merge não achar quase nenhum confronto em
@@ -5826,6 +5831,20 @@ Home {home_emoji}   x   Away {away_emoji}
         except:
             return ""
             
+    # =========================================
+    # 🔧 FIX — chave dos times do ranking600, pra restringir a coluna
+    # "Sinais" só a jogos com o Home_Team nessa lista (os 13 filtros
+    # só foram validados pra esse grupo de times jogando em casa).
+    # =========================================
+    if df_rank_la.empty:
+        st.warning(
+            "⚠️ Sinais (ranking600) indisponível nesta rodada: "
+            "df_rank_la (lista dos times ranking600) veio vazia."
+        )
+        _ranking600_keys = set()
+    else:
+        _ranking600_keys = set(df_rank_la["Home_Key"])
+
     # =========================================
     # 🧠 LISTA FINAL
     # =========================================
@@ -6509,13 +6528,17 @@ Home {home_emoji}   x   Away {away_emoji}
             pass
 
         # =========================================
-        # 🔧 NOVO — COLUNA "SINAIS"
-        # Roda os 13 filtros dos mercados ranking600 sobre esse mesmo
-        # `row` (já tem as colunas extras do df_base mescladas lá em
-        # cima) e junta os que bateram numa string só.
+        # 🔧 FIX — COLUNA "SINAIS"
+        # Só roda os 13 filtros se o Home_Team estiver no ranking600
+        # (os limiares só foram validados pra esse grupo específico).
         # =========================================
 
-        sinais = montar_sinais(row)
+        _home_key_atual = str(row.get("Home_Team", "")).strip().lower()
+
+        if _home_key_atual in _ranking600_keys:
+            sinais = montar_sinais(row)
+        else:
+            sinais = ""
 
         # =========================================
         # 💰 STAKE
