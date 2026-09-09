@@ -5503,9 +5503,15 @@ LABEL = {
 GRUPO_OVER_FT = ["OVER30FT_ASIAN", "OVER25FT", "OVER15FT"]
 GRUPO_OVER_HT = ["OVER15HT", "OVER05HT"]
 
+# Lay Goleada Away e Lay Goleada Home juntos no mesmo jogo é dobrar a
+# exposição numa mesma partida instável (goleada de qualquer lado já é
+# o cenário raro que faz os dois perderem) — mostra só 1. Prioridade:
+# Away primeiro (winrate um pouco maior no teste, 96,8% vs 95,0%).
+GRUPO_GOLEADA = ["LAY_GOLEADA_AWAY", "LAY_GOLEADA_HOME"]
+
 # os demais sinais são independentes e podem aparecer juntos
 SINAIS_LIVRES = [
-    "BTTS_SIM", "LAY_GOLEADA_AWAY", "LAY_GOLEADA_HOME", "LAY_EMPATE",
+    "BTTS_SIM", "LAY_EMPATE",
     "LAY_AWAY", "LAY_HOME", "LAY_0X0", "LAY_0X1", "UNDER25FT", "UNDER15HT",
 ]
 
@@ -5518,7 +5524,7 @@ def montar_sinais(row, separador=" | "):
     string vazia."""
     ativos = []
 
-    for grupo in (GRUPO_OVER_FT, GRUPO_OVER_HT):
+    for grupo in (GRUPO_OVER_FT, GRUPO_OVER_HT, GRUPO_GOLEADA):
         for nome in grupo:
             try:
                 if FILTROS[nome](row):
