@@ -6250,87 +6250,108 @@ Home {home_emoji}   x   Away {away_emoji}
 
             if "lay away" in dir_ia.lower():
 
-                odd_home = row.get(
-                    "Odds_Casa",
+                # =========================================
+                # 🎯 FILTRO FAH — MANDANTE
+                # Lay Away exige FAH >= 35
+                # =========================================
+
+                fah = row.get(
+                    "FAH",
                     np.nan
                 )
 
-                if pd.notna(odd_home):
+                if (
+                    pd.isna(fah)
+                    or
+                    fah < 35
+                ):
 
-                    if odd_home > 1.13 and odd_home < 5.01:
+                    tier_la = ""
+                    passou_filtro_la = False
 
-                        if df_rank_la.empty:
+                else:
 
-                            tier_la = ""
-                            passou_filtro_la = False
+                    odd_home = row.get(
+                        "Odds_Casa",
+                        np.nan
+                    )
 
-                        else:
+                    if pd.notna(odd_home):
 
-                            home_key = (
-                                str(row["Home_Team"])
-                                .strip()
-                                .lower()
-                            )
+                        if odd_home > 1.13 and odd_home < 5.01:
 
-                            linha_rank = df_rank_la[
-                                df_rank_la["Home_Key"]
-                                == home_key
-                            ]
-
-                            # 🚫 HOME NÃO ESTÁ NO TOP600
-                            if linha_rank.empty:
+                            if df_rank_la.empty:
 
                                 tier_la = ""
                                 passou_filtro_la = False
 
                             else:
 
-                                tier_original = linha_rank.iloc[0].get(
-                                    "Tier_LA",
-                                    ""
+                                home_key = (
+                                    str(row["Home_Team"])
+                                    .strip()
+                                    .lower()
                                 )
 
-                                if tier_original is None:
+                                linha_rank = df_rank_la[
+                                    df_rank_la["Home_Key"]
+                                    == home_key
+                                ]
 
-                                    tier_original = ""
+                                # 🚫 HOME NÃO ESTÁ NO TOP600
+                                if linha_rank.empty:
 
-                                elif pd.isna(tier_original):
-
-                                    tier_original = ""
-
-                                tier_original = str(
-                                    tier_original
-                                ).strip()
-
-                                # =============================
-                                # ✅ FILTRO NORMAL
-                                # =============================
-
-                                if passou_filtro_la:
-
-                                    tier_la = tier_original
-
-                                # =============================
-                                # 💜 ELITE BLOQUEADO
-                                # =============================
+                                    tier_la = ""
+                                    passou_filtro_la = False
 
                                 else:
 
-                                    if "⭐⭐⭐⭐⭐" in tier_original:
+                                    tier_original = linha_rank.iloc[0].get(
+                                        "Tier_LA",
+                                        ""
+                                    )
 
-                                        tier_la = "LA💜💜💜💜💜"
+                                    if tier_original is None:
 
-                                    elif "⭐⭐⭐" in tier_original:
+                                        tier_original = ""
 
-                                        tier_la = "LA💜💜💜"
+                                    elif pd.isna(tier_original):
 
-                                    elif "⭐" in tier_original:
+                                        tier_original = ""
 
-                                        tier_la = "LA💜"
+                                    tier_original = str(
+                                        tier_original
+                                    ).strip()
+
+                                    # =============================
+                                    # ✅ FILTRO NORMAL
+                                    # =============================
+
+                                    if passou_filtro_la:
+
+                                        tier_la = tier_original
+
+                                    # =============================
+                                    # 💜 ELITE BLOQUEADO
+                                    # =============================
 
                                     else:
 
-                                        tier_la = ""
+                                        if "⭐⭐⭐⭐⭐" in tier_original:
+
+                                            tier_la = "LA💜💜💜💜💜"
+
+                                        elif "⭐⭐⭐" in tier_original:
+
+                                            tier_la = "LA💜💜💜"
+
+                                        elif "⭐" in tier_original:
+
+                                            tier_la = "LA💜"
+
+                                        else:
+
+                                            tier_la = ""
 
         # =========================================
         # 🧠 TIER LAY HOME
@@ -6342,57 +6363,78 @@ Home {home_emoji}   x   Away {away_emoji}
 
             if "lay home" in dir_ia.lower():
 
-                odd_away = row.get(
-                    "Odds_Visitante",
+                # =========================================
+                # 🎯 FILTRO FAA — VISITANTE
+                # Lay Home exige FAA >= 40
+                # =========================================
+
+                faa = row.get(
+                    "FAA",
                     np.nan
                 )
 
-                if pd.notna(odd_away):
+                if (
+                    pd.isna(faa)
+                    or
+                    faa < 40
+                ):
 
-                    if odd_away > 1.13:
+                    tier_lh = ""
+                    passou_filtro_lh = False
 
-                        if df_rank_lh.empty:
+                else:
 
-                            tier_lh = ""
-                            passou_filtro_lh = False
+                    odd_away = row.get(
+                        "Odds_Visitante",
+                        np.nan
+                    )
 
-                        else:
+                    if pd.notna(odd_away):
 
-                            away_key = (
-                                str(row["Visitor_Team"])
-                                .strip()
-                                .lower()
-                            )
+                        if odd_away > 1.13:
 
-                            linha_rank = df_rank_lh[
-                                df_rank_lh["Away_Key"]
-                                == away_key
-                            ]
-
-                            # 🚫 AWAY NÃO ESTÁ NO TOP200
-                            if linha_rank.empty:
+                            if df_rank_lh.empty:
 
                                 tier_lh = ""
                                 passou_filtro_lh = False
 
                             else:
 
-                                tier_lh = linha_rank.iloc[0].get(
-                                    "Tier_LH",
-                                    ""
+                                away_key = (
+                                    str(row["Visitor_Team"])
+                                    .strip()
+                                    .lower()
                                 )
 
-                                if tier_lh is None:
+                                linha_rank = df_rank_lh[
+                                    df_rank_lh["Away_Key"]
+                                    == away_key
+                                ]
+
+                                # 🚫 AWAY NÃO ESTÁ NO TOP200
+                                if linha_rank.empty:
 
                                     tier_lh = ""
+                                    passou_filtro_lh = False
 
-                                elif pd.isna(tier_lh):
+                                else:
 
-                                    tier_lh = ""
+                                    tier_lh = linha_rank.iloc[0].get(
+                                        "Tier_LH",
+                                        ""
+                                    )
 
-                                tier_lh = str(
-                                    tier_lh
-                                ).strip()
+                                    if tier_lh is None:
+
+                                        tier_lh = ""
+
+                                    elif pd.isna(tier_lh):
+
+                                        tier_lh = ""
+
+                                    tier_lh = str(
+                                        tier_lh
+                                    ).strip()
 
         # =========================================
         # 🧠 TIER HANDICAP VALUE
