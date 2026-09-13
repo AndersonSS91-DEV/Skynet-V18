@@ -5372,8 +5372,6 @@ def definir_lay(row):
 
     return "⚠️Lay Away (Atenção)"
 
-st.info("Sem jogos válidos após filtro")
-
 # =========================================
 # 🤖 ABA IA (ISOLADA CORRETA)
 # =========================================
