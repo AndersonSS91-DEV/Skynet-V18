@@ -3696,6 +3696,7 @@ with tab1:
         odd_justa_fora=_resumo_odd_justa_fora,
         top5=_ig_top5_fmt,
         over_under=_ig_ou_fmt,
+        exg_consenso=(lambda_home + lambda_away),
         top4_mercados=_ig_mercados_fmt,
         sinal_texto=_resumo_texto_sinal_principal,
         sinal_cor=_resumo_cor_sinal_principal,
