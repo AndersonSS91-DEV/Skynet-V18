@@ -3783,18 +3783,6 @@ with tab3:
         linha_mgf["ExG_Away_MGF"]
     )
 
-    exibir_matriz(
-        matriz,
-        linha_mgf["Home_Team"],
-        linha_mgf["Visitor_Team"],
-        "🔢⚽🥅 Poisson — MGF"
-    )
-
-    mostrar_over_under(
-        matriz,
-        "Over/Under — Média de Gols (MGF)"
-    )
-
        # ===== RADAR MGF =====
     ief_home = eficiencia_finalizacao(linha_mgf["CHM"])
     ief_away = eficiencia_finalizacao(linha_mgf["CAM"])
@@ -3815,16 +3803,56 @@ with tab3:
         linha_mgf["BTTS_%"]
     ]
 
-    st.markdown("### 🎯 Radar Ofensivo — MGF")
+    # =========================================
+    # 📊 MATRIZ / OVER-UNDER / RADAR — LADO A LADO
+    # (mesma disposição visual da aba Resumo)
+    # =========================================
+    _col_matriz, _col_ou, _col_radar = st.columns(3)
 
-    fig = radar_comparativo(
-        radar_home_mgf,
-        radar_away_mgf,
-        linha_mgf["Home_Team"],
-        linha_mgf["Visitor_Team"]
-    )
+    with _col_matriz:
+        exibir_matriz(
+            matriz,
+            linha_mgf["Home_Team"],
+            linha_mgf["Visitor_Team"],
+            "🔢⚽🥅 Poisson — MGF"
+        )
 
-    st.pyplot(fig, use_container_width=False)
+    with _col_ou:
+        mostrar_over_under(
+            matriz,
+            "Over/Under — Média de Gols (MGF)"
+        )
+
+    with _col_radar:
+
+        st.markdown("### 🎯 Radar Ofensivo — MGF")
+
+        _r_home, _r_vs, _r_away = st.columns([2, 0.5, 2])
+
+        with _r_home:
+            st.markdown(f"**{linha_mgf['Home_Team'].upper()}**")
+            st.caption("🏠 MANDANTE")
+
+        with _r_vs:
+            st.markdown("### X")
+
+        with _r_away:
+            st.markdown(f"**{linha_mgf['Visitor_Team'].upper()}**")
+            st.caption("✈ VISITANTE")
+
+        fig = radar_comparativo(
+            radar_home_mgf,
+            radar_away_mgf,
+            linha_mgf["Home_Team"],
+            linha_mgf["Visitor_Team"]
+        )
+
+        try:
+            fig.set_size_inches(4.0, 4.0)
+        except Exception:
+            pass
+
+        st.pyplot(fig, use_container_width=False)
 
     cards_ofensivos(
     radar_home_mgf,
@@ -3983,18 +4011,6 @@ with tab4:
         linha_exg["ExG_Away_ATKxDEF"]
     )
 
-    exibir_matriz(
-        matriz,
-        linha_exg["Home_Team"],
-        linha_exg["Visitor_Team"],
-        "🔢⚔️ Poisson — ATK x DEF"
-    )
-
-    mostrar_over_under(
-        matriz,
-        "Over/Under — Ataque x Defesa"
-    )
-
        # ===== RADAR ATK x DEF =====
     radar_home_exg = [
         linha_exg["FAH"],
@@ -4012,16 +4028,56 @@ with tab4:
         linha_exg["BTTS_%"]
     ]
 
-    st.markdown("### ⚔️ Radar Tático")
+    # =========================================
+    # 📊 MATRIZ / OVER-UNDER / RADAR — LADO A LADO
+    # (mesma disposição visual da aba Resumo)
+    # =========================================
+    _col_matriz, _col_ou, _col_radar = st.columns(3)
 
-    fig = radar_comparativo(
-        radar_home_exg,
-        radar_away_exg,
-        linha_exg["Home_Team"],
-        linha_exg["Visitor_Team"]
-    )
+    with _col_matriz:
+        exibir_matriz(
+            matriz,
+            linha_exg["Home_Team"],
+            linha_exg["Visitor_Team"],
+            "🔢⚔️ Poisson — ATK x DEF"
+        )
 
-    st.pyplot(fig, use_container_width=False)
+    with _col_ou:
+        mostrar_over_under(
+            matriz,
+            "Over/Under — Ataque x Defesa"
+        )
+
+    with _col_radar:
+
+        st.markdown("### ⚔️ Radar Tático")
+
+        _r_home, _r_vs, _r_away = st.columns([2, 0.5, 2])
+
+        with _r_home:
+            st.markdown(f"**{linha_exg['Home_Team'].upper()}**")
+            st.caption("🏠 MANDANTE")
+
+        with _r_vs:
+            st.markdown("### X")
+
+        with _r_away:
+            st.markdown(f"**{linha_exg['Visitor_Team'].upper()}**")
+            st.caption("✈ VISITANTE")
+
+        fig = radar_comparativo(
+            radar_home_exg,
+            radar_away_exg,
+            linha_exg["Home_Team"],
+            linha_exg["Visitor_Team"]
+        )
+
+        try:
+            fig.set_size_inches(4.0, 4.0)
+        except Exception:
+            pass
+
+        st.pyplot(fig, use_container_width=False)
 
     cards_ofensivos(
         radar_home_exg,
@@ -4128,18 +4184,6 @@ with tab5:
         linha_vg["ExG_Away_VG"]
     )
 
-    exibir_matriz(
-        matriz,
-        linha_vg["Home_Team"],
-        linha_vg["Visitor_Team"],
-        "🔢💰⚽Poisson — Valor do Gol (VG)"
-    )
-
-    mostrar_over_under(
-        matriz,
-        "Over/Under — Valor do Gol (VG)"
-    )
-
     # ===== RADAR VG =====
     radar_home_vg = [
         linha_exg["FAH"],
@@ -4157,16 +4201,56 @@ with tab5:
         linha_vg["BTTS_%"]
     ]
 
-    st.markdown("### 💎 Radar Ofensivo — Valor")
+    # =========================================
+    # 📊 MATRIZ / OVER-UNDER / RADAR — LADO A LADO
+    # (mesma disposição visual da aba Resumo)
+    # =========================================
+    _col_matriz, _col_ou, _col_radar = st.columns(3)
 
-    fig = radar_comparativo(
-        radar_home_vg,
-        radar_away_vg,
-        linha_vg["Home_Team"],
-        linha_vg["Visitor_Team"]
-    )
+    with _col_matriz:
+        exibir_matriz(
+            matriz,
+            linha_vg["Home_Team"],
+            linha_vg["Visitor_Team"],
+            "🔢💰⚽Poisson — Valor do Gol (VG)"
+        )
 
-    st.pyplot(fig, use_container_width=False)
+    with _col_ou:
+        mostrar_over_under(
+            matriz,
+            "Over/Under — Valor do Gol (VG)"
+        )
+
+    with _col_radar:
+
+        st.markdown("### 💎 Radar Ofensivo — Valor")
+
+        _r_home, _r_vs, _r_away = st.columns([2, 0.5, 2])
+
+        with _r_home:
+            st.markdown(f"**{linha_vg['Home_Team'].upper()}**")
+            st.caption("🏠 MANDANTE")
+
+        with _r_vs:
+            st.markdown("### X")
+
+        with _r_away:
+            st.markdown(f"**{linha_vg['Visitor_Team'].upper()}**")
+            st.caption("✈ VISITANTE")
+
+        fig = radar_comparativo(
+            radar_home_vg,
+            radar_away_vg,
+            linha_vg["Home_Team"],
+            linha_vg["Visitor_Team"]
+        )
+
+        try:
+            fig.set_size_inches(4.0, 4.0)
+        except Exception:
+            pass
+
+        st.pyplot(fig, use_container_width=False)
 
     cards_ofensivos(
         radar_home_vg,
