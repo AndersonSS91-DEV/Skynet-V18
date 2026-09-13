@@ -374,6 +374,7 @@ def gerar_card_instagram(
     odd_justa_casa=0.0, odd_justa_empate=0.0, odd_justa_fora=0.0,
     top5=None,
     over_under=None,
+    exg_consenso=None,
     top4_mercados=None,
     titulo_mercados="TOP 4 MERCADOS",
     sinal_texto=None, sinal_cor=None, sinal_estrelas=None, sinal_subtexto=None,
@@ -506,6 +507,30 @@ def gerar_card_instagram(
         oy += 33
 
     y = b1[3] + 20
+
+    # ---------- ExG Consenso ----------
+    if exg_consenso is not None:
+        try:
+            _exg_val = float(exg_consenso)
+        except (TypeError, ValueError):
+            _exg_val = None
+
+        if _exg_val is not None and not math.isnan(_exg_val):
+            # Arredondamento: ties (X.50 exato) para baixo.
+            # Ex.: 2.51–3.50 -> 3 | 3.51–4.50 -> 4
+            _exg_gols = math.ceil(_exg_val - 0.5)
+
+            box_exg_h = 92
+            box_exg = [pad_out + pad_in, y, W - pad_out - pad_in, y + box_exg_h]
+            rrect(d, box_exg, 14, fill=INNER_BG, outline=INNER_BORDER, width=2)
+            section_title(d, cx, box_exg[1] + 24, "goal", "ExG CONSENSO", WHITE, GOLD, 14)
+            ctext(d, cx, box_exg[1] + 62, f"{_exg_gols} GOLS", F("bold", 26), GOLD)
+            ctext(
+                d, cx, box_exg[1] + 82,
+                f"Expectativa de gols (consenso MGF · ATKxDEF · VG) — ExG {_exg_val:.2f}",
+                F("regular", 12), GREY,
+            )
+            y = box_exg[3] + 20
 
     # ---------- Top 4 mercados ----------
     n_mkt = len(top4_mercados)
