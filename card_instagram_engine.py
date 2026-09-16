@@ -516,9 +516,9 @@ def gerar_card_instagram(
             _exg_val = None
 
         if _exg_val is not None and not math.isnan(_exg_val):
-            # Arredondamento: ties (X.50 exato) para baixo.
-            # Ex.: 2.51–3.50 -> 3 | 3.51–4.50 -> 4
-            _exg_gols = math.ceil(_exg_val - 0.5)
+            # Arredondamento sempre pra baixo (floor).
+            # Ex.: 2.99 -> 2 | 3.00 -> 3 | 3.99 -> 3
+            _exg_gols = math.floor(_exg_val)
 
             box_exg_h = 92
             box_exg = [pad_out + pad_in, y, W - pad_out - pad_in, y + box_exg_h]
