@@ -6277,12 +6277,13 @@ Home {home_emoji}   x   Away {away_emoji}
         elite_bloqueado_la = False
 
         if (
-
-            is_lay_away(dir_poisson)
-            or
-            is_lay_away(dir_ia)
-
-        ):
+            not blacklist_absoluta
+            and
+            (
+                is_lay_away(dir_poisson)
+                or
+                is_lay_away(dir_ia)
+            )):
 
             if not df_rank_la.empty:
 
@@ -6344,10 +6345,12 @@ Home {home_emoji}   x   Away {away_emoji}
         tier_la = ""
 
         if (
-            passou_filtro_la
-            or
-            elite_bloqueado_la
-        ):
+            not blacklist_absoluta
+            and
+            (
+                passou_filtro_la
+                or
+                elite_bloqueado_la)):
 
             if "lay away" in dir_ia.lower():
 
