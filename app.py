@@ -5830,6 +5830,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
         _cols_extra = [
             "Home_Team", "Visitor_Team",
+            "Country", "League",
             "MGFH", "MGFA", "MGCH", "MGCA",
             "MG_Global", "Média_2,5FT_Global",
             "Classificação - Casa", "Classificação - Casa.1",
