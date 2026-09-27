@@ -5875,6 +5875,19 @@ Home {home_emoji}   x   Away {away_emoji}
         )
         df_clean = df_clean.drop(columns=["_chave_jogo"])
 
+        # =========================================
+        # 🌎 COUNTRY / LEAGUE OFICIAIS DO CSV_LIMPO
+        # =========================================
+        if "Country_csv600" in df_clean.columns:
+            df_clean["Country"] = df_clean["Country_csv600"].combine_first(
+                df_clean.get("Country")
+            )
+
+        if "League_csv600" in df_clean.columns:
+            df_clean["League"] = df_clean["League_csv600"].combine_first(
+                df_clean.get("League")
+            )
+
         # 🔎 DIAGNÓSTICO — se o merge não achar quase nenhum confronto em
         # comum entre as planilhas Poisson (Home_Team x Visitor_Team) e o
         # df_base (Home_Team/Visitor_Team do CSV_LIMPO), a causa costuma
