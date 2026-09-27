@@ -6041,30 +6041,14 @@ Home {home_emoji}   x   Away {away_emoji}
 
         blacklist_keywords = [
 
-            "u17",
-            "u19",
-            "u20",
-            "u21",
-            "u23",
-            "youth",
-            "juniores",
-            "juvenil",
+            "u17","u19","u20","u21","u23","youth","juniores","juvenil",
+            "women","woman","feminino","fem",
 
-            "women",
-            "woman",
-            "feminino",
-            "fem",
-
-            "reserve",
-            "reserves",
-
-            "friendly",
-            "amistoso", 
-            "serie c",
-            "serie d",
-            "nwsl",
-            "copa paulista"
-        ]
+            "reserve","reserves",
+            "jamaica","nicaragua","el salvador",
+            
+            "friendly","amistoso", 
+            "serie c","serie d","nwsl","copa paulista"]
 
         if any(
             word in league
