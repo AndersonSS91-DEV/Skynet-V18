@@ -6082,11 +6082,13 @@ Home {home_emoji}   x   Away {away_emoji}
             for word in blacklist_leagues
         )
 
-        if (
+        blacklist_absoluta = (
             pais_bloqueado
             or
             liga_bloqueada
-        ):
+        )
+
+        if blacklist_absoluta:
             passou_filtro_la = False
             passou_filtro_lh = False
             
