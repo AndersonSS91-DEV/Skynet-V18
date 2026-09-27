@@ -6032,32 +6032,64 @@ Home {home_emoji}   x   Away {away_emoji}
             passou_filtro_lh = False
 
         # =========================================
-        # 🚫 BLACKLIST
+        # 🚫 BLACKLIST — PAÍS + LIGA
         # =========================================
+
+        country = str(
+            row.get("Country", "")
+        ).strip().lower()
 
         league = str(
             row.get("League", "")
-        ).lower()
+        ).strip().lower()
 
-        blacklist_keywords = [
+        blacklist_countries = [
+            "jamaica",
+            "nicaragua",
+            "el salvador",
+        ]
 
-            "u17","u19","u20","u21","u23","youth","juniores","juvenil",
-            "women","woman","feminino","fem",
+        blacklist_leagues = [
+            "u17",
+            "u19",
+            "u20",
+            "u21",
+            "u23",
+            "youth",
+            "juniores",
+            "juvenil",
+            "women",
+            "woman",
+            "feminino",
+            "fem",
+            "reserve",
+            "reserves",
+            "friendly",
+            "amistoso",
+            "serie c",
+            "serie d",
+            "nwsl",
+            "copa paulista",
+        ]
 
-            "reserve","reserves",
-            "jamaica","nicaragua","el salvador",
-            
-            "friendly","amistoso", 
-            "serie c","serie d","nwsl","copa paulista"]
+        pais_bloqueado = any(
+            word in country
+            for word in blacklist_countries
+        )
 
-        if any(
+        liga_bloqueada = any(
             word in league
-            for word in blacklist_keywords
-        ):
+            for word in blacklist_leagues
+        )
 
+        if (
+            pais_bloqueado
+            or
+            liga_bloqueada
+        ):
             passou_filtro_la = False
             passou_filtro_lh = False
-
+            
         # =========================================
         # 🚫 UNDER 2.5
         # =========================================
