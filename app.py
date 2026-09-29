@@ -5830,6 +5830,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
         _cols_extra = [
             "Home_Team", "Visitor_Team",
+            "Country", "League",
             "MGFH", "MGFA", "MGCH", "MGCA",
             "MG_Global", "Média_2,5FT_Global",
             "Classificação - Casa", "Classificação - Casa.1",
@@ -5873,6 +5874,19 @@ Home {home_emoji}   x   Away {away_emoji}
             _extras, on="_chave_jogo", how="left", suffixes=("", "_csv600")
         )
         df_clean = df_clean.drop(columns=["_chave_jogo"])
+
+        # =========================================
+        # 🌎 COUNTRY / LEAGUE OFICIAIS DO CSV_LIMPO
+        # =========================================
+        if "Country_csv600" in df_clean.columns:
+            df_clean["Country"] = df_clean["Country_csv600"].combine_first(
+                df_clean.get("Country")
+            )
+
+        if "League_csv600" in df_clean.columns:
+            df_clean["League"] = df_clean["League_csv600"].combine_first(
+                df_clean.get("League")
+            )
 
         # 🔎 DIAGNÓSTICO — se o merge não achar quase nenhum confronto em
         # comum entre as planilhas Poisson (Home_Team x Visitor_Team) e o
@@ -6032,32 +6046,66 @@ Home {home_emoji}   x   Away {away_emoji}
             passou_filtro_lh = False
 
         # =========================================
-        # 🚫 BLACKLIST
+        # 🚫 BLACKLIST — PAÍS + LIGA
         # =========================================
+
+        country = str(
+            row.get("Country", "")
+        ).strip().lower()
 
         league = str(
             row.get("League", "")
-        ).lower()
+        ).strip().lower()
 
-        blacklist_keywords = [
+        blacklist_countries = [
+            "jamaica",
+            "nicaragua",
+            "el salvador",
+        ]
 
-            "u17","u19","u20","u21","u23","youth","juniores","juvenil",
-            "women","woman","feminino","fem",
+        blacklist_leagues = [
+            "u17",
+            "u19",
+            "u20",
+            "u21",
+            "u23",
+            "youth",
+            "juniores",
+            "juvenil",
+            "women",
+            "woman",
+            "feminino",
+            "fem",
+            "reserve",
+            "reserves",
+            "friendly",
+            "amistoso",
+            "serie c",
+            "serie d",
+            "nwsl",
+            "copa paulista",
+        ]
 
-            "reserve","reserves",
-            "jamaica","nicaragua","el salvador",
-            
-            "friendly","amistoso", 
-            "serie c","serie d","nwsl","copa paulista"]
+        pais_bloqueado = any(
+            word in country
+            for word in blacklist_countries
+        )
 
-        if any(
+        liga_bloqueada = any(
             word in league
-            for word in blacklist_keywords
-        ):
+            for word in blacklist_leagues
+        )
 
+        blacklist_absoluta = (
+            pais_bloqueado
+            or
+            liga_bloqueada
+        )
+
+        if blacklist_absoluta:
             passou_filtro_la = False
             passou_filtro_lh = False
-
+            
         # =========================================
         # 🚫 UNDER 2.5
         # =========================================
@@ -6243,12 +6291,13 @@ Home {home_emoji}   x   Away {away_emoji}
         elite_bloqueado_la = False
 
         if (
-
-            is_lay_away(dir_poisson)
-            or
-            is_lay_away(dir_ia)
-
-        ):
+            not blacklist_absoluta
+            and
+            (
+                is_lay_away(dir_poisson)
+                or
+                is_lay_away(dir_ia)
+            )):
 
             if not df_rank_la.empty:
 
@@ -6310,10 +6359,12 @@ Home {home_emoji}   x   Away {away_emoji}
         tier_la = ""
 
         if (
-            passou_filtro_la
-            or
-            elite_bloqueado_la
-        ):
+            not blacklist_absoluta
+            and
+            (
+                passou_filtro_la
+                or
+                elite_bloqueado_la)):
 
             if "lay away" in dir_ia.lower():
 
