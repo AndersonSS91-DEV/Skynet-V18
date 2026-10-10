@@ -6083,9 +6083,42 @@ Home {home_emoji}   x   Away {away_emoji}
             "serie c",
             "serie d",
             "nwsl",
-            "copa paulista",
+            "copa paulista",]
+        
+        # =========================================
+        # 🚫 BLACKLIST POR NOME DOS TIMES
+        # =========================================
+
+        home_team = str(
+            row.get("Home_Team", row.get("Home", ""))
+        ).strip().lower()
+
+        away_team = str(
+            row.get("Visitor_Team", row.get("Away", ""))
+        ).strip().lower()
+
+        blacklist_teams = [
+            "u17",
+            "u19",
+            "u20",
+            "u21",
+            "u23",
+            "youth",
+            "juniores",
+            "juvenil",
+            "women",
+            "woman",
+            "feminino",
+            "feminina",
+            "reserves",
+            "reserve",
         ]
 
+        time_bloqueado = any(
+            word in home_team or word in away_team
+            for word in blacklist_teams
+        )
+        
         pais_bloqueado = any(
             word in country
             for word in blacklist_countries
@@ -6100,6 +6133,8 @@ Home {home_emoji}   x   Away {away_emoji}
             pais_bloqueado
             or
             liga_bloqueada
+            or
+            time_bloqueado
         )
 
         if blacklist_absoluta:
