@@ -5698,8 +5698,12 @@ Home {home_emoji}   x   Away {away_emoji}
     # =========================================
     # 📊 RANKING IA (CORRIGIDO)
     # =========================================
+    colunas_ia = [
+        "JOGO","Poisson_Direcao","IA_Direcao","IFH","IFA","Delta_IF"]
+    consenso_ia = df_consenso.reindex(columns=colunas_ia)
+
     base_df = df_mgf.merge(
-        df_consenso[["JOGO", "Poisson_Direcao", "IA_Direcao"]],
+        consenso_ia,
         on="JOGO",
         how="left"
     )
@@ -6905,6 +6909,12 @@ Home {home_emoji}   x   Away {away_emoji}
 
             "Home": row["Home"],
             "Away": row["Away"],
+            
+            # ÍNDICES DE FORÇA — COMPATÍVEL COM ARQUIVOS ANTIGOS
+            "IFH": "-" if pd.isna(row.get("IFH")) else round(float(row["IFH"]), 2),
+            "IFA": "-" if pd.isna(row.get("IFA")) else round(float(row["IFA"]), 2),
+            "Delta_IF": "-" if pd.isna(row.get("Delta_IF")) else round(float(row["Delta_IF"]), 2),
+            
             "Stake": stake,
 
             # 🔥 TIER
