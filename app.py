@@ -5898,7 +5898,7 @@ Home {home_emoji}   x   Away {away_emoji}
                 validate="many_to_one"
             )
 
-                        for _pos in ("POS_H", "POS_A"):
+            for _pos in ("POS_H", "POS_A"):
                 _col_csv = f"{_pos}_csv600"
 
                 if _col_csv in df_clean.columns:
