@@ -5857,79 +5857,97 @@ Home {home_emoji}   x   Away {away_emoji}
                 "vão bater (os outros continuam funcionando)."
             )
 
+        # =========================================================
+        # 🔧 POS_H / POS_A DO JOGO VIGENTE
+        # (antes este bloco estava indentado dentro do
+        # "if _cols_faltando", então só rodava quando faltava coluna)
+        # Regra: a classificação vem da linha do CSV que representa o
+        # JOGO DE HOJE (mesmo confronto + mesma data). Nunca usa jogos
+        # passados entre os dois times.
+        # =========================================================
+        _precisa = {"Home_Team", "Visitor_Team", "POS_H", "POS_A"}
+        if _precisa.issubset(set(_cols_achadas)):
 
+            _norm = lambda s: s.astype(str).str.strip().str.casefold()
 
-            _extras = df_base[_cols_achadas].copy()
+            _cols_pos = ["Home_Team", "Visitor_Team", "POS_H", "POS_A"]
+            for _c in ("Hour", "Result Home"):
+                if _c in df_base.columns:
+                    _cols_pos.append(_c)
 
-            # Preserva as classificações do CSV
-            _extras["POS_H"] = pd.to_numeric(
-                _extras["POS_H"], errors="coerce"
+            _extras = df_base[_cols_pos].copy()
+            _extras["POS_H"] = pd.to_numeric(_extras["POS_H"], errors="coerce")
+            _extras["POS_A"] = pd.to_numeric(_extras["POS_A"], errors="coerce")
+
+            # só linhas que realmente têm classificação
+            _extras = _extras[
+                _extras["POS_H"].notna() | _extras["POS_A"].notna()
+            ].copy()
+
+            _extras["_chave_jogo"] = (
+                _norm(_extras["Home_Team"]) + " x " + _norm(_extras["Visitor_Team"])
             )
-            _extras["POS_A"] = pd.to_numeric(
-                _extras["POS_A"], errors="coerce"
+            df_clean["_chave_jogo"] = (
+                _norm(df_clean["Home_Team"]) + " x " + _norm(df_clean["Visitor_Team"])
             )
 
-            # Chave do confronto: mandante + visitante + data
-            for _df in (df_clean, _extras):
-                _df["_chave_jogo"] = (
-                    _df["Home_Team"].astype(str).str.strip().str.casefold()
-                    + " x " +
-                    _df["Visitor_Team"].astype(str).str.strip().str.casefold()
-                )
-
-                _df["_chave_data"] = pd.to_datetime(
-                    _df["Hour"],
-                    dayfirst=True,
-                    errors="coerce"
+            if "Hour" in _extras.columns:
+                _extras["_chave_data"] = pd.to_datetime(
+                    _extras["Hour"], errors="coerce"
                 ).dt.date
+            else:
+                _extras["_chave_data"] = pd.NaT
 
-            # Não aceita datas inválidas ou confrontos duplicados
-            _extras = _extras.dropna(
-                subset=["_chave_data"]
+            if "Hour" in df_clean.columns:
+                df_clean["_chave_data"] = pd.to_datetime(
+                    df_clean["Hour"], errors="coerce"
+                ).dt.date
+            else:
+                df_clean["_chave_data"] = pd.NaT
+
+            df_clean = df_clean.drop(columns=["POS_H", "POS_A"], errors="ignore")
+
+            # ---- 1) match exato: confronto + data do jogo ----
+            _ex1 = (
+                _extras.dropna(subset=["_chave_data"])
+                .drop_duplicates(subset=["_chave_jogo", "_chave_data"], keep="last")
+                [["_chave_jogo", "_chave_data", "POS_H", "POS_A"]]
             )
-
-            _keys = ["_chave_jogo", "_chave_data"]
-
-            _extras = _extras.drop_duplicates(
-                subset=_keys,
-                keep=False
-            )
-
-            # Transfere somente as classificações
-            _posicoes = _extras[
-                _keys + ["POS_H", "POS_A"]
-            ].rename(
-                columns={
-                    "POS_H": "_POS_H_DATA",
-                    "POS_A": "_POS_A_DATA"
-                }
-            )
-
-            # Remove posições antigas para não misturar datas
-            df_clean = df_clean.drop(
-                columns=["POS_H", "POS_A"],
-                errors="ignore"
-            )
-
-            # Associação EXATA por confronto e data
             df_clean = df_clean.merge(
-                _posicoes,
-                on=_keys,
-                how="left",
-                validate="many_to_one"
+                _ex1, on=["_chave_jogo", "_chave_data"],
+                how="left", validate="many_to_one"
             )
 
-            # Restaura os nomes originais das colunas
-            df_clean = df_clean.rename(
-                columns={
-                    "_POS_H_DATA": "POS_H",
-                    "_POS_A_DATA": "POS_A"
-                }
-            )
+            # ---- 2) fallback (planilha sem Hour ou data não bateu):
+            # usa SOMENTE a linha ainda sem resultado (jogo vigente),
+            # nunca um jogo já disputado entre os dois times ----
+            _sem_pos = df_clean["POS_H"].isna() & df_clean["POS_A"].isna()
+            if _sem_pos.any():
+                _ex2 = _extras
+                if "Result Home" in _ex2.columns:
+                    _ex2 = _ex2[
+                        pd.to_numeric(_ex2["Result Home"], errors="coerce").isna()
+                    ]
+                if "Hour" in _ex2.columns:
+                    _ex2 = _ex2.assign(
+                        _h=pd.to_datetime(_ex2["Hour"], errors="coerce")
+                    ).sort_values("_h")
+                _ex2 = (
+                    _ex2.drop_duplicates(subset=["_chave_jogo"], keep="last")
+                    [["_chave_jogo", "POS_H", "POS_A"]]
+                    .rename(columns={"POS_H": "_PH2", "POS_A": "_PA2"})
+                )
+                df_clean = df_clean.merge(
+                    _ex2, on="_chave_jogo", how="left", validate="many_to_one"
+                )
+                df_clean["POS_H"] = df_clean["POS_H"].fillna(df_clean["_PH2"])
+                df_clean["POS_A"] = df_clean["POS_A"].fillna(df_clean["_PA2"])
+                df_clean = df_clean.drop(columns=["_PH2", "_PA2"])
 
-            df_clean = df_clean.drop(
-                columns=_keys
-            )
+            df_clean["POS_H"] = pd.to_numeric(df_clean["POS_H"], errors="coerce").astype("Int64")
+            df_clean["POS_A"] = pd.to_numeric(df_clean["POS_A"], errors="coerce").astype("Int64")
+
+            df_clean = df_clean.drop(columns=["_chave_jogo", "_chave_data"])
         
         # =========================================
         # 🌎 COUNTRY / LEAGUE OFICIAIS DO CSV_LIMPO
