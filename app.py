@@ -5857,13 +5857,19 @@ Home {home_emoji}   x   Away {away_emoji}
                 "vão bater (os outros continuam funcionando)."
             )
 
+
+
             _extras = df_base[_cols_achadas].copy()
 
-            # Obrigatório: data/hora nos dois arquivos
-            if "Hour" not in df_clean.columns or "Hour" not in _extras.columns:
-                st.error("Coluna Hour ausente. Não é seguro associar as classificações.")
-                st.stop()
+            # Preserva as classificações do CSV
+            _extras["POS_H"] = pd.to_numeric(
+                _extras["POS_H"], errors="coerce"
+            )
+            _extras["POS_A"] = pd.to_numeric(
+                _extras["POS_A"], errors="coerce"
+            )
 
+            # Chave do confronto: mandante + visitante + data
             for _df in (df_clean, _extras):
                 _df["_chave_jogo"] = (
                     _df["Home_Team"].astype(str).str.strip().str.casefold()
@@ -5871,56 +5877,60 @@ Home {home_emoji}   x   Away {away_emoji}
                     _df["Visitor_Team"].astype(str).str.strip().str.casefold()
                 )
 
-                _df["_chave_hora"] = pd.to_datetime(
-                    _df["Hour"], dayfirst=True, errors="coerce"
-                ).dt.floor("min")
+                _df["_chave_data"] = pd.to_datetime(
+                    _df["Hour"],
+                    dayfirst=True,
+                    errors="coerce"
+                ).dt.date
 
-            # Remove registros sem data/hora válida
-            _extras = _extras.dropna(subset=["_chave_hora"])
-
-            # Impede associações ambíguas
-            _keys = ["_chave_jogo", "_chave_hora"]
-            _extras = _extras.drop_duplicates(subset=_keys, keep=False)
-
-            _extras = _extras.drop(
-                columns=["Home_Team", "Visitor_Team", "Hour"]
+            # Não aceita datas inválidas ou confrontos duplicados
+            _extras = _extras.dropna(
+                subset=["_chave_data"]
             )
 
-            _n_antes = df_clean[_keys].merge(
-                _extras[_keys], on=_keys, how="inner"
-            ).shape[0]
+            _keys = ["_chave_jogo", "_chave_data"]
 
+            _extras = _extras.drop_duplicates(
+                subset=_keys,
+                keep=False
+            )
+
+            # Transfere somente as classificações
+            _posicoes = _extras[
+                _keys + ["POS_H", "POS_A"]
+            ].rename(
+                columns={
+                    "POS_H": "_POS_H_DATA",
+                    "POS_A": "_POS_A_DATA"
+                }
+            )
+
+            # Remove posições antigas para não misturar datas
+            df_clean = df_clean.drop(
+                columns=["POS_H", "POS_A"],
+                errors="ignore"
+            )
+
+            # Associação EXATA por confronto e data
             df_clean = df_clean.merge(
-                _extras,
+                _posicoes,
                 on=_keys,
                 how="left",
-                suffixes=("", "_csv600"),
                 validate="many_to_one"
             )
 
-            for _pos in ("POS_H", "POS_A"):
-                _col_csv = f"{_pos}_csv600"
-
-                if _col_csv in df_clean.columns:
-                    if _pos in df_clean.columns:
-                        df_clean[_pos] = df_clean[_col_csv].combine_first(
-                            df_clean[_pos]
-                        )
-                    else:
-                        df_clean[_pos] = df_clean[_col_csv]
-
-                    df_clean = df_clean.drop(columns=[_col_csv])
-
-                if _pos not in df_clean.columns:
-                    df_clean[_pos] = np.nan
-
-            df_clean = df_clean.drop(columns=_keys)
-
-            st.write(
-                "POS_H / POS_A:",
-                df_clean[["POS_H", "POS_A"]].notna().sum().to_dict()
+            # Restaura os nomes originais das colunas
+            df_clean = df_clean.rename(
+                columns={
+                    "_POS_H_DATA": "POS_H",
+                    "_POS_A_DATA": "POS_A"
+                }
             )
 
+            df_clean = df_clean.drop(
+                columns=_keys
+            )
+        
         # =========================================
         # 🌎 COUNTRY / LEAGUE OFICIAIS DO CSV_LIMPO
         # =========================================
