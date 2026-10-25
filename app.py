@@ -5898,13 +5898,28 @@ Home {home_emoji}   x   Away {away_emoji}
                 validate="many_to_one"
             )
 
-            for _pos in ("POS_H", "POS_A"):
+                        for _pos in ("POS_H", "POS_A"):
                 _col_csv = f"{_pos}_csv600"
+
                 if _col_csv in df_clean.columns:
-                    df_clean[_pos] = df_clean[_col_csv]
+                    if _pos in df_clean.columns:
+                        df_clean[_pos] = df_clean[_col_csv].combine_first(
+                            df_clean[_pos]
+                        )
+                    else:
+                        df_clean[_pos] = df_clean[_col_csv]
+
                     df_clean = df_clean.drop(columns=[_col_csv])
 
+                if _pos not in df_clean.columns:
+                    df_clean[_pos] = np.nan
+
             df_clean = df_clean.drop(columns=_keys)
+
+            st.write(
+                "POS_H / POS_A:",
+                df_clean[["POS_H", "POS_A"]].notna().sum().to_dict()
+            )
 
         # =========================================
         # 🌎 COUNTRY / LEAGUE OFICIAIS DO CSV_LIMPO
