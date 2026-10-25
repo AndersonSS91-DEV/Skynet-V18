@@ -345,8 +345,8 @@ if os.path.exists(CSV_BASE):
 
     df_base = carregar_csv_base(CSV_BASE, os.path.getmtime(CSV_BASE))
 
-    df_base["POS_H"] = pd.to_numeric(df_base["Classificação - Casa"], errors="coerce").astype("Int64")
-    df_base["POS_A"] = pd.to_numeric(df_base["Classificação - Casa.1"], errors="coerce").astype("Int64")
+    df_base["POS_H"] = pd.to_numeric(df_base["Classificação - Casa"], errors="coerce")
+    df_base["POS_A"] = pd.to_numeric(df_base["Classificação - Casa.1"], errors="coerce")
     
     # =====================================
     # CORRIGE COLUNAS NUMÉRICAS
