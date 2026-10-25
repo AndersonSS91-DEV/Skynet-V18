@@ -5859,52 +5859,52 @@ Home {home_emoji}   x   Away {away_emoji}
 
             _extras = df_base[_cols_achadas].copy()
 
-    # Obrigatório: data/hora nos dois arquivos
-    if "Hour" not in df_clean.columns or "Hour" not in _extras.columns:
-        st.error("Coluna Hour ausente. Não é seguro associar as classificações.")
-        st.stop()
+            # Obrigatório: data/hora nos dois arquivos
+            if "Hour" not in df_clean.columns or "Hour" not in _extras.columns:
+                st.error("Coluna Hour ausente. Não é seguro associar as classificações.")
+                st.stop()
 
-    for _df in (df_clean, _extras):
-        _df["_chave_jogo"] = (
-            _df["Home_Team"].astype(str).str.strip().str.casefold()
-            + " x " +
-            _df["Visitor_Team"].astype(str).str.strip().str.casefold()
-        )
+            for _df in (df_clean, _extras):
+                _df["_chave_jogo"] = (
+                    _df["Home_Team"].astype(str).str.strip().str.casefold()
+                    + " x " +
+                    _df["Visitor_Team"].astype(str).str.strip().str.casefold()
+                )
 
-        _df["_chave_hora"] = pd.to_datetime(
-            _df["Hour"], dayfirst=True, errors="coerce"
-        ).dt.floor("min")
+                _df["_chave_hora"] = pd.to_datetime(
+                    _df["Hour"], dayfirst=True, errors="coerce"
+                ).dt.floor("min")
 
-    # Remove registros sem data/hora válida
-    _extras = _extras.dropna(subset=["_chave_hora"])
+            # Remove registros sem data/hora válida
+            _extras = _extras.dropna(subset=["_chave_hora"])
 
-    # Impede associações ambíguas
-    _keys = ["_chave_jogo", "_chave_hora"]
-    _extras = _extras.drop_duplicates(subset=_keys, keep=False)
+            # Impede associações ambíguas
+            _keys = ["_chave_jogo", "_chave_hora"]
+            _extras = _extras.drop_duplicates(subset=_keys, keep=False)
 
-    _extras = _extras.drop(
-        columns=["Home_Team", "Visitor_Team", "Hour"]
-    )
+            _extras = _extras.drop(
+                columns=["Home_Team", "Visitor_Team", "Hour"]
+            )
 
-    _n_antes = df_clean[_keys].merge(
-        _extras[_keys], on=_keys, how="inner"
-    ).shape[0]
+            _n_antes = df_clean[_keys].merge(
+                _extras[_keys], on=_keys, how="inner"
+            ).shape[0]
 
-    df_clean = df_clean.merge(
-        _extras,
-        on=_keys,
-        how="left",
-        suffixes=("", "_csv600"),
-        validate="many_to_one"
-    )
+            df_clean = df_clean.merge(
+                _extras,
+                on=_keys,
+                how="left",
+                suffixes=("", "_csv600"),
+                validate="many_to_one"
+            )
 
-    for _pos in ("POS_H", "POS_A"):
-        _col_csv = f"{_pos}_csv600"
-        if _col_csv in df_clean.columns:
-            df_clean[_pos] = df_clean[_col_csv]
-            df_clean = df_clean.drop(columns=[_col_csv])
+            for _pos in ("POS_H", "POS_A"):
+                _col_csv = f"{_pos}_csv600"
+                if _col_csv in df_clean.columns:
+                    df_clean[_pos] = df_clean[_col_csv]
+                    df_clean = df_clean.drop(columns=[_col_csv])
 
-    df_clean = df_clean.drop(columns=_keys)
+            df_clean = df_clean.drop(columns=_keys)
 
         # =========================================
         # 🌎 COUNTRY / LEAGUE OFICIAIS DO CSV_LIMPO
