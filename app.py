@@ -345,6 +345,9 @@ if os.path.exists(CSV_BASE):
 
     df_base = carregar_csv_base(CSV_BASE, os.path.getmtime(CSV_BASE))
 
+    df_base["POS_H"] = pd.to_numeric(df_base["Classificação - Casa"], errors="coerce").astype("Int64")
+    df_base["POS_A"] = pd.to_numeric(df_base["Classificação - Casa.1"], errors="coerce").astype("Int64")
+    
     # =====================================
     # CORRIGE COLUNAS NUMÉRICAS
     # =====================================
@@ -5836,6 +5839,7 @@ Home {home_emoji}   x   Away {away_emoji}
             "Home_Team", "Visitor_Team",
             "Country", "League",
             "MGFH", "MGFA", "MGCH", "MGCA",
+            "POS_H", "POS_A",
             "MG_Global", "Média_2,5FT_Global",
             "Classificação - Casa", "Classificação - Casa.1",
             "CS 0X0", "CS 0X1", "CS 1X1", "CS 2X2", "CS 3X3",
@@ -6932,7 +6936,10 @@ Home {home_emoji}   x   Away {away_emoji}
                 if pd.notna(score_zebra)
                 else np.nan
             ),
-
+            
+            "POS_H": row.get("POS_H", pd.NA),
+            "POS_A": row.get("POS_A", pd.NA),
+            
             # 🔥 TIMES
             "Home_Team": row.get(
                 "Home_Team",
