@@ -5948,7 +5948,7 @@ Home {home_emoji}   x   Away {away_emoji}
         # comum entre as planilhas Poisson (Home_Team x Visitor_Team) e o
         # df_base (Home_Team/Visitor_Team do CSV_LIMPO), a causa costuma
         # ser grafia diferente do nome dos times entre as duas fontes.
-        if len(df_clean) > 0 and _n_antes == 0:
+        if len(df_clean) > 0 and df_clean[["POS_H", "POS_A"]].notna().any(axis=1).sum() == 0:
             st.warning(
                 "⚠️ Sinais (ranking600): nenhum dos jogos desta rodada "
                 "bateu com o histórico do df_base pela chave Home_Team + "
