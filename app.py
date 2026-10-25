@@ -347,7 +347,6 @@ if os.path.exists(CSV_BASE):
 
     df_base["POS_H"] = pd.to_numeric(df_base["POS_H"], errors="coerce")
     df_base["POS_A"] = pd.to_numeric(df_base["POS_A"], errors="coerce")
-    
     # =====================================
     # CORRIGE COLUNAS NUMÉRICAS
     # =====================================
@@ -5839,9 +5838,8 @@ Home {home_emoji}   x   Away {away_emoji}
             "Home_Team", "Visitor_Team",
             "Country", "League",
             "MGFH", "MGFA", "MGCH", "MGCA",
-            "POS_H", "POS_A",
             "MG_Global", "Média_2,5FT_Global",
-            "Classificação - Casa", "Classificação - Casa.1",
+            "Hour", "POS_H", "POS_A",
             "CS 0X0", "CS 0X1", "CS 1X1", "CS 2X2", "CS 3X3",
             "Chutes Pro Gol - Casa", "Chutes Pro Gol - Visitante",
             "Over 1,5FT - Global",
@@ -5859,29 +5857,54 @@ Home {home_emoji}   x   Away {away_emoji}
                 "vão bater (os outros continuam funcionando)."
             )
 
-        _extras = df_base[_cols_achadas].copy()
-        _extras["_chave_jogo"] = (
-            _extras["Home_Team"].astype(str).str.strip().str.lower()
+            _extras = df_base[_cols_achadas].copy()
+
+    # Obrigatório: data/hora nos dois arquivos
+    if "Hour" not in df_clean.columns or "Hour" not in _extras.columns:
+        st.error("Coluna Hour ausente. Não é seguro associar as classificações.")
+        st.stop()
+
+    for _df in (df_clean, _extras):
+        _df["_chave_jogo"] = (
+            _df["Home_Team"].astype(str).str.strip().str.casefold()
             + " x " +
-            _extras["Visitor_Team"].astype(str).str.strip().str.lower()
-        )
-        _extras = _extras.drop(columns=["Home_Team", "Visitor_Team"])
-        # se o mesmo confronto aparecer mais de uma vez no histórico,
-        # fica só com o jogo mais recente pra não duplicar linha no merge
-        _extras = _extras.drop_duplicates(subset="_chave_jogo", keep="last")
-
-        df_clean["_chave_jogo"] = (
-            df_clean["Home_Team"].astype(str).str.strip().str.lower()
-            + " x " +
-            df_clean["Visitor_Team"].astype(str).str.strip().str.lower()
+            _df["Visitor_Team"].astype(str).str.strip().str.casefold()
         )
 
-        _n_antes = df_clean["_chave_jogo"].isin(_extras["_chave_jogo"]).sum()
+        _df["_chave_hora"] = pd.to_datetime(
+            _df["Hour"], dayfirst=True, errors="coerce"
+        ).dt.floor("min")
 
-        df_clean = df_clean.merge(
-            _extras, on="_chave_jogo", how="left", suffixes=("", "_csv600")
-        )
-        df_clean = df_clean.drop(columns=["_chave_jogo"])
+    # Remove registros sem data/hora válida
+    _extras = _extras.dropna(subset=["_chave_hora"])
+
+    # Impede associações ambíguas
+    _keys = ["_chave_jogo", "_chave_hora"]
+    _extras = _extras.drop_duplicates(subset=_keys, keep=False)
+
+    _extras = _extras.drop(
+        columns=["Home_Team", "Visitor_Team", "Hour"]
+    )
+
+    _n_antes = df_clean[_keys].merge(
+        _extras[_keys], on=_keys, how="inner"
+    ).shape[0]
+
+    df_clean = df_clean.merge(
+        _extras,
+        on=_keys,
+        how="left",
+        suffixes=("", "_csv600"),
+        validate="many_to_one"
+    )
+
+    for _pos in ("POS_H", "POS_A"):
+        _col_csv = f"{_pos}_csv600"
+        if _col_csv in df_clean.columns:
+            df_clean[_pos] = df_clean[_col_csv]
+            df_clean = df_clean.drop(columns=[_col_csv])
+
+    df_clean = df_clean.drop(columns=_keys)
 
         # =========================================
         # 🌎 COUNTRY / LEAGUE OFICIAIS DO CSV_LIMPO
