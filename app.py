@@ -6979,7 +6979,7 @@ Home {home_emoji}   x   Away {away_emoji}
         # =========================================
 
         lista.append({
-
+            "Hour": row.get("Hour"),
             "Home": row["Home"],
             "Away": row["Away"],
             
