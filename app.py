@@ -5870,6 +5870,28 @@ Home {home_emoji}   x   Away {away_emoji}
 
             _norm = lambda s: s.astype(str).str.strip().str.casefold()
 
+            # 🔧 CORREÇÃO (data): o Hour do CSV_LIMPO vem como dd/mm/aaaa e a
+            # planilha do app vem como ISO (aaaa-mm-ddTHH:MM:SS.000, às vezes
+            # com vírgula nos milissegundos). O pd.to_datetime SEM dayfirst
+            # trocava dia/mês (01/11 virava 11/jan) e zerava (NaT) todo dia
+            # > 12, então o match por data nunca batia.
+            def _parse_hour(_s):
+                _s = _s.astype(str).str.strip()
+                _iso = _s.str.match(r"^\d{4}-\d{2}-\d{2}")
+                _out = pd.Series(pd.NaT, index=_s.index, dtype="datetime64[ns]")
+                if _iso.any():
+                    _out[_iso] = pd.to_datetime(
+                        _s[_iso].str.slice(0, 19).str.replace("T", " ", regex=False),
+                        errors="coerce"
+                    )
+                if (~_iso).any():
+                    _out[~_iso] = pd.to_datetime(
+                        _s[~_iso], errors="coerce", dayfirst=True
+                    )
+                return _out
+
+            _nat = lambda idx: pd.Series(pd.NaT, index=idx, dtype="datetime64[ns]")
+
             _cols_pos = ["Home_Team", "Visitor_Team", "POS_H", "POS_A"]
             for _c in ("Hour", "Result Home"):
                 if _c in df_base.columns:
@@ -5891,19 +5913,16 @@ Home {home_emoji}   x   Away {away_emoji}
                 _norm(df_clean["Home_Team"]) + " x " + _norm(df_clean["Visitor_Team"])
             )
 
-            if "Hour" in _extras.columns:
-                _extras["_chave_data"] = pd.to_datetime(
-                    _extras["Hour"], errors="coerce"
-                ).dt.date
-            else:
-                _extras["_chave_data"] = pd.NaT
-
-            if "Hour" in df_clean.columns:
-                df_clean["_chave_data"] = pd.to_datetime(
-                    df_clean["Hour"], errors="coerce"
-                ).dt.date
-            else:
-                df_clean["_chave_data"] = pd.NaT
+            _extras["_dt"] = (
+                _parse_hour(_extras["Hour"]) if "Hour" in _extras.columns
+                else _nat(_extras.index)
+            )
+            df_clean["_dt"] = (
+                _parse_hour(df_clean["Hour"]) if "Hour" in df_clean.columns
+                else _nat(df_clean.index)
+            )
+            _extras["_chave_data"] = _extras["_dt"].dt.date.astype("object")
+            df_clean["_chave_data"] = df_clean["_dt"].dt.date.astype("object")
 
             df_clean = df_clean.drop(columns=["POS_H", "POS_A"], errors="ignore")
 
@@ -5918,20 +5937,42 @@ Home {home_emoji}   x   Away {away_emoji}
                 how="left", validate="many_to_one"
             )
 
-            # ---- 2) fallback (planilha sem Hour ou data não bateu):
-            # usa SOMENTE a linha ainda sem resultado (jogo vigente),
-            # nunca um jogo já disputado entre os dois times ----
-            _sem_pos = df_clean["POS_H"].isna() & df_clean["POS_A"].isna()
-            if _sem_pos.any():
+            # ---- 2) mesmo confronto, data mais próxima (até 2 dias):
+            # cobre virada de dia/fuso. Vale para jogo já disputado também
+            # (planilha do dia anterior), sem pegar confronto antigo ----
+            _sem = (
+                df_clean["POS_H"].isna() & df_clean["POS_A"].isna()
+                & df_clean["_dt"].notna()
+            )
+            if _sem.any():
+                _cand = df_clean.loc[_sem, ["_chave_jogo", "_dt"]].reset_index().merge(
+                    _extras.dropna(subset=["_dt"])[
+                        ["_chave_jogo", "_dt", "POS_H", "POS_A"]
+                    ].rename(columns={"_dt": "_dt_c", "POS_H": "_PH", "POS_A": "_PA"}),
+                    on="_chave_jogo", how="inner"
+                )
+                _cand["_gap"] = (_cand["_dt"] - _cand["_dt_c"]).abs()
+                _cand = (
+                    _cand[_cand["_gap"] <= pd.Timedelta(days=2)]
+                    .sort_values("_gap")
+                    .drop_duplicates("index")
+                )
+                df_clean.loc[_cand["index"], "POS_H"] = _cand["_PH"].values
+                df_clean.loc[_cand["index"], "POS_A"] = _cand["_PA"].values
+
+            # ---- 3) fallback (planilha sem Hour): usa SOMENTE a linha ainda
+            # sem resultado (jogo vigente), nunca um jogo já disputado ----
+            _sem = (
+                df_clean["POS_H"].isna() & df_clean["POS_A"].isna()
+                & df_clean["_dt"].isna()
+            )
+            if _sem.any():
                 _ex2 = _extras
                 if "Result Home" in _ex2.columns:
                     _ex2 = _ex2[
                         pd.to_numeric(_ex2["Result Home"], errors="coerce").isna()
                     ]
-                if "Hour" in _ex2.columns:
-                    _ex2 = _ex2.assign(
-                        _h=pd.to_datetime(_ex2["Hour"], errors="coerce")
-                    ).sort_values("_h")
+                _ex2 = _ex2.sort_values("_dt")
                 _ex2 = (
                     _ex2.drop_duplicates(subset=["_chave_jogo"], keep="last")
                     [["_chave_jogo", "POS_H", "POS_A"]]
@@ -5947,7 +5988,7 @@ Home {home_emoji}   x   Away {away_emoji}
             df_clean["POS_H"] = pd.to_numeric(df_clean["POS_H"], errors="coerce").astype("Int64")
             df_clean["POS_A"] = pd.to_numeric(df_clean["POS_A"], errors="coerce").astype("Int64")
 
-            df_clean = df_clean.drop(columns=["_chave_jogo", "_chave_data"])
+            df_clean = df_clean.drop(columns=["_chave_jogo", "_chave_data", "_dt"])
         
         # =========================================
         # 🌎 COUNTRY / LEAGUE OFICIAIS DO CSV_LIMPO
