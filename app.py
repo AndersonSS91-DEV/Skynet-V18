@@ -5490,8 +5490,8 @@ def filtro_lay_away(row):
     # classificação do VISITANTE (cabeçalho duplicado no CSV original
     # virou ".1" no pandas).
     efic_a = _num(row.get("Eficiência_A"))
-    class_casa = _num(row.get("Classificação - Casa"))
-    class_visit = _num(row.get("Classificação - Casa.1"))
+    class_casa = _num(row.get("Classificação - Casa", row.get("POS_H")))
+    class_visit = _num(row.get("Classificação - Casa.1", row.get("POS_A")))
     odd = _num(row.get("Odds_Visitante"))
     return (efic_a <= 51.500) and (class_casa <= 5.500) and (class_visit > 8.500) and (3.00 <= odd <= 18.00)
     # TREINO n=1879 wr=90,5% | TESTE n=387 wr=84,8% (base~74-78%)
@@ -5528,8 +5528,8 @@ def filtro_lay_home(row):
     # espelho do Lay Away: "Classificação - Casa.1" no CSV_LIMPO é, na
     # prática, a classificação do VISITANTE (cabeçalho duplicado no
     # CSV original virou ".1" no pandas).
-    class_visit = _num(row.get("Classificação - Casa.1"))
-    class_casa = _num(row.get("Classificação - Casa"))
+    class_visit = _num(row.get("Classificação - Casa.1", row.get("POS_A")))
+    class_casa = _num(row.get("Classificação - Casa", row.get("POS_H")))
     odd = _num(row.get("Odds_Casa"))
     return (class_visit <= 5.500) and (class_casa > 8.500) and (1.80 <= odd <= 8.00)
     # TREINO n=1455 wr=70,3% | TESTE n=337 wr=70,0% (base~50-52%)
@@ -5870,11 +5870,6 @@ Home {home_emoji}   x   Away {away_emoji}
 
             _norm = lambda s: s.astype(str).str.strip().str.casefold()
 
-            # 🔧 CORREÇÃO (data): o Hour do CSV_LIMPO vem como dd/mm/aaaa e a
-            # planilha do app vem como ISO (aaaa-mm-ddTHH:MM:SS.000, às vezes
-            # com vírgula nos milissegundos). O pd.to_datetime SEM dayfirst
-            # trocava dia/mês (01/11 virava 11/jan) e zerava (NaT) todo dia
-            # > 12, então o match por data nunca batia.
             def _parse_hour(_s):
                 _s = _s.astype(str).str.strip()
                 _iso = _s.str.match(r"^\d{4}-\d{2}-\d{2}")
@@ -5892,19 +5887,34 @@ Home {home_emoji}   x   Away {away_emoji}
 
             _nat = lambda idx: pd.Series(pd.NaT, index=idx, dtype="datetime64[ns]")
 
-            _cols_pos = ["Home_Team", "Visitor_Team", "POS_H", "POS_A"]
-            for _c in ("Hour", "Result Home"):
-                if _c in df_base.columns:
-                    _cols_pos.append(_c)
+            # =========================================================
+            # 🔧 RESTAURADO — traz TODAS as colunas do df_base que os filtros
+            # de Sinais precisam (CS 0X0, MG_Global, Chutes Pro Gol, FAA...).
+            # Quando a coluna já existe na planilha Poisson, a do CSV entra
+            # com o sufixo "_csv600" (os filtros leem FAA_csv600, FDA_csv600,
+            # FDH_csv600 e o bloco Country/League mais abaixo lê *_csv600).
+            # POS_H/POS_A continuam vindo do jogo vigente (mesma data).
+            # =========================================================
+            df_clean = df_clean.drop(columns=["POS_H", "POS_A"], errors="ignore")
 
-            _extras = df_base[_cols_pos].copy()
+            _src_cols = [
+                c for c in _cols_achadas
+                if c not in ("Home_Team", "Visitor_Team", "Hour")
+            ]
+            _ren = {
+                c: (c + "_csv600" if (c in df_clean.columns and c not in ("POS_H", "POS_A")) else c)
+                for c in _src_cols
+            }
+            _pay = list(_ren.values())
+
+            _cols_ex = ["Home_Team", "Visitor_Team"] + _src_cols
+            for _c in ("Hour", "Result Home"):
+                if _c in df_base.columns and _c not in _cols_ex:
+                    _cols_ex.append(_c)
+
+            _extras = df_base[_cols_ex].copy().rename(columns=_ren)
             _extras["POS_H"] = pd.to_numeric(_extras["POS_H"], errors="coerce")
             _extras["POS_A"] = pd.to_numeric(_extras["POS_A"], errors="coerce")
-
-            # só linhas que realmente têm classificação
-            _extras = _extras[
-                _extras["POS_H"].notna() | _extras["POS_A"].notna()
-            ].copy()
 
             _extras["_chave_jogo"] = (
                 _norm(_extras["Home_Team"]) + " x " + _norm(_extras["Visitor_Team"])
@@ -5924,14 +5934,13 @@ Home {home_emoji}   x   Away {away_emoji}
             _extras["_chave_data"] = _extras["_dt"].dt.date.astype("object")
             df_clean["_chave_data"] = df_clean["_dt"].dt.date.astype("object")
 
-            df_clean = df_clean.drop(columns=["POS_H", "POS_A"], errors="ignore")
-
             # ---- 1) match exato: confronto + data do jogo ----
             _ex1 = (
                 _extras.dropna(subset=["_chave_data"])
                 .drop_duplicates(subset=["_chave_jogo", "_chave_data"], keep="last")
-                [["_chave_jogo", "_chave_data", "POS_H", "POS_A"]]
+                [["_chave_jogo", "_chave_data"] + _pay]
             )
+            _ex1["_achou"] = 1
             df_clean = df_clean.merge(
                 _ex1, on=["_chave_jogo", "_chave_data"],
                 how="left", validate="many_to_one"
@@ -5940,15 +5949,12 @@ Home {home_emoji}   x   Away {away_emoji}
             # ---- 2) mesmo confronto, data mais próxima (até 2 dias):
             # cobre virada de dia/fuso. Vale para jogo já disputado também
             # (planilha do dia anterior), sem pegar confronto antigo ----
-            _sem = (
-                df_clean["POS_H"].isna() & df_clean["POS_A"].isna()
-                & df_clean["_dt"].notna()
-            )
+            _sem = df_clean["_achou"].isna() & df_clean["_dt"].notna()
             if _sem.any():
                 _cand = df_clean.loc[_sem, ["_chave_jogo", "_dt"]].reset_index().merge(
                     _extras.dropna(subset=["_dt"])[
-                        ["_chave_jogo", "_dt", "POS_H", "POS_A"]
-                    ].rename(columns={"_dt": "_dt_c", "POS_H": "_PH", "POS_A": "_PA"}),
+                        ["_chave_jogo", "_dt"] + _pay
+                    ].rename(columns={"_dt": "_dt_c"}),
                     on="_chave_jogo", how="inner"
                 )
                 _cand["_gap"] = (_cand["_dt"] - _cand["_dt_c"]).abs()
@@ -5957,15 +5963,13 @@ Home {home_emoji}   x   Away {away_emoji}
                     .sort_values("_gap")
                     .drop_duplicates("index")
                 )
-                df_clean.loc[_cand["index"], "POS_H"] = _cand["_PH"].values
-                df_clean.loc[_cand["index"], "POS_A"] = _cand["_PA"].values
+                for _c in _pay:
+                    df_clean.loc[_cand["index"], _c] = _cand[_c].values
+                df_clean.loc[_cand["index"], "_achou"] = 1
 
             # ---- 3) fallback (planilha sem Hour): usa SOMENTE a linha ainda
             # sem resultado (jogo vigente), nunca um jogo já disputado ----
-            _sem = (
-                df_clean["POS_H"].isna() & df_clean["POS_A"].isna()
-                & df_clean["_dt"].isna()
-            )
+            _sem = df_clean["_achou"].isna() & df_clean["_dt"].isna()
             if _sem.any():
                 _ex2 = _extras
                 if "Result Home" in _ex2.columns:
@@ -5975,20 +5979,21 @@ Home {home_emoji}   x   Away {away_emoji}
                 _ex2 = _ex2.sort_values("_dt")
                 _ex2 = (
                     _ex2.drop_duplicates(subset=["_chave_jogo"], keep="last")
-                    [["_chave_jogo", "POS_H", "POS_A"]]
-                    .rename(columns={"POS_H": "_PH2", "POS_A": "_PA2"})
+                    [["_chave_jogo"] + _pay]
+                    .rename(columns={_c: _c + "__f" for _c in _pay})
                 )
                 df_clean = df_clean.merge(
                     _ex2, on="_chave_jogo", how="left", validate="many_to_one"
                 )
-                df_clean["POS_H"] = df_clean["POS_H"].fillna(df_clean["_PH2"])
-                df_clean["POS_A"] = df_clean["POS_A"].fillna(df_clean["_PA2"])
-                df_clean = df_clean.drop(columns=["_PH2", "_PA2"])
+                _sem = df_clean["_achou"].isna() & df_clean["_dt"].isna()
+                for _c in _pay:
+                    df_clean.loc[_sem, _c] = df_clean.loc[_sem, _c + "__f"]
+                df_clean = df_clean.drop(columns=[_c + "__f" for _c in _pay])
 
             df_clean["POS_H"] = pd.to_numeric(df_clean["POS_H"], errors="coerce").astype("Int64")
             df_clean["POS_A"] = pd.to_numeric(df_clean["POS_A"], errors="coerce").astype("Int64")
 
-            df_clean = df_clean.drop(columns=["_chave_jogo", "_chave_data", "_dt"])
+            df_clean = df_clean.drop(columns=["_chave_jogo", "_chave_data", "_dt", "_achou"])
         
         # =========================================
         # 🌎 COUNTRY / LEAGUE OFICIAIS DO CSV_LIMPO
