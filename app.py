@@ -7178,6 +7178,7 @@ Home {home_emoji}   x   Away {away_emoji}
             delta_if = numero("Delta_IF")
             odd_home = numero("Odds_Casa")
             pos_a = numero("POS_A")
+            pos_h = numero("POS_H")
 
             simbolos = ""
 
@@ -7187,7 +7188,7 @@ Home {home_emoji}   x   Away {away_emoji}
             if pd.notna(delta_if) and delta_if <= 0:
                 simbolos += "▲"
 
-            if pd.notna(POS_H) and delta_if => 13:
+            if pd.notna(pos_h) and delta_if => 13:
                 simbolos += "█"
 
             if pd.notna(odd_home) and pd.notna(pos_a) and odd_home >= 3.00 and pos_a <= 5:
