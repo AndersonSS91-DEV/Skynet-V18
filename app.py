@@ -7158,6 +7158,44 @@ Home {home_emoji}   x   Away {away_emoji}
             errors="coerce"
         )
 
+        # =========================================
+        # SÍMBOLOS LAY AWAY — APENAS VISUAL
+        # ○ IFH <= 40 | ▲ Delta_IF <= 0 | ■ Odds_Casa >= 3 e POS_A <= 5
+        # (precisa rodar ANTES do st.dataframe)
+        # =========================================
+        def adicionar_simbolos_la(linha):
+
+            tier = str(linha["Tier_LA"]).strip()
+
+            if not tier.startswith("LA"):
+                return tier
+
+            def numero(coluna):
+                valor = str(linha.get(coluna, "")).strip().replace(",", ".")
+                return pd.to_numeric(valor, errors="coerce")
+
+            ifh = numero("IFH")
+            delta_if = numero("Delta_IF")
+            odd_home = numero("Odds_Casa")
+            pos_a = numero("POS_A")
+
+            simbolos = ""
+
+            if pd.notna(ifh) and ifh <= 40:
+                simbolos += "○"
+
+            if pd.notna(delta_if) and delta_if <= 0:
+                simbolos += "▲"
+
+            if pd.notna(odd_home) and pd.notna(pos_a) and odd_home >= 3.00 and pos_a <= 5:
+                simbolos += "■"
+
+            return simbolos + tier
+
+        df_final_aba7["Tier_LA"] = df_final_aba7.apply(
+            adicionar_simbolos_la, axis=1
+        )
+
         st.dataframe(
             df_final_aba7,
             use_container_width=True,
@@ -7166,36 +7204,6 @@ Home {home_emoji}   x   Away {away_emoji}
     else:
 
         st.info("Sem jogos válidos após filtro")
-
-
-        # SÍMBOLOS LAY AWAY — APENAS VISUAL
-        def adicionar_simbolos_la(linha):
-
-            tier = str(linha["Tier_LA"])
-
-            if not tier.startswith("LA"):
-                return tier
-
-            def numero(coluna):
-                valor = str(linha[coluna]).strip().replace(",", ".")
-                return pd.to_numeric(valor, errors="coerce")
-
-            simbolos = ""
-
-            if numero("IFH") <= 40:
-                simbolos += "○"
-
-            if numero("Delta_IF") <= 0:
-                simbolos += "▲"
-
-            if numero("Odds_Casa") >= 3.00 and numero("POS_A") <= 5:
-                simbolos += "■"
-
-            return simbolos + tier
-
-        df_final_aba7["Tier_LA"] = df_final_aba7.apply(
-            adicionar_simbolos_la, axis=1
-        )
 
 # =========================================
 # ABA 8 — CLEAN SHEET (CS)
