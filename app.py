@@ -6630,38 +6630,32 @@ Home {home_emoji}   x   Away {away_emoji}
                                             tier_la = ""
 
 
-        # =========================================
-        # MARCADORES ADICIONAIS — TIER LAY AWAY
-        # =========================================
+
+        # MARCADORES LAY AWAY
         if isinstance(tier_la, str) and tier_la.startswith("LA"):
-
-            def valor_la(coluna):
-                valor = str(row.get(coluna, "")).strip().replace(",", ".")
-                return pd.to_numeric(valor, errors="coerce")
-
-            ifh = valor_la("IFH")
-            delta_if = valor_la("Delta_IF")
-            odd_home = valor_la("Odds_Casa")
-            pos_a = valor_la("POS_A")
 
             marcadores_la = ""
 
-            if pd.notna(ifh) and ifh <= 40:
+            ifh_la = pd.to_numeric(row.get("IFH"), errors="coerce")
+            delta_la = pd.to_numeric(row.get("Delta_IF"), errors="coerce")
+            odd_la = pd.to_numeric(row.get("Odds_Casa"), errors="coerce")
+            pos_a_la = pd.to_numeric(row.get("POS_A"), errors="coerce")
+
+            if pd.notna(ifh_la) and ifh_la <= 40:
                 marcadores_la += "○"
 
-            if pd.notna(delta_if) and delta_if <= 0:
+            if pd.notna(delta_la) and delta_la <= 0:
                 marcadores_la += "▲"
 
             if (
-                pd.notna(odd_home)
-                and pd.notna(pos_a)
-                and odd_home >= 3.00
-                and pos_a <= 5
+                pd.notna(odd_la)
+                and pd.notna(pos_a_la)
+                and odd_la >= 3.00
+                and pos_a_la <= 5
             ):
                 marcadores_la += "■"
 
             tier_la = marcadores_la + tier_la
-
 
         # =========================================
         # 🧠 TIER LAY HOME
