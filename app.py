@@ -7187,7 +7187,7 @@ Home {home_emoji}   x   Away {away_emoji}
 
             if pd.notna(delta_if) and delta_if <= 0:
                 simbolos += "▲"
-
+            
             if pd.notna(pos_h) and delta_if => 13:
                 simbolos += "█"
 
