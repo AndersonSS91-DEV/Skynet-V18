@@ -7021,6 +7021,31 @@ Home {home_emoji}   x   Away {away_emoji}
             elif "VALUE" in tier_ha:
                 stake = 40
                 
+
+        # MARCADORES VISUAIS — SEM ALTERAR O TIER ORIGINAL
+        simbolos_la = ""
+
+        if isinstance(tier_la, str) and tier_la.startswith("LA"):
+
+            ifh_la = pd.to_numeric(row.get("IFH"), errors="coerce")
+            delta_la = pd.to_numeric(row.get("Delta_IF"), errors="coerce")
+            odd_la = pd.to_numeric(row.get("Odds_Casa"), errors="coerce")
+            pos_a_la = pd.to_numeric(row.get("POS_A"), errors="coerce")
+
+            if pd.notna(ifh_la) and ifh_la <= 40:
+                simbolos_la += "○"
+
+            if pd.notna(delta_la) and delta_la <= 0:
+                simbolos_la += "▲"
+
+            if (
+                pd.notna(odd_la)
+                and pd.notna(pos_a_la)
+                and odd_la >= 3.00
+                and pos_a_la <= 5
+            ):
+                simbolos_la += "■"
+
         # =========================================
         # 📋 APPEND FINAL
         # =========================================
@@ -7038,7 +7063,7 @@ Home {home_emoji}   x   Away {away_emoji}
             "Stake": stake,
 
             # 🔥 TIER
-            "Tier_LA": tier_la,
+            "Tier_LA": simbolos_la + tier_la,
             "Tier_LH": tier_lh,
             "Tier_HA": tier_ha,
 
