@@ -7021,32 +7021,7 @@ Home {home_emoji}   x   Away {away_emoji}
             elif "VALUE" in tier_ha:
                 stake = 40
                 
-
-        # MARCADORES VISUAIS — SEM ALTERAR O TIER ORIGINAL
-        simbolos_la = ""
-
-        if isinstance(tier_la, str) and tier_la.startswith("LA"):
-
-            ifh_la = pd.to_numeric(row.get("IFH"), errors="coerce")
-            delta_la = pd.to_numeric(row.get("Delta_IF"), errors="coerce")
-            odd_la = pd.to_numeric(row.get("Odds_Casa"), errors="coerce")
-            pos_a_la = pd.to_numeric(row.get("POS_A"), errors="coerce")
-
-            if pd.notna(ifh_la) and ifh_la <= 40:
-                simbolos_la += "○"
-
-            if pd.notna(delta_la) and delta_la <= 0:
-                simbolos_la += "▲"
-
-            if (
-                pd.notna(odd_la)
-                and pd.notna(pos_a_la)
-                and odd_la >= 3.00
-                and pos_a_la <= 5
-            ):
-                simbolos_la += "■"
-
-        # =========================================
+       # =========================================
         # 📋 APPEND FINAL
         # =========================================
 
@@ -7063,7 +7038,7 @@ Home {home_emoji}   x   Away {away_emoji}
             "Stake": stake,
 
             # 🔥 TIER
-            "Tier_LA": simbolos_la + tier_la,
+            "Tier_LA": tier_la,
             "Tier_LH": tier_lh,
             "Tier_HA": tier_ha,
 
@@ -7192,6 +7167,37 @@ Home {home_emoji}   x   Away {away_emoji}
 
         st.info("Sem jogos válidos após filtro")
 
+
+        # MARCADORES LAY AWAY — SOMENTE VISUAL
+        def marcar_la(linha):
+            tier = str(linha["Tier_LA"])
+
+            if not tier.startswith("LA"):
+                return tier
+
+            def numero(coluna):
+                valor = str(linha[coluna]).replace(",", ".")
+                return pd.to_numeric(valor, errors="coerce")
+
+            simbolos = ""
+
+            if numero("IFH") <= 40:
+                simbolos += "○"
+
+            if numero("Delta_IF") <= 0:
+                simbolos += "▲"
+
+            if (
+                numero("Odds_Casa") >= 3.00
+                and numero("POS_A") <= 5
+            ):
+                simbolos += "■"
+
+            return simbolos + tier
+
+        df_final_aba7["Tier_LA"] = df_final_aba7.apply(
+            marcar_la, axis=1
+        )
 
 # =========================================
 # ABA 8 — CLEAN SHEET (CS)
