@@ -7168,15 +7168,16 @@ Home {home_emoji}   x   Away {away_emoji}
         st.info("Sem jogos válidos após filtro")
 
 
-        # MARCADORES LAY AWAY — SOMENTE VISUAL
-        def marcar_la(linha):
+        # SÍMBOLOS LAY AWAY — APENAS VISUAL
+        def adicionar_simbolos_la(linha):
+
             tier = str(linha["Tier_LA"])
 
             if not tier.startswith("LA"):
                 return tier
 
             def numero(coluna):
-                valor = str(linha[coluna]).replace(",", ".")
+                valor = str(linha[coluna]).strip().replace(",", ".")
                 return pd.to_numeric(valor, errors="coerce")
 
             simbolos = ""
@@ -7187,16 +7188,13 @@ Home {home_emoji}   x   Away {away_emoji}
             if numero("Delta_IF") <= 0:
                 simbolos += "▲"
 
-            if (
-                numero("Odds_Casa") >= 3.00
-                and numero("POS_A") <= 5
-            ):
+            if numero("Odds_Casa") >= 3.00 and numero("POS_A") <= 5:
                 simbolos += "■"
 
             return simbolos + tier
 
         df_final_aba7["Tier_LA"] = df_final_aba7.apply(
-            marcar_la, axis=1
+            adicionar_simbolos_la, axis=1
         )
 
 # =========================================
