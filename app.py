@@ -7189,7 +7189,7 @@ Home {home_emoji}   x   Away {away_emoji}
                 simbolos += "▲"
             
             if pd.notna(pos_h) and pos_h >= 13:
-                simbolos += "█"
+                simbolos += "♦"
 
             if pd.notna(odd_home) and pd.notna(pos_a) and odd_home >= 3.00 and pos_a <= 5:
                 simbolos += "■"
