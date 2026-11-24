@@ -3231,8 +3231,8 @@ with tab1:
         elif "⭐" in _resumo_tier_la:
             _resumo_frases_sinal.append(("Lay Away ⭐⭐⭐⭐⭐", "#4ade80"))
     if _resumo_tier_lh:
-        if "💜" in _resumo_tier_lh:
-            _resumo_frases_sinal.append(("Lay Home - Atenção!", "#a78bfa"))
+        if "🧡" in _resumo_tier_lh:
+            _resumo_frases_sinal.append(("Lay Home - Atenção!", "#fb923c"))
         elif "⭐" in _resumo_tier_lh:
             _resumo_frases_sinal.append(("Lay Home ⭐⭐⭐⭐⭐", "#60a5fa"))
 
@@ -6434,11 +6434,13 @@ Home {home_emoji}   x   Away {away_emoji}
                 CV_CG_H_01 <= 0.80
             )
 
-        if home_is_rocket():
+        elite_bloqueado_lh = (
+            passou_filtro_lh
+            and
+            (home_is_rocket() or home_is_volcano())
+        )
 
-            passou_filtro_lh = False
-
-        if home_is_volcano():
+        if home_is_rocket() or home_is_volcano():
 
             passou_filtro_lh = False
 
@@ -6633,10 +6635,13 @@ Home {home_emoji}   x   Away {away_emoji}
         # =========================================
         # 🧠 TIER LAY HOME
         # =========================================
-
         tier_lh = ""
 
-        if passou_filtro_lh:
+        if (
+            not blacklist_absoluta
+            and
+            (passou_filtro_lh or elite_bloqueado_lh)
+        ):
 
             if "lay home" in dir_ia.lower():
 
@@ -6713,6 +6718,24 @@ Home {home_emoji}   x   Away {away_emoji}
                                         tier_lh
                                     ).strip()
 
+                                    # 🧡 ELITE BLOQUEADO LH
+                                    if elite_bloqueado_lh:
+
+                                        if "⭐⭐⭐⭐⭐" in tier_lh:
+
+                                            tier_lh = "LH🧡🧡🧡🧡🧡"
+
+                                        elif "⭐⭐⭐" in tier_lh:
+
+                                            tier_lh = "LH🧡🧡🧡"
+
+                                        elif "⭐" in tier_lh:
+
+                                            tier_lh = "LH🧡"
+
+                                        else:
+
+                                            tier_lh = ""
         # =========================================
         # 🧠 TIER HANDICAP VALUE
         # =========================================
