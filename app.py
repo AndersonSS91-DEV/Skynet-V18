@@ -7220,9 +7220,47 @@ Home {home_emoji}   x   Away {away_emoji}
             return simbolos + tier
 
         df_final_aba7["Tier_LA"] = df_final_aba7.apply(
-            adicionar_simbolos_la, axis=1
-        )
+            adicionar_simbolos_la, axis=1)
+        
+        # =========================================
+        # SÍMBOLOS LAY HOME — APENAS VISUAL
+        # =========================================
+        def adicionar_simbolos_lh(linha):
 
+            tier = str(linha["Tier_LH"]).strip()
+
+            if not tier.startswith("LH"):
+                return tier
+
+            def numero(coluna):
+                valor = str(linha.get(coluna, "")).strip().replace(",", ".")
+                return pd.to_numeric(valor, errors="coerce")
+
+            ifa = numero("IFA")
+            delta_if = numero("Delta_IF")
+            odd_away = numero("Odds_Visitante")
+            pos_a = numero("POS_A")
+            pos_h = numero("POS_H")
+
+            simbolos = ""
+
+            if pd.notna(ifa) and ifa <= 40:
+                simbolos += "○"
+
+            if pd.notna(delta_if) and delta_if >= 0:
+                simbolos += "▲"
+
+            if pd.notna(pos_a) and pos_a >= 13:
+                simbolos += "♦"
+
+            if pd.notna(odd_away) and pd.notna(pos_h) and odd_away >= 3.00 and pos_h <= 5:
+                simbolos += "■"
+
+            return simbolos + tier
+
+        df_final_aba7["Tier_LH"] = df_final_aba7.apply(
+            adicionar_simbolos_lh, axis=1)
+        
         st.dataframe(
             df_final_aba7,
             use_container_width=True,
